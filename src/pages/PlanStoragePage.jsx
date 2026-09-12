@@ -72,9 +72,9 @@ export default function PlanStoragePage({ setCurrentRoute }) {
               bottom: 16,
               left: 16,
               right: 16,
-              background: 'rgba(15, 23, 42, 0.75)',
+              background: 'rgba(15, 23, 42, 0.85)',
               backdropFilter: 'blur(8px)',
-              padding: '10px 18px',
+              padding: '12px 18px',
               borderRadius: 'var(--radius-md)',
               display: 'flex',
               alignItems: 'center',
@@ -84,7 +84,7 @@ export default function PlanStoragePage({ setCurrentRoute }) {
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700 }}>
                 <Sparkles size={16} color="#38bdf8" />
-                <span>PLAN 02 完成予想パース：斜め境界にジャストフィット × 片流れ屋根 × 直角台形ガレージ</span>
+                <span>PLAN 02：屋根・外壁ガルバリウム鋼板仕上げ × 軒の出ゼロ・シャープ納まり × 変形地台形</span>
               </div>
               <span style={{ fontSize: 11, color: '#94a3b8' }}>シミュレーターでこの形状からカスタマイズ可能</span>
             </div>

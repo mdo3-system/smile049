@@ -73,9 +73,9 @@ export default function PlanAgriPage({ setCurrentRoute }) {
               bottom: 16,
               left: 16,
               right: 16,
-              background: 'rgba(15, 23, 42, 0.75)',
+              background: 'rgba(15, 23, 42, 0.85)',
               backdropFilter: 'blur(8px)',
-              padding: '10px 18px',
+              padding: '12px 18px',
               borderRadius: 'var(--radius-md)',
               display: 'flex',
               alignItems: 'center',
@@ -85,7 +85,7 @@ export default function PlanAgriPage({ setCurrentRoute }) {
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700 }}>
                 <Sparkles size={16} color="#38bdf8" />
-                <span>PLAN 03 完成予想パース：大型トラス構法 × 高天井 × トラクター乗入れ大開口倉庫</span>
+                <span>PLAN 03：外壁ガルバリウム鋼板仕上げ × 迫力の大型木造トラス構法 × トラクター大開口倉庫</span>
               </div>
               <span style={{ fontSize: 11, color: '#94a3b8' }}>シミュレーターでこの形状からカスタマイズ可能</span>
             </div>

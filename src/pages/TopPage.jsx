@@ -674,7 +674,7 @@ export default function TopPage({ setCurrentRoute }) {
               </div>
               <div style={{ padding: '24px 24px 0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-primary)' }}>木造ピット × 梁現し自由設計</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-primary)' }}>屋根外壁ガルバリウム × 軒ゼロシャープ設計</span>
                   <Car size={20} color="var(--color-primary)" />
                 </div>
                 <h3 style={{ fontSize: 19, marginBottom: 8, color: 'var(--text-main)', lineHeight: 1.4 }}>
@@ -682,7 +682,7 @@ export default function TopPage({ setCurrentRoute }) {
                   【愛車・大型バイク・ホビー】
                 </h3>
                 <p style={{ fontSize: 13.5, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 20 }}>
-                  「自分が一番長くいたくなる場所」を設計。無垢の木に囲まれた落ち着いた空間で愛車と過ごす時間を創ります。壁面全面がカスタムベース。
+                  「自分が一番長くいたくなる場所」を設計。屋根・外壁ガルバリウム鋼板仕上げと軒ゼロのシャープな外観、内部は温もりある木造梁現し。
                 </p>
               </div>
             </div>
@@ -730,7 +730,7 @@ export default function TopPage({ setCurrentRoute }) {
               </div>
               <div style={{ padding: '24px 24px 0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-wood)' }}>斜め境界・台形敷地ジャストフィット</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-wood)' }}>ガルバリウム × 軒ゼロ台形ジャストフィット</span>
                   <Home size={20} color="var(--color-wood)" />
                 </div>
                 <h3 style={{ fontSize: 19, marginBottom: 8, color: 'var(--text-main)', lineHeight: 1.4 }}>
@@ -738,7 +738,7 @@ export default function TopPage({ setCurrentRoute }) {
                   【狭小地・変形地向け特注ストッカー】
                 </h3>
                 <p style={{ fontSize: 13.5, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 20 }}>
-                  既製品では使えなかったスペースを活かし、敷地の形に合わせて収納空間をつくります。斜めの境界沿い、母屋の軒下にもぴったりフィット。
+                  既製品では使えなかったスペースを活かし、軒の出ゼロで敷地境界ギリギリまで活用。耐久ガルバリウム外壁で長く美しく保ちます。
                 </p>
               </div>
             </div>
@@ -786,7 +786,7 @@ export default function TopPage({ setCurrentRoute }) {
               </div>
               <div style={{ padding: '24px 24px 0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-accent)' }}>大型トラス × 大開口・高天井設計</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-accent)' }}>外壁ガルバリウム × 大型木造トラス構法</span>
                   <Warehouse size={20} color="var(--color-accent)" />
                 </div>
                 <h3 style={{ fontSize: 19, marginBottom: 8, color: 'var(--text-main)', lineHeight: 1.4 }}>
