@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { 
   ArrowLeft, BookOpen, Save, FolderOpen, Undo2, Redo2, 
   Camera, Eye, EyeOff, ZoomIn, HelpCircle, Layers, CheckCircle2, AlertCircle,
-  Maximize2, Compass, Move, ChevronRight, Sliders, FileText, Check, MessageSquare
+  Maximize2, Compass, Move, ChevronRight, Sliders, FileText, Check, MessageSquare, Sparkles
 } from 'lucide-react';
 import ManualModal from '../components/ManualModal';
 import ParseRequestModal from '../components/ParseRequestModal';
