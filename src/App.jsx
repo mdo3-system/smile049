@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import TopPage from './pages/TopPage';
@@ -14,11 +14,17 @@ export default function App() {
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
   const [customerModelData, setCustomerModelData] = useState(null);
 
+  // ルート変更時に100%確実にページ最上部（Y=0）へ即座にスクロールリセット
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentRoute]);
+
   const handleRouteNavigation = (route) => {
     if (route === 'chat') {
       setIsChatModalOpen(true);
       return;
     }
+    window.scrollTo(0, 0);
     setCurrentRoute(route);
   };
 
