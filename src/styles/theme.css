@@ -1,6 +1,7 @@
 /* ==========================================================================
    木造自由設計ガレージ・倉庫 デザインシステム
    トーン＆マナー: 温かみのあるアースカラー ＆ 清潔感のあるナチュラルモダン
+   スマホ利用9割前提のレスポンシブ設計
    ========================================================================== */
 
 :root {
@@ -54,6 +55,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -63,6 +65,7 @@ body {
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 h1, h2, h3, h4, .brand-font {
@@ -92,15 +95,14 @@ button {
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
   color: #ffffff;
   font-weight: 700;
-  padding: 14px 28px;
+  padding: 13px 24px;
   border-radius: var(--radius-full);
   box-shadow: 0 4px 14px rgba(45, 106, 79, 0.3);
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
   font-size: 15px;
 }
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(45, 106, 79, 0.4);
+.btn-primary:active {
+  transform: scale(0.98);
 }
 
 .btn-secondary {
@@ -112,14 +114,14 @@ button {
   color: var(--color-primary);
   border: 2px solid var(--color-primary);
   font-weight: 700;
-  padding: 12px 26px;
+  padding: 11px 22px;
   border-radius: var(--radius-full);
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
   font-size: 15px;
 }
-.btn-secondary:hover {
+.btn-secondary:active {
   background: var(--color-primary-soft);
-  transform: translateY(-2px);
+  transform: scale(0.98);
 }
 
 .btn-accent {
@@ -130,50 +132,49 @@ button {
   background: linear-gradient(135deg, var(--color-accent) 0%, #eb8a70 100%);
   color: #ffffff;
   font-weight: 700;
-  padding: 14px 28px;
+  padding: 13px 24px;
   border-radius: var(--radius-full);
   box-shadow: 0 4px 14px rgba(224, 122, 95, 0.35);
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
   font-size: 15px;
 }
-.btn-accent:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(224, 122, 95, 0.45);
+.btn-accent:active {
+  transform: scale(0.98);
 }
 
 /* セクション共通 */
 .section-container {
   max-width: 1120px;
   margin: 0 auto;
-  padding: 80px 24px;
+  padding: 70px 20px;
 }
 
 .section-header {
   text-align: center;
-  margin-bottom: 50px;
+  margin-bottom: 40px;
 }
 
 .section-tag {
   display: inline-block;
   background: var(--color-primary-soft);
   color: var(--color-primary);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
-  padding: 4px 14px;
+  padding: 4px 12px;
   border-radius: var(--radius-full);
   margin-bottom: 12px;
   letter-spacing: 0.05em;
 }
 
 .section-title {
-  font-size: 32px;
+  font-size: clamp(22px, 3.5vw, 32px);
   color: var(--text-main);
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   line-height: 1.4;
 }
 
 .section-desc {
-  font-size: 16px;
+  font-size: clamp(14px, 2vw, 16px);
   color: var(--text-muted);
   max-width: 720px;
   margin: 0 auto;
@@ -184,24 +185,22 @@ button {
   background: var(--bg-card);
   border: 1px solid var(--border-card);
   border-radius: var(--radius-lg);
-  padding: 32px;
+  padding: 24px;
   box-shadow: var(--shadow-sm);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-.nature-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* レスポンシブ対応 */
+/* スマホ最適化レスポンシブメディアクエリ */
 @media (max-width: 768px) {
   .section-container {
-    padding: 50px 16px;
+    padding: 40px 16px;
   }
-  .section-title {
-    font-size: 24px;
+  .nature-card {
+    padding: 20px 16px;
   }
-  .section-desc {
-    font-size: 14px;
+  .btn-primary, .btn-secondary, .btn-accent {
+    width: 100%;
+    padding: 13px 18px;
+    font-size: 14.5px;
   }
 }
