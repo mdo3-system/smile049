@@ -1,0 +1,2413 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>高精度 ガレージスケッチャー (Undo/Redo・車両配置・AIパース対応版)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { display: flex; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow: hidden; background: #1e293b; height: 100vh; }
+    
+    #sidebar {
+      width: 450px;
+      height: 100vh;
+      background: #f8f9fa;
+      padding: 16px;
+      overflow-y: auto;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 10;
+      flex-shrink: 0;
+    }
+    h2 { font-size: 14px; color: #1e293b; border-bottom: 2px solid #0284c7; padding-bottom: 4px; margin-top: 2px; }
+    .section-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .input-group { display: flex; flex-direction: column; gap: 3px; position: relative; }
+    label { font-size: 11px; font-weight: bold; color: #475569; }
+    input, select { padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px; outline: none; }
+    input:focus, select:focus { border-color: #0284c7; }
+    
+    .toggle-row { display: flex; flex-direction: column; gap: 6px; background: #e0f2fe; padding: 8px 10px; border-radius: 4px; border: 1px solid #bae6fd; }
+    .toggle-header { display: flex; align-items: center; justify-content: space-between; }
+    .toggle-header label { font-size: 12px; color: #0369a1; cursor: pointer; font-weight: bold; }
+    .toggle-header input[type="checkbox"] { cursor: pointer; width: 16px; height: 16px; }
+
+    .file-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .btn-file {
+      background: #475569; color: white; border: none; border-radius: 4px; padding: 8px; font-size: 12px; font-weight: bold; cursor: pointer; text-align: center;
+    }
+    .btn-file:hover { background: #334155; }
+    .btn-file-load { background: #0284c7; }
+    .btn-file-load:hover { background: #0369a1; }
+
+    .history-bar { display: flex; gap: 8px; }
+    .btn-history {
+      flex: 1; background: #e2e8f0; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px 8px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;
+    }
+    .btn-history:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-history:not(:disabled):hover { background: #cbd5e1; }
+
+    .card {
+      background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 8px; position: relative; display: flex; flex-direction: column; gap: 6px; margin-top: 4px;
+    }
+    .card.has-error { border: 2px solid #ef4444; background: #fef2f2; }
+    .error-container { display: flex; flex-direction: column; gap: 2px; }
+    .error-badge {
+      background: #ef4444; color: white; border-radius: 3px; padding: 3px 6px; font-size: 10.5px; font-weight: bold; line-height: 1.3;
+    }
+
+    .btn-delete {
+      position: absolute; top: 4px; right: 4px; background: #ef4444; color: white; border: none; border-radius: 3px; padding: 2px 6px; font-size: 10px; cursor: pointer; z-index: 5;
+    }
+    .btn-add {
+      background: #0284c7; color: white; border: none; border-radius: 4px; padding: 7px; font-weight: bold; font-size: 12px; cursor: pointer;
+    }
+    .btn-download {
+      background: #10b981; color: white; border: none; border-radius: 4px; padding: 10px; font-weight: bold; font-size: 13px; cursor: pointer;
+    }
+
+    .shelf-levels-container {
+      display: flex; flex-direction: column; gap: 4px; background: #ffffff; padding: 6px; border-radius: 4px; border: 1px solid #cbd5e1; margin-top: 4px;
+    }
+    .shelf-level-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+    .shelf-level-row input { flex: 1; padding: 3px 6px; }
+
+    .shelf-guide-badge {
+      background: #e0f2fe; border: 1px solid #bae6fd; color: #0369a1; border-radius: 4px; padding: 4px 6px; font-size: 11px; font-weight: bold; margin-top: 2px;
+    }
+
+    .calc-card {
+      background: #f8fafc; border: 1px solid #cbd5e1; border-left: 4px solid #0284c7; border-radius: 4px; padding: 8px 10px; display: flex; flex-direction: column; gap: 5px; font-size: 11px;
+    }
+    .calc-title { font-weight: bold; color: #0f172a; font-size: 12px; }
+    .calc-formula { font-family: monospace; color: #475569; font-size: 10px; background: #e2e8f0; padding: 4px 6px; border-radius: 3px; word-break: break-all; line-height: 1.4; }
+    .calc-value { font-weight: bold; color: #0284c7; font-size: 13px; text-align: right; margin-top: 2px; }
+    
+    #main-stage { flex: 1; height: 100vh; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+    
+    #tab-bar {
+      display: flex; background: #0f172a; padding: 8px 12px 0 12px; gap: 6px; border-bottom: 2px solid #334155; align-items: center; flex-shrink: 0;
+    }
+    .view-tab {
+      padding: 8px 14px; background: #1e293b; color: #94a3b8; font-size: 12px; font-weight: bold; border-radius: 6px 6px 0 0; cursor: pointer; border: none; transition: 0.15s;
+    }
+    .view-tab.active { background: #f8fafc; color: #0284c7; border-top: 3px solid #0284c7; }
+    
+    #view-helpers {
+      margin-left: auto; display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+    }
+    .btn-helper {
+      background: #334155; color: #e2e8f0; border: none; border-radius: 4px; padding: 4px 8px; font-size: 11px; font-weight: bold; cursor: pointer;
+    }
+    .btn-helper:hover { background: #475569; }
+    .btn-helper.active { background: #0284c7; color: white; }
+
+    #zoom-controls {
+      display: none; align-items: center; gap: 12px; background: #1e293b; padding: 4px 10px; border-radius: 4px;
+    }
+    .control-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #38bdf8; font-weight: bold; }
+    .control-item input[type="range"] { width: 80px; cursor: pointer; }
+    
+    #viewer-container { flex: 1; position: relative; width: 100%; height: calc(100vh - 45px); overflow: hidden; }
+    #canvas-container { width: 100%; height: 100%; }
+    #svg-container { width: 100%; height: 100%; display: none; background: #ffffff; overflow: auto; position: relative; }
+    #drawSvg { display: block; margin: auto; }
+
+    #info-tag {
+      position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.75); color: #fff; padding: 6px 12px; border-radius: 4px; font-size: 11px; pointer-events: none; z-index: 5;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+<div id="sidebar">
+  <!-- 保存・読込 & 戻る/進む -->
+  <div class="file-actions">
+    <button class="btn-file" id="saveProjectBtn">💾 設定を保存 (JSON)</button>
+    <button class="btn-file btn-file-load" id="loadProjectBtn">📂 設定を読み込む</button>
+    <input type="file" id="fileInput" accept=".json" style="display: none;">
+  </div>
+  
+  <div class="history-bar">
+    <button class="btn-history" id="undoBtn" title="Ctrl+Z">↩ 元に戻す</button>
+    <button class="btn-history" id="redoBtn" title="Ctrl+Y">↪ やり直す</button>
+  </div>
+
+  <div class="toggle-row">
+    <div class="toggle-header">
+      <label for="showDimensions">📐 3D寸法を表示する</label>
+      <input type="checkbox" id="showDimensions" checked>
+    </div>
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+      <span style="font-size: 11px; color: #0369a1; font-weight: bold;">3D文字倍率</span>
+      <input type="range" id="fontScale" min="0.5" max="2.5" step="0.1" value="1.0" style="flex:1;">
+      <span id="fontScaleVal" style="font-size: 11px; color: #0369a1; font-weight: bold; width: 28px; text-align: right;">1.0x</span>
+    </div>
+  </div>
+
+  <h2>柱芯寸法 (mm)</h2>
+  <div class="section-box">
+    <div class="grid-2">
+      <div class="input-group">
+        <label>正面幅 柱芯 (mm)</label>
+        <input type="number" id="wFront" value="5400" step="10">
+      </div>
+      <div class="input-group">
+        <label>背面幅 柱芯 (mm)</label>
+        <input type="number" id="wBack" value="5400" step="10">
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="input-group">
+        <label>左奥行 柱芯 (mm)</label>
+        <input type="number" id="dLeft" value="6000" step="10">
+      </div>
+      <div class="input-group">
+        <label>右奥行 柱芯 (mm)</label>
+        <input type="number" id="dRight" value="6000" step="10">
+      </div>
+    </div>
+    <span style="font-size:10px; color:#64748b;">※外壁ふかし+100mm / 内装仕上: 柱芯+65mm</span>
+  </div>
+
+  <h2>高さ・屋根・天井仕様</h2>
+  <div class="section-box">
+    <div class="grid-2">
+      <div class="input-group">
+        <label>水下軒高 (GL〜桁天 mm)</label>
+        <input type="number" id="eaveHeight" value="2800" step="10">
+      </div>
+      <div class="input-group">
+        <label>基礎高 (GL+ mm)</label>
+        <input type="number" id="foundationHeight" value="300" step="10">
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="input-group">
+        <label>屋根勾配 (寸)</label>
+        <input type="number" id="roofSlope" value="1.5" min="1.0" max="10.0" step="0.1">
+      </div>
+      <div class="input-group">
+        <label>水流し方向 (水上→水下)</label>
+        <select id="slopeDirection">
+          <option value="front-to-back" selected>前高・後低 (後へ流す)</option>
+          <option value="back-to-front">後高・前低 (前へ流す)</option>
+          <option value="left-to-right">左高・右低 (右へ流す)</option>
+          <option value="right-to-left">右高・左低 (左へ流す)</option>
+        </select>
+      </div>
+    </div>
+    <div class="input-group">
+      <label>天井仕様</label>
+      <select id="ceilingType">
+        <option value="open" selected>小屋組み現し (標準仕様)</option>
+        <option value="flat">フラット天井 (階高 - 320mm / PB9.5mm)</option>
+        <option value="sloped">勾配天井 (屋根なり斜め / PB9.5mm)</option>
+      </select>
+    </div>
+  </div>
+
+  <h2>開口部・建具配置（半外付け / シャッター内付け）</h2>
+  <div class="section-box">
+    <div id="openingsContainer"></div>
+    <button class="btn-add" id="addOpeningBtn">＋ 開口部を追加</button>
+  </div>
+
+  <h2>内部棚・間仕切り壁設定</h2>
+  <div class="section-box">
+    <div id="shelvesContainer"></div>
+    <button class="btn-add" id="addShelfUnitBtn">＋ 棚ユニットを追加</button>
+  </div>
+
+  <h2>🚗 車・バイク配置（AIパース生成用）</h2>
+  <div class="section-box">
+    <div id="vehiclesContainer"></div>
+    <button class="btn-add" id="addVehicleBtn">＋ 車両・バイクを追加</button>
+  </div>
+
+  <h2>📊 面積・積算数量（詳細計算式）</h2>
+  <div class="section-box" style="gap: 8px;">
+    <div class="calc-card">
+      <div class="calc-title">① 床面積 (柱芯間)</div>
+      <div class="calc-formula" id="calcFormulaFloor">-</div>
+      <div class="calc-value" id="calcValFloor">- ㎡</div>
+    </div>
+    <div class="calc-card">
+      <div class="calc-title">② 基礎長さ (外周ふかし面)</div>
+      <div class="calc-formula" id="calcFormulaFound">-</div>
+      <div class="calc-value" id="calcValFound">- m</div>
+    </div>
+    <div class="calc-card">
+      <div class="calc-title">③ 屋根実面積 (最外周ふかし・勾配加算)</div>
+      <div class="calc-formula" id="calcFormulaRoof">-</div>
+      <div class="calc-value" id="calcValRoof">- ㎡</div>
+    </div>
+    <div class="calc-card">
+      <div class="calc-title">④ サッシ・開口部面積 (算出式)</div>
+      <div class="calc-formula" id="calcFormulaOpenings">-</div>
+      <div class="calc-value" id="calcValOpenings">- ㎡</div>
+    </div>
+    <div class="calc-card">
+      <div class="calc-title">⑤ 外壁各面面積 (正・裏・右・左 算出式)</div>
+      <div class="calc-formula" id="calcFormulaWalls" style="white-space: pre-line;">-</div>
+      <div class="calc-value" id="calcValWalls">- ㎡</div>
+    </div>
+  </div>
+
+  <button class="btn-download" id="downloadBtn">📸 表示中の画面を画像保存 (AI生成用)</button>
+</div>
+
+<div id="main-stage">
+  <div id="tab-bar">
+    <button class="view-tab active" data-view="3d">🏠 3Dパース</button>
+    <button class="view-tab" data-view="plan">📐 平面図</button>
+    <button class="view-tab" data-view="front-elev">🏛 正立面図</button>
+    <button class="view-tab" data-view="back-elev">🏛 裏立面図</button>
+    <button class="view-tab" data-view="left-elev">🏛 左側立面図</button>
+    <button class="view-tab" data-view="right-elev">🏛 右側立面図</button>
+    
+    <div id="view-helpers">
+      <button class="btn-helper" id="seeThroughBtn">透視モード: OFF</button>
+      <button class="btn-helper" id="insideCamBtn">内観視点</button>
+    </div>
+
+    <div id="zoom-controls">
+      <div class="control-item">
+        <span>図面縮尺:</span>
+        <input type="range" id="zoomRange" min="0.5" max="2.0" step="0.05" value="1.0">
+        <span id="zoomVal" style="width: 34px;">100%</span>
+      </div>
+      <div class="control-item">
+        <span>寸法文字:</span>
+        <input type="range" id="dimFontRange" min="0.6" max="2.5" step="0.1" value="1.0">
+        <span id="dimFontVal" style="width: 28px;">1.0x</span>
+      </div>
+      <button id="resetZoomBtn" style="padding: 2px 6px; font-size: 10px; background: #0284c7; color: white; border: none; border-radius: 3px; cursor: pointer;">リセット</button>
+    </div>
+  </div>
+
+  <div id="viewer-container">
+    <div id="canvas-container"></div>
+    <div id="svg-container">
+      <svg id="drawSvg"></svg>
+    </div>
+    <div id="info-tag">ドラッグ: 回転 | 右ドラッグ: 平行移動 | ホイール: ズーム</div>
+  </div>
+</div>
+
+<script>
+  let currentView = '3d';
+  const WALL_OUTER_OFFSET = 100;
+  const WALL_INNER_OFFSET = 65;
+  let svgZoom = 1.0;
+  let dimFontScale = 1.0;
+  let isSeeThrough = false;
+
+  // -------------------------------------------------------------
+  // Undo / Redo 履歴スタック管理
+  // -------------------------------------------------------------
+  const historyStack = [];
+  let historyIndex = -1;
+  const MAX_HISTORY = 30;
+
+  function getCurrentState() {
+    return JSON.stringify({
+      dimensions: {
+        wFront: parseFloat(document.getElementById('wFront').value) || 5400,
+        wBack: parseFloat(document.getElementById('wBack').value) || 5400,
+        dLeft: parseFloat(document.getElementById('dLeft').value) || 6000,
+        dRight: parseFloat(document.getElementById('dRight').value) || 6000,
+        eaveHeight: parseFloat(document.getElementById('eaveHeight').value) || 2800,
+        foundationHeight: parseFloat(document.getElementById('foundationHeight').value) || 300,
+        roofSlope: parseFloat(document.getElementById('roofSlope').value) || 1.5,
+        slopeDirection: document.getElementById('slopeDirection').value,
+        ceilingType: document.getElementById('ceilingType').value
+      },
+      openings: JSON.parse(JSON.stringify(openings)),
+      shelfUnits: JSON.parse(JSON.stringify(shelfUnits)),
+      vehicles: JSON.parse(JSON.stringify(vehicles))
+    });
+  }
+
+  function pushHistory() {
+    const state = getCurrentState();
+    if (historyIndex >= 0 && historyStack[historyIndex] === state) return;
+    // 分岐を破棄して新規追加
+    historyStack.splice(historyIndex + 1);
+    historyStack.push(state);
+    if (historyStack.length > MAX_HISTORY) historyStack.shift();
+    historyIndex = historyStack.length - 1;
+    updateHistoryButtons();
+  }
+
+  function applyState(stateStr) {
+    const data = JSON.parse(stateStr);
+    if (data.dimensions) {
+      document.getElementById('wFront').value = data.dimensions.wFront;
+      document.getElementById('wBack').value = data.dimensions.wBack;
+      document.getElementById('dLeft').value = data.dimensions.dLeft;
+      document.getElementById('dRight').value = data.dimensions.dRight;
+      document.getElementById('eaveHeight').value = data.dimensions.eaveHeight;
+      document.getElementById('foundationHeight').value = data.dimensions.foundationHeight;
+      document.getElementById('roofSlope').value = data.dimensions.roofSlope;
+      document.getElementById('slopeDirection').value = data.dimensions.slopeDirection;
+      document.getElementById('ceilingType').value = data.dimensions.ceilingType;
+    }
+    openings = data.openings || [];
+    shelfUnits = data.shelfUnits || [];
+    vehicles = data.vehicles || [];
+
+    renderOpeningsUI();
+    renderShelvesUI();
+    renderVehiclesUI();
+    updateModel();
+    updateHistoryButtons();
+  }
+
+  function undo() {
+    if (historyIndex > 0) {
+      historyIndex--;
+      applyState(historyStack[historyIndex]);
+    }
+  }
+
+  function redo() {
+    if (historyIndex < historyStack.length - 1) {
+      historyIndex++;
+      applyState(historyStack[historyIndex]);
+    }
+  }
+
+  function updateHistoryButtons() {
+    document.getElementById('undoBtn').disabled = (historyIndex <= 0);
+    document.getElementById('redoBtn').disabled = (historyIndex >= historyStack.length - 1);
+  }
+
+  document.getElementById('undoBtn').addEventListener('click', undo);
+  document.getElementById('redoBtn').addEventListener('click', redo);
+  window.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+      if (e.shiftKey) redo(); else undo();
+      e.preventDefault();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+      redo();
+      e.preventDefault();
+    }
+  });
+
+  // -------------------------------------------------------------
+  // 初期データ（開口部・棚・車両）
+  // -------------------------------------------------------------
+  let opIdCounter = 1;
+  let openings = [
+    { id: opIdCounter++, wall: 'front', type: 'shutter', width: 2400, height: 2200, clearanceLeft: 100, distFromLeft: 1300, topHeightGL: 2250, openRatio: 0 },
+    { id: opIdCounter++, wall: 'front', type: 'shutter', width: 2400, height: 2200, clearanceLeft: 2900, distFromLeft: 4100, topHeightGL: 2250, openRatio: 0 }
+  ];
+
+  let shelfUnits = [
+    {
+      wall: 'back',
+      distFromLeft: 200,
+      width: 4500,
+      depth: 500,
+      levels: [450, 900, 1350, 1800]
+    }
+  ];
+
+  let vehicleIdCounter = 1;
+  let vehicles = [
+    { id: vehicleIdCounter++, type: 'car_suv', posX: -1200, posZ: -3200, rotDeg: 0, color: '#1e293b' }
+  ];
+
+  // Three.js 初期化
+  const container = document.getElementById('canvas-container');
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xf1f5f9);
+
+  const camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 10, 100000);
+  camera.position.set(9000, 6000, 11000);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  container.appendChild(renderer.domElement);
+
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 1500, 0);
+  controls.update();
+
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+  scene.add(ambientLight);
+  const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+  dirLight.position.set(12000, 24000, 15000);
+  scene.add(dirLight);
+
+  const grid = new THREE.GridHelper(30000, 60, 0x94a3b8, 0xe2e8f0);
+  scene.add(grid);
+
+  let buildingGroup = new THREE.Group();
+  let dimGroup = new THREE.Group();
+  scene.add(buildingGroup);
+  scene.add(dimGroup);
+
+  // マテリアル
+  const wallMat = new THREE.MeshLambertMaterial({ color: 0xf8fafc, side: THREE.DoubleSide });
+  const foundationMat = new THREE.MeshLambertMaterial({ color: 0x94a3b8, side: THREE.DoubleSide });
+  const slabMat = new THREE.MeshLambertMaterial({ color: 0xcbd5e1, side: THREE.DoubleSide });
+  const roofMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
+  const ceilingMat = new THREE.MeshLambertMaterial({ color: 0xede9fe, side: THREE.DoubleSide });
+  const shelfWoodMat = new THREE.MeshLambertMaterial({ color: 0xd97706 });
+  const partitionMat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 });
+  const edgeLineMat = new THREE.LineBasicMaterial({ color: 0x1e293b, linewidth: 2 });
+  const dimLineMat = new THREE.LineBasicMaterial({ color: 0x0284c7, linewidth: 2 });
+  
+  const shutterMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.6 });
+  const shutterBoxMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4 });
+  const doorMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.4 });
+  const sashFrameMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.3 });
+  const windowGlassMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.1, transparent: true, opacity: 0.65 });
+
+  // 車両用マテリアル
+  const tireMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.9 });
+  const wheelMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.8, roughness: 0.2 });
+  const carGlassMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.1, metalness: 0.9 });
+  const lightHeadMat = new THREE.MeshBasicMaterial({ color: 0xffedd5 });
+  const lightTailMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+  const chromeMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.9, roughness: 0.1 });
+
+  function makeTextSprite(message, scaleFactor) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 1024; canvas.height = 256;
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+    if (ctx.roundRect) ctx.roundRect(16, 16, 992, 224, 28); else ctx.rect(16, 16, 992, 224);
+    ctx.fill();
+    ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 10; ctx.stroke();
+    ctx.font = 'bold 84px sans-serif'; ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(message, 512, 128);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.minFilter = THREE.LinearFilter;
+    const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, depthTest: false }));
+    sprite.scale.set(1800 * scaleFactor, 450 * scaleFactor, 1);
+    return sprite;
+  }
+
+  function addDimensionSegment(pA, pB, labelText, offsetVec, scaleFactor) {
+    const start = pA.clone().add(offsetVec);
+    const end = pB.clone().add(offsetVec);
+    dimGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([start, end]), dimLineMat));
+    dimGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([pA, start]), dimLineMat));
+    dimGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([pB, end]), dimLineMat));
+    const dir = new THREE.Vector3().subVectors(end, start).normalize();
+    let tickNormal = new THREE.Vector3(0, 1, 0);
+    if (Math.abs(dir.y) > 0.9) tickNormal = new THREE.Vector3(1, 0, 0);
+    const tickLen = 120 * scaleFactor;
+    dimGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([start.clone().addScaledVector(tickNormal, tickLen), start.clone().addScaledVector(tickNormal, -tickLen)]), dimLineMat));
+    dimGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([end.clone().addScaledVector(tickNormal, tickLen), end.clone().addScaledVector(tickNormal, -tickLen)]), dimLineMat));
+    const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+    const textSprite = makeTextSprite(labelText, scaleFactor);
+    textSprite.position.copy(mid).add(new THREE.Vector3(0, 150 * scaleFactor, 0));
+    dimGroup.add(textSprite);
+  }
+
+  function getCorePoints(wFront, wBack, dLeft, dRight) {
+    const p0 = new THREE.Vector2(-wFront / 2, 0);
+    const p1 = new THREE.Vector2(wFront / 2, 0);
+    const backCenterOffset = (wFront - wBack) / 2;
+    const p2 = new THREE.Vector2(wFront / 2 - backCenterOffset, -dRight);
+    const p3 = new THREE.Vector2(-wFront / 2 + backCenterOffset, -dLeft);
+    return [p0, p1, p2, p3];
+  }
+
+  function getOffsetPoints(corePts, offset) {
+    const n = corePts.length;
+    const lines = [];
+    for (let i = 0; i < n; i++) {
+      const next = (i + 1) % n;
+      const pA = corePts[i];
+      const pB = corePts[next];
+      const v = new THREE.Vector2().subVectors(pB, pA).normalize();
+      const norm = new THREE.Vector2(-v.y, v.x);
+      lines.push({ p: new THREE.Vector2().addVectors(pA, norm.clone().multiplyScalar(offset)), v: v });
+    }
+    const outPts = [];
+    for (let i = 0; i < n; i++) {
+      const prev = (i + n - 1) % n;
+      const l1 = lines[prev]; const l2 = lines[i];
+      const det = l1.v.x * l2.v.y - l1.v.y * l2.v.x;
+      if (Math.abs(det) < 1e-6) outPts.push(corePts[i].clone());
+      else {
+        const dp = new THREE.Vector2().subVectors(l2.p, l1.p);
+        const t = (dp.x * l2.v.y - dp.y * l2.v.x) / det;
+        outPts.push(new THREE.Vector2(l1.p.x + t * l1.v.x, l1.p.y + t * l1.v.y));
+      }
+    }
+    return outPts;
+  }
+
+  function getGirderHeight(point, bounds, baseEaveH, slopeVal, dir) {
+    const slopeRatio = slopeVal / 10.0;
+    let distFromLow = 0;
+    if (dir === 'front-to-back') distFromLow = point.y - bounds.minY;
+    else if (dir === 'back-to-front') distFromLow = bounds.maxY - point.y;
+    else if (dir === 'left-to-right') distFromLow = bounds.maxX - point.x;
+    else if (dir === 'right-to-left') distFromLow = point.x - bounds.minX;
+    return baseEaveH + distFromLow * slopeRatio;
+  }
+
+  function calcPolygonArea(pts) {
+    let area = 0;
+    const n = pts.length;
+    for (let i = 0; i < n; i++) {
+      const j = (i + 1) % n;
+      area += pts[i].x * pts[j].y - pts[j].x * pts[i].y;
+    }
+    return Math.abs(area) / 2;
+  }
+
+  function getWallSpan(wallKey) {
+    const wF = parseFloat(document.getElementById('wFront').value) || 5400;
+    const wB = parseFloat(document.getElementById('wBack').value) || 5400;
+    const dL = parseFloat(document.getElementById('dLeft').value) || 6000;
+    const dR = parseFloat(document.getElementById('dRight').value) || 6000;
+    if (wallKey === 'front') return wF;
+    if (wallKey === 'right') return dR;
+    if (wallKey === 'back') return wB;
+    if (wallKey === 'left') return dL;
+    return 5400;
+  }
+
+  function isFloorLevelOpening(type) {
+    return type === 'shutter' || type === 'door' || type === 'sliding_door';
+  }
+
+  function validateOpenings() {
+    const errors = {};
+    const wallGroups = { front: [], right: [], back: [], left: [] };
+
+    openings.forEach((op) => {
+      const span = getWallSpan(op.wall);
+      const errList = [];
+
+      const clearance = parseFloat(op.clearanceLeft) || 0;
+      const w = parseFloat(op.width) || 0;
+
+      if (clearance < 100) {
+        errList.push(`⚠️ 左柱芯からの逃げは最短100mm以上必要です（現在: ${clearance}mm）`);
+      }
+
+      const rightClearance = span - (clearance + w);
+      if (rightClearance < 100) {
+        errList.push(`⚠️ 右柱芯との隙間が不足しています（右端逃げ: ${rightClearance}mm / 最低100mm必要）`);
+      }
+
+      wallGroups[op.wall].push({ id: op.id, op, start: clearance, end: clearance + w, top: op.topHeightGL, bottom: op.topHeightGL - op.height });
+      errors[op.id] = errList;
+    });
+
+    Object.keys(wallGroups).forEach(wKey => {
+      const list = wallGroups[wKey];
+      for (let i = 0; i < list.length; i++) {
+        for (let j = i + 1; j < list.length; j++) {
+          const a = list[i]; const b = list[j];
+          const isHorizOverlap = Math.max(a.start, b.start) < Math.min(a.end, b.end);
+          const isVertOverlap = Math.max(a.bottom, b.bottom) < Math.min(a.top, b.top);
+          if (isHorizOverlap && isVertOverlap) {
+            const msg = `⚠️ 開口部同士が平面的・立体的に重複しています（被り配置NG）`;
+            if (!errors[a.id].includes(msg)) errors[a.id].push(msg);
+            if (!errors[b.id].includes(msg)) errors[b.id].push(msg);
+          }
+        }
+      }
+    });
+
+    return errors;
+  }
+
+  function updateCalculations(corePts, outerPts, hPts, roofThickness, slopeVal) {
+    const wF = parseFloat(document.getElementById('wFront').value) || 5400;
+    const wB = parseFloat(document.getElementById('wBack').value) || 5400;
+    const dL = parseFloat(document.getElementById('dLeft').value) || 6000;
+    const dR = parseFloat(document.getElementById('dRight').value) || 6000;
+    const foundationH = parseFloat(document.getElementById('foundationHeight').value) || 300;
+
+    const floorAreaMm2 = calcPolygonArea(corePts);
+    const floorAreaM2 = floorAreaMm2 / 1000000;
+    const tsubo = floorAreaM2 * 0.3025;
+    document.getElementById('calcFormulaFloor').innerText = `[(間口平均 ${(wF+wB)/2}mm) × (奥行平均 ${(dL+dR)/2}mm)]`;
+    document.getElementById('calcValFloor').innerText = `${floorAreaM2.toFixed(2)} ㎡ (${tsubo.toFixed(2)} 坪)`;
+
+    const fL0 = outerPts[0].distanceTo(outerPts[1]);
+    const fL1 = outerPts[1].distanceTo(outerPts[2]);
+    const fL2 = outerPts[2].distanceTo(outerPts[3]);
+    const fL3 = outerPts[3].distanceTo(outerPts[0]);
+    const totalFoundM = (fL0 + fL1 + fL2 + fL3) / 1000;
+    document.getElementById('calcFormulaFound').innerText = `正:${(fL0/1000).toFixed(2)}m + 右:${(fL1/1000).toFixed(2)}m + 裏:${(fL2/1000).toFixed(2)}m + 左:${(fL3/1000).toFixed(2)}m`;
+    document.getElementById('calcValFound').innerText = `全周: ${totalFoundM.toFixed(2)} m`;
+
+    const roofProjMm2 = calcPolygonArea(outerPts);
+    const slopeRatio = slopeVal / 10.0;
+    const slopeFactor = Math.sqrt(1 + slopeRatio * slopeRatio);
+    const roofRealMm2 = roofProjMm2 * slopeFactor;
+    const roofRealM2 = roofRealMm2 / 1000000;
+    document.getElementById('calcFormulaRoof').innerText = `投影 ${(roofProjMm2/1000000).toFixed(2)}㎡ × 勾配係数 √[1+(${slopeVal}/10)²] (${slopeFactor.toFixed(3)})`;
+    document.getElementById('calcValRoof').innerText = `${roofRealM2.toFixed(2)} ㎡ (${(roofRealM2 * 0.3025).toFixed(2)} 坪)`;
+
+    let openAreaMap = { front: 0, right: 0, back: 0, left: 0 };
+    let openFormulas = [];
+    openings.forEach((op, i) => {
+      const a = (op.width * op.height) / 1000000;
+      openAreaMap[op.wall] += a;
+      let typeStr = '開口';
+      if (op.type === 'shutter') typeStr = 'シャッター';
+      else if (op.type === 'door') typeStr = '框ドア';
+      else if (op.type === 'sliding_door') typeStr = '片引き戸';
+      else if (op.type === 'window') typeStr = '引き違い窓';
+      else if (op.type === 'fix') typeStr = 'FIX窓';
+      openFormulas.push(`[#${i+1} ${typeStr} (${op.wall})]: ${(op.width/1000).toFixed(2)}m × ${(op.height/1000).toFixed(2)}m = ${a.toFixed(2)}㎡`);
+    });
+    const totalOpenM2 = Object.values(openAreaMap).reduce((a, b) => a + b, 0);
+    document.getElementById('calcFormulaOpenings').innerHTML = openFormulas.length > 0 ? openFormulas.join('<br>') : '開口部なし (0.00㎡)';
+    document.getElementById('calcValOpenings').innerText = `合計: ${totalOpenM2.toFixed(2)} ㎡`;
+
+    function getWallData(pA, pB, hA, hB, wallKey, nameJp) {
+      const lenM = pA.distanceTo(pB) / 1000;
+      const hEffAM = Math.max(0, hA - foundationH) / 1000;
+      const hEffBM = Math.max(0, hB - foundationH) / 1000;
+      const hAvgM = (hEffAM + hEffBM) / 2;
+      const grossM2 = hAvgM * lenM;
+      const opAreaM2 = openAreaMap[wallKey];
+      const netM2 = Math.max(0, grossM2 - opAreaM2);
+      const formulaStr = `【${nameJp}】[(${hEffAM.toFixed(2)}m + ${hEffBM.toFixed(2)}m)/2 × ${lenM.toFixed(2)}m = ${grossM2.toFixed(2)}㎡] − 開口 ${opAreaM2.toFixed(2)}㎡ ＝ ${netM2.toFixed(2)}㎡`;
+      return { gross: grossM2, net: netM2, formula: formulaStr };
+    }
+
+    const wFront = getWallData(outerPts[0], outerPts[1], hPts[0], hPts[1], 'front', '正面');
+    const wRight = getWallData(outerPts[1], outerPts[2], hPts[1], hPts[2], 'right', '右面');
+    const wBack  = getWallData(outerPts[2], outerPts[3], hPts[2], hPts[3], 'back', '裏面');
+    const wLeft  = getWallData(outerPts[3], outerPts[0], hPts[3], hPts[0], 'left', '左面');
+    const totalWallNetM2 = wFront.net + wRight.net + wBack.net + wLeft.net;
+
+    document.getElementById('calcFormulaWalls').innerHTML = [wFront.formula, wBack.formula, wRight.formula, wLeft.formula].join('<br>');
+    document.getElementById('calcValWalls').innerText = `純外壁合計: ${totalWallNetM2.toFixed(2)} ㎡`;
+  }
+
+  function createQuadMesh(p1, p2, p3, p4, mat) {
+    const geo = new THREE.BufferGeometry();
+    const verts = new Float32Array([
+      p1.x, p1.y, p1.z,  p2.x, p2.y, p2.z,  p3.x, p3.y, p3.z,
+      p1.x, p1.y, p1.z,  p3.x, p3.y, p3.z,  p4.x, p4.y, p4.z
+    ]);
+    geo.setAttribute('position', new THREE.BufferAttribute(verts, 3));
+    geo.computeVertexNormals();
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo), edgeLineMat));
+    return mesh;
+  }
+
+  function createSlidingWindowMesh(width, height) {
+    const group = new THREE.Group();
+    const frameDepth = 65;
+    const frameThick = 40;
+
+    const topFrame = new THREE.Mesh(new THREE.BoxGeometry(width, frameThick, frameDepth), sashFrameMat);
+    topFrame.position.set(0, height / 2 - frameThick / 2, 0);
+    group.add(topFrame);
+
+    const bottomFrame = new THREE.Mesh(new THREE.BoxGeometry(width, frameThick, frameDepth), sashFrameMat);
+    bottomFrame.position.set(0, -height / 2 + frameThick / 2, 0);
+    group.add(bottomFrame);
+
+    const leftFrame = new THREE.Mesh(new THREE.BoxGeometry(frameThick, height - frameThick * 2, frameDepth), sashFrameMat);
+    leftFrame.position.set(-width / 2 + frameThick / 2, 0, 0);
+    group.add(leftFrame);
+
+    const rightFrame = new THREE.Mesh(new THREE.BoxGeometry(frameThick, height - frameThick * 2, frameDepth), sashFrameMat);
+    rightFrame.position.set(width / 2 - frameThick / 2, 0, 0);
+    group.add(rightFrame);
+
+    const paneW = (width - frameThick * 2 + 30) / 2;
+    const paneH = height - frameThick * 2;
+
+    const paneLGroup = new THREE.Group();
+    const glassL = new THREE.Mesh(new THREE.BoxGeometry(paneW, paneH, 8), windowGlassMat);
+    paneLGroup.add(glassL);
+    const barL = new THREE.Mesh(new THREE.BoxGeometry(28, paneH, 22), sashFrameMat);
+    barL.position.set(paneW / 2 - 14, 0, 0);
+    paneLGroup.add(barL);
+    paneLGroup.position.set(-width / 4 + 7, 0, 10);
+    group.add(paneLGroup);
+
+    const paneRGroup = new THREE.Group();
+    const glassR = new THREE.Mesh(new THREE.BoxGeometry(paneW, paneH, 8), windowGlassMat);
+    paneRGroup.add(glassR);
+    const barR = new THREE.Mesh(new THREE.BoxGeometry(28, paneH, 22), sashFrameMat);
+    barR.position.set(-paneW / 2 + 14, 0, 0);
+    paneRGroup.add(barR);
+    paneRGroup.position.set(width / 4 - 7, 0, -10);
+    group.add(paneRGroup);
+
+    return group;
+  }
+
+  function createFixWindowMesh(width, height) {
+    const group = new THREE.Group();
+    const frameDepth = 60;
+    const frameThick = 35;
+
+    const topFrame = new THREE.Mesh(new THREE.BoxGeometry(width, frameThick, frameDepth), sashFrameMat);
+    topFrame.position.set(0, height / 2 - frameThick / 2, 0);
+    group.add(topFrame);
+
+    const bottomFrame = new THREE.Mesh(new THREE.BoxGeometry(width, frameThick, frameDepth), sashFrameMat);
+    bottomFrame.position.set(0, -height / 2 + frameThick / 2, 0);
+    group.add(bottomFrame);
+
+    const leftFrame = new THREE.Mesh(new THREE.BoxGeometry(frameThick, height - frameThick * 2, frameDepth), sashFrameMat);
+    leftFrame.position.set(-width / 2 + frameThick / 2, 0, 0);
+    group.add(leftFrame);
+
+    const rightFrame = new THREE.Mesh(new THREE.BoxGeometry(frameThick, height - frameThick * 2, frameDepth), sashFrameMat);
+    rightFrame.position.set(width / 2 - frameThick / 2, 0, 0);
+    group.add(rightFrame);
+
+    const glass = new THREE.Mesh(new THREE.BoxGeometry(width - frameThick * 2, height - frameThick * 2, 8), windowGlassMat);
+    glass.position.set(0, 0, 0);
+    group.add(glass);
+
+    return group;
+  }
+
+  // -------------------------------------------------------------
+  // AIフォトリアル認識用 車両・バイク立体モデリング生成
+  // -------------------------------------------------------------
+  function createVehicleMesh(type, bodyColorHex) {
+    const group = new THREE.Group();
+    const bodyColorMat = new THREE.MeshStandardMaterial({ color: bodyColorHex, roughness: 0.2, metalness: 0.7 });
+
+    if (type === 'car_suv') {
+      // SUV: 全長4800, 全幅1850, 全高1750
+      const bodyBase = new THREE.Mesh(new THREE.BoxGeometry(1850, 650, 4800), bodyColorMat);
+      bodyBase.position.y = 350 + 650 / 2;
+      group.add(bodyBase);
+
+      const cabin = new THREE.Mesh(new THREE.BoxGeometry(1650, 750, 2700), carGlassMat);
+      cabin.position.set(0, 1000 + 750 / 2, -200);
+      group.add(cabin);
+
+      const roof = new THREE.Mesh(new THREE.BoxGeometry(1670, 60, 2720), bodyColorMat);
+      roof.position.set(0, 1750 + 30, -200);
+      group.add(roof);
+
+      // タイヤ4輪 (半径360, 幅240)
+      [[-880, 360, 1400], [880, 360, 1400], [-880, 360, -1400], [880, 360, -1400]].forEach(pos => {
+        const tire = new THREE.Mesh(new THREE.CylinderGeometry(360, 360, 240, 24), tireMat);
+        tire.rotation.z = Math.PI / 2;
+        tire.position.set(pos[0], pos[1], pos[2]);
+        const wheel = new THREE.Mesh(new THREE.CylinderGeometry(220, 220, 245, 16), wheelMat);
+        wheel.rotation.z = Math.PI / 2;
+        wheel.position.set(pos[0], pos[1], pos[2]);
+        group.add(tire);
+        group.add(wheel);
+      });
+
+      // ヘッドライト・テールランプ
+      const hl1 = new THREE.Mesh(new THREE.BoxGeometry(320, 120, 20), lightHeadMat);
+      hl1.position.set(-600, 750, 2400); group.add(hl1);
+      const hl2 = hl1.clone(); hl2.position.x = 600; group.add(hl2);
+
+      const tl1 = new THREE.Mesh(new THREE.BoxGeometry(320, 100, 20), lightTailMat);
+      tl1.position.set(-600, 850, -2400); group.add(tl1);
+      const tl2 = tl1.clone(); tl2.position.x = 600; group.add(tl2);
+
+    } else if (type === 'car_sport') {
+      // スポーツカー: 全長4500, 全幅1850, 全高1280
+      const bodyBase = new THREE.Mesh(new THREE.BoxGeometry(1850, 480, 4500), bodyColorMat);
+      bodyBase.position.y = 200 + 480 / 2;
+      group.add(bodyBase);
+
+      const cabin = new THREE.Mesh(new THREE.BoxGeometry(1500, 580, 2000), carGlassMat);
+      cabin.position.set(0, 680 + 580 / 2, -300);
+      group.add(cabin);
+
+      const roof = new THREE.Mesh(new THREE.BoxGeometry(1520, 50, 1800), bodyColorMat);
+      roof.position.set(0, 1260 + 25, -350);
+      group.add(roof);
+
+      // タイヤ
+      [[-880, 320, 1300], [880, 320, 1300], [-880, 320, -1300], [880, 320, -1300]].forEach(pos => {
+        const tire = new THREE.Mesh(new THREE.CylinderGeometry(320, 320, 250, 24), tireMat);
+        tire.rotation.z = Math.PI / 2;
+        tire.position.set(pos[0], pos[1], pos[2]);
+        const wheel = new THREE.Mesh(new THREE.CylinderGeometry(200, 200, 255, 16), wheelMat);
+        wheel.rotation.z = Math.PI / 2;
+        wheel.position.set(pos[0], pos[1], pos[2]);
+        group.add(tire);
+        group.add(wheel);
+      });
+
+      const hl1 = new THREE.Mesh(new THREE.BoxGeometry(280, 80, 20), lightHeadMat);
+      hl1.position.set(-600, 550, 2250); group.add(hl1);
+      const hl2 = hl1.clone(); hl2.position.x = 600; group.add(hl2);
+
+      const tl1 = new THREE.Mesh(new THREE.BoxGeometry(280, 70, 20), lightTailMat);
+      tl1.position.set(-600, 600, -2250); group.add(tl1);
+      const tl2 = tl1.clone(); tl2.position.x = 600; group.add(tl2);
+
+    } else if (type === 'bike') {
+      // 大型バイク: 全長2100, 全幅800, 全高1150
+      // 前後ホイール/タイヤ (半径320, 幅140)
+      const tireF = new THREE.Mesh(new THREE.CylinderGeometry(320, 320, 120, 24), tireMat);
+      tireF.rotation.z = Math.PI / 2;
+      tireF.position.set(0, 320, 750);
+      group.add(tireF);
+
+      const tireR = new THREE.Mesh(new THREE.CylinderGeometry(320, 320, 160, 24), tireMat);
+      tireR.rotation.z = Math.PI / 2;
+      tireR.position.set(0, 320, -750);
+      group.add(tireR);
+
+      // エンジン・フレームブロック
+      const engine = new THREE.Mesh(new THREE.BoxGeometry(320, 420, 650), chromeMat);
+      engine.position.set(0, 480, 0);
+      group.add(engine);
+
+      // タンク
+      const tank = new THREE.Mesh(new THREE.BoxGeometry(380, 280, 600), bodyColorMat);
+      tank.position.set(0, 780, 200);
+      group.add(tank);
+
+      // シート
+      const seat = new THREE.Mesh(new THREE.BoxGeometry(280, 120, 600), tireMat);
+      seat.position.set(0, 720, -350);
+      group.add(seat);
+
+      // フロントフォーク & ハンドル
+      const fork = new THREE.Mesh(new THREE.CylinderGeometry(30, 30, 700, 12), chromeMat);
+      fork.rotation.x = -0.35;
+      fork.position.set(0, 600, 580);
+      group.add(fork);
+
+      const handle = new THREE.Mesh(new THREE.CylinderGeometry(18, 18, 780, 12), chromeMat);
+      handle.rotation.z = Math.PI / 2;
+      handle.position.set(0, 960, 480);
+      group.add(handle);
+
+      // ヘッドライト
+      const headlight = new THREE.Mesh(new THREE.CylinderGeometry(90, 90, 80, 16), chromeMat);
+      headlight.rotation.x = Math.PI / 2;
+      headlight.position.set(0, 820, 820);
+      const hlGlass = new THREE.Mesh(new THREE.CircleGeometry(85, 16), lightHeadMat);
+      hlGlass.position.set(0, 0, 41);
+      headlight.add(hlGlass);
+      group.add(headlight);
+
+      // マフラー
+      const exhaust = new THREE.Mesh(new THREE.CylinderGeometry(45, 45, 900, 16), chromeMat);
+      exhaust.rotation.x = Math.PI / 2 - 0.15;
+      exhaust.position.set(220, 340, -350);
+      group.add(exhaust);
+    }
+
+    return group;
+  }
+
+  function updateModel() {
+    scene.remove(buildingGroup);
+    scene.remove(dimGroup);
+    buildingGroup = new THREE.Group();
+    dimGroup = new THREE.Group();
+
+    const wF = parseFloat(document.getElementById('wFront').value) || 5400;
+    const wB = parseFloat(document.getElementById('wBack').value) || 5400;
+    const dL = parseFloat(document.getElementById('dLeft').value) || 6000;
+    const dR = parseFloat(document.getElementById('dRight').value) || 6000;
+    const eaveH = parseFloat(document.getElementById('eaveHeight').value) || 2800;
+    const foundationH = parseFloat(document.getElementById('foundationHeight').value) || 300;
+    const slope = parseFloat(document.getElementById('roofSlope').value) || 1.5;
+    const slopeDir = document.getElementById('slopeDirection').value;
+    const ceilingType = document.getElementById('ceilingType').value;
+    const showDim = document.getElementById('showDimensions').checked;
+    const fontScale = parseFloat(document.getElementById('fontScale').value) || 1.0;
+
+    const corePts = getCorePoints(wF, wB, dL, dR);
+    const outerPts = getOffsetPoints(corePts, WALL_OUTER_OFFSET);
+    const innerPts = getOffsetPoints(corePts, -WALL_INNER_OFFSET);
+
+    const bounds = {
+      minX: Math.min(...outerPts.map(p => p.x)),
+      maxX: Math.max(...outerPts.map(p => p.x)),
+      minY: Math.min(...outerPts.map(p => p.y)),
+      maxY: Math.max(...outerPts.map(p => p.y))
+    };
+
+    const hPts = outerPts.map(p => getGirderHeight(p, bounds, eaveH, slope, slopeDir));
+    const hInnerPts = innerPts.map(p => getGirderHeight(p, bounds, eaveH, slope, slopeDir));
+    const roofThickness = Math.round(100 + (slope * 2));
+
+    wallMat.transparent = isSeeThrough;
+    wallMat.opacity = isSeeThrough ? 0.35 : 1.0;
+    roofMat.transparent = isSeeThrough;
+    roofMat.opacity = isSeeThrough ? 0.35 : 1.0;
+
+    updateCalculations(corePts, outerPts, hPts, roofThickness, slope);
+
+    // 1. 土間コン床
+    const slabVerts = [
+      innerPts[0].x, 50, innerPts[0].y,
+      innerPts[1].x, 50, innerPts[1].y,
+      innerPts[2].x, 50, innerPts[2].y,
+      innerPts[0].x, 50, innerPts[0].y,
+      innerPts[2].x, 50, innerPts[2].y,
+      innerPts[3].x, 50, innerPts[3].y
+    ];
+    const slabGeo = new THREE.BufferGeometry();
+    slabGeo.setAttribute('position', new THREE.Float32BufferAttribute(slabVerts, 3));
+    slabGeo.computeVertexNormals();
+    buildingGroup.add(new THREE.Mesh(slabGeo, slabMat));
+
+    // 2. 基礎
+    const wallKeys = ['front', 'right', 'back', 'left'];
+    for (let i = 0; i < 4; i++) {
+      const next = (i + 1) % 4;
+      const pA = outerPts[i]; const pB = outerPts[next];
+      const pACore = corePts[i];
+      const wKey = wallKeys[i];
+      const vWall = new THREE.Vector2().subVectors(pB, pA);
+      const wallLen = vWall.length();
+      const wallDir = vWall.clone().normalize();
+
+      const floorLevelOps = openings
+        .filter(op => op.wall === wKey && isFloorLevelOpening(op.type))
+        .map(op => {
+          const pStart = new THREE.Vector2().addVectors(pACore, wallDir.clone().multiplyScalar(op.clearanceLeft));
+          const pEnd = new THREE.Vector2().addVectors(pACore, wallDir.clone().multiplyScalar(op.clearanceLeft + op.width));
+          const distStart = new THREE.Vector2().subVectors(pStart, pA).dot(wallDir);
+          const distEnd = new THREE.Vector2().subVectors(pEnd, pA).dot(wallDir);
+          return { start: Math.max(0, distStart), end: Math.min(wallLen, distEnd) };
+        })
+        .sort((a, b) => a.start - b.start);
+
+      let curX = 0;
+      floorLevelOps.forEach(fOp => {
+        if (fOp.start > curX) {
+          const pt1 = new THREE.Vector2().addVectors(pA, wallDir.clone().multiplyScalar(curX));
+          const pt2 = new THREE.Vector2().addVectors(pA, wallDir.clone().multiplyScalar(fOp.start));
+          buildingGroup.add(createQuadMesh(
+            new THREE.Vector3(pt1.x, 0, pt1.y),
+            new THREE.Vector3(pt2.x, 0, pt2.y),
+            new THREE.Vector3(pt2.x, foundationH, pt2.y),
+            new THREE.Vector3(pt1.x, foundationH, pt1.y),
+            foundationMat
+          ));
+        }
+        curX = fOp.end;
+      });
+      if (curX < wallLen) {
+        const pt1 = new THREE.Vector2().addVectors(pA, wallDir.clone().multiplyScalar(curX));
+        buildingGroup.add(createQuadMesh(
+          new THREE.Vector3(pt1.x, 0, pt1.y),
+          new THREE.Vector3(pB.x, 0, pB.y),
+          new THREE.Vector3(pB.x, foundationH, pB.y),
+          new THREE.Vector3(pt1.x, foundationH, pt1.y),
+          foundationMat
+        ));
+      }
+    }
+
+    // 3. 外壁
+    const insideOffset = 100;
+    for (let i = 0; i < 4; i++) {
+      const next = (i + 1) % 4;
+      const pA = outerPts[i];
+      const pB = outerPts[next];
+      const pACore = corePts[i];
+      const hA = hPts[i];
+      const hB = hPts[next];
+      const wKey = wallKeys[i];
+
+      const vWall = new THREE.Vector2().subVectors(pB, pA);
+      const wallLen = vWall.length();
+      const wallDir = vWall.clone().normalize();
+      const inNorm = new THREE.Vector2(wallDir.y, -wallDir.x).normalize();
+
+      const wallOps = openings
+        .filter(op => op.wall === wKey)
+        .map(op => {
+          const pStart = new THREE.Vector2().addVectors(pACore, wallDir.clone().multiplyScalar(op.clearanceLeft));
+          const pEnd = new THREE.Vector2().addVectors(pACore, wallDir.clone().multiplyScalar(op.clearanceLeft + op.width));
+          const distStart = new THREE.Vector2().subVectors(pStart, pA).dot(wallDir);
+          const distEnd = new THREE.Vector2().subVectors(pEnd, pA).dot(wallDir);
+          const bottomY = isFloorLevelOpening(op.type) ? 50 : Math.max(op.topHeightGL - op.height, 50);
+          return {
+            start: Math.max(0, distStart),
+            end: Math.min(wallLen, distEnd),
+            topGL: op.topHeightGL,
+            bottomGL: bottomY,
+            op: op
+          };
+        })
+        .sort((a, b) => a.start - b.start);
+
+      let curX = 0;
+      wallOps.forEach(wOp => {
+        if (wOp.start > curX) {
+          const t1 = curX / wallLen, t2 = wOp.start / wallLen;
+          const ptA1 = new THREE.Vector2().addVectors(pA, wallDir.clone().multiplyScalar(curX));
+          const ptA2 = new THREE.Vector2().addVectors(pA, wallDir.clone().multiplyScalar(wOp.start));
+          const h1 = hA + (hB - hA) * t1;
+          const h2 = hA + (hB - hA) * t2;
+
+          buildingGroup.add(createQuadMesh(
+            new THREE.Vector3(ptA1.x, foundationH, ptA1.y),
+            new THREE.Vector3(ptA2.x, foundationH, ptA2.y),
+            new THREE.Vector3(ptA2.x, h2, ptA2.y),
+            new THREE.Vector3(ptA1.x, h1, ptA1.y),
+            wallMat
+          ));
+        }
+
+        const tS = wOp.start / wallLen, tE = wOp.end / wallLen;
+        const ptS = new THREE.Vector2().addVectors(pA, wallDir.clone().multiplyScalar(wOp.start));
+        const ptE = new THREE.Vector2().addVectors(pA, wallDir.clone().multiplyScalar(wOp.end));
+        const hS = hA + (hB - hA) * tS;
+        const hE = hA + (hB - hA) * tE;
+
+        if (wOp.bottomGL > foundationH) {
+          buildingGroup.add(createQuadMesh(
+            new THREE.Vector3(ptS.x, foundationH, ptS.y),
+            new THREE.Vector3(ptE.x, foundationH, ptE.y),
+            new THREE.Vector3(ptE.x, wOp.bottomGL, ptE.y),
+            new THREE.Vector3(ptS.x, wOp.bottomGL, ptS.y),
+            wallMat
+          ));
+        }
+
+        if (Math.min(hS, hE) > wOp.topGL) {
+          buildingGroup.add(createQuadMesh(
+            new THREE.Vector3(ptS.x, wOp.topGL, ptS.y),
+            new THREE.Vector3(ptE.x, wOp.topGL, ptE.y),
+            new THREE.Vector3(ptE.x, hE, ptE.y),
+            new THREE.Vector3(ptS.x, hS, ptS.y),
+            wallMat
+          ));
+        }
+
+        if (wOp.op.type === 'shutter') {
+          const totalInDepth = WALL_OUTER_OFFSET + insideOffset;
+          const ptS_in = ptS.clone().add(inNorm.clone().multiplyScalar(totalInDepth));
+          const ptE_in = ptE.clone().add(inNorm.clone().multiplyScalar(totalInDepth));
+
+          buildingGroup.add(createQuadMesh(
+            new THREE.Vector3(ptS.x, 0, ptS.y),
+            new THREE.Vector3(ptS_in.x, 0, ptS_in.y),
+            new THREE.Vector3(ptS_in.x, foundationH, ptS_in.y),
+            new THREE.Vector3(ptS.x, foundationH, ptS.y),
+            foundationMat
+          ));
+          buildingGroup.add(createQuadMesh(
+            new THREE.Vector3(ptS.x, foundationH, ptS.y),
+            new THREE.Vector3(ptS_in.x, foundationH, ptS_in.y),
+            new THREE.Vector3(ptS_in.x, wOp.topGL, ptS_in.y),
+            new THREE.Vector3(ptS.x, wOp.topGL, ptS.y),
+            wallMat
+          ));
+
+          buildingGroup.add(createQuadMesh(
+            new THREE.Vector3(ptE_in.x, 0, ptE_in.y),
+            new THREE.Vector3(ptE.x, 0, ptE.y),
+            new THREE.Vector3(ptE.x, foundationH, ptE.y),
+            new THREE.Vector3(ptE_in.x, foundationH, ptE_in.y),
+            foundationMat
+          ));
+          buildingGroup.add(createQuadMesh(
+            new THREE.Vector3(ptE_in.x, foundationH, ptE_in.y),
+            new THREE.Vector3(ptE.x, foundationH, ptE.y),
+            new THREE.Vector3(ptE.x, wOp.topGL, ptE.y),
+            new THREE.Vector3(ptE_in.x, wOp.topGL, ptE_in.y),
+            wallMat
+          ));
+        }
+
+        curX = wOp.end;
+      });
+
+      if (curX < wallLen) {
+        const t1 = curX / wallLen;
+        const ptA1 = new THREE.Vector2().addVectors(pA, wallDir.clone().multiplyScalar(curX));
+        const h1 = hA + (hB - hA) * t1;
+
+        buildingGroup.add(createQuadMesh(
+          new THREE.Vector3(ptA1.x, foundationH, ptA1.y),
+          new THREE.Vector3(pB.x, foundationH, pB.y),
+          new THREE.Vector3(pB.x, hB, pB.y),
+          new THREE.Vector3(ptA1.x, h1, ptA1.y),
+          wallMat
+        ));
+      }
+    }
+
+    // 4. 屋根
+    const roofVertices = [];
+    for (let i = 0; i < 4; i++) roofVertices.push(outerPts[i].x, hPts[i], outerPts[i].y);
+    for (let i = 0; i < 4; i++) roofVertices.push(outerPts[i].x, hPts[i] + roofThickness, outerPts[i].y);
+    const roofIndices = [
+      4, 5, 6, 4, 6, 7,  0, 2, 1, 0, 3, 2,
+      0, 1, 5, 0, 5, 4,  1, 2, 6, 1, 6, 5,
+      2, 3, 7, 2, 7, 6,  3, 0, 4, 3, 4, 7
+    ];
+    const roofGeo = new THREE.BufferGeometry();
+    roofGeo.setAttribute('position', new THREE.Float32BufferAttribute(roofVertices, 3));
+    roofGeo.setIndex(roofIndices);
+    roofGeo.computeVertexNormals();
+    buildingGroup.add(new THREE.Mesh(roofGeo, roofMat));
+    buildingGroup.add(new THREE.LineSegments(new THREE.EdgesGeometry(roofGeo), edgeLineMat));
+
+    // 5. 天井
+    if (ceilingType === 'flat') {
+      const ceilH = eaveH - 320;
+      const cVerts = [
+        innerPts[0].x, ceilH, innerPts[0].y,
+        innerPts[1].x, ceilH, innerPts[1].y,
+        innerPts[2].x, ceilH, innerPts[2].y,
+        innerPts[0].x, ceilH, innerPts[0].y,
+        innerPts[2].x, ceilH, innerPts[2].y,
+        innerPts[3].x, ceilH, innerPts[3].y
+      ];
+      const cGeo = new THREE.BufferGeometry();
+      cGeo.setAttribute('position', new THREE.Float32BufferAttribute(cVerts, 3));
+      cGeo.computeVertexNormals();
+      buildingGroup.add(new THREE.Mesh(cGeo, ceilingMat));
+    } else if (ceilingType === 'sloped') {
+      const cVerts = [];
+      for (let i = 0; i < 4; i++) cVerts.push(innerPts[i].x, hInnerPts[i] - 10, innerPts[i].y);
+      for (let i = 0; i < 4; i++) cVerts.push(innerPts[i].x, hInnerPts[i] - 19.5, innerPts[i].y);
+      const cGeo = new THREE.BufferGeometry();
+      cGeo.setAttribute('position', new THREE.Float32BufferAttribute(cVerts, 3));
+      cGeo.setIndex(roofIndices);
+      cGeo.computeVertexNormals();
+      buildingGroup.add(new THREE.Mesh(cGeo, ceilingMat));
+    }
+
+    // 6. 開口部
+    openings.forEach(op => {
+      let pLeftCore, pRightCore;
+      if (op.wall === 'front') { pLeftCore = corePts[0]; pRightCore = corePts[1]; }
+      else if (op.wall === 'right') { pLeftCore = corePts[1]; pRightCore = corePts[2]; }
+      else if (op.wall === 'back') { pLeftCore = corePts[2]; pRightCore = corePts[3]; }
+      else if (op.wall === 'left') { pLeftCore = corePts[3]; pRightCore = corePts[0]; }
+      
+      const vWall = new THREE.Vector2().subVectors(pRightCore, pLeftCore);
+      const wallDir = vWall.clone().normalize();
+      const inNorm = new THREE.Vector2(wallDir.y, -wallDir.x).normalize();
+      const outNorm = inNorm.clone().negate();
+
+      const corePos = new THREE.Vector2().addVectors(pLeftCore, wallDir.clone().multiplyScalar(op.clearanceLeft + op.width / 2));
+      const angle = -Math.atan2(wallDir.y, wallDir.x);
+      const bottomY = isFloorLevelOpening(op.type) ? 50 : Math.max(op.topHeightGL - op.height, 50);
+      const fullH = op.topHeightGL - bottomY;
+
+      if (op.type === 'shutter') {
+        const shutterPos = corePos.clone().add(inNorm.clone().multiplyScalar(insideOffset));
+        const ratio = op.openRatio !== undefined ? op.openRatio : 0;
+        const currentH = fullH * (1 - ratio);
+        const currentCenterY = op.topHeightGL - currentH / 2;
+
+        const boxGeo = new THREE.BoxGeometry(op.width, 240, 240);
+        const boxMesh = new THREE.Mesh(boxGeo, shutterBoxMat);
+        boxMesh.position.set(shutterPos.x, op.topHeightGL - 120, shutterPos.y);
+        boxMesh.rotation.y = angle;
+        buildingGroup.add(boxMesh);
+
+        [-1, 1].forEach(side => {
+          const railPos = shutterPos.clone().add(wallDir.clone().multiplyScalar(side * (op.width / 2 - 15)));
+          const railGeo = new THREE.BoxGeometry(30, fullH, 40);
+          const railMesh = new THREE.Mesh(railGeo, shutterBoxMat);
+          railMesh.position.set(railPos.x, bottomY + fullH / 2, railPos.y);
+          railMesh.rotation.y = angle;
+          buildingGroup.add(railMesh);
+        });
+
+        if (currentH > 20) {
+          const sGeo = new THREE.BoxGeometry(op.width - 20, currentH, 20);
+          const sMesh = new THREE.Mesh(sGeo, shutterMat);
+          sMesh.position.set(shutterPos.x, currentCenterY, shutterPos.y);
+          sMesh.rotation.y = angle;
+          sMesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(sGeo), edgeLineMat));
+          buildingGroup.add(sMesh);
+        }
+      } else {
+        const semiOuterPos = corePos.clone().add(outNorm.clone().multiplyScalar(WALL_OUTER_OFFSET + 10));
+
+        if (op.type === 'window') {
+          const winMesh = createSlidingWindowMesh(op.width, fullH);
+          winMesh.position.set(semiOuterPos.x, bottomY + fullH / 2, semiOuterPos.y);
+          winMesh.rotation.y = angle;
+          buildingGroup.add(winMesh);
+        } else if (op.type === 'fix') {
+          const fixMesh = createFixWindowMesh(op.width, fullH);
+          fixMesh.position.set(semiOuterPos.x, bottomY + fullH / 2, semiOuterPos.y);
+          fixMesh.rotation.y = angle;
+          buildingGroup.add(fixMesh);
+        } else if (op.type === 'sliding_door') {
+          const doorGroup = new THREE.Group();
+          const frameGeo = new THREE.BoxGeometry(op.width, fullH, 50);
+          const frameMesh = new THREE.Mesh(frameGeo, sashFrameMat);
+          doorGroup.add(frameMesh);
+          const panelGeo = new THREE.BoxGeometry(op.width - 60, fullH - 60, 28);
+          const panelMesh = new THREE.Mesh(panelGeo, doorMat);
+          panelMesh.position.set(0, 0, 5);
+          doorGroup.add(panelMesh);
+          doorGroup.position.set(semiOuterPos.x, bottomY + fullH / 2, semiOuterPos.y);
+          doorGroup.rotation.y = angle;
+          buildingGroup.add(doorGroup);
+        } else if (op.type === 'door') {
+          const doorGroup = new THREE.Group();
+          const frameGeo = new THREE.BoxGeometry(op.width, fullH, 50);
+          const frameMesh = new THREE.Mesh(frameGeo, sashFrameMat);
+          doorGroup.add(frameMesh);
+          const panelGeo = new THREE.BoxGeometry(op.width - 60, fullH - 60, 30);
+          const panelMesh = new THREE.Mesh(panelGeo, doorMat);
+          doorGroup.add(panelMesh);
+          doorGroup.position.set(semiOuterPos.x, bottomY + fullH / 2, semiOuterPos.y);
+          doorGroup.rotation.y = angle;
+          buildingGroup.add(doorGroup);
+        }
+      }
+    });
+
+    // 7. 内部棚
+    shelfUnits.forEach(unit => {
+      let pLeftInner, pRightInner;
+      if (unit.wall === 'front') { pLeftInner = innerPts[0]; pRightInner = innerPts[1]; }
+      else if (unit.wall === 'right') { pLeftInner = innerPts[1]; pRightInner = innerPts[2]; }
+      else if (unit.wall === 'back') { pLeftInner = innerPts[2]; pRightInner = innerPts[3]; }
+      else if (unit.wall === 'left') { pLeftInner = innerPts[3]; pRightInner = innerPts[0]; }
+
+      const vWall = new THREE.Vector2().subVectors(pRightInner, pLeftInner);
+      const wallLen = vWall.length();
+      const wallDir = vWall.clone().normalize();
+      const inNorm = new THREE.Vector2(wallDir.y, -wallDir.x).normalize();
+
+      const partThick = unit.depth <= 600 ? 60 : 90;
+      const shelfThick = 30;
+      const angle = -Math.atan2(wallDir.y, wallDir.x);
+
+      const maxLevel = Math.max(...unit.levels, 1200);
+      const unitTotalH = maxLevel + 100;
+
+      const maxSpan = 2000;
+      const nSpans = Math.max(1, Math.ceil(unit.width / maxSpan));
+      const spanW = (unit.width - (nSpans + 1) * partThick) / nSpans;
+
+      for (let s = 0; s <= nSpans; s++) {
+        const distOnWall = unit.distFromLeft + s * (spanW + partThick) + partThick / 2;
+        const partBase = new THREE.Vector2().addVectors(pLeftInner, wallDir.clone().multiplyScalar(distOnWall))
+          .add(inNorm.clone().multiplyScalar(unit.depth / 2));
+
+        const partGeo = new THREE.BoxGeometry(partThick, unitTotalH, unit.depth);
+        const partMesh = new THREE.Mesh(partGeo, partitionMat);
+        partMesh.position.set(partBase.x, 50 + unitTotalH / 2, partBase.y);
+        partMesh.rotation.y = angle;
+        partMesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(partGeo), edgeLineMat));
+        buildingGroup.add(partMesh);
+      }
+
+      unit.levels.forEach(lvlH => {
+        const boardCenterY = 50 + lvlH - shelfThick / 2;
+        for (let s = 0; s < nSpans; s++) {
+          const distOnWall = unit.distFromLeft + (s + 0.5) * partThick + (s + 0.5) * spanW;
+          const shelfBase = new THREE.Vector2().addVectors(pLeftInner, wallDir.clone().multiplyScalar(distOnWall))
+            .add(inNorm.clone().multiplyScalar(unit.depth / 2));
+
+          const shelfGeo = new THREE.BoxGeometry(spanW, shelfThick, unit.depth);
+          const shelfMesh = new THREE.Mesh(shelfGeo, shelfWoodMat);
+          shelfMesh.position.set(shelfBase.x, boardCenterY, shelfBase.y);
+          shelfMesh.rotation.y = angle;
+          shelfMesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(shelfGeo), edgeLineMat));
+          buildingGroup.add(shelfMesh);
+        }
+      });
+    });
+
+    // 8. 車両・バイク配置（GL+50mm 土間面上）
+    vehicles.forEach(veh => {
+      const vMesh = createVehicleMesh(veh.type, veh.color || '#1e293b');
+      vMesh.position.set(veh.posX, 50, veh.posZ);
+      vMesh.rotation.y = ((veh.rotDeg || 0) * Math.PI) / 180;
+      buildingGroup.add(vMesh);
+    });
+
+    // 9. 3D寸法
+    if (showDim) {
+      const pFrontL = new THREE.Vector3(corePts[0].x, 20, corePts[0].y);
+      const pFrontR = new THREE.Vector3(corePts[1].x, 20, corePts[1].y);
+      addDimensionSegment(pFrontL, pFrontR, `正面芯: ${wF}mm (外寸:${wF+200})`, new THREE.Vector3(0, 0, 700), fontScale);
+
+      const pLeftB = new THREE.Vector3(corePts[3].x, 20, corePts[3].y);
+      addDimensionSegment(pLeftB, pFrontL, `左奥行芯: ${dL}mm`, new THREE.Vector3(-700, 0, 0), fontScale);
+
+      const pRightB = new THREE.Vector3(corePts[2].x, 20, corePts[2].y);
+      addDimensionSegment(pFrontR, pRightB, `右奥行芯: ${dR}mm`, new THREE.Vector3(700, 0, 0), fontScale);
+      addDimensionSegment(pLeftB, pRightB, `背面芯: ${wB}mm`, new THREE.Vector3(0, 0, -700), fontScale);
+
+      const minH = Math.min(...hPts);
+      const minIdx = hPts.indexOf(minH);
+      const pMin = outerPts[minIdx];
+
+      const maxH = Math.max(...hPts);
+      const maxIdx = hPts.indexOf(maxH);
+      const pMax = outerPts[maxIdx];
+
+      const offsetLow = new THREE.Vector3(-1200, 0, 0);
+      const pGL = new THREE.Vector3(pMin.x, 0, pMin.y);
+      const pFound = new THREE.Vector3(pMin.x, foundationH, pMin.y);
+      addDimensionSegment(pGL, pFound, `基礎高: ${foundationH}mm`, offsetLow, fontScale);
+
+      const pGirderLow = new THREE.Vector3(pMin.x, minH, pMin.y);
+      addDimensionSegment(pGL, pGirderLow, `軒高: ${eaveH}mm`, new THREE.Vector3(-2200, 0, 0), fontScale);
+
+      const pRoofLowTop = new THREE.Vector3(pMin.x, minH + roofThickness, pMin.y);
+      addDimensionSegment(pGirderLow, pRoofLowTop, `屋根厚: ${roofThickness}mm`, offsetLow, fontScale);
+
+      const maxHeightVal = Math.round(maxH + roofThickness);
+      const pGLHigh = new THREE.Vector3(pMax.x, 0, pMax.y);
+      const pRoofHighTop = new THREE.Vector3(pMax.x, maxHeightVal, pMax.y);
+      addDimensionSegment(pGLHigh, pRoofHighTop, `最高高: ${maxHeightVal}mm`, new THREE.Vector3(1400, 0, 0), fontScale);
+    }
+
+    scene.add(buildingGroup);
+    scene.add(dimGroup);
+
+    if (currentView !== '3d') render2DDrawings();
+  }
+
+  // -------------------------------------------------------------
+  // 2D 図面作図エンジン
+  // -------------------------------------------------------------
+  function render2DDrawings() {
+    const svgContainer = document.getElementById('svg-container');
+    const svg = document.getElementById('drawSvg');
+    svg.innerHTML = '';
+
+    const wF = parseFloat(document.getElementById('wFront').value) || 5400;
+    const wB = parseFloat(document.getElementById('wBack').value) || 5400;
+    const dL = parseFloat(document.getElementById('dLeft').value) || 6000;
+    const dR = parseFloat(document.getElementById('dRight').value) || 6000;
+    const eaveH = parseFloat(document.getElementById('eaveHeight').value) || 2800;
+    const foundationH = parseFloat(document.getElementById('foundationHeight').value) || 300;
+    const slope = parseFloat(document.getElementById('roofSlope').value) || 1.5;
+    const slopeDir = document.getElementById('slopeDirection').value;
+
+    const corePts = getCorePoints(wF, wB, dL, dR);
+    const outerPts = getOffsetPoints(corePts, WALL_OUTER_OFFSET);
+
+    const bounds = {
+      minX: Math.min(...outerPts.map(p => p.x)),
+      maxX: Math.max(...outerPts.map(p => p.x)),
+      minY: Math.min(...outerPts.map(p => p.y)),
+      maxY: Math.max(...outerPts.map(p => p.y))
+    };
+    const hPts = outerPts.map(p => getGirderHeight(p, bounds, eaveH, slope, slopeDir));
+    const roofThickness = Math.round(100 + (slope * 2));
+
+    const containerW = svgContainer.clientWidth;
+    const containerH = svgContainer.clientHeight;
+
+    let elements = [];
+    const baseFontSize = Math.round(125 * dimFontScale);
+    const tickLen = Math.round(35 * dimFontScale);
+
+    function drawDim2D(x1, y1, x2, y2, text, offset, isVertical = false) {
+      let nx = isVertical ? offset : 0;
+      let ny = isVertical ? 0 : offset;
+      const sx = x1 + nx, sy = y1 + ny;
+      const ex = x2 + nx, ey = y2 + ny;
+
+      elements.push(`<line x1="${x1}" y1="${y1}" x2="${sx}" y2="${sy}" stroke="#94a3b8" stroke-width="3" stroke-dasharray="8,8"/>`);
+      elements.push(`<line x1="${x2}" y1="${y2}" x2="${ex}" y2="${ey}" stroke="#94a3b8" stroke-width="3" stroke-dasharray="8,8"/>`);
+      elements.push(`<line x1="${sx}" y1="${sy}" x2="${ex}" y2="${ey}" stroke="#0284c7" stroke-width="5"/>`);
+      
+      if (isVertical) {
+        elements.push(`<line x1="${sx - tickLen}" y1="${sy}" x2="${sx + tickLen}" y2="${sy}" stroke="#0284c7" stroke-width="5"/>`);
+        elements.push(`<line x1="${ex - tickLen}" y1="${ey}" x2="${ex + tickLen}" y2="${ey}" stroke="#0284c7" stroke-width="5"/>`);
+      } else {
+        elements.push(`<line x1="${sx}" y1="${sy - tickLen}" x2="${sx}" y2="${sy + tickLen}" stroke="#0284c7" stroke-width="5"/>`);
+        elements.push(`<line x1="${ex}" y1="${ey - tickLen}" x2="${ex}" y2="${ey + tickLen}" stroke="#0284c7" stroke-width="5"/>`);
+      }
+
+      const midX = (sx + ex) / 2;
+      const midY = (sy + ey) / 2;
+      const approxCharW = baseFontSize * 0.65;
+      const bgW = text.length * approxCharW + 40;
+      const bgH = baseFontSize + 30;
+
+      let tx = midX; let ty = midY;
+      if (isVertical) tx = sx + (offset > 0 ? (bgW / 2 + 30) : -(bgW / 2 + 30));
+      else ty = sy + (offset > 0 ? (bgH / 2 + 30) : -(bgH / 2 + 30));
+
+      elements.push(`<rect x="${tx - bgW/2}" y="${ty - bgH/2}" width="${bgW}" height="${bgH}" fill="rgba(255, 255, 255, 0.95)" stroke="#0284c7" stroke-width="2" rx="10"/>`);
+      elements.push(`<text x="${tx}" y="${ty}" fill="#0f172a" font-size="${baseFontSize}" font-weight="bold" text-anchor="middle" dominant-baseline="central">${text}</text>`);
+    }
+
+    let vbMinX, vbMinY, vbW, vbH;
+
+    if (currentView === 'plan') {
+      const toSvg = p => ({ x: p.x, y: p.y });
+      const sc0 = toSvg(corePts[0]), sc1 = toSvg(corePts[1]), sc2 = toSvg(corePts[2]), sc3 = toSvg(corePts[3]);
+      const so0 = toSvg(outerPts[0]), so1 = toSvg(outerPts[1]), so2 = toSvg(outerPts[2]), so3 = toSvg(outerPts[3]);
+
+      elements.push(`<polygon points="${so0.x},${so0.y} ${so1.x},${so1.y} ${so2.x},${so2.y} ${so3.x},${so3.y}" fill="#f8fafc" stroke="#94a3b8" stroke-width="4"/>`);
+      elements.push(`<polygon points="${sc0.x},${sc0.y} ${sc1.x},${sc1.y} ${sc2.x},${sc2.y} ${sc3.x},${sc3.y}" fill="none" stroke="#ef4444" stroke-width="6" stroke-dasharray="24,8,6,8"/>`);
+
+      [sc0, sc1, sc2, sc3].forEach(pt => {
+        elements.push(`<rect x="${pt.x - 52.5}" y="${pt.y - 52.5}" width="105" height="105" fill="#cbd5e1" stroke="#334155" stroke-width="4"/>`);
+      });
+
+      const midDepthY = -(dL + dR) / 4;
+      let rotDeg = 0;
+      if (slopeDir === 'front-to-back') rotDeg = 180;
+      else if (slopeDir === 'back-to-front') rotDeg = 0;
+      else if (slopeDir === 'left-to-right') rotDeg = 90;
+      else if (slopeDir === 'right-to-left') rotDeg = -90;
+
+      const arrowTxtSize = Math.round(baseFontSize * 1.1);
+      elements.push(`
+        <g transform="translate(0, ${midDepthY})">
+          <g transform="rotate(${rotDeg})">
+            <line x1="0" y1="-200" x2="0" y2="200" stroke="#0284c7" stroke-width="10"/>
+            <polygon points="0,250 -35,170 35,170" fill="#0284c7"/>
+          </g>
+          <rect x="50" y="${-arrowTxtSize/2 - 10}" width="${arrowTxtSize * 2.4}" height="${arrowTxtSize + 20}" fill="rgba(255,255,255,0.9)" rx="8"/>
+          <text x="${50 + arrowTxtSize * 1.2}" y="0" font-size="${arrowTxtSize}" fill="#0284c7" font-weight="bold" text-anchor="middle" dominant-baseline="central">水下</text>
+        </g>
+      `);
+
+      openings.forEach(op => {
+        let pL, pR;
+        if (op.wall === 'front') { pL = corePts[0]; pR = corePts[1]; }
+        else if (op.wall === 'right') { pL = corePts[1]; pR = corePts[2]; }
+        else if (op.wall === 'back') { pL = corePts[2]; pR = corePts[3]; }
+        else if (op.wall === 'left') { pL = corePts[3]; pR = corePts[0]; }
+        const vWall = new THREE.Vector2().subVectors(pR, pL);
+        const wallDir = vWall.clone().normalize();
+        const cDist = op.clearanceLeft + op.width / 2;
+
+        const opStart = new THREE.Vector2().addVectors(pL, wallDir.clone().multiplyScalar(cDist - op.width / 2));
+        const opEnd = new THREE.Vector2().addVectors(pL, wallDir.clone().multiplyScalar(cDist + op.width / 2));
+        const sopS = toSvg(opStart), sopE = toSvg(opEnd);
+
+        let strokeColor = (op.type === 'shutter') ? '#0f172a' : ((op.type === 'door' || op.type === 'sliding_door') ? '#059669' : '#0284c7');
+        elements.push(`<line x1="${sopS.x}" y1="${sopS.y}" x2="${sopE.x}" y2="${sopE.y}" stroke="#ffffff" stroke-width="24"/>`);
+        elements.push(`<line x1="${sopS.x}" y1="${sopS.y}" x2="${sopE.x}" y2="${sopE.y}" stroke="${strokeColor}" stroke-width="14"/>`);
+      });
+
+      // 2D平面図上の車両フットプリント投影
+      vehicles.forEach(veh => {
+        let vW = 1850, vL = 4800;
+        if (veh.type === 'car_sport') { vW = 1850; vL = 4500; }
+        else if (veh.type === 'bike') { vW = 800; vL = 2100; }
+        
+        elements.push(`
+          <g transform="translate(${veh.posX}, ${veh.posZ}) rotate(${veh.rotDeg || 0})">
+            <rect x="${-vW/2}" y="${-vL/2}" width="${vW}" height="${vL}" rx="80" fill="rgba(30, 41, 59, 0.25)" stroke="#0f172a" stroke-width="4"/>
+            <polygon points="0,${-vL/2 + 100} -60,${-vL/2 + 250} 60,${-vL/2 + 250}" fill="#0f172a"/>
+            <text x="0" y="20" font-size="90" font-weight="bold" fill="#0f172a" text-anchor="middle">${veh.type === 'bike' ? 'BIKE' : 'CAR'}</text>
+          </g>
+        `);
+      });
+
+      const offFront = Math.max(550, baseFontSize * 3.5);
+      const offSide = Math.max(650, baseFontSize * 4.2);
+
+      drawDim2D(sc0.x, sc0.y, sc1.x, sc1.y, `正面 柱芯: ${wF}mm`, offFront);
+      drawDim2D(sc1.x, sc1.y, sc2.x, sc2.y, `右奥行 柱芯: ${dR}mm`, offSide, true);
+      drawDim2D(sc3.x, sc3.y, sc2.x, sc2.y, `背面 柱芯: ${wB}mm`, -offFront);
+      drawDim2D(sc0.x, sc0.y, sc3.x, sc3.y, `左奥行 柱芯: ${dL}mm`, -offSide, true);
+
+      const titleY = Math.min(-dL, -dR) - offFront - 450;
+      const titleSize = Math.round(baseFontSize * 1.3);
+      elements.push(`<text x="0" y="${titleY}" font-size="${titleSize}" font-weight="bold" fill="#0f172a" text-anchor="middle">平面図 (赤線: 柱芯 / 外側線: 仕上ふかし+100mm)</text>`);
+
+      const allX = [sc0.x, sc1.x, sc2.x, sc3.x, so0.x, so1.x, so2.x, so3.x];
+      const allY = [sc0.y, sc1.y, sc2.y, sc3.y, so0.y, so1.y, so2.y, so3.y];
+      const padX = offSide + 1400;
+      const padY = offFront + 1000;
+      const minX = Math.min(...allX) - padX;
+      const maxX = Math.max(...allX) + padX;
+      const minY = titleY - 250;
+      const maxY = Math.max(...allY) + padY;
+
+      vbMinX = minX; vbMinY = minY; vbW = maxX - minX; vbH = maxY - minY;
+
+    } else if (currentView === 'front-elev' || currentView === 'back-elev') {
+      const isFront = currentView === 'front-elev';
+      const wallName = isFront ? 'front' : 'back';
+      const wSpan = isFront ? wF : wB;
+      const totalW = wSpan + WALL_OUTER_OFFSET * 2;
+      const idxL = isFront ? 0 : 3;
+      const idxR = isFront ? 1 : 2;
+
+      const hL = hPts[idxL], hR = hPts[idxR];
+      const maxH = Math.max(hL, hR) + roofThickness;
+
+      const coreX1 = -wSpan / 2;
+      const coreX2 = wSpan / 2;
+      const outerX1 = coreX1 - WALL_OUTER_OFFSET;
+      const outerX2 = coreX2 + WALL_OUTER_OFFSET;
+
+      const baseGL_Y = 0;
+      const fFoundY = -foundationH;
+      const fGirdY1 = -hL;
+      const fGirdY2 = -hR;
+      const fRoofY1 = fGirdY1 - roofThickness;
+      const fRoofY2 = fGirdY2 - roofThickness;
+
+      elements.push(`<line x1="${outerX1 - 1200}" y1="${baseGL_Y}" x2="${outerX2 + 1200}" y2="${baseGL_Y}" stroke="#64748b" stroke-width="5"/>`);
+      elements.push(`<text x="${outerX1 - 1100}" y="${baseGL_Y + 70}" font-size="${baseFontSize}" font-weight="bold" fill="#64748b">▼ 設計GL (±0)</text>`);
+
+      const floorOps = openings.filter(op => op.wall === wallName && isFloorLevelOpening(op.type));
+      if (floorOps.length === 0) {
+        elements.push(`<rect x="${outerX1}" y="${fFoundY}" width="${totalW}" height="${foundationH}" fill="#94a3b8" stroke="#1e293b" stroke-width="3"/>`);
+      } else {
+        let curFoundX = outerX1;
+        floorOps.sort((a,b) => a.clearanceLeft - b.clearanceLeft).forEach(fOp => {
+          const sX1 = coreX1 + fOp.clearanceLeft;
+          const sX2 = sX1 + fOp.width;
+          if (sX1 > curFoundX) {
+            elements.push(`<rect x="${curFoundX}" y="${fFoundY}" width="${sX1 - curFoundX}" height="${foundationH}" fill="#94a3b8" stroke="#1e293b" stroke-width="3"/>`);
+          }
+          curFoundX = sX2;
+        });
+        if (curFoundX < outerX2) {
+          elements.push(`<rect x="${curFoundX}" y="${fFoundY}" width="${outerX2 - curFoundX}" height="${foundationH}" fill="#94a3b8" stroke="#1e293b" stroke-width="3"/>`);
+        }
+      }
+
+      elements.push(`<polygon points="${outerX1},${fFoundY} ${outerX2},${fFoundY} ${outerX2},${fGirdY2} ${outerX1},${fGirdY1}" fill="#f8fafc" stroke="#1e293b" stroke-width="3"/>`);
+
+      elements.push(`<line x1="${coreX1}" y1="${baseGL_Y + 90}" x2="${coreX1}" y2="${fRoofY1 - 90}" stroke="#ef4444" stroke-width="3" stroke-dasharray="16,6,4,6"/>`);
+      elements.push(`<line x1="${coreX2}" y1="${baseGL_Y + 90}" x2="${coreX2}" y2="${fRoofY2 - 90}" stroke="#ef4444" stroke-width="3" stroke-dasharray="16,6,4,6"/>`);
+      elements.push(`<text x="${coreX1}" y="${baseGL_Y + 140}" font-size="${baseFontSize * 0.9}" fill="#ef4444" font-weight="bold" text-anchor="middle">柱芯</text>`);
+      elements.push(`<text x="${coreX2}" y="${baseGL_Y + 140}" font-size="${baseFontSize * 0.9}" fill="#ef4444" font-weight="bold" text-anchor="middle">柱芯</text>`);
+
+      elements.push(`<polygon points="${outerX1},${fGirdY1} ${outerX2},${fGirdY2} ${outerX2},${fRoofY2} ${outerX1},${fRoofY1}" fill="#334155" stroke="#1e293b" stroke-width="3"/>`);
+
+      openings.filter(op => op.wall === wallName).forEach(op => {
+        const opLeftX = coreX1 + op.clearanceLeft;
+        const opW = op.width;
+        const opTopY = -op.topHeightGL;
+        const opH = isFloorLevelOpening(op.type) ? op.topHeightGL - 50 : op.topHeightGL - Math.max(op.topHeightGL - op.height, 50);
+
+        let fillC = (op.type === 'shutter') ? '#334155' : ((op.type === 'door' || op.type === 'sliding_door') ? '#475569' : '#38bdf8');
+        elements.push(`<rect x="${opLeftX}" y="${opTopY}" width="${opW}" height="${opH}" fill="${fillC}" stroke="#1e293b" stroke-width="3"/>`);
+        elements.push(`<text x="${opLeftX + opW/2}" y="${opTopY + opH/2}" fill="#fff" font-size="${baseFontSize * 0.85}" font-weight="bold" text-anchor="middle" dominant-baseline="central">${op.width}×${op.height}</text>`);
+      });
+
+      const offH1 = Math.max(450, baseFontSize * 3.5);
+      const offH2 = offH1 + Math.max(400, baseFontSize * 3.0);
+      drawDim2D(coreX1, baseGL_Y, coreX2, baseGL_Y, `柱芯間口: ${wSpan}mm`, offH1);
+      drawDim2D(outerX1, baseGL_Y, outerX2, baseGL_Y, `仕上全幅: ${totalW}mm`, offH2);
+      drawDim2D(outerX1, baseGL_Y, coreX1, baseGL_Y, `${WALL_OUTER_OFFSET}`, 200);
+      drawDim2D(coreX2, baseGL_Y, outerX2, baseGL_Y, `${WALL_OUTER_OFFSET}`, 200);
+
+      const offV1 = Math.max(500, baseFontSize * 4.0);
+      const offV2 = offV1 + Math.max(500, baseFontSize * 4.0);
+      drawDim2D(outerX1, baseGL_Y, outerX1, fFoundY, `基礎高: ${foundationH}mm`, -offV1, true);
+      drawDim2D(outerX1, baseGL_Y, outerX1, fGirdY1, `左軒高: ${Math.round(hL)}mm`, -offV2, true);
+      drawDim2D(outerX2, baseGL_Y, outerX2, fGirdY2, `右軒高: ${Math.round(hR)}mm`, offV1, true);
+
+      const titleY = Math.min(fRoofY1, fRoofY2) - 450;
+      elements.push(`<text x="0" y="${titleY}" font-size="${baseFontSize * 1.3}" font-weight="bold" fill="#0f172a" text-anchor="middle">${isFront ? '正立面図' : '裏立面図'} (両端柱芯より各100mmふかし施工)</text>`);
+
+      vbMinX = outerX1 - offV2 - 1200;
+      vbW = totalW + offV2 * 2 + 2400;
+      vbMinY = titleY - 250;
+      vbH = baseGL_Y + offH2 + 900 - vbMinY;
+
+    } else if (currentView === 'left-elev' || currentView === 'right-elev') {
+      const isLeft = currentView === 'left-elev';
+      const sideWallName = isLeft ? 'left' : 'right';
+      const dSide = isLeft ? dL : dR;
+      const totalD = dSide + WALL_OUTER_OFFSET * 2;
+      const idxA = isLeft ? 0 : 1;
+      const idxB = isLeft ? 3 : 2;
+      const hA = hPts[idxA], hB = hPts[idxB];
+
+      const coreX1 = -dSide / 2;
+      const coreX2 = dSide / 2;
+      const outerX1 = coreX1 - WALL_OUTER_OFFSET;
+      const outerX2 = coreX2 + WALL_OUTER_OFFSET;
+
+      const baseGL_Y = 0;
+      const sFoundY = -foundationH;
+      const sGirdY1 = -hA;
+      const sGirdY2 = -hB;
+      const sRoofY1 = sGirdY1 - roofThickness;
+      const sRoofY2 = sGirdY2 - roofThickness;
+
+      elements.push(`<line x1="${outerX1 - 1200}" y1="${baseGL_Y}" x2="${outerX2 + 1200}" y2="${baseGL_Y}" stroke="#64748b" stroke-width="5"/>`);
+      elements.push(`<text x="${outerX1 - 1100}" y="${baseGL_Y + 70}" font-size="${baseFontSize}" font-weight="bold" fill="#64748b">▼ 設計GL (±0)</text>`);
+
+      const floorOps = openings.filter(op => op.wall === sideWallName && isFloorLevelOpening(op.type));
+      if (floorOps.length === 0) {
+        elements.push(`<rect x="${outerX1}" y="${sFoundY}" width="${totalD}" height="${foundationH}" fill="#94a3b8" stroke="#1e293b" stroke-width="3"/>`);
+      } else {
+        let curFoundX = outerX1;
+        floorOps.sort((a,b) => a.clearanceLeft - b.clearanceLeft).forEach(fOp => {
+          const sX1 = coreX1 + fOp.clearanceLeft;
+          const sX2 = sX1 + fOp.width;
+          if (sX1 > curFoundX) {
+            elements.push(`<rect x="${curFoundX}" y="${sFoundY}" width="${sX1 - curFoundX}" height="${foundationH}" fill="#94a3b8" stroke="#1e293b" stroke-width="3"/>`);
+          }
+          curFoundX = sX2;
+        });
+        if (curFoundX < outerX2) {
+          elements.push(`<rect x="${curFoundX}" y="${sFoundY}" width="${outerX2 - curFoundX}" height="${foundationH}" fill="#94a3b8" stroke="#1e293b" stroke-width="3"/>`);
+        }
+      }
+
+      elements.push(`<polygon points="${outerX1},${sFoundY} ${outerX2},${sFoundY} ${outerX2},${sGirdY2} ${outerX1},${sGirdY1}" fill="#f8fafc" stroke="#1e293b" stroke-width="3"/>`);
+
+      elements.push(`<line x1="${coreX1}" y1="${baseGL_Y + 90}" x2="${coreX1}" y2="${sRoofY1 - 90}" stroke="#ef4444" stroke-width="3" stroke-dasharray="16,6,4,6"/>`);
+      elements.push(`<line x1="${coreX2}" y1="${baseGL_Y + 90}" x2="${coreX2}" y2="${sRoofY2 - 90}" stroke="#ef4444" stroke-width="3" stroke-dasharray="16,6,4,6"/>`);
+      elements.push(`<text x="${coreX1}" y="${baseGL_Y + 140}" font-size="${baseFontSize * 0.9}" fill="#ef4444" font-weight="bold" text-anchor="middle">柱芯</text>`);
+      elements.push(`<text x="${coreX2}" y="${baseGL_Y + 140}" font-size="${baseFontSize * 0.9}" fill="#ef4444" font-weight="bold" text-anchor="middle">柱芯</text>`);
+
+      elements.push(`<polygon points="${outerX1},${sGirdY1} ${outerX2},${sGirdY2} ${outerX2},${sRoofY2} ${outerX1},${sRoofY1}" fill="#334155" stroke="#1e293b" stroke-width="3"/>`);
+
+      openings.filter(op => op.wall === sideWallName).forEach(op => {
+        const opLeftX = coreX1 + op.clearanceLeft;
+        const opW = op.width;
+        const opTopY = -op.topHeightGL;
+        const opH = isFloorLevelOpening(op.type) ? op.topHeightGL - 50 : op.topHeightGL - Math.max(op.topHeightGL - op.height, 50);
+
+        let fillC = (op.type === 'shutter') ? '#334155' : ((op.type === 'door' || op.type === 'sliding_door') ? '#475569' : '#38bdf8');
+        elements.push(`<rect x="${opLeftX}" y="${opTopY}" width="${opW}" height="${opH}" fill="${fillC}" stroke="#1e293b" stroke-width="3"/>`);
+      });
+
+      const offH1 = Math.max(450, baseFontSize * 3.5);
+      const offH2 = offH1 + Math.max(400, baseFontSize * 3.0);
+      drawDim2D(coreX1, baseGL_Y, coreX2, baseGL_Y, `柱芯奥行: ${dSide}mm`, offH1);
+      drawDim2D(outerX1, baseGL_Y, outerX2, baseGL_Y, `仕上全奥行: ${totalD}mm`, offH2);
+      drawDim2D(outerX1, baseGL_Y, coreX1, baseGL_Y, `${WALL_OUTER_OFFSET}`, 200);
+      drawDim2D(coreX2, baseGL_Y, outerX2, baseGL_Y, `${WALL_OUTER_OFFSET}`, 200);
+
+      const offV1 = Math.max(500, baseFontSize * 4.0);
+      const offV2 = offV1 + Math.max(500, baseFontSize * 4.0);
+      drawDim2D(outerX1, baseGL_Y, outerX1, sFoundY, `基礎高: ${foundationH}mm`, -offV1, true);
+      drawDim2D(outerX1, baseGL_Y, outerX1, sGirdY1, `手前軒高: ${Math.round(hA)}mm`, -offV2, true);
+      drawDim2D(outerX2, baseGL_Y, outerX2, sGirdY2, `奥側軒高: ${Math.round(hB)}mm`, offV1, true);
+
+      const titleY = Math.min(sRoofY1, sRoofY2) - 450;
+      elements.push(`<text x="0" y="${titleY}" font-size="${baseFontSize * 1.3}" font-weight="bold" fill="#0f172a" text-anchor="middle">${isLeft ? '左側立面図' : '右側立面図'} (勾配: ${slope}寸 / ふかし各100mm加算)</text>`);
+
+      vbMinX = outerX1 - offV2 - 1200;
+      vbW = totalD + offV2 * 2 + 2400;
+      vbMinY = titleY - 250;
+      vbH = baseGL_Y + offH2 + 900 - vbMinY;
+    }
+
+    svg.setAttribute('viewBox', `${vbMinX} ${vbMinY} ${vbW} ${vbH}`);
+    const aspect = vbW / vbH;
+    let targetW, targetH;
+    if (containerW / containerH > aspect) {
+      targetH = containerH * 0.94;
+      targetW = targetH * aspect;
+    } else {
+      targetW = containerW * 0.94;
+      targetH = targetW / aspect;
+    }
+    svg.style.width = `${targetW * svgZoom}px`;
+    svg.style.height = `${targetH * svgZoom}px`;
+    svg.innerHTML = elements.join('');
+  }
+
+  function getWallInnerMaxSpan(wallKey) {
+    const wF = parseFloat(document.getElementById('wFront').value) || 5400;
+    const wB = parseFloat(document.getElementById('wBack').value) || 5400;
+    const dL = parseFloat(document.getElementById('dLeft').value) || 6000;
+    const dR = parseFloat(document.getElementById('dRight').value) || 6000;
+    const corePts = getCorePoints(wF, wB, dL, dR);
+    const innerPts = getOffsetPoints(corePts, -WALL_INNER_OFFSET);
+
+    let p1, p2;
+    if (wallKey === 'front') { p1 = innerPts[0]; p2 = innerPts[1]; }
+    else if (wallKey === 'right') { p1 = innerPts[1]; p2 = innerPts[2]; }
+    else if (wallKey === 'back')  { p1 = innerPts[2]; p2 = innerPts[3]; }
+    else if (wallKey === 'left')  { p1 = innerPts[3]; p2 = innerPts[0]; }
+    return Math.round(p1.distanceTo(p2));
+  }
+
+  // -------------------------------------------------------------
+  // 開口部UI描画（削除＆フォーカス完全修正版）
+  // -------------------------------------------------------------
+  function renderOpeningsUI() {
+    const container = document.getElementById('openingsContainer');
+    container.innerHTML = '';
+
+    openings.forEach((op) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.id = `opening-card-${op.id}`;
+
+      card.innerHTML = `
+        <button type="button" class="btn-delete" onclick="removeOpeningById(${op.id})">削除</button>
+        <div class="grid-2">
+          <div class="input-group">
+            <label>設置面</label>
+            <select id="op-wall-${op.id}" onchange="updateOpeningField(${op.id}, 'wall', this.value)">
+              <option value="front" ${op.wall === 'front' ? 'selected' : ''}>正面</option>
+              <option value="right" ${op.wall === 'right' ? 'selected' : ''}>右側面</option>
+              <option value="back" ${op.wall === 'back' ? 'selected' : ''}>背面</option>
+              <option value="left" ${op.wall === 'left' ? 'selected' : ''}>左側面</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>開口種類</label>
+            <select id="op-type-${op.id}" onchange="changeOpeningType(${op.id}, this.value)">
+              <option value="shutter" ${op.type === 'shutter' ? 'selected' : ''}>シャッター (床付け内付け)</option>
+              <option value="sliding_door" ${op.type === 'sliding_door' ? 'selected' : ''}>片引き戸 (土間付け半外付)</option>
+              <option value="door" ${op.type === 'door' ? 'selected' : ''}>框ドア (土間付け半外付)</option>
+              <option value="window" ${op.type === 'window' ? 'selected' : ''}>引き違い窓 (半外付け)</option>
+              <option value="fix" ${op.type === 'fix' ? 'selected' : ''}>FIX窓 (半外付け)</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="input-group">
+            <label>幅 W (mm)</label>
+            <input type="number" id="op-w-${op.id}" value="${op.width}" step="10" 
+              oninput="changeOpeningWidthDirect(${op.id}, parseFloat(this.value))"
+              onchange="commitHistory()">
+          </div>
+          <div class="input-group">
+            <label>高さ H (mm)</label>
+            <input type="number" id="op-h-${op.id}" value="${op.height}" step="10" 
+              oninput="updateOpeningField(${op.id}, 'height', parseFloat(this.value))"
+              onchange="commitHistory()">
+          </div>
+        </div>
+        
+        <div class="grid-2" style="background: #e2e8f0; padding: 6px; border-radius: 4px;">
+          <div class="input-group" title="左柱芯から開口左端までのクリアランス（最短100mm必要）">
+            <label style="color: #0369a1;">左柱芯の逃げ (mm) 💡</label>
+            <input type="number" id="op-clearance-${op.id}" value="${op.clearanceLeft}" step="10" 
+              oninput="changeClearanceLeftDirect(${op.id}, parseFloat(this.value))"
+              onchange="commitHistory()">
+          </div>
+          <div class="input-group" title="左柱芯から開口部中心までの距離（逃げ + W/2 で自動計算）">
+            <label style="color: #0369a1;">中心距離 (mm)</label>
+            <input type="number" id="op-center-${op.id}" value="${op.distFromLeft}" step="10" 
+              oninput="changeCenterDistDirect(${op.id}, parseFloat(this.value))"
+              onchange="commitHistory()">
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="input-group">
+            <label>天端高さ (GL+ mm)</label>
+            <input type="number" id="op-top-${op.id}" value="${op.topHeightGL}" step="10" 
+              oninput="updateOpeningField(${op.id}, 'topHeightGL', parseFloat(this.value))"
+              onchange="commitHistory()">
+          </div>
+          <div style="font-size: 10px; color: #64748b; display: flex; align-items: center;">
+            ※シャッター以外は半外付け<br>※出入口は基礎切り欠き
+          </div>
+        </div>
+        <div id="op-error-container-${op.id}" class="error-container"></div>
+        <div id="op-shutter-ctrl-${op.id}"></div>
+      `;
+      container.appendChild(card);
+      renderShutterSlider(op.id);
+    });
+
+    refreshValidationUI();
+  }
+
+  function renderShutterSlider(id) {
+    const box = document.getElementById(`op-shutter-ctrl-${id}`);
+    if (!box) return;
+    const op = openings.find(o => o.id === id);
+    if (!op) return;
+    if (op.type === 'shutter') {
+      const ratio = op.openRatio !== undefined ? op.openRatio : 0;
+      box.innerHTML = `
+        <div style="background: #e2e8f0; padding: 6px; border-radius: 4px; margin-top: 2px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <span id="op-shutter-label-${id}" style="font-size:11px; font-weight:bold; color:#0f172a;">シャッター開閉: ${Math.round(ratio * 100)}%</span>
+            <div>
+              <button type="button" style="padding:2px 5px; font-size:10px; cursor:pointer;" onclick="setShutterRatioBtn(${id}, 0)">全閉</button>
+              <button type="button" style="padding:2px 5px; font-size:10px; cursor:pointer;" onclick="setShutterRatioBtn(${id}, 1)">全開</button>
+            </div>
+          </div>
+          <input type="range" id="op-shutter-range-${id}" min="0" max="1" step="0.05" value="${ratio}" style="width:100%; cursor:pointer;" 
+            oninput="onShutterSliderInput(${id}, parseFloat(this.value))"
+            onchange="commitHistory()">
+        </div>
+      `;
+    } else {
+      box.innerHTML = '';
+    }
+  }
+
+  function refreshValidationUI() {
+    const validationErrors = validateOpenings();
+    openings.forEach((op) => {
+      const card = document.getElementById(`opening-card-${op.id}`);
+      const errBox = document.getElementById(`op-error-container-${op.id}`);
+      if (!card || !errBox) return;
+      const errs = validationErrors[op.id] || [];
+      if (errs.length > 0) {
+        card.classList.add('has-error');
+        errBox.innerHTML = errs.map(e => `<div class="error-badge">${e}</div>`).join('');
+      } else {
+        card.classList.remove('has-error');
+        errBox.innerHTML = '';
+      }
+    });
+  }
+
+  window.commitHistory = function() {
+    pushHistory();
+  };
+
+  window.updateOpeningField = function(id, key, val) {
+    const op = openings.find(o => o.id === id);
+    if (!op) return;
+    op[key] = val;
+    updateModel();
+  };
+
+  window.changeOpeningType = function(id, typeVal) {
+    const op = openings.find(o => o.id === id);
+    if (!op) return;
+    op.type = typeVal;
+    if (typeVal === 'shutter' && op.openRatio === undefined) {
+      op.openRatio = 0;
+    }
+    renderShutterSlider(id);
+    refreshValidationUI();
+    updateModel();
+    pushHistory();
+  };
+
+  window.changeClearanceLeftDirect = function(id, clearanceVal) {
+    const op = openings.find(o => o.id === id);
+    if (!op) return;
+    const val = isNaN(clearanceVal) ? 0 : clearanceVal;
+    op.clearanceLeft = val;
+    op.distFromLeft = Math.round(val + op.width / 2);
+    const centerInput = document.getElementById(`op-center-${id}`);
+    if (centerInput) centerInput.value = op.distFromLeft;
+    updateModel();
+  };
+
+  window.changeCenterDistDirect = function(id, centerVal) {
+    const op = openings.find(o => o.id === id);
+    if (!op) return;
+    const val = isNaN(centerVal) ? 0 : centerVal;
+    op.distFromLeft = val;
+    op.clearanceLeft = Math.round(val - op.width / 2);
+    const clearanceInput = document.getElementById(`op-clearance-${id}`);
+    if (clearanceInput) clearanceInput.value = op.clearanceLeft;
+    updateModel();
+  };
+
+  window.changeOpeningWidthDirect = function(id, wVal) {
+    const op = openings.find(o => o.id === id);
+    if (!op) return;
+    const w = isNaN(wVal) ? 600 : wVal;
+    op.width = w;
+    op.distFromLeft = Math.round(op.clearanceLeft + w / 2);
+    const centerInput = document.getElementById(`op-center-${id}`);
+    if (centerInput) centerInput.value = op.distFromLeft;
+    updateModel();
+  };
+
+  window.onShutterSliderInput = function(id, val) {
+    const op = openings.find(o => o.id === id);
+    if (!op) return;
+    op.openRatio = val;
+    const label = document.getElementById(`op-shutter-label-${id}`);
+    if (label) label.innerText = `シャッター開閉: ${Math.round(val * 100)}%`;
+    updateModel();
+  };
+
+  window.setShutterRatioBtn = function(id, val) {
+    const op = openings.find(o => o.id === id);
+    if (!op) return;
+    op.openRatio = val;
+    const slider = document.getElementById(`op-shutter-range-${id}`);
+    const label = document.getElementById(`op-shutter-label-${id}`);
+    if (slider) slider.value = val;
+    if (label) label.innerText = `シャッター開閉: ${Math.round(val * 100)}%`;
+    updateModel();
+    pushHistory();
+  };
+
+  window.removeOpeningById = function(id) {
+    const idx = openings.findIndex(o => o.id === id);
+    if (idx !== -1) {
+      openings.splice(idx, 1);
+      renderOpeningsUI();
+      updateModel();
+      pushHistory();
+    }
+  };
+
+  document.getElementById('addOpeningBtn').addEventListener('click', () => {
+    openings.push({
+      id: opIdCounter++,
+      wall: 'front',
+      type: 'shutter',
+      width: 2400,
+      height: 2200,
+      clearanceLeft: 100,
+      distFromLeft: 1300,
+      topHeightGL: 2250,
+      openRatio: 0
+    });
+    renderOpeningsUI();
+    updateModel();
+    pushHistory();
+  });
+
+  // -------------------------------------------------------------
+  // 車両配置 UI管理
+  // -------------------------------------------------------------
+  function renderVehiclesUI() {
+    const container = document.getElementById('vehiclesContainer');
+    container.innerHTML = '';
+
+    vehicles.forEach((veh) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <button type="button" class="btn-delete" onclick="removeVehicleById(${veh.id})">削除</button>
+        <div class="grid-2">
+          <div class="input-group">
+            <label>車両種別</label>
+            <select onchange="updateVehicleData(${veh.id}, 'type', this.value); pushHistory();">
+              <option value="car_suv" ${veh.type === 'car_suv' ? 'selected' : ''}>SUV・大型ワゴン</option>
+              <option value="car_sport" ${veh.type === 'car_sport' ? 'selected' : ''}>スポーツカー・クーペ</option>
+              <option value="bike" ${veh.type === 'bike' ? 'selected' : ''}>大型バイク</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>ボディカラー</label>
+            <input type="color" value="${veh.color || '#1e293b'}" style="height:32px; padding:2px; cursor:pointer;" 
+              onchange="updateVehicleData(${veh.id}, 'color', this.value); pushHistory();">
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="input-group">
+            <label>左右位置 X (mm)</label>
+            <input type="number" value="${veh.posX}" step="50" 
+              oninput="updateVehicleData(${veh.id}, 'posX', parseFloat(this.value))" 
+              onchange="pushHistory()">
+          </div>
+          <div class="input-group">
+            <label>前後位置 Z (mm)</label>
+            <input type="number" value="${veh.posZ}" step="50" 
+              oninput="updateVehicleData(${veh.id}, 'posZ', parseFloat(this.value))" 
+              onchange="pushHistory()">
+          </div>
+        </div>
+        <div class="input-group">
+          <label>回転角度 (度)</label>
+          <input type="number" value="${veh.rotDeg || 0}" step="5" min="-360" max="360" 
+            oninput="updateVehicleData(${veh.id}, 'rotDeg', parseFloat(this.value))" 
+            onchange="pushHistory()">
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  window.updateVehicleData = function(id, key, val) {
+    const veh = vehicles.find(v => v.id === id);
+    if (!veh) return;
+    veh[key] = val;
+    updateModel();
+  };
+
+  window.removeVehicleById = function(id) {
+    const idx = vehicles.findIndex(v => v.id === id);
+    if (idx !== -1) {
+      vehicles.splice(idx, 1);
+      renderVehiclesUI();
+      updateModel();
+      pushHistory();
+    }
+  };
+
+  document.getElementById('addVehicleBtn').addEventListener('click', () => {
+    vehicles.push({
+      id: vehicleIdCounter++,
+      type: 'car_suv',
+      posX: 1200,
+      posZ: -3200,
+      rotDeg: 0,
+      color: '#ffffff'
+    });
+    renderVehiclesUI();
+    updateModel();
+    pushHistory();
+  });
+
+  // -------------------------------------------------------------
+  // 棚 UI管理
+  // -------------------------------------------------------------
+  function renderShelvesUI() {
+    const container = document.getElementById('shelvesContainer');
+    container.innerHTML = '';
+
+    shelfUnits.forEach((unit, uIdx) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      const maxSpan = getWallInnerMaxSpan(unit.wall);
+
+      let levelsHtml = '';
+      unit.levels.forEach((lvl, lIdx) => {
+        levelsHtml += `
+          <div class="shelf-level-row">
+            <span style="font-size:10px; color:#475569; width:45px;">段 #${lIdx + 1}:</span>
+            <input type="number" value="${lvl}" step="10" placeholder="天端高 (GL+50基準)" 
+              oninput="updateShelfLevel(${uIdx}, ${lIdx}, parseFloat(this.value))" 
+              onchange="pushHistory()">
+            <span style="font-size:10px; color:#64748b;">mm</span>
+            <button type="button" style="background:#ef4444; color:white; border:none; border-radius:2px; font-size:10px; padding:2px 5px; cursor:pointer;" onclick="removeShelfLevel(${uIdx}, ${lIdx})">×</button>
+          </div>
+        `;
+      });
+
+      card.innerHTML = `
+        <button type="button" class="btn-delete" onclick="removeShelfUnit(${uIdx})">削除</button>
+        <div class="grid-2">
+          <div class="input-group">
+            <label>設置壁面 (内壁面基準)</label>
+            <select onchange="updateShelfUnitData(${uIdx}, 'wall', this.value); pushHistory();">
+              <option value="front" ${unit.wall === 'front' ? 'selected' : ''}>正面</option>
+              <option value="right" ${unit.wall === 'right' ? 'selected' : ''}>右面</option>
+              <option value="back" ${unit.wall === 'back' ? 'selected' : ''}>背面</option>
+              <option value="left" ${unit.wall === 'left' ? 'selected' : ''}>左面</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>出幅 D (奥行 mm)</label>
+            <input type="number" value="${unit.depth}" step="10" 
+              oninput="updateShelfUnitData(${uIdx}, 'depth', parseFloat(this.value))" 
+              onchange="pushHistory()">
+          </div>
+        </div>
+
+        <div class="shelf-guide-badge">
+          📏 この壁の内法有効最大寸法: 約 ${maxSpan} mm (柱芯+65mm内法)
+        </div>
+
+        <div class="grid-2">
+          <div class="input-group" title="ワンポイント：向かって左端の内壁仕上がり面（柱芯+65mm）を『0mm』として開始距離を設定します。">
+            <label>左端からの開始 (mm) 💡</label>
+            <input type="number" value="${unit.distFromLeft}" step="10" 
+              oninput="updateShelfUnitData(${uIdx}, 'distFromLeft', parseFloat(this.value))" 
+              onchange="pushHistory()">
+          </div>
+          <div class="input-group" title="棚全体の横幅を設定します（最大寸法以内で指定してください）">
+            <label>棚の総幅 W (mm)</label>
+            <input type="number" value="${unit.width}" max="${maxSpan}" step="10" 
+              oninput="updateShelfUnitData(${uIdx}, 'width', parseFloat(this.value))" 
+              onchange="pushHistory()">
+          </div>
+        </div>
+        <div style="font-size:10px; color:#64748b; line-height: 1.3;">
+          ※向かって左端の内壁面を0として開始位置を指定<br>
+          ・間仕切厚: ${unit.depth <= 600 ? '60mm (出幅≦600)' : '90mm (出幅>600)'} / 板厚: 30mm
+        </div>
+        <div class="shelf-levels-container">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <label style="font-size:10px;">棚板天端高 (土間天端 GL+50mm基準)</label>
+            <button type="button" style="background:#0284c7; color:white; border:none; border-radius:3px; font-size:10px; padding:2px 6px; cursor:pointer;" onclick="addShelfLevel(${uIdx})">＋段追加</button>
+          </div>
+          ${levelsHtml}
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  window.updateShelfUnitData = function(uIdx, key, val) {
+    shelfUnits[uIdx][key] = val;
+    renderShelvesUI();
+    updateModel();
+  };
+
+  window.removeShelfUnit = function(uIdx) {
+    shelfUnits.splice(uIdx, 1);
+    renderShelvesUI();
+    updateModel();
+    pushHistory();
+  };
+
+  window.updateShelfLevel = function(uIdx, lIdx, val) {
+    shelfUnits[uIdx].levels[lIdx] = val;
+    updateModel();
+  };
+
+  window.addShelfLevel = function(uIdx) {
+    const arr = shelfUnits[uIdx].levels;
+    const last = arr.length > 0 ? arr[arr.length - 1] : 450;
+    arr.push(last + 450);
+    renderShelvesUI();
+    updateModel();
+    pushHistory();
+  };
+
+  window.removeShelfLevel = function(uIdx, lIdx) {
+    shelfUnits[uIdx].levels.splice(lIdx, 1);
+    renderShelvesUI();
+    updateModel();
+    pushHistory();
+  };
+
+  document.getElementById('addShelfUnitBtn').addEventListener('click', () => {
+    shelfUnits.push({
+      wall: 'back',
+      distFromLeft: 200,
+      width: 3600,
+      depth: 500,
+      levels: [450, 900, 1350]
+    });
+    renderShelvesUI();
+    updateModel();
+    pushHistory();
+  });
+
+  // -------------------------------------------------------------
+  // プロジェクト設定の保存(JSON) & 復元(インポート)
+  // -------------------------------------------------------------
+  document.getElementById('saveProjectBtn').addEventListener('click', () => {
+    const projectData = {
+      version: "3.0",
+      timestamp: new Date().toISOString(),
+      dimensions: {
+        wFront: parseFloat(document.getElementById('wFront').value),
+        wBack: parseFloat(document.getElementById('wBack').value),
+        dLeft: parseFloat(document.getElementById('dLeft').value),
+        dRight: parseFloat(document.getElementById('dRight').value),
+        eaveHeight: parseFloat(document.getElementById('eaveHeight').value),
+        foundationHeight: parseFloat(document.getElementById('foundationHeight').value),
+        roofSlope: parseFloat(document.getElementById('roofSlope').value),
+        slopeDirection: document.getElementById('slopeDirection').value,
+        ceilingType: document.getElementById('ceilingType').value
+      },
+      openings: openings,
+      shelfUnits: shelfUnits,
+      vehicles: vehicles
+    };
+
+    const blob = new Blob([JSON.stringify(projectData, null, 2)], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.download = `garage-project-${Date.now()}.json`;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+    URL.revokeObjectURL(link.href);
+  });
+
+  const fileInput = document.getElementById('fileInput');
+  document.getElementById('loadProjectBtn').addEventListener('click', () => {
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        if (data.dimensions) {
+          document.getElementById('wFront').value = data.dimensions.wFront;
+          document.getElementById('wBack').value = data.dimensions.wBack;
+          document.getElementById('dLeft').value = data.dimensions.dLeft;
+          document.getElementById('dRight').value = data.dimensions.dRight;
+          document.getElementById('eaveHeight').value = data.dimensions.eaveHeight;
+          document.getElementById('foundationHeight').value = data.dimensions.foundationHeight;
+          document.getElementById('roofSlope').value = data.dimensions.roofSlope;
+          document.getElementById('slopeDirection').value = data.dimensions.slopeDirection;
+          if (data.dimensions.ceilingType) document.getElementById('ceilingType').value = data.dimensions.ceilingType;
+        }
+        if (data.openings && Array.isArray(data.openings)) {
+          openings = data.openings.map(op => {
+            if (!op.id) op.id = opIdCounter++;
+            if (op.clearanceLeft === undefined) {
+              op.clearanceLeft = Math.round(op.distFromLeft - op.width / 2);
+            }
+            return op;
+          });
+        }
+        if (data.shelfUnits && Array.isArray(data.shelfUnits)) {
+          shelfUnits = data.shelfUnits;
+        }
+        if (data.vehicles && Array.isArray(data.vehicles)) {
+          vehicles = data.vehicles.map(v => {
+            if (!v.id) v.id = vehicleIdCounter++;
+            return v;
+          });
+        }
+        renderOpeningsUI();
+        renderShelvesUI();
+        renderVehiclesUI();
+        updateModel();
+        pushHistory();
+        alert('設定ファイルを正常に読み込み、モデルを復元しました。');
+      } catch (err) {
+        alert('設定ファイルの読み込みに失敗しました。正しいJSONファイルかご確認ください。');
+      }
+    };
+    reader.readAsText(file);
+    fileInput.value = '';
+  });
+
+  const seeThroughBtn = document.getElementById('seeThroughBtn');
+  seeThroughBtn.addEventListener('click', () => {
+    isSeeThrough = !isSeeThrough;
+    seeThroughBtn.innerText = isSeeThrough ? '透視モード: ON' : '透視モード: OFF';
+    seeThroughBtn.classList.toggle('active', isSeeThrough);
+    updateModel();
+  });
+
+  document.getElementById('insideCamBtn').addEventListener('click', () => {
+    camera.position.set(0, 1200, -1000);
+    controls.target.set(0, 1200, -3500);
+    controls.update();
+  });
+
+  const tabs = document.querySelectorAll('.view-tab');
+  const canvasContainer = document.getElementById('canvas-container');
+  const svgContainer = document.getElementById('svg-container');
+  const infoTag = document.getElementById('info-tag');
+  const viewHelpers = document.getElementById('view-helpers');
+  const zoomControls = document.getElementById('zoom-controls');
+  const zoomRange = document.getElementById('zoomRange');
+  const zoomVal = document.getElementById('zoomVal');
+  const dimFontRange = document.getElementById('dimFontRange');
+  const dimFontVal = document.getElementById('dimFontVal');
+  const resetZoomBtn = document.getElementById('resetZoomBtn');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentView = tab.getAttribute('data-view');
+
+      if (currentView === '3d') {
+        canvasContainer.style.display = 'block';
+        svgContainer.style.display = 'none';
+        viewHelpers.style.display = 'flex';
+        zoomControls.style.display = 'none';
+        infoTag.innerText = 'ドラッグ: 回転 | 右ドラッグ: 平行移動 | ホイール: ズーム';
+        updateModel();
+      } else {
+        canvasContainer.style.display = 'none';
+        svgContainer.style.display = 'block';
+        viewHelpers.style.display = 'none';
+        zoomControls.style.display = 'flex';
+        infoTag.innerText = '実寸自動フィット製図モード (スクロール可)';
+        render2DDrawings();
+      }
+    });
+  });
+
+  zoomRange.addEventListener('input', () => {
+    svgZoom = parseFloat(zoomRange.value);
+    zoomVal.innerText = `${Math.round(svgZoom * 100)}%`;
+    render2DDrawings();
+  });
+
+  dimFontRange.addEventListener('input', () => {
+    dimFontScale = parseFloat(dimFontRange.value);
+    dimFontVal.innerText = `${dimFontScale.toFixed(1)}x`;
+    render2DDrawings();
+  });
+
+  resetZoomBtn.addEventListener('click', () => {
+    svgZoom = 1.0;
+    dimFontScale = 1.0;
+    zoomRange.value = "1.0";
+    dimFontRange.value = "1.0";
+    zoomVal.innerText = "100%";
+    dimFontVal.innerText = "1.0x";
+    render2DDrawings();
+  });
+
+  ['wFront', 'wBack', 'dLeft', 'dRight', 'eaveHeight', 'foundationHeight', 'roofSlope', 'slopeDirection', 'ceilingType', 'showDimensions'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      renderShelvesUI();
+      updateModel();
+    });
+    document.getElementById(id).addEventListener('change', () => {
+      pushHistory();
+    });
+  });
+
+  const fontScaleInput = document.getElementById('fontScale');
+  const fontScaleVal = document.getElementById('fontScaleVal');
+  fontScaleInput.addEventListener('input', () => {
+    fontScaleVal.innerText = `${parseFloat(fontScaleInput.value).toFixed(1)}x`;
+    updateModel();
+  });
+
+  // 画像保存（StableDiffusion/ArchiX用高解像度出力）
+  document.getElementById('downloadBtn').addEventListener('click', () => {
+    if (currentView === '3d') {
+      const link = document.createElement('a');
+      link.download = `sd-archix-pass-${Date.now()}.png`;
+      link.href = renderer.domElement.toDataURL('image/png');
+      link.click();
+    } else {
+      const svg = document.getElementById('drawSvg');
+      const svgData = new XMLSerializer().serializeToString(svg);
+      const canvas = document.createElement('canvas');
+      canvas.width = 3000;
+      canvas.height = 2100;
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      img.onload = () => {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const link = document.createElement('a');
+        link.download = `${currentView}-drawing-${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      };
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgData);
+    }
+  });
+
+  function animate() {
+    requestAnimationFrame(animate);
+    if (currentView === '3d') renderer.render(scene, camera);
+  }
+
+  // 初期化実行
+  renderOpeningsUI();
+  renderShelvesUI();
+  renderVehiclesUI();
+  updateModel();
+  pushHistory(); // 初期状態を履歴スタックにプッシュ
+  animate();
+
+  window.addEventListener('resize', () => {
+    camera.aspect = container.clientWidth / container.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    if (currentView !== '3d') render2DDrawings();
+  });
+</script>
+</body>
+</html>

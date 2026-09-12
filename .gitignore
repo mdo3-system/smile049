@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing / Build
+dist/
+build/
+coverage/
+
+# Misc
+.DS_Store
+Thumbs.db
+*.log
+
+# Env
+.env
+.env.local
