@@ -123,19 +123,51 @@ export default function Header({ currentRoute, setCurrentRoute }) {
           })}
         </nav>
 
-        {/* 右側CTA（3Dシミュレーター直通） */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        {/* 右側CTA（チャット ＆ 3Dシミュレーター直通 ＆ 管理画面） */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button
+            onClick={() => handleNav('chat')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '8px 12px',
+              borderRadius: 'var(--radius-full)',
+              background: '#f1f5f9',
+              color: '#334155',
+              fontSize: 13,
+              fontWeight: 600
+            }}
+            title="個別相談チャットを開く"
+          >
+            <span>💬 相談チャット</span>
+          </button>
+
           <button
             onClick={() => handleNav('simulator')}
             className="btn-accent"
             style={{
-              padding: '10px 20px',
-              fontSize: 14,
+              padding: '9px 18px',
+              fontSize: 13.5,
               boxShadow: '0 3px 12px rgba(224, 122, 95, 0.35)'
             }}
           >
-            <Compass size={17} />
-            <span>3Dシミュレーターを開く</span>
+            <Compass size={16} />
+            <span>3Dシミュレーター</span>
+          </button>
+
+          <button
+            onClick={() => handleNav('admin')}
+            style={{
+              padding: '8px',
+              borderRadius: 'var(--radius-md)',
+              color: '#94a3b8',
+              fontSize: 12,
+              fontWeight: 600
+            }}
+            title="建築士・スタッフ管理パネル"
+          >
+            👤 管理
           </button>
 
           {/* モバイルハンバーガー */}

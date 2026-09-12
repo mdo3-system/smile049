@@ -1,0 +1,474 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  Users, MessageSquare, Send, Paperclip, Sparkles, CheckCircle, 
+  ArrowUpRight, ArrowLeft, RefreshCw, Download, Database, ShieldCheck, 
+  ExternalLink, Calendar, Mail, FileText, Image as ImageIcon, Box
+} from 'lucide-react';
+import { getChatRooms, sendMessageToRoom, updateRoomStatus, saveChatRooms } from '../services/chatService';
+
+export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel }) {
+  const [rooms, setRooms] = useState(getChatRooms());
+  const [selectedRoomId, setSelectedRoomId] = useState(rooms[0]?.roomId || null);
+  const [replyText, setReplyText] = useState('');
+  const [isAiGenerating, setIsAiGenerating] = useState(false);
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setRooms(getChatRooms());
+    };
+    window.addEventListener('chat_rooms_updated', handleUpdate);
+    return () => window.removeEventListener('chat_rooms_updated', handleUpdate);
+  }, []);
+
+  const activeRoom = rooms.find(r => r.roomId === selectedRoomId) || rooms[0];
+
+  const handleSendReply = (e) => {
+    e?.preventDefault();
+    if (!replyText.trim() || !activeRoom) return;
+
+    sendMessageToRoom(activeRoom.roomId, {
+      sender: 'staff',
+      text: replyText
+    });
+    setReplyText('');
+  };
+
+  // AIフォトリアルパース生成・送付アクション（Stable Diffusion / ControlNet 連携模倣）
+  const handleSendAiRender = () => {
+    if (!activeRoom) return;
+    setIsAiGenerating(true);
+
+    // AIパース生成処理をシミュレート (実際には画像アップロードまたはサーバーレスAPI)
+    setTimeout(() => {
+      // サンプルパース画像用キャンバス生成 (高精細なウッドガレージパース風)
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 680;
+      const ctx = canvas.getContext('2d');
+
+      // 背景・青空グラデーション
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, 400);
+      skyGrad.addColorStop(0, '#38bdf8');
+      skyGrad.addColorStop(1, '#e0f2fe');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, 1024, 680);
+
+      // 地面・アスファルト
+      ctx.fillStyle = '#475569';
+      ctx.fillRect(0, 400, 1024, 280);
+
+      // ガレージ建物本体（木造無垢パース表現）
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(200, 180, 624, 280);
+
+      // 木目ルーバー・シャッター
+      ctx.fillStyle = '#b45309';
+      ctx.fillRect(260, 240, 360, 220);
+      ctx.fillStyle = '#78350f';
+      for (let y = 250; y < 450; y += 14) {
+        ctx.fillRect(260, y, 360, 2);
+      }
+
+      // 屋根・軒
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.moveTo(180, 180);
+      ctx.lineTo(844, 150);
+      ctx.lineTo(844, 175);
+      ctx.lineTo(180, 205);
+      ctx.closePath();
+      ctx.fill();
+
+      // パースタイトル透かし
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 24px sans-serif';
+      ctx.fillText('【AI Photoreal Perspective】木造自由設計ガレージ', 220, 140);
+      ctx.font = '16px sans-serif';
+      ctx.fillText(`Client: ${activeRoom.customerName} / Stable Diffusion v1.5 ControlNet Depth`, 220, 480);
+
+      const renderDataUrl = canvas.toDataURL('image/png');
+
+      sendMessageToRoom(activeRoom.roomId, {
+        sender: 'staff',
+        text: `お待たせいたしました！3DデータをもとにAIフォトリアルパース（外観昼景）を作成いたしました。木造の質感とシャッターの納まりをご確認ください。`,
+        attachments: [
+          {
+            name: `${activeRoom.customerName}_フォトリアルパース.png`,
+            type: 'image',
+            size: '3.8MB',
+            url: renderDataUrl,
+            isAiRender: true
+          }
+        ]
+      });
+
+      updateRoomStatus(activeRoom.roomId, 'AIパース提案済');
+      setIsAiGenerating(false);
+    }, 1200);
+  };
+
+  // 自社顧客管理CRMへの自動移管
+  const handleCrmTransfer = () => {
+    if (!activeRoom) return;
+    if (confirm(`${activeRoom.customerName} の商談データを「自社顧客管理CRM」へ登録・移管しますか？`)) {
+      updateRoomStatus(activeRoom.roomId, '契約・CRM移管済');
+      alert(`【CRM自動連携完了】\n${activeRoom.customerName} の顧客情報・3D仕様パラメータ・合意図面を自社CRMデータベースへ正常に登録・移管いたしました。`);
+    }
+  };
+
+  // 顧客の3Dデータをシミュレーターで開く
+  const handleOpenCustomer3D = () => {
+    if (!activeRoom || !activeRoom.modelData) {
+      alert('この依頼には3Dデータが添付されています（標準モデルで開きます）。');
+    }
+    if (onLoadCustomerModel && activeRoom.modelData) {
+      onLoadCustomerModel(activeRoom.modelData);
+    }
+    setCurrentRoute('simulator');
+  };
+
+  return (
+    <div style={{
+      minHeight: 'calc(100vh - 65px)',
+      background: '#f1f5f9',
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
+      {/* 管理画面トップバー */}
+      <div style={{
+        background: '#0f172a',
+        color: '#ffffff',
+        padding: '12px 24px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button
+            onClick={() => setCurrentRoute('top')}
+            style={{ color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}
+          >
+            <ArrowLeft size={16} />
+            <span>サイトへ戻る</span>
+          </button>
+          <div style={{ height: 16, width: 1, background: '#334155' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Users size={18} color="#38bdf8" />
+            <h2 style={{ fontSize: 16, margin: 0, fontWeight: 700 }}>
+              建築士・スタッフ専用 管理パネル
+            </h2>
+            <span style={{ fontSize: 11, background: '#1e293b', color: '#38bdf8', padding: '2px 8px', borderRadius: 4 }}>
+              Xserver 連携運用モード
+            </span>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button
+            onClick={() => setRooms(getChatRooms())}
+            style={{ color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12 }}
+          >
+            <RefreshCw size={14} />
+            <span>データ更新</span>
+          </button>
+        </div>
+      </div>
+
+      {/* メインレイアウト (左: 顧客一覧 / 右: チャット＆アクション) */}
+      <div style={{
+        flex: 1,
+        maxWidth: 1300,
+        width: '100%',
+        margin: '0 auto',
+        padding: '20px',
+        display: 'grid',
+        gridTemplateColumns: '360px 1fr',
+        gap: 20
+      }}>
+        {/* 左: 依頼・顧客リスト */}
+        <div style={{
+          background: '#ffffff',
+          borderRadius: 12,
+          border: '1px solid #e2e8f0',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          boxShadow: 'var(--shadow-sm)'
+        }}>
+          <div style={{
+            padding: '14px 18px',
+            borderBottom: '1px solid #e2e8f0',
+            background: '#f8fafc',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+            <h3 style={{ fontSize: 14, color: '#1e293b', fontWeight: 700, margin: 0 }}>
+              パース依頼・問い合わせ一覧 ({rooms.length}件)
+            </h3>
+          </div>
+
+          <div style={{ flex: 1, overflowY: 'auto' }}>
+            {rooms.map((room) => {
+              const isSelected = room.roomId === selectedRoomId;
+              return (
+                <div
+                  key={room.roomId}
+                  onClick={() => setSelectedRoomId(room.roomId)}
+                  style={{
+                    padding: '14px 18px',
+                    borderBottom: '1px solid #f1f5f9',
+                    background: isSelected ? 'var(--color-primary-soft)' : '#ffffff',
+                    borderLeft: isSelected ? '4px solid var(--color-primary)' : '4px solid transparent',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: '#1e293b' }}>
+                      {room.customerName}
+                    </span>
+                    <span style={{
+                      fontSize: 10.5,
+                      padding: '2px 8px',
+                      borderRadius: 12,
+                      fontWeight: 700,
+                      background: room.crmTransferred ? '#dcfce7' : '#e0f2fe',
+                      color: room.crmTransferred ? '#15803d' : '#0369a1'
+                    }}>
+                      {room.status}
+                    </span>
+                  </div>
+
+                  <div style={{ fontSize: 12, color: '#64748b', marginBottom: 6 }}>
+                    {room.planType}
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11, color: '#94a3b8' }}>
+                    <span>{room.createdAt}</span>
+                    <span>{room.messages.length}件のやり取り</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 右: 個別チャット対応 ＆ アクションパネル */}
+        {activeRoom ? (
+          <div style={{
+            background: '#ffffff',
+            borderRadius: 12,
+            border: '1px solid #e2e8f0',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            boxShadow: 'var(--shadow-sm)'
+          }}>
+            {/* 顧客サマリー＆アクションバー */}
+            <div style={{
+              padding: '16px 20px',
+              borderBottom: '1px solid #e2e8f0',
+              background: '#f8fafc',
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 12
+            }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <h3 style={{ fontSize: 17, color: '#0f172a', margin: 0, fontWeight: 800 }}>
+                    {activeRoom.customerName}
+                  </h3>
+                  <span style={{ fontSize: 12, color: '#64748b' }}>({activeRoom.email})</span>
+                  {activeRoom.crmTransferred && (
+                    <span style={{ fontSize: 11, background: '#dcfce7', color: '#166534', padding: '3px 8px', borderRadius: 4, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <CheckCircle size={12} /> CRM移管完了
+                    </span>
+                  )}
+                </div>
+                <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>
+                  プラン種別：<strong>{activeRoom.planType}</strong>
+                </div>
+              </div>
+
+              {/* スタッフ専用アクションボタン群 */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {/* 3Dモデルで開く */}
+                <button
+                  onClick={handleOpenCustomer3D}
+                  className="btn-secondary"
+                  style={{ padding: '7px 12px', fontSize: 12, borderRadius: 6 }}
+                >
+                  <Box size={14} />
+                  <span>3Dで開いて確認</span>
+                </button>
+
+                {/* AIパース作成・送付 */}
+                <button
+                  onClick={handleSendAiRender}
+                  className="btn-accent"
+                  disabled={isAiGenerating}
+                  style={{ padding: '7px 14px', fontSize: 12, borderRadius: 6 }}
+                >
+                  <Sparkles size={14} />
+                  <span>{isAiGenerating ? 'AIパース生成中...' : '✨ AIパースを生成して送付'}</span>
+                </button>
+
+                {/* CRMへ移管 */}
+                <button
+                  onClick={handleCrmTransfer}
+                  style={{
+                    padding: '7px 14px',
+                    fontSize: 12,
+                    borderRadius: 6,
+                    background: activeRoom.crmTransferred ? '#e2e8f0' : '#1e293b',
+                    color: activeRoom.crmTransferred ? '#64748b' : '#ffffff',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    fontWeight: 700
+                  }}
+                  disabled={activeRoom.crmTransferred}
+                >
+                  <Database size={14} />
+                  <span>{activeRoom.crmTransferred ? 'CRM登録済' : '自社CRMへ登録・移管'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* チャットタイムライン */}
+            <div style={{
+              flex: 1,
+              padding: '20px',
+              overflowY: 'auto',
+              background: '#f8fafc',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 14,
+              maxHeight: '480px'
+            }}>
+              {activeRoom.messages.map((msg) => {
+                const isStaff = msg.sender === 'staff';
+                const isSystem = msg.sender === 'system';
+
+                if (isSystem) {
+                  return (
+                    <div key={msg.id} style={{
+                      background: '#f1f5f9',
+                      border: '1px dashed #cbd5e1',
+                      borderRadius: 8,
+                      padding: '8px 12px',
+                      fontSize: 12,
+                      color: '#475569',
+                      textAlign: 'center'
+                    }}>
+                      {msg.text}
+                    </div>
+                  );
+                }
+
+                return (
+                  <div
+                    key={msg.id}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: isStaff ? 'flex-end' : 'flex-start',
+                      maxWidth: '80%',
+                      alignSelf: isStaff ? 'flex-end' : 'flex-start'
+                    }}
+                  >
+                    <div style={{ fontSize: 11, color: '#64748b', marginBottom: 2 }}>
+                      {isStaff ? '自社（建築士・スタッフ）' : activeRoom.customerName} • {msg.time}
+                    </div>
+
+                    <div style={{
+                      background: isStaff ? 'var(--color-primary)' : '#ffffff',
+                      color: isStaff ? '#ffffff' : '#1e293b',
+                      padding: '12px 16px',
+                      borderRadius: 12,
+                      border: isStaff ? 'none' : '1px solid #e2e8f0',
+                      fontSize: 13.5,
+                      lineHeight: 1.6,
+                      boxShadow: 'var(--shadow-sm)'
+                    }}>
+                      {msg.text}
+
+                      {/* 添付ファイル */}
+                      {msg.attachments && msg.attachments.length > 0 && (
+                        <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                          {msg.attachments.map((att, aIdx) => (
+                            <div key={aIdx} style={{
+                              background: isStaff ? 'rgba(255,255,255,0.15)' : '#f1f5f9',
+                              padding: '6px 10px',
+                              borderRadius: 6,
+                              fontSize: 12,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              gap: 10
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                {att.type === 'image' ? <ImageIcon size={14} /> : <FileText size={14} />}
+                                <span>{att.name}</span>
+                              </div>
+                              {att.url && (
+                                <a href={att.url} download={att.name} style={{ color: isStaff ? '#a7f3d0' : 'var(--color-primary)', fontWeight: 700, fontSize: 11 }}>
+                                  ダウンロード
+                                </a>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* 返信入力フォーム */}
+            <form onSubmit={handleSendReply} style={{
+              padding: '14px 20px',
+              borderTop: '1px solid #e2e8f0',
+              background: '#ffffff',
+              display: 'flex',
+              gap: 10,
+              alignItems: 'center'
+            }}>
+              <input
+                type="text"
+                placeholder={`${activeRoom.customerName} へ返信メッセージを入力...`}
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                style={{
+                  flex: 1,
+                  padding: '10px 14px',
+                  borderRadius: 8,
+                  border: '1px solid #cbd5e1',
+                  fontSize: 14,
+                  outline: 'none'
+                }}
+              />
+              <button
+                type="submit"
+                className="btn-primary"
+                style={{ padding: '10px 20px', fontSize: 14, borderRadius: 8 }}
+              >
+                <Send size={15} />
+                <span>返信する</span>
+              </button>
+            </form>
+          </div>
+        ) : (
+          <div style={{ background: '#fff', borderRadius: 12, padding: 40, textAlign: 'center', color: '#94a3b8' }}>
+            顧客を選択してください。
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

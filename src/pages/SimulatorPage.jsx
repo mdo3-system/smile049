@@ -7,14 +7,21 @@ import {
   Maximize2, Compass, Move, ChevronRight, Sliders, FileText, Check
 } from 'lucide-react';
 import ManualModal from '../components/ManualModal';
+import ParseRequestModal from '../components/ParseRequestModal';
+import ChatRoomModal from '../components/ChatRoomModal';
 
-export default function SimulatorPage({ setCurrentRoute }) {
+export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
   const canvasContainerRef = useRef(null);
   const svgRef = useRef(null);
   const fileInputRef = useRef(null);
 
   // マニュアルモーダル
   const [isManualOpen, setIsManualOpen] = useState(false);
+  // パース作成依頼モーダル
+  const [isParseRequestOpen, setIsParseRequestOpen] = useState(false);
+  // チャットモーダル
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatRoomId, setChatRoomId] = useState(null);
 
   // 表示モード ('3d', 'plan', 'front-elev', 'back-elev', 'left-elev', 'right-elev')
   const [currentView, setCurrentView] = useState('3d');
@@ -167,6 +174,13 @@ export default function SimulatorPage({ setCurrentRoute }) {
     if (s.shelfUnits) setShelfUnits(s.shelfUnits);
     if (s.vehicles) setVehicles(s.vehicles);
   };
+
+  useEffect(() => {
+    if (externalModelData) {
+      restoreState(externalModelData);
+      pushHistory(externalModelData);
+    }
+  }, [externalModelData]);
 
   // -------------------------------------------------------------
   // Three.js 初期化
@@ -1234,6 +1248,24 @@ export default function SimulatorPage({ setCurrentRoute }) {
       {/* 操作マニュアルモーダル */}
       <ManualModal isOpen={isManualOpen} onClose={() => setIsManualOpen(false)} />
 
+      {/* パース作成依頼モーダル */}
+      <ParseRequestModal 
+        isOpen={isParseRequestOpen} 
+        onClose={() => setIsParseRequestOpen(false)} 
+        currentModelData={{ dimensions, openings, shelfUnits, vehicles }}
+        onOpenChat={(newRoomId) => {
+          setChatRoomId(newRoomId);
+          setIsChatOpen(true);
+        }}
+      />
+
+      {/* チャットモーダル */}
+      <ChatRoomModal 
+        isOpen={isChatOpen} 
+        onClose={() => setIsChatOpen(false)} 
+        initialRoomId={chatRoomId}
+      />
+
       {/* 隠しファイルインプット */}
       <input type="file" ref={fileInputRef} onChange={handleLoadJson} accept=".json" style={{ display: 'none' }} />
 
@@ -1253,7 +1285,7 @@ export default function SimulatorPage({ setCurrentRoute }) {
         flexShrink: 0,
         zIndex: 20
       }}>
-        {/* トップバー（サイト戻る・マニュアル・JSON・Undo/Redo） */}
+        {/* トップバー（サイト戻る・マニュアル・パース依頼） */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
           <button
             onClick={() => setCurrentRoute('top')}
@@ -1263,15 +1295,36 @@ export default function SimulatorPage({ setCurrentRoute }) {
             <span>サイトへ戻る</span>
           </button>
 
-          <button
-            onClick={() => setIsManualOpen(true)}
-            className="btn-primary"
-            style={{ padding: '6px 12px', fontSize: 12, borderRadius: 6 }}
-          >
-            <BookOpen size={14} />
-            <span>操作マニュアル</span>
-          </button>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button
+              onClick={() => setIsChatOpen(true)}
+              className="btn-secondary"
+              style={{ padding: '6px 10px', fontSize: 11, borderRadius: 6 }}
+              title="相談チャットを開く"
+            >
+              <MessageSquare size={13} />
+              <span>相談チャット</span>
+            </button>
+            <button
+              onClick={() => setIsManualOpen(true)}
+              className="btn-primary"
+              style={{ padding: '6px 10px', fontSize: 11, borderRadius: 6 }}
+            >
+              <BookOpen size={13} />
+              <span>マニュアル</span>
+            </button>
+          </div>
         </div>
+
+        {/* パース依頼 目立つCTA */}
+        <button
+          onClick={() => setIsParseRequestOpen(true)}
+          className="btn-accent"
+          style={{ padding: '11px 16px', fontSize: 13.5, borderRadius: 8, justifyContent: 'center', boxShadow: '0 4px 14px rgba(224, 122, 95, 0.4)' }}
+        >
+          <Sparkles size={16} color="#fde047" />
+          <span>✨ フォトリアルパースの作成を依頼 (無料)</span>
+        </button>
 
         {/* 保存・読込 ＆ Undo/Redo */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 6 }}>
