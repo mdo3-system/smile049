@@ -243,17 +243,211 @@ export default function TopPage({ setCurrentRoute }) {
           </div>
         </div>
 
+        {/* =========================================================
+            3D設計〜AIフォトリアルパース受領までの一連ステップギャラリー
+           ========================================================= */}
+        <div style={{
+          background: '#ffffff',
+          borderRadius: 'var(--radius-xl)',
+          padding: '40px 24px',
+          boxShadow: 'var(--shadow-md)',
+          border: '1px solid var(--border-card)',
+          marginBottom: 44
+        }}>
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <span style={{
+              background: 'var(--color-primary-soft)',
+              color: 'var(--color-primary)',
+              padding: '4px 14px',
+              borderRadius: 20,
+              fontSize: 12,
+              fontWeight: 800,
+              letterSpacing: '0.05em'
+            }}>
+              実際の画面でわかる！体験ストーリー
+            </span>
+            <h3 style={{
+              fontSize: 'clamp(20px, 3vw, 28px)',
+              color: 'var(--text-main)',
+              marginTop: 10,
+              marginBottom: 10
+            }}>
+              0ベースの自由設計から、AIフォトリアルパース完成まで
+            </h3>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', maxWidth: 640, margin: '0 auto' }}>
+              スマホやPCの画面上で、あなたの敷地に合わせたガレージがカタチになり、
+              プロ建築士監修の超リアルな完成予想パースがチャットに届くまでの一連の流れをご覧ください。
+            </p>
+          </div>
+
+          {/* 6ステップ グリッド表示 */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))',
+            gap: 24,
+            marginBottom: 20
+          }}>
+            {[
+              {
+                step: '01',
+                title: '幅・奥行・屋根勾配をミリ単位で設計',
+                desc: '敷地境界や変形地に合わせてミリ単位で入力。3D寸法線が連動し、立体空間が即座に立ち上がります。',
+                img: './assets/steps/step1.png',
+                tag: '自由設計'
+              },
+              {
+                step: '02',
+                title: 'シャッター・ドア・サッシを自由配置',
+                desc: '大型電動シャッターや片開きドア、高所換気窓を直感配置。内付け・半外付け・基礎切欠きも自動連動。',
+                img: './assets/steps/step2.png',
+                tag: '建具配置'
+              },
+              {
+                step: '03',
+                title: '内部の造作棚・ラックをレイアウト',
+                desc: '木造の柱間に合わせた収納棚を自由に設計。透視モードをONにすると内部の広がりが隅々まで見通せます。',
+                img: './assets/steps/step3.png',
+                tag: '内部空間'
+              },
+              {
+                step: '04',
+                title: '愛車・バイク・農機具を配置確認',
+                desc: 'SUVやスポーツカー、農業用トラクターをガレージ内に格納。車の出入り動線やクリアランスを実寸確認。',
+                img: './assets/steps/step4.png',
+                tag: '車両格納'
+              },
+              {
+                step: '05',
+                title: 'ワンタップでAIパース作成を依頼',
+                desc: 'パスワード登録不要。作成した3Dデータが自動添付され、お名前とご連絡先だけで即座に無料依頼できます。',
+                img: './assets/steps/step5.png',
+                tag: '無料依頼'
+              },
+              {
+                step: '06',
+                title: 'LINE風チャットでAIパースを受領！',
+                desc: '専任建築士との専用チャットに超高画質フォトリアルパースが届きます。図面の相談や仕様変更もチャットで完結。',
+                img: './assets/steps/step6.png',
+                tag: 'パース完成'
+              }
+            ].map((item, idx) => (
+              <div 
+                key={idx}
+                style={{
+                  background: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: 'var(--radius-lg)',
+                  overflow: 'hidden',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  transition: 'all 0.25s ease',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
+                }}
+                className="step-card-hover"
+              >
+                {/* ステップ画像プレビュー枠 */}
+                <div style={{
+                  position: 'relative',
+                  width: '100%',
+                  paddingTop: '62%',
+                  background: '#0f172a',
+                  overflow: 'hidden'
+                }}>
+                  <img 
+                    src={item.img} 
+                    alt={item.title} 
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      transition: 'transform 0.3s ease'
+                    }}
+                    onError={(e) => {
+                      // 代替表示
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                  {/* ステップバッジ */}
+                  <div style={{
+                    position: 'absolute',
+                    top: 10,
+                    left: 10,
+                    background: 'rgba(30, 41, 59, 0.9)',
+                    color: '#ffffff',
+                    fontSize: 11,
+                    fontWeight: 800,
+                    padding: '3px 9px',
+                    borderRadius: 20,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    backdropFilter: 'blur(4px)',
+                    border: '1px solid rgba(255,255,255,0.2)'
+                  }}>
+                    <span style={{ color: '#80ed99' }}>STEP</span>
+                    <span>{item.step}</span>
+                  </div>
+
+                  <div style={{
+                    position: 'absolute',
+                    top: 10,
+                    right: 10,
+                    background: 'rgba(45, 106, 79, 0.9)',
+                    color: '#ffffff',
+                    fontSize: 10.5,
+                    fontWeight: 700,
+                    padding: '2px 8px',
+                    borderRadius: 4
+                  }}>
+                    {item.tag}
+                  </div>
+                </div>
+
+                {/* カードテキスト */}
+                <div style={{ padding: '16px 18px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <h4 style={{
+                    fontSize: 15.5,
+                    fontWeight: 800,
+                    color: 'var(--text-main)',
+                    marginBottom: 8,
+                    lineHeight: 1.4
+                  }}>
+                    {item.title}
+                  </h4>
+                  <p style={{
+                    fontSize: 13,
+                    color: '#64748b',
+                    lineHeight: 1.6,
+                    margin: 0,
+                    flex: 1
+                  }}>
+                    {item.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 今すぐ触ってみるCTAボタン */}
         <div style={{ textAlign: 'center' }}>
           <button
             onClick={() => navigateTo('simulator')}
             className="btn-accent"
-            style={{ fontSize: 16, padding: '16px 36px' }}
+            style={{ fontSize: 17, padding: '16px 40px', boxShadow: '0 6px 20px rgba(224, 122, 95, 0.4)' }}
           >
-            <Compass size={20} />
-            <span>無料3Dシミュレーターを今すぐ体験する（登録不要）</span>
+            <Compass size={22} />
+            <span>今すぐ触ってみる（無料 3D設計＋自動見積）</span>
           </button>
+          <div style={{ fontSize: 12.5, color: 'var(--text-muted)', marginTop: 10 }}>
+            ※ 会員登録や個人情報の入力なしで、今すぐブラウザで自由に動かせます。
+          </div>
         </div>
       </section>
+
 
       {/* =========================================================
           お悩み共感セクション
@@ -624,6 +818,18 @@ export default function TopPage({ setCurrentRoute }) {
           </div>
         </div>
       </section>
+
+      <style>{`
+        .step-card-hover:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 10px 24px rgba(0,0,0,0.08) !important;
+          border-color: var(--color-primary-light) !important;
+        }
+        .step-card-hover:hover img {
+          transform: scale(1.03);
+        }
+      `}</style>
     </div>
   );
 }
+

@@ -1728,40 +1728,50 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
           </div>
 
 
-        {/* スマホ用ボトムシート タブバー */}
-        <div className="mobile-tab-bar" style={{
-          display: 'none',
+        {/* 操作セクション タブバー (PC・スマホ両対応で常時くっきり表示) */}
+        <div className="sim-tab-bar" style={{
+          display: 'flex',
           overflowX: 'auto',
-          gap: 6,
-          paddingBottom: 4,
-          borderBottom: '1px solid #cbd5e1'
+          gap: 8,
+          padding: '4px 2px 8px',
+          borderBottom: '2px solid #e2e8f0',
+          flexShrink: 0,
+          WebkitOverflowScrolling: 'touch'
         }}>
           {[
             { id: 'dims', label: '📐 4辺寸法' },
             { id: 'roof', label: '🏠 屋根・高さ' },
             { id: 'openings', label: '🚪 開口部' },
-            { id: 'shelves', label: '📦 棚' },
+            { id: 'shelves', label: '📦 内部棚' },
             { id: 'vehicles', label: '🚜 車両' },
             { id: 'calc', label: '📊 積算見積' }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveMobileTab(tab.id)}
-              style={{
-                whiteSpace: 'nowrap',
-                padding: '6px 12px',
-                borderRadius: 20,
-                fontSize: 12,
-                fontWeight: activeMobileTab === tab.id ? 800 : 500,
-                color: activeMobileTab === tab.id ? '#ffffff' : '#475569',
-                background: activeMobileTab === tab.id ? 'var(--color-primary)' : '#e2e8f0',
-                border: 'none'
-              }}
-            >
-              {tab.label}
-            </button>
-          ))}
+          ].map(tab => {
+            const isActive = activeMobileTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveMobileTab(tab.id)}
+                style={{
+                  whiteSpace: 'nowrap',
+                  padding: '7px 14px',
+                  borderRadius: 20,
+                  fontSize: 12.5,
+                  fontWeight: isActive ? 800 : 600,
+                  color: isActive ? '#ffffff' : '#334155',
+                  background: isActive ? 'var(--color-primary)' : '#e2e8f0',
+                  border: isActive ? '1px solid var(--color-primary-dark)' : '1px solid #cbd5e1',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  boxShadow: isActive ? '0 2px 6px rgba(45, 106, 79, 0.3)' : 'none',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
         </div>
+
 
         {/* 1. 柱芯寸法セクション (台形・変形地対応) */}
         <div className={`control-section ${activeMobileTab === 'dims' ? 'mobile-show' : 'mobile-hide'}`} style={{
@@ -2549,8 +2559,27 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
       </div>
 
 
-      {/* スマホ9割前提レスポンシブ & 3D最優先スタイル */}
+      {/* レスポンシブ & タブ切り替えスタイル */}
       <style>{`
+        .sim-tab-bar::-webkit-scrollbar {
+          height: 4px;
+        }
+        .sim-tab-bar::-webkit-scrollbar-thumb {
+          background: #cbd5e1;
+          border-radius: 4px;
+        }
+        .control-section.mobile-hide {
+          display: none !important;
+        }
+        .control-section.mobile-show {
+          display: block !important;
+          animation: fadeIn 0.2s ease-in-out;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(4px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
         @media (max-width: 900px) {
           .simulator-root {
             height: 100vh !important;
@@ -2573,15 +2602,6 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
             border-right: none !important;
             padding: 10px 12px 28px !important;
           }
-          .mobile-tab-bar {
-            display: flex !important;
-          }
-          .control-section.mobile-hide {
-            display: none !important;
-          }
-          .control-section.mobile-show {
-            display: block !important;
-          }
         }
         @media (max-width: 480px) {
           .sim-top-bar {
@@ -2592,6 +2612,7 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
           }
         }
       `}</style>
+
     </div>
   );
 }
