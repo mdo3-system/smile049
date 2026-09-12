@@ -15,6 +15,7 @@
 // - 2026/09/13 v0.1.12: 【Phase 1 リファクタリング】幾何計算・定数・積算見積もり層の分離
 // - 2026/09/13 v0.1.13: 【Phase 2 リファクタリング】2Dベクトル製図エンジン（SVG Drawing）の分離
 // - 2026/09/13 v0.1.14: 【Phase 3 リファクタリング】3D建具・スケールモデル・3D寸法線メッシュ生成の分離
+// - 2026/09/13 v0.1.15: 【Phase 4 リファクタリング】3D躯体メインビルダーの分離 ＆ SimulatorPageのUIオーケストレーター化
 
-window.APP_VERSION = "0.1.14";
-export const APP_VERSION = "0.1.14";
+window.APP_VERSION = "0.1.15";
+export const APP_VERSION = "0.1.15";
