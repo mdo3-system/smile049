@@ -10,6 +10,9 @@ import ManualModal from '../components/ManualModal';
 import ParseRequestModal from '../components/ParseRequestModal';
 import ChatRoomModal from '../components/ChatRoomModal';
 import { APP_VERSION } from '../version.js';
+import { WALL_KEYS, WALL_NAMES_JA, WALL_OUTER_OFFSET, WALL_INNER_OFFSET, isFloorLevelOpening } from '../simulator/constants';
+import { getCorePoints, getOffsetPoints, calculateAngles, getGirderHeight, getWallSpan } from '../simulator/geometry/buildingGeometry';
+import { calculateBuildingQuantities } from '../simulator/pricing/costEstimator';
 
 export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
 
@@ -38,11 +41,6 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
 
   // スマホ用アクティブタブ ('dims', 'roof', 'openings', 'shelves', 'vehicles', 'calc')
   const [activeMobileTab, setActiveMobileTab] = useState('dims');
-
-
-  // 定数
-  const WALL_OUTER_OFFSET = 100;
-  const WALL_INNER_OFFSET = 65;
 
   // 寸法・形状パラメータ
   const [dimensions, setDimensions] = useState({
@@ -306,7 +304,7 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
     const errors = {};
     openings.forEach((op) => {
       const errList = [];
-      const span = getWallSpan(op.wall);
+      const span = getWallSpan(op.wall, dimensions);
       const clearance = parseFloat(op.clearanceLeft) || 0;
       const w = parseFloat(op.width) || 0;
 
@@ -322,18 +320,6 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
       }
     });
     setValidationErrors(errors);
-  };
-
-  const getWallSpan = (wallKey) => {
-    if (wallKey === 'front') return dimensions.wFront;
-    if (wallKey === 'right') return dimensions.dRight;
-    if (wallKey === 'back') return dimensions.wBack;
-    if (wallKey === 'left') return dimensions.dLeft;
-    return 5400;
-  };
-
-  const isFloorLevelOpening = (type) => {
-    return type === 'shutter' || type === 'door' || type === 'sliding_door';
   };
 
   // -------------------------------------------------------------
@@ -1076,176 +1062,11 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
 
 
   // -------------------------------------------------------------
-  // 積算計算 & 計算式表示 (gemini-code 完全移植)
+  // 積算計算 & 計算式表示 (【単一責任の原則】costEstimatorモジュールへ委譲)
   // -------------------------------------------------------------
   const updateCalculations = (corePts, outerPts, hPts, roofThickness, slopeVal) => {
-    const { wFront: wF, wBack: wB, dLeft: dL, dRight: dR } = dimensions;
-
-    // 1. 床面積
-    let floorMm2 = 0;
-    for (let i = 0; i < 4; i++) {
-      const j = (i + 1) % 4;
-      floorMm2 += corePts[i].x * corePts[j].y - corePts[j].x * corePts[i].y;
-    }
-    const floorAreaM2 = Math.abs(floorMm2) / 2 / 1000000;
-    const tsubo = floorAreaM2 * 0.3025;
-    const floorFormula = `[(間口平均 ${(wF + wB) / 2}mm) × (奥行平均 ${(dL + dR) / 2}mm)]`;
-    const floorVal = `${floorAreaM2.toFixed(2)} ㎡ (${tsubo.toFixed(2)} 坪)`;
-
-    // 2. 基礎長さ
-    const fL0 = outerPts[0].distanceTo(outerPts[1]);
-    const fL1 = outerPts[1].distanceTo(outerPts[2]);
-    const fL2 = outerPts[2].distanceTo(outerPts[3]);
-    const fL3 = outerPts[3].distanceTo(outerPts[0]);
-    const totalFoundM = (fL0 + fL1 + fL2 + fL3) / 1000;
-    const foundFormula = `正:${(fL0 / 1000).toFixed(2)}m + 右:${(fL1 / 1000).toFixed(2)}m + 裏:${(fL2 / 1000).toFixed(2)}m + 左:${(fL3 / 1000).toFixed(2)}m`;
-    const foundVal = `全周: ${totalFoundM.toFixed(2)} m`;
-
-    // 3. 屋根実面積
-    let roofProjMm2 = 0;
-    for (let i = 0; i < 4; i++) {
-      const j = (i + 1) % 4;
-      roofProjMm2 += outerPts[i].x * outerPts[j].y - outerPts[j].x * outerPts[i].y;
-    }
-    const roofProjM2 = Math.abs(roofProjMm2) / 2 / 1000000;
-    const slopeRatio = slopeVal / 10.0;
-    const slopeFactor = Math.sqrt(1 + slopeRatio * slopeRatio);
-    const roofRealM2 = roofProjM2 * slopeFactor;
-    const roofFormula = `(水平投影面積 ${roofProjM2.toFixed(2)}㎡) × (勾配係数 √[1+(${slopeVal}/10)²] = ${slopeFactor.toFixed(3)})`;
-    const roofVal = `${roofRealM2.toFixed(2)} ㎡`;
-
-    // 4. 開口部面積
-    let totalOpM2 = 0;
-    const opDetails = openings.map(op => {
-      const area = (op.width / 1000) * (op.height / 1000);
-      totalOpM2 += area;
-      return `${op.wall === 'front' ? '正' : op.wall === 'right' ? '右' : op.wall === 'back' ? '裏' : '左'}: ${op.type} (${(op.width / 1000).toFixed(2)}m × ${(op.height / 1000).toFixed(2)}m = ${area.toFixed(2)}㎡)`;
-    });
-    const openingsFormula = opDetails.length > 0 ? opDetails.join('\n') : '開口部なし';
-    const openingsVal = `総面積: ${totalOpM2.toFixed(2)} ㎡`;
-
-    // 5. 外壁各面面積 (正・裏・右・左)
-    const getWallData = (pA, pB, hA, hB, wKey, nameJp) => {
-      const lenM = pA.distanceTo(pB) / 1000;
-      const hAM = (hA - dimensions.foundationHeight) / 1000;
-      const hBM = (hB - dimensions.foundationHeight) / 1000;
-      const grossM2 = ((hAM + hBM) / 2) * lenM;
-      let wOpM2 = 0;
-      openings.filter(op => op.wall === wKey).forEach(op => {
-        wOpM2 += (op.width / 1000) * (op.height / 1000);
-      });
-      const netM2 = Math.max(0, grossM2 - wOpM2);
-      return {
-        formula: `${nameJp}: [(${hAM.toFixed(2)}m+${hBM.toFixed(2)}m)/2 × ${lenM.toFixed(2)}m] - 控除${wOpM2.toFixed(2)}㎡ = 純壁 ${netM2.toFixed(2)}㎡`,
-        netM2: netM2
-      };
-    };
-
-    const w0 = getWallData(outerPts[0], outerPts[1], hPts[0], hPts[1], 'front', '正面');
-    const w1 = getWallData(outerPts[1], outerPts[2], hPts[1], hPts[2], 'right', '右面');
-    const w2 = getWallData(outerPts[2], outerPts[3], hPts[2], hPts[3], 'back', '裏面');
-    const w3 = getWallData(outerPts[3], outerPts[0], hPts[3], hPts[0], 'left', '左面');
-    const totalNetWallM2 = w0.netM2 + w1.netM2 + w2.netM2 + w3.netM2;
-    const wallsFormula = `${w0.formula}\n${w1.formula}\n${w2.formula}\n${w3.formula}`;
-    const wallsVal = `純外壁総面積: ${totalNetWallM2.toFixed(2)} ㎡`;
-
-    // 概算建築費用目安算出 (坪22万円〜 + 基礎・開口部・屋根係数)
-    const approxCost = Math.round((tsubo * 220000 + totalFoundM * 25000 + roofRealM2 * 18000 + totalOpM2 * 45000) / 10000) * 10000;
-
-    setCalculations({
-      floorFormula,
-      floorVal,
-      foundFormula,
-      foundVal,
-      roofFormula,
-      roofVal,
-      openingsFormula,
-      openingsVal,
-      wallsFormula,
-      wallsVal,
-      approxCost
-    });
-  };
-
-  // 幾何計算ヘルパー & 角度計算
-  const calculateAngles = (corePts) => {
-    if (!corePts || corePts.length < 4) return { angleLeft: 90, angleRight: 90 };
-    const [p0, p1, p2, p3] = corePts;
-    // 左壁: p0からp3へのベクトル (正面に対する開き角度)
-    const dxLeft = p0.x - p3.x; // p3が左に張り出すと正
-    const dyLeft = -(p3.y - p0.y);
-    const angleLeft = dyLeft > 0 ? Math.round((90 + Math.atan2(dxLeft, dyLeft) * 180 / Math.PI) * 10) / 10 : 90;
-
-    // 右壁: p1からp2へのベクトル (正面に対する開き角度)
-    const dxRight = p2.x - p1.x; // p2が右に張り出すと正
-    const dyRight = -(p2.y - p1.y);
-    const angleRight = dyRight > 0 ? Math.round((90 + Math.atan2(dxRight, dyRight) * 180 / Math.PI) * 10) / 10 : 90;
-
-    return { angleLeft, angleRight };
-  };
-
-  const getCorePoints = (wF, wB, dL, dR, shapeType = 'regular', skewOffset = 0) => {
-    const p0 = new THREE.Vector2(-wF / 2, 0);
-    const p1 = new THREE.Vector2(wF / 2, 0);
-
-    let p2, p3;
-    if (shapeType === 'trapezoid_right_angle_left') {
-      // 左直角台形: 左壁が正面に対して直角(90°垂直)
-      p3 = new THREE.Vector2(-wF / 2, -dL);
-      p2 = new THREE.Vector2(-wF / 2 + wB, -dR);
-    } else if (shapeType === 'trapezoid_right_angle_right') {
-      // 右直角台形: 右壁が正面に対して直角(90°垂直)
-      p2 = new THREE.Vector2(wF / 2, -dR);
-      p3 = new THREE.Vector2(wF / 2 - wB, -dL);
-    } else if (shapeType === 'trapezoid_free') {
-      // 自由偏芯台形: 背面中心が skewOffset だけ左右にシフト
-      p2 = new THREE.Vector2(skewOffset + wB / 2, -dR);
-      p3 = new THREE.Vector2(skewOffset - wB / 2, -dL);
-    } else {
-      // regular / 等脚台形
-      const backOffset = (wF - wB) / 2;
-      p2 = new THREE.Vector2(wF / 2 - backOffset, -dR);
-      p3 = new THREE.Vector2(-wF / 2 + backOffset, -dL);
-    }
-
-    return [p0, p1, p2, p3];
-  };
-
-  const getOffsetPoints = (corePts, offset) => {
-    const n = corePts.length;
-    const lines = [];
-    for (let i = 0; i < n; i++) {
-      const next = (i + 1) % n;
-      const pA = corePts[i];
-      const pB = corePts[next];
-      const v = new THREE.Vector2().subVectors(pB, pA).normalize();
-      const norm = new THREE.Vector2(-v.y, v.x);
-      lines.push({ p: new THREE.Vector2().addVectors(pA, norm.clone().multiplyScalar(offset)), v });
-    }
-    const out = [];
-    for (let i = 0; i < n; i++) {
-      const prev = (i + n - 1) % n;
-      const l1 = lines[prev];
-      const l2 = lines[i];
-      const det = l1.v.x * l2.v.y - l1.v.y * l2.v.x;
-      if (Math.abs(det) < 1e-6) out.push(corePts[i].clone());
-      else {
-        const dp = new THREE.Vector2().subVectors(l2.p, l1.p);
-        const t = (dp.x * l2.v.y - dp.y * l2.v.x) / det;
-        out.push(new THREE.Vector2(l1.p.x + t * l1.v.x, l1.p.y + t * l1.v.y));
-      }
-    }
-    return out;
-  };
-
-  const getGirderHeight = (point, bounds, baseEaveH, slopeVal, dir) => {
-    const slopeRatio = slopeVal / 10.0;
-    let distFromLow = 0;
-    if (dir === 'front-to-back') distFromLow = point.y - bounds.minY;
-    else if (dir === 'back-to-front') distFromLow = bounds.maxY - point.y;
-    else if (dir === 'left-to-right') distFromLow = bounds.maxX - point.x;
-    else if (dir === 'right-to-left') distFromLow = point.x - bounds.minX;
-    return baseEaveH + distFromLow * slopeRatio;
+    const quantities = calculateBuildingQuantities(corePts, outerPts, hPts, dimensions, openings);
+    setCalculations(quantities);
   };
 
   // -------------------------------------------------------------
