@@ -1,0 +1,207 @@
+/* ==========================================================================
+   木造自由設計ガレージ・倉庫 デザインシステム
+   トーン＆マナー: 温かみのあるアースカラー ＆ 清潔感のあるナチュラルモダン
+   ========================================================================== */
+
+:root {
+  /* ブランドカラー・アースカラーパレット */
+  --color-primary: #2d6a4f;         /* フォレストグリーン（信頼・木々の息吹） */
+  --color-primary-dark: #1b4332;
+  --color-primary-light: #40916c;
+  --color-primary-soft: #e8f5e9;
+
+  --color-wood: #8c6239;            /* ウッドブラウン（木造・クラフト感） */
+  --color-wood-light: #f5ebe0;
+  --color-wood-dark: #5e3a18;
+
+  --color-accent: #e07a5f;          /* テラコッタ・ウォームオレンジ（親しみ・アクセント） */
+  --color-accent-hover: #cf6245;
+
+  /* 背景色（ナチュラル・やさしい生成り色） */
+  --bg-main: #fbfaf8;
+  --bg-card: #ffffff;
+  --bg-muted: #f2efe9;
+  --bg-dark: #1f2937;
+
+  /* テキスト色 */
+  --text-main: #2d3748;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  --text-inverse: #ffffff;
+
+  /* ボーダー・ライン */
+  --border-light: #e5e0d8;
+  --border-card: #ede8e1;
+
+  /* 影・角丸 */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 3px rgba(45, 55, 72, 0.05);
+  --shadow-md: 0 4px 12px rgba(45, 55, 72, 0.08);
+  --shadow-lg: 0 10px 25px rgba(45, 55, 72, 0.1);
+  --shadow-hover: 0 8px 20px rgba(45, 106, 79, 0.15);
+
+  /* タイポグラフィ */
+  --font-family-base: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-family-heading: 'M PLUS Rounded 1c', 'Noto Sans JP', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family-base);
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, .brand-font {
+  font-family: var(--font-family-heading);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* 共通ボタンスタイル */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+  color: #ffffff;
+  font-weight: 700;
+  padding: 14px 28px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 4px 14px rgba(45, 106, 79, 0.3);
+  transition: all 0.25s ease;
+  font-size: 15px;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(45, 106, 79, 0.4);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #ffffff;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  font-weight: 700;
+  padding: 12px 26px;
+  border-radius: var(--radius-full);
+  transition: all 0.25s ease;
+  font-size: 15px;
+}
+.btn-secondary:hover {
+  background: var(--color-primary-soft);
+  transform: translateY(-2px);
+}
+
+.btn-accent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--color-accent) 0%, #eb8a70 100%);
+  color: #ffffff;
+  font-weight: 700;
+  padding: 14px 28px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 4px 14px rgba(224, 122, 95, 0.35);
+  transition: all 0.25s ease;
+  font-size: 15px;
+}
+.btn-accent:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(224, 122, 95, 0.45);
+}
+
+/* セクション共通 */
+.section-container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 80px 24px;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.section-tag {
+  display: inline-block;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: var(--radius-full);
+  margin-bottom: 12px;
+  letter-spacing: 0.05em;
+}
+
+.section-title {
+  font-size: 32px;
+  color: var(--text-main);
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.section-desc {
+  font-size: 16px;
+  color: var(--text-muted);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* カード共通 */
+.nature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.nature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .section-container {
+    padding: 50px 16px;
+  }
+  .section-title {
+    font-size: 24px;
+  }
+  .section-desc {
+    font-size: 14px;
+  }
+}
