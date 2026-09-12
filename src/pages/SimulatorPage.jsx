@@ -46,6 +46,13 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
 
   // 寸法・形状パラメータ
   const [dimensions, setDimensions] = useState({
+    shapeType: 'regular', // 'regular' | 'trapezoid_right_angle_left' | 'trapezoid_right_angle_right' | 'trapezoid_free' | 'l_shaped'
+    skewOffset: 0,
+    targetAngle: 90,
+    cornerCutEnabled: false,
+    cornerCutPos: 'back-right',
+    cornerCutWidth: 1500,
+    cornerCutDepth: 1500,
     wFront: 5400,
     wBack: 5400,
     dLeft: 6000,
@@ -348,9 +355,9 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
       if (obj.geometry) obj.geometry.dispose();
     }
 
-    const { wFront: wF, wBack: wB, dLeft: dL, dRight: dR, eaveHeight: eaveH, foundationHeight: foundationH, roofSlope: slope, slopeDirection: slopeDir, ceilingType } = dimensions;
+    const { wFront: wF, wBack: wB, dLeft: dL, dRight: dR, eaveHeight: eaveH, foundationHeight: foundationH, roofSlope: slope, slopeDirection: slopeDir, ceilingType, shapeType, skewOffset } = dimensions;
 
-    const corePts = getCorePoints(wF, wB, dL, dR);
+    const corePts = getCorePoints(wF, wB, dL, dR, shapeType, skewOffset);
     const outerPts = getOffsetPoints(corePts, WALL_OUTER_OFFSET);
     const innerPts = getOffsetPoints(corePts, -WALL_INNER_OFFSET);
 
@@ -761,6 +768,50 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
       buildingGroup.add(vMesh);
     });
 
+    // 8.5 敷地障害物・隅欠き（凸凹）ゾーンの可視化
+    if (dimensions.cornerCutEnabled) {
+      const cutW = dimensions.cornerCutWidth || 1500;
+      const cutD = dimensions.cornerCutDepth || 1500;
+      const pos = dimensions.cornerCutPos || 'back-right';
+      
+      let cornerX = 0, cornerZ = 0;
+      if (pos === 'back-right') {
+        cornerX = corePts[2].x - cutW / 2;
+        cornerZ = corePts[2].y + cutD / 2;
+      } else if (pos === 'back-left') {
+        cornerX = corePts[3].x + cutW / 2;
+        cornerZ = corePts[3].y + cutD / 2;
+      } else if (pos === 'front-right') {
+        cornerX = corePts[1].x - cutW / 2;
+        cornerZ = corePts[1].y - cutD / 2;
+      } else if (pos === 'front-left') {
+        cornerX = corePts[0].x + cutW / 2;
+        cornerZ = corePts[0].y - cutD / 2;
+      }
+
+      const cutGeo = new THREE.BoxGeometry(cutW, 2400, cutD);
+      const cutMat = new THREE.MeshStandardMaterial({
+        color: 0xf59e0b,
+        transparent: true,
+        opacity: 0.35,
+        roughness: 0.7
+      });
+      const cutMesh = new THREE.Mesh(cutGeo, cutMat);
+      cutMesh.position.set(cornerX, 1200, cornerZ);
+      cutMesh.add(new THREE.LineSegments(
+        new THREE.EdgesGeometry(cutGeo),
+        new THREE.LineBasicMaterial({ color: 0xd97706, linewidth: 2 })
+      ));
+      buildingGroup.add(cutMesh);
+
+      // 電柱・障害物シンボルポール
+      const poleGeo = new THREE.CylinderGeometry(100, 100, 3500, 16);
+      const poleMat = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.8 });
+      const poleMesh = new THREE.Mesh(poleGeo, poleMat);
+      poleMesh.position.set(cornerX, 1750, cornerZ);
+      buildingGroup.add(poleMesh);
+    }
+
     // 9. 3D寸法線・文字スプライト (gemini-code 完全復元)
     if (show3dDimensions) {
       const pFrontL = new THREE.Vector3(corePts[0].x, 20, corePts[0].y);
@@ -1116,13 +1167,47 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
     });
   };
 
-  // 幾何計算ヘルパー
-  const getCorePoints = (wF, wB, dL, dR) => {
+  // 幾何計算ヘルパー & 角度計算
+  const calculateAngles = (corePts) => {
+    if (!corePts || corePts.length < 4) return { angleLeft: 90, angleRight: 90 };
+    const [p0, p1, p2, p3] = corePts;
+    // 左壁: p0からp3へのベクトル (正面に対する開き角度)
+    const dxLeft = p0.x - p3.x; // p3が左に張り出すと正
+    const dyLeft = -(p3.y - p0.y);
+    const angleLeft = dyLeft > 0 ? Math.round((90 + Math.atan2(dxLeft, dyLeft) * 180 / Math.PI) * 10) / 10 : 90;
+
+    // 右壁: p1からp2へのベクトル (正面に対する開き角度)
+    const dxRight = p2.x - p1.x; // p2が右に張り出すと正
+    const dyRight = -(p2.y - p1.y);
+    const angleRight = dyRight > 0 ? Math.round((90 + Math.atan2(dxRight, dyRight) * 180 / Math.PI) * 10) / 10 : 90;
+
+    return { angleLeft, angleRight };
+  };
+
+  const getCorePoints = (wF, wB, dL, dR, shapeType = 'regular', skewOffset = 0) => {
     const p0 = new THREE.Vector2(-wF / 2, 0);
     const p1 = new THREE.Vector2(wF / 2, 0);
-    const backOffset = (wF - wB) / 2;
-    const p2 = new THREE.Vector2(wF / 2 - backOffset, -dR);
-    const p3 = new THREE.Vector2(-wF / 2 + backOffset, -dL);
+
+    let p2, p3;
+    if (shapeType === 'trapezoid_right_angle_left') {
+      // 左直角台形: 左壁が正面に対して直角(90°垂直)
+      p3 = new THREE.Vector2(-wF / 2, -dL);
+      p2 = new THREE.Vector2(-wF / 2 + wB, -dR);
+    } else if (shapeType === 'trapezoid_right_angle_right') {
+      // 右直角台形: 右壁が正面に対して直角(90°垂直)
+      p2 = new THREE.Vector2(wF / 2, -dR);
+      p3 = new THREE.Vector2(wF / 2 - wB, -dL);
+    } else if (shapeType === 'trapezoid_free') {
+      // 自由偏芯台形: 背面中心が skewOffset だけ左右にシフト
+      p2 = new THREE.Vector2(skewOffset + wB / 2, -dR);
+      p3 = new THREE.Vector2(skewOffset - wB / 2, -dL);
+    } else {
+      // regular / 等脚台形
+      const backOffset = (wF - wB) / 2;
+      p2 = new THREE.Vector2(wF / 2 - backOffset, -dR);
+      p3 = new THREE.Vector2(-wF / 2 + backOffset, -dL);
+    }
+
     return [p0, p1, p2, p3];
   };
 
@@ -1171,9 +1256,9 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
     if (!svg) return;
     svg.innerHTML = '';
 
-    const { wFront: wF, wBack: wB, dLeft: dL, dRight: dR, eaveHeight: eaveH, foundationHeight: foundationH, roofSlope: slope, slopeDirection: slopeDir } = dimensions;
+    const { wFront: wF, wBack: wB, dLeft: dL, dRight: dR, eaveHeight: eaveH, foundationHeight: foundationH, roofSlope: slope, slopeDirection: slopeDir, shapeType, skewOffset } = dimensions;
 
-    const corePts = getCorePoints(wF, wB, dL, dR);
+    const corePts = getCorePoints(wF, wB, dL, dR, shapeType, skewOffset);
     const outerPts = getOffsetPoints(corePts, WALL_OUTER_OFFSET);
 
     const bounds = {
@@ -1828,6 +1913,257 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
             )}
           </div>
 
+          {/* 建物形状・敷地タイプ選択 */}
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ fontSize: 11, fontWeight: 700, color: '#334155', display: 'block', marginBottom: 6 }}>
+              📐 建物形状・敷地タイプ
+            </label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6, marginBottom: 8 }}>
+              {[
+                { id: 'regular', label: '長方形 (四角形)', icon: '⬛', desc: '標準的な四角い敷地' },
+                { id: 'trapezoid_right_angle_left', label: '片側直角 (左直角)', icon: '📐', desc: '左境界に直角・右斜め' },
+                { id: 'trapezoid_right_angle_right', label: '片側直角 (右直角)', icon: '📐', desc: '右境界に直角・左斜め' },
+                { id: 'trapezoid_free', label: '自由台形・偏芯', icon: '▱', desc: '左右の開き角が異なる' }
+              ].map(st => {
+                const isSelected = (dimensions.shapeType || 'regular') === st.id;
+                return (
+                  <button
+                    key={st.id}
+                    type="button"
+                    onClick={() => {
+                      let update = { ...dimensions, shapeType: st.id };
+                      if (st.id === 'regular') {
+                        update.wBack = dimensions.wFront;
+                        update.dRight = dimensions.dLeft;
+                        update.skewOffset = 0;
+                      } else if (st.id === 'trapezoid_right_angle_left' && dimensions.wBack === dimensions.wFront) {
+                        // 少し開き角度(100度)をつけてわかりやすくする
+                        const rad = (100 - 90) * Math.PI / 180;
+                        update.wBack = Math.round(dimensions.wFront + dimensions.dRight * Math.tan(rad));
+                      } else if (st.id === 'trapezoid_right_angle_right' && dimensions.wBack === dimensions.wFront) {
+                        const rad = (100 - 90) * Math.PI / 180;
+                        update.wBack = Math.round(dimensions.wFront + dimensions.dLeft * Math.tan(rad));
+                      }
+                      setDimensions(update);
+                      pushHistory(update);
+                    }}
+                    style={{
+                      padding: '7px 8px',
+                      borderRadius: 6,
+                      border: isSelected ? '2px solid var(--color-primary)' : '1px solid #cbd5e1',
+                      background: isSelected ? 'var(--color-primary-soft)' : '#f8fafc',
+                      color: isSelected ? 'var(--color-primary-dark)' : '#475569',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6
+                    }}
+                  >
+                    <span style={{ fontSize: 16 }}>{st.icon}</span>
+                    <div>
+                      <div style={{ fontSize: 11.5, fontWeight: 800, lineHeight: 1.2 }}>{st.label}</div>
+                      <div style={{ fontSize: 9.5, color: isSelected ? 'var(--color-primary)' : '#94a3b8' }}>{st.desc}</div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* 開き角度 ＆ 偏芯調整パネル */}
+            {(() => {
+              const currentCore = getCorePoints(dimensions.wFront, dimensions.wBack, dimensions.dLeft, dimensions.dRight, dimensions.shapeType, dimensions.skewOffset);
+              const angles = calculateAngles(currentCore);
+              const shape = dimensions.shapeType || 'regular';
+
+              return (
+                <div style={{
+                  background: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: 6,
+                  padding: '8px 10px',
+                  marginBottom: 10
+                }}>
+                  {/* リアルタイム角度表示バッジ */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#334155' }}>壁面の開き角度 (内角)</span>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <span style={{
+                        fontSize: 10.5,
+                        fontWeight: 700,
+                        padding: '2px 6px',
+                        borderRadius: 4,
+                        background: angles.angleLeft === 90 ? '#e2e8f0' : '#e0f2fe',
+                        color: angles.angleLeft === 90 ? '#475569' : '#0369a1'
+                      }}>
+                        左壁: {angles.angleLeft}° {angles.angleLeft === 90 ? '(直角)' : angles.angleLeft > 90 ? '(開き)' : '(狭まり)'}
+                      </span>
+                      <span style={{
+                        fontSize: 10.5,
+                        fontWeight: 700,
+                        padding: '2px 6px',
+                        borderRadius: 4,
+                        background: angles.angleRight === 90 ? '#e2e8f0' : '#e0f2fe',
+                        color: angles.angleRight === 90 ? '#475569' : '#0369a1'
+                      }}>
+                        右壁: {angles.angleRight}° {angles.angleRight === 90 ? '(直角)' : angles.angleRight > 90 ? '(開き)' : '(狭まり)'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 左直角のときの右壁角度スライダー */}
+                  {shape === 'trapezoid_right_angle_left' && (
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                        <span style={{ fontSize: 11, color: '#0369a1', fontWeight: 700 }}>📐 右壁の開き角度を設定</span>
+                        <span style={{ fontSize: 12, fontWeight: 800, color: '#0284c7' }}>{angles.angleRight}°</span>
+                      </div>
+                      <input 
+                        type="range" 
+                        min="70" 
+                        max="115" 
+                        step="0.5" 
+                        value={angles.angleRight} 
+                        onChange={(e) => {
+                          const targetA = parseFloat(e.target.value);
+                          const rad = (targetA - 90) * Math.PI / 180;
+                          const newWB = Math.max(1200, Math.round(dimensions.wFront + dimensions.dRight * Math.tan(rad)));
+                          const up = { ...dimensions, wBack: newWB };
+                          setDimensions(up);
+                          pushHistory(up);
+                        }}
+                        style={{ width: '100%', marginBottom: 6 }}
+                      />
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        {[75, 85, 90, 100, 105, 110].map(deg => (
+                          <button
+                            key={deg}
+                            type="button"
+                            onClick={() => {
+                              const rad = (deg - 90) * Math.PI / 180;
+                              const newWB = Math.max(1200, Math.round(dimensions.wFront + dimensions.dRight * Math.tan(rad)));
+                              const up = { ...dimensions, wBack: newWB };
+                              setDimensions(up);
+                              pushHistory(up);
+                            }}
+                            style={{
+                              flex: 1,
+                              fontSize: 10,
+                              padding: '3px 0',
+                              borderRadius: 4,
+                              border: '1px solid #cbd5e1',
+                              background: Math.abs(angles.angleRight - deg) < 0.3 ? '#0284c7' : '#fff',
+                              color: Math.abs(angles.angleRight - deg) < 0.3 ? '#fff' : '#334155',
+                              cursor: 'pointer',
+                              fontWeight: 700
+                            }}
+                          >
+                            {deg}°{deg === 90 ? '直角' : ''}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 右直角のときの左壁角度スライダー */}
+                  {shape === 'trapezoid_right_angle_right' && (
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                        <span style={{ fontSize: 11, color: '#0369a1', fontWeight: 700 }}>📐 左壁の開き角度を設定</span>
+                        <span style={{ fontSize: 12, fontWeight: 800, color: '#0284c7' }}>{angles.angleLeft}°</span>
+                      </div>
+                      <input 
+                        type="range" 
+                        min="70" 
+                        max="115" 
+                        step="0.5" 
+                        value={angles.angleLeft} 
+                        onChange={(e) => {
+                          const targetA = parseFloat(e.target.value);
+                          const rad = (targetA - 90) * Math.PI / 180;
+                          const newWB = Math.max(1200, Math.round(dimensions.wFront + dimensions.dLeft * Math.tan(rad)));
+                          const up = { ...dimensions, wBack: newWB };
+                          setDimensions(up);
+                          pushHistory(up);
+                        }}
+                        style={{ width: '100%', marginBottom: 6 }}
+                      />
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        {[75, 85, 90, 100, 105, 110].map(deg => (
+                          <button
+                            key={deg}
+                            type="button"
+                            onClick={() => {
+                              const rad = (deg - 90) * Math.PI / 180;
+                              const newWB = Math.max(1200, Math.round(dimensions.wFront + dimensions.dLeft * Math.tan(rad)));
+                              const up = { ...dimensions, wBack: newWB };
+                              setDimensions(up);
+                              pushHistory(up);
+                            }}
+                            style={{
+                              flex: 1,
+                              fontSize: 10,
+                              padding: '3px 0',
+                              borderRadius: 4,
+                              border: '1px solid #cbd5e1',
+                              background: Math.abs(angles.angleLeft - deg) < 0.3 ? '#0284c7' : '#fff',
+                              color: Math.abs(angles.angleLeft - deg) < 0.3 ? '#fff' : '#334155',
+                              cursor: 'pointer',
+                              fontWeight: 700
+                            }}
+                          >
+                            {deg}°{deg === 90 ? '直角' : ''}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 自由偏芯台形のときの左右ズレスライダー */}
+                  {shape === 'trapezoid_free' && (
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                        <span style={{ fontSize: 11, color: '#0369a1', fontWeight: 700 }}>▱ 背面の左右ズレ (偏芯・斜行)</span>
+                        <span style={{ fontSize: 12, fontWeight: 800, color: '#0284c7' }}>
+                          {dimensions.skewOffset > 0 ? `右へ +${dimensions.skewOffset}mm` : dimensions.skewOffset < 0 ? `左へ ${dimensions.skewOffset}mm` : '中央 0mm'}
+                        </span>
+                      </div>
+                      <input 
+                        type="range" 
+                        min="-1500" 
+                        max="1500" 
+                        step="50" 
+                        value={dimensions.skewOffset || 0} 
+                        onChange={(e) => {
+                          const off = parseFloat(e.target.value);
+                          const up = { ...dimensions, skewOffset: off };
+                          setDimensions(up);
+                          pushHistory(up);
+                        }}
+                        style={{ width: '100%', marginBottom: 4 }}
+                      />
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#64748b' }}>
+                        <span>← 左に振る (-1500)</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const up = { ...dimensions, skewOffset: 0 };
+                            setDimensions(up);
+                            pushHistory(up);
+                          }}
+                          style={{ border: 'none', background: 'none', color: '#0284c7', cursor: 'pointer', fontWeight: 700 }}
+                        >
+                          中央リセット
+                        </button>
+                        <span>右に振る (+1500) →</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+          </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
             <div>
               <label style={{ fontSize: 11, fontWeight: 700, color: '#475569' }}>正面幅 (mm)</label>
@@ -1837,8 +2173,10 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                 step="10" 
                 onChange={(e) => {
                   const val = parseFloat(e.target.value) || 0;
-                  setDimensions({ ...dimensions, wFront: val });
-                  pushHistory({ ...dimensions, wFront: val });
+                  const up = { ...dimensions, wFront: val };
+                  if (dimensions.shapeType === 'regular') up.wBack = val;
+                  setDimensions(up);
+                  pushHistory(up);
                 }}
                 style={{ width: '100%', padding: '5px 8px', borderRadius: 4, border: '1px solid #cbd5e1', fontSize: 13, fontWeight: 700 }}
               />
@@ -1865,8 +2203,10 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                 step="10" 
                 onChange={(e) => {
                   const val = parseFloat(e.target.value) || 0;
-                  setDimensions({ ...dimensions, dLeft: val });
-                  pushHistory({ ...dimensions, dLeft: val });
+                  const up = { ...dimensions, dLeft: val };
+                  if (dimensions.shapeType === 'regular') up.dRight = val;
+                  setDimensions(up);
+                  pushHistory(up);
                 }}
                 style={{ width: '100%', padding: '5px 8px', borderRadius: 4, border: '1px solid #cbd5e1', fontSize: 13, fontWeight: 700 }}
               />
@@ -1886,6 +2226,112 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
               />
             </div>
           </div>
+
+          {/* 敷地の障害物・隅欠き（凸凹・L字敷地対応） */}
+          <div style={{
+            background: dimensions.cornerCutEnabled ? '#fffbeb' : '#f8fafc',
+            border: dimensions.cornerCutEnabled ? '1px solid #fde68a' : '1px solid #e2e8f0',
+            borderRadius: 6,
+            padding: '8px 10px',
+            marginTop: 10,
+            marginBottom: 8
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <label style={{ fontSize: 11.5, fontWeight: 700, color: '#92400e', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <input 
+                  type="checkbox" 
+                  checked={dimensions.cornerCutEnabled || false} 
+                  onChange={(e) => {
+                    const up = { ...dimensions, cornerCutEnabled: e.target.checked };
+                    setDimensions(up);
+                    pushHistory(up);
+                  }} 
+                  style={{ width: 16, height: 16, cursor: 'pointer' }}
+                />
+                <span>🚧 敷地の障害物・隅欠き（凸凹回避）</span>
+              </label>
+              <span style={{ fontSize: 10.5, color: '#b45309', fontWeight: 700 }}>
+                {dimensions.cornerCutEnabled ? '有効 (3D表示中)' : 'オフ'}
+              </span>
+            </div>
+
+            {dimensions.cornerCutEnabled && (
+              <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px dashed #fcd34d', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ fontSize: 10, color: '#78350f' }}>
+                  ※電柱・隣地ブロック・母屋のひさし・樹木等の障害物を避けてガレージを配置します。
+                </div>
+                <div>
+                  <label style={{ fontSize: 10.5, fontWeight: 700, color: '#78350f', display: 'block', marginBottom: 4 }}>
+                    障害物の角位置
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4 }}>
+                    {[
+                      { id: 'back-right', label: '右奥' },
+                      { id: 'back-left', label: '左奥' },
+                      { id: 'front-right', label: '右手前' },
+                      { id: 'front-left', label: '左手前' }
+                    ].map(cp => (
+                      <button
+                        key={cp.id}
+                        type="button"
+                        onClick={() => {
+                          const up = { ...dimensions, cornerCutPos: cp.id };
+                          setDimensions(up);
+                          pushHistory(up);
+                        }}
+                        style={{
+                          fontSize: 10.5,
+                          padding: '4px 0',
+                          borderRadius: 4,
+                          border: (dimensions.cornerCutPos || 'back-right') === cp.id ? '2px solid #d97706' : '1px solid #d1d5db',
+                          background: (dimensions.cornerCutPos || 'back-right') === cp.id ? '#fef3c7' : '#fff',
+                          color: (dimensions.cornerCutPos || 'back-right') === cp.id ? '#92400e' : '#374151',
+                          fontWeight: 700,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {cp.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  <div>
+                    <label style={{ fontSize: 10.5, fontWeight: 700, color: '#78350f' }}>欠き取り幅 (mm)</label>
+                    <input 
+                      type="number" 
+                      value={dimensions.cornerCutWidth || 1500} 
+                      step="50" 
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value) || 0;
+                        const up = { ...dimensions, cornerCutWidth: val };
+                        setDimensions(up);
+                        pushHistory(up);
+                      }}
+                      style={{ width: '100%', padding: '4px 6px', borderRadius: 4, border: '1px solid #cbd5e1', fontSize: 12, fontWeight: 700 }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 10.5, fontWeight: 700, color: '#78350f' }}>欠き取り奥行 (mm)</label>
+                    <input 
+                      type="number" 
+                      value={dimensions.cornerCutDepth || 1500} 
+                      step="50" 
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value) || 0;
+                        const up = { ...dimensions, cornerCutDepth: val };
+                        setDimensions(up);
+                        pushHistory(up);
+                      }}
+                      style={{ width: '100%', padding: '4px 6px', borderRadius: 4, border: '1px solid #cbd5e1', fontSize: 12, fontWeight: 700 }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           <div style={{ fontSize: 10.5, color: '#64748b' }}>
             ※外壁ふかし+100mm（通気・外装仕上） / 内装仕上: 柱芯+65mm
           </div>

@@ -643,84 +643,171 @@ export default function TopPage({ setCurrentRoute }) {
           gap: 28
         }}>
           {/* Plan 1 */}
-          <div className="nature-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div className="nature-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: 0, overflow: 'hidden' }}>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--color-wood)', background: 'var(--color-wood-light)', padding: '3px 10px', borderRadius: 12 }}>
-                  PLAN 01
-                </span>
-                <Car size={22} color="var(--color-primary)" />
+              <div style={{ position: 'relative', width: '100%', height: 200, overflow: 'hidden' }}>
+                <img
+                  src="/assets/plans/plan01.jpg"
+                  alt="Plan 01 愛車・ホビー木造ガレージ"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                />
+                <div style={{
+                  position: 'absolute',
+                  top: 12,
+                  left: 12,
+                  background: 'rgba(15, 23, 42, 0.85)',
+                  backdropFilter: 'blur(6px)',
+                  color: '#fff',
+                  fontSize: 11,
+                  fontWeight: 800,
+                  padding: '4px 10px',
+                  borderRadius: 12,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6
+                }}>
+                  <span>PLAN 01</span>
+                  <span style={{ color: '#38bdf8' }}>愛車・ホビー</span>
+                </div>
               </div>
-              <h3 style={{ fontSize: 20, marginBottom: 8, color: 'var(--text-main)' }}>
-                大人の秘密基地<br />
-                【愛車・大型バイク・ホビー】
-              </h3>
-              <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 20 }}>
-                「自分が一番長くいたくなる場所」を設計。無垢の木に囲まれた落ち着いた空間で愛車と過ごす時間を創ります。壁面全面がカスタムベース。
-              </p>
+              <div style={{ padding: '24px 24px 0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-primary)' }}>木造ピット × 梁現し自由設計</span>
+                  <Car size={20} color="var(--color-primary)" />
+                </div>
+                <h3 style={{ fontSize: 19, marginBottom: 8, color: 'var(--text-main)', lineHeight: 1.4 }}>
+                  大人の秘密基地<br />
+                  【愛車・大型バイク・ホビー】
+                </h3>
+                <p style={{ fontSize: 13.5, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 20 }}>
+                  「自分が一番長くいたくなる場所」を設計。無垢の木に囲まれた落ち着いた空間で愛車と過ごす時間を創ります。壁面全面がカスタムベース。
+                </p>
+              </div>
             </div>
-            <button
-              onClick={() => navigateTo('plan-hobby')}
-              className="btn-primary"
-              style={{ width: '100%', justifyContent: 'center' }}
-            >
-              <span>愛車・ホビーガレージを見る</span>
-              <ChevronRight size={16} />
-            </button>
+            <div style={{ padding: '0 24px 24px' }}>
+              <button
+                onClick={() => navigateTo('plan-hobby')}
+                className="btn-primary"
+                style={{ width: '100%', justifyContent: 'center' }}
+              >
+                <span>愛車・ホビーガレージを見る</span>
+                <ChevronRight size={16} />
+              </button>
+            </div>
           </div>
 
           {/* Plan 2 */}
-          <div className="nature-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div className="nature-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: 0, overflow: 'hidden' }}>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--color-wood)', background: 'var(--color-wood-light)', padding: '3px 10px', borderRadius: 12 }}>
-                  PLAN 02
-                </span>
-                <Home size={22} color="var(--color-wood)" />
+              <div style={{ position: 'relative', width: '100%', height: 200, overflow: 'hidden' }}>
+                <img
+                  src="/assets/plans/plan02.jpg"
+                  alt="Plan 02 狭小・変形地向け木造ストッカー"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                />
+                <div style={{
+                  position: 'absolute',
+                  top: 12,
+                  left: 12,
+                  background: 'rgba(15, 23, 42, 0.85)',
+                  backdropFilter: 'blur(6px)',
+                  color: '#fff',
+                  fontSize: 11,
+                  fontWeight: 800,
+                  padding: '4px 10px',
+                  borderRadius: 12,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6
+                }}>
+                  <span>PLAN 02</span>
+                  <span style={{ color: '#fbbf24' }}>狭小・変形地</span>
+                </div>
               </div>
-              <h3 style={{ fontSize: 20, marginBottom: 8, color: 'var(--text-main)' }}>
-                デッドスペースを、収納に。<br />
-                【狭小地・変形地向け特注ストッカー】
-              </h3>
-              <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 20 }}>
-                既製品では使えなかったスペースを活かし、敷地の形に合わせて収納空間をつくります。斜めの境界沿い、母屋の軒下にもぴったりフィット。
-              </p>
+              <div style={{ padding: '24px 24px 0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-wood)' }}>斜め境界・台形敷地ジャストフィット</span>
+                  <Home size={20} color="var(--color-wood)" />
+                </div>
+                <h3 style={{ fontSize: 19, marginBottom: 8, color: 'var(--text-main)', lineHeight: 1.4 }}>
+                  デッドスペースを、収納に。<br />
+                  【狭小地・変形地向け特注ストッカー】
+                </h3>
+                <p style={{ fontSize: 13.5, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 20 }}>
+                  既製品では使えなかったスペースを活かし、敷地の形に合わせて収納空間をつくります。斜めの境界沿い、母屋の軒下にもぴったりフィット。
+                </p>
+              </div>
             </div>
-            <button
-              onClick={() => navigateTo('plan-storage')}
-              className="btn-secondary"
-              style={{ width: '100%', justifyContent: 'center' }}
-            >
-              <span>狭小・変形地向けストッカーを見る</span>
-              <ChevronRight size={16} />
-            </button>
+            <div style={{ padding: '0 24px 24px' }}>
+              <button
+                onClick={() => navigateTo('plan-storage')}
+                className="btn-secondary"
+                style={{ width: '100%', justifyContent: 'center' }}
+              >
+                <span>狭小・変形地向けストッカーを見る</span>
+                <ChevronRight size={16} />
+              </button>
+            </div>
           </div>
 
           {/* Plan 3 */}
-          <div className="nature-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div className="nature-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: 0, overflow: 'hidden' }}>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--color-wood)', background: 'var(--color-wood-light)', padding: '3px 10px', borderRadius: 12 }}>
-                  PLAN 03
-                </span>
-                <Warehouse size={22} color="var(--color-accent)" />
+              <div style={{ position: 'relative', width: '100%', height: 200, overflow: 'hidden' }}>
+                <img
+                  src="/assets/plans/plan03.jpg"
+                  alt="Plan 03 農機具・大型倉庫向けアグリシェッド"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                />
+                <div style={{
+                  position: 'absolute',
+                  top: 12,
+                  left: 12,
+                  background: 'rgba(15, 23, 42, 0.85)',
+                  backdropFilter: 'blur(6px)',
+                  color: '#fff',
+                  fontSize: 11,
+                  fontWeight: 800,
+                  padding: '4px 10px',
+                  borderRadius: 12,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6
+                }}>
+                  <span>PLAN 03</span>
+                  <span style={{ color: '#4ade80' }}>農機具・大型倉庫</span>
+                </div>
               </div>
-              <h3 style={{ fontSize: 20, marginBottom: 8, color: 'var(--text-main)' }}>
-                作業動線から、逆算する。<br />
-                【農機具・収穫物向けアグリシェッド】
-              </h3>
-              <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 20 }}>
-                トラクターや農機具の出入り、収穫物保管など「何を入れるか」から逆算して設計。市街化調整区域や農地の面倒な手続きもワンストップ。
-              </p>
+              <div style={{ padding: '24px 24px 0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-accent)' }}>大型トラス × 大開口・高天井設計</span>
+                  <Warehouse size={20} color="var(--color-accent)" />
+                </div>
+                <h3 style={{ fontSize: 19, marginBottom: 8, color: 'var(--text-main)', lineHeight: 1.4 }}>
+                  作業動線から、逆算する。<br />
+                  【農機具・収穫物向けアグリシェッド】
+                </h3>
+                <p style={{ fontSize: 13.5, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 20 }}>
+                  トラクターや農機具の出入り、収穫物保管など「何を入れるか」から逆算して設計。市街化調整区域や農地の面倒な手続きもワンストップ。
+                </p>
+              </div>
             </div>
-            <button
-              onClick={() => navigateTo('plan-agri')}
-              className="btn-accent"
-              style={{ width: '100%', justifyContent: 'center' }}
-            >
-              <span>農機具・大型倉庫を見る</span>
-              <ChevronRight size={16} />
-            </button>
+            <div style={{ padding: '0 24px 24px' }}>
+              <button
+                onClick={() => navigateTo('plan-agri')}
+                className="btn-accent"
+                style={{ width: '100%', justifyContent: 'center' }}
+              >
+                <span>農機具・大型倉庫を見る</span>
+                <ChevronRight size={16} />
+              </button>
+            </div>
           </div>
         </div>
       </section>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, ArrowRight, Check, Warehouse, ShieldCheck, ChevronRight, Wrench, Trees } from 'lucide-react';
+import { Compass, ArrowRight, Check, Warehouse, ShieldCheck, ChevronRight, Wrench, Trees, Sparkles } from 'lucide-react';
 
 export default function PlanAgriPage({ setCurrentRoute }) {
   const navigateTo = (route) => {
@@ -36,7 +36,7 @@ export default function PlanAgriPage({ setCurrentRoute }) {
             建築士の構造計算・確認申請から施工まで、面倒な行政手続きもまとめてお任せいただけます。
           </p>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, justifyContent: 'center' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, justifyContent: 'center', marginBottom: 36 }}>
             <button
               onClick={() => navigateTo('simulator')}
               className="btn-accent"
@@ -51,6 +51,44 @@ export default function PlanAgriPage({ setCurrentRoute }) {
             >
               <span>敷地図面を送って建築士に申請・配置を相談する</span>
             </button>
+          </div>
+
+          {/* 生成モデル建物外観写真 */}
+          <div style={{
+            position: 'relative',
+            maxWidth: 880,
+            margin: '0 auto',
+            borderRadius: 'var(--radius-lg)',
+            overflow: 'hidden',
+            boxShadow: '0 20px 45px rgba(0,0,0,0.14)',
+            border: '1px solid rgba(255,255,255,0.8)'
+          }}>
+            <img
+              src="/assets/plans/plan03.jpg"
+              alt="Plan 03 農機具・大型木造アグリシェッド 完成予想モデル"
+              style={{ width: '100%', height: 'auto', display: 'block' }}
+            />
+            <div style={{
+              position: 'absolute',
+              bottom: 16,
+              left: 16,
+              right: 16,
+              background: 'rgba(15, 23, 42, 0.75)',
+              backdropFilter: 'blur(8px)',
+              padding: '10px 18px',
+              borderRadius: 'var(--radius-md)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              color: '#fff',
+              fontSize: 13
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700 }}>
+                <Sparkles size={16} color="#38bdf8" />
+                <span>PLAN 03 完成予想パース：大型トラス構法 × 高天井 × トラクター乗入れ大開口倉庫</span>
+              </div>
+              <span style={{ fontSize: 11, color: '#94a3b8' }}>シミュレーターでこの形状からカスタマイズ可能</span>
+            </div>
           </div>
         </div>
       </section>

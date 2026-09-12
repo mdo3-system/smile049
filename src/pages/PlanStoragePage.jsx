@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, ArrowRight, Check, Home, ShieldCheck, ChevronRight, Layers, Maximize } from 'lucide-react';
+import { Compass, ArrowRight, Check, Home, ShieldCheck, ChevronRight, Layers, Maximize, Sparkles } from 'lucide-react';
 
 export default function PlanStoragePage({ setCurrentRoute }) {
   const navigateTo = (route) => {
@@ -35,7 +35,7 @@ export default function PlanStoragePage({ setCurrentRoute }) {
             リアルタイムに概算見積もりを確認しながら、あなただけのジャストサイズを組み立てられます。
           </p>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, justifyContent: 'center' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, justifyContent: 'center', marginBottom: 36 }}>
             <button
               onClick={() => navigateTo('simulator')}
               className="btn-accent"
@@ -50,6 +50,44 @@ export default function PlanStoragePage({ setCurrentRoute }) {
             >
               <span>敷地図面を送って建築士に納まりを相談する</span>
             </button>
+          </div>
+
+          {/* 生成モデル建物外観写真 */}
+          <div style={{
+            position: 'relative',
+            maxWidth: 880,
+            margin: '0 auto',
+            borderRadius: 'var(--radius-lg)',
+            overflow: 'hidden',
+            boxShadow: '0 20px 45px rgba(0,0,0,0.14)',
+            border: '1px solid rgba(255,255,255,0.8)'
+          }}>
+            <img
+              src="/assets/plans/plan02.jpg"
+              alt="Plan 02 狭小・変形地向け木造ストッカーガレージ 完成予想モデル"
+              style={{ width: '100%', height: 'auto', display: 'block' }}
+            />
+            <div style={{
+              position: 'absolute',
+              bottom: 16,
+              left: 16,
+              right: 16,
+              background: 'rgba(15, 23, 42, 0.75)',
+              backdropFilter: 'blur(8px)',
+              padding: '10px 18px',
+              borderRadius: 'var(--radius-md)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              color: '#fff',
+              fontSize: 13
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700 }}>
+                <Sparkles size={16} color="#38bdf8" />
+                <span>PLAN 02 完成予想パース：斜め境界にジャストフィット × 片流れ屋根 × 直角台形ガレージ</span>
+              </div>
+              <span style={{ fontSize: 11, color: '#94a3b8' }}>シミュレーターでこの形状からカスタマイズ可能</span>
+            </div>
           </div>
         </div>
       </section>
