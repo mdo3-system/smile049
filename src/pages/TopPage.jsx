@@ -810,6 +810,17 @@ export default function TopPage({ setCurrentRoute }) {
             </div>
           </div>
         </div>
+
+        {/* 掲載モデル画像の注意事項 */}
+        <p style={{
+          fontSize: 12.5,
+          color: 'var(--text-muted)',
+          textAlign: 'center',
+          marginTop: 24,
+          lineHeight: 1.6
+        }}>
+          ※掲載モデルは、3Dシミュレーション・自動見積もりでは表現しきれない多数のオプション項目が含まれております。あらかじめご承知おきください。
+        </p>
       </section>
 
       {/* =========================================================

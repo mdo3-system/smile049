@@ -86,9 +86,19 @@ export default function PlanStoragePage({ setCurrentRoute }) {
                 <Sparkles size={16} color="#38bdf8" />
                 <span>PLAN 02：屋根・外壁ガルバリウム鋼板仕上げ × 軒の出ゼロ・シャープ納まり × 変形地台形</span>
               </div>
-              <span style={{ fontSize: 11, color: '#94a3b8' }}>シミュレーターでこの形状からカスタマイズ可能</span>
             </div>
           </div>
+
+          {/* 掲載モデル画像の注意事項 */}
+          <p style={{
+            fontSize: 12,
+            color: 'var(--text-muted)',
+            textAlign: 'center',
+            marginTop: 14,
+            lineHeight: 1.6
+          }}>
+            ※掲載モデルは、3Dシミュレーション・自動見積もりでは表現しきれない多数のオプション項目が含まれております。あらかじめご承知おきください。
+          </p>
         </div>
       </section>
 
