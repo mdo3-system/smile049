@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Home, Compass, Layers, Wrench, Menu, X, ArrowRight, ShieldCheck } from 'lucide-react';
+import { APP_VERSION } from '../version.js';
+
 
 export default function Header({ currentRoute, setCurrentRoute }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -63,9 +65,22 @@ export default function Header({ currentRoute, setCurrentRoute }) {
               fontSize: 11,
               fontWeight: 700,
               color: 'var(--color-wood)',
-              letterSpacing: '0.08em'
+              letterSpacing: '0.08em',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6
             }}>
-              木造自由設計ガレージ・倉庫
+              <span>木造自由設計ガレージ・倉庫</span>
+              <span style={{
+                background: 'var(--color-primary-soft)',
+                color: 'var(--color-primary)',
+                fontSize: 10,
+                padding: '1px 6px',
+                borderRadius: 4,
+                fontWeight: 800
+              }}>
+                v{APP_VERSION}
+              </span>
             </div>
             <div style={{
               fontSize: 18,
@@ -79,6 +94,7 @@ export default function Header({ currentRoute, setCurrentRoute }) {
             </div>
           </div>
         </div>
+
 
         {/* デスクトップナビ */}
         <nav style={{

@@ -1,7 +1,10 @@
 import React from 'react';
 import { Shield, Phone, Mail, MapPin, CheckCircle, ExternalLink } from 'lucide-react';
+import { APP_VERSION } from '../version.js';
+
 
 export default function Footer({ setCurrentRoute }) {
+
   return (
     <footer style={{
       background: '#202a36',
@@ -120,7 +123,19 @@ export default function Footer({ setCurrentRoute }) {
           fontSize: 12,
           color: '#64748b'
         }}>
-          <div>© 住ま居る / スマイチ ガレージ プロジェクト All Rights Reserved.</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span>© 住ま居る / スマイチ ガレージ プロジェクト All Rights Reserved.</span>
+            <span style={{
+              background: '#334155',
+              color: '#94a3b8',
+              fontSize: 10,
+              padding: '2px 6px',
+              borderRadius: 4,
+              fontWeight: 700
+            }}>
+              v{APP_VERSION}
+            </span>
+          </div>
           <div style={{ display: 'flex', gap: 16, marginTop: 8 }}>
             <span>プライバシーポリシー</span>
             <span>特定商取引法に基づく表記</span>
@@ -131,3 +146,4 @@ export default function Footer({ setCurrentRoute }) {
     </footer>
   );
 }
+

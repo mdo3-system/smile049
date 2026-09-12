@@ -36,8 +36,10 @@ export default function App() {
         onClose={() => setIsChatModalOpen(false)} 
       />
 
-      {/* 共通ヘッダー */}
-      <Header currentRoute={currentRoute} setCurrentRoute={handleRouteNavigation} />
+      {/* 共通ヘッダー（シミュレーター画面時は3Dモデルを最大表示するため専用極薄バーにする） */}
+      {currentRoute !== 'simulator' && (
+        <Header currentRoute={currentRoute} setCurrentRoute={handleRouteNavigation} />
+      )}
 
       {/* メインコンテンツ切り替え */}
       <main style={{ flex: 1 }}>

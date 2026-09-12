@@ -4,13 +4,15 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { 
   ArrowLeft, BookOpen, Save, FolderOpen, Undo2, Redo2, 
   Camera, Eye, EyeOff, ZoomIn, HelpCircle, Layers, CheckCircle2, AlertCircle,
-  Maximize2, Compass, Move, ChevronRight, Sliders, FileText, Check, MessageSquare, Sparkles
+  Maximize2, Minimize2, Compass, Move, ChevronRight, Sliders, FileText, Check, MessageSquare, Sparkles
 } from 'lucide-react';
 import ManualModal from '../components/ManualModal';
 import ParseRequestModal from '../components/ParseRequestModal';
 import ChatRoomModal from '../components/ChatRoomModal';
+import { APP_VERSION } from '../version.js';
 
 export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
+
   const canvasContainerRef = useRef(null);
   const svgRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -23,6 +25,9 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatRoomId, setChatRoomId] = useState(null);
 
+  // 3D全画面表示モード (スマホで3Dモデルを最大化して鑑賞)
+  const [is3dFullScreen, setIs3dFullScreen] = useState(false);
+
   // 表示モード ('3d', 'plan', 'front-elev', 'back-elev', 'left-elev', 'right-elev')
   const [currentView, setCurrentView] = useState('3d');
   const [isSeeThrough, setIsSeeThrough] = useState(false);
@@ -33,6 +38,7 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
 
   // スマホ用アクティブタブ ('dims', 'roof', 'openings', 'shelves', 'vehicles', 'calc')
   const [activeMobileTab, setActiveMobileTab] = useState('dims');
+
 
   // 定数
   const WALL_OUTER_OFFSET = 100;
@@ -270,6 +276,23 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
       renderSvgDrawings();
     }
   }, [currentView, dimensions, openings, shelfUnits, svgZoom, dimFontScale]);
+
+  // 全画面モードやビュー切り替え時にThree.jsキャンバスリサイズを自動再実行
+  useEffect(() => {
+    const container = canvasContainerRef.current;
+    if (!container || !threeRef.current.renderer || !threeRef.current.camera) return;
+    const timer = setTimeout(() => {
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      if (w > 0 && h > 0) {
+        threeRef.current.camera.aspect = w / h;
+        threeRef.current.camera.updateProjectionMatrix();
+        threeRef.current.renderer.setSize(w, h);
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [is3dFullScreen, currentView]);
+
 
   // 開口部バリデーション
   const validateAllOpenings = () => {
@@ -740,13 +763,43 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
 
     // 9. 3D寸法線・文字スプライト (gemini-code 完全復元)
     if (show3dDimensions) {
-      const offsetDist = 800;
-      addDimensionSegment(corePts[0], corePts[1], `正面幅 ${wF}mm`, new THREE.Vector2(0, offsetDist), dim3dFontScale);
-      addDimensionSegment(corePts[1], corePts[2], `右奥行 ${dR}mm`, new THREE.Vector2(offsetDist, 0), dim3dFontScale);
-      addDimensionSegment(corePts[2], corePts[3], `背面幅 ${wB}mm`, new THREE.Vector2(0, -offsetDist), dim3dFontScale);
-      addDimensionSegment(corePts[3], corePts[0], `左奥行 ${dL}mm`, new THREE.Vector2(-offsetDist, 0), dim3dFontScale);
+      const pFrontL = new THREE.Vector3(corePts[0].x, 20, corePts[0].y);
+      const pFrontR = new THREE.Vector3(corePts[1].x, 20, corePts[1].y);
+      addDimensionSegment(pFrontL, pFrontR, `正面芯: ${wF}mm (外寸:${wF + 200})`, new THREE.Vector3(0, 0, 700), dim3dFontScale);
+
+      const pLeftB = new THREE.Vector3(corePts[3].x, 20, corePts[3].y);
+      addDimensionSegment(pLeftB, pFrontL, `左奥行芯: ${dL}mm`, new THREE.Vector3(-700, 0, 0), dim3dFontScale);
+
+      const pRightB = new THREE.Vector3(corePts[2].x, 20, corePts[2].y);
+      addDimensionSegment(pFrontR, pRightB, `右奥行芯: ${dR}mm`, new THREE.Vector3(700, 0, 0), dim3dFontScale);
+      addDimensionSegment(pLeftB, pRightB, `背面芯: ${wB}mm`, new THREE.Vector3(0, 0, -700), dim3dFontScale);
+
+      const minH = Math.min(...hPts);
+      const minIdx = hPts.indexOf(minH);
+      const pMin = outerPts[minIdx];
+
+      const maxH = Math.max(...hPts);
+      const maxIdx = hPts.indexOf(maxH);
+      const pMax = outerPts[maxIdx];
+
+      const offsetLow = new THREE.Vector3(-1200, 0, 0);
+      const pGL = new THREE.Vector3(pMin.x, 0, pMin.y);
+      const pFound = new THREE.Vector3(pMin.x, foundationH, pMin.y);
+      addDimensionSegment(pGL, pFound, `基礎高: ${foundationH}mm`, offsetLow, dim3dFontScale);
+
+      const pGirderLow = new THREE.Vector3(pMin.x, minH, pMin.y);
+      addDimensionSegment(pGL, pGirderLow, `軒高: ${eaveH}mm`, new THREE.Vector3(-2200, 0, 0), dim3dFontScale);
+
+      const pRoofLowTop = new THREE.Vector3(pMin.x, minH + roofThickness, pMin.y);
+      addDimensionSegment(pGirderLow, pRoofLowTop, `屋根厚: ${roofThickness}mm`, offsetLow, dim3dFontScale);
+
+      const maxHeightVal = Math.round(maxH + roofThickness);
+      const pGLHigh = new THREE.Vector3(pMax.x, 0, pMax.y);
+      const pRoofHighTop = new THREE.Vector3(pMax.x, maxHeightVal, pMax.y);
+      addDimensionSegment(pGLHigh, pRoofHighTop, `最高高: ${maxHeightVal}mm`, new THREE.Vector3(1400, 0, 0), dim3dFontScale);
     }
   };
+
 
   // -------------------------------------------------------------
   // 建具・車両メッシュビルダー (gemini-code 完全移植)
@@ -899,45 +952,77 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
   };
 
   // -------------------------------------------------------------
-  // 3D寸法線・スプライト描画 (gemini-code 完全移植)
+  // 3D寸法線・スプライト描画 (gemini-code 完全復元)
   // -------------------------------------------------------------
   const makeTextSprite = (message, scaleFactor = 1.0) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    canvas.width = 512;
-    canvas.height = 128;
-    ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    canvas.width = 1024;
+    canvas.height = 256;
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+    if (ctx.roundRect) {
+      ctx.roundRect(16, 16, 992, 224, 28);
+    } else {
+      ctx.rect(16, 16, 992, 224);
+    }
+    ctx.fill();
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 10;
+    ctx.stroke();
+
+    ctx.font = 'bold 84px sans-serif';
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 44px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(message, 256, 64);
+    ctx.fillText(message, 512, 128);
 
     const texture = new THREE.CanvasTexture(canvas);
-    const spriteMat = new THREE.SpriteMaterial({ map: texture, depthTest: false });
-    const sprite = new THREE.Sprite(spriteMat);
-    sprite.scale.set(600 * scaleFactor, 150 * scaleFactor, 1);
+    texture.minFilter = THREE.LinearFilter;
+    const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, depthTest: false }));
+    sprite.scale.set(1800 * scaleFactor, 450 * scaleFactor, 1);
     return sprite;
   };
 
-  const addDimensionSegment = (pA, pB, labelText, offsetVec, scaleFactor) => {
+  const addDimensionSegment = (pA, pB, labelText, offsetVec, scaleFactor = 1.0) => {
     const { dimGroup } = threeRef.current;
     if (!dimGroup) return;
 
     const dimLineMat = new THREE.LineBasicMaterial({ color: 0x0284c7, linewidth: 2 });
-    const start = new THREE.Vector3(pA.x + offsetVec.x, 100, pA.y + offsetVec.y);
-    const end = new THREE.Vector3(pB.x + offsetVec.x, 100, pB.y + offsetVec.y);
+    const start = pA.clone().add(offsetVec);
+    const end = pB.clone().add(offsetVec);
 
+    // 主寸法線と引き出し線
     dimGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([start, end]), dimLineMat));
-    dimGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(pA.x, 100, pA.y), start]), dimLineMat));
-    dimGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(pB.x, 100, pB.y), end]), dimLineMat));
+    dimGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([pA, start]), dimLineMat));
+    dimGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([pB, end]), dimLineMat));
 
+    // 両端ティック
+    const dir = new THREE.Vector3().subVectors(end, start).normalize();
+    let tickNormal = new THREE.Vector3(0, 1, 0);
+    if (Math.abs(dir.y) > 0.9) tickNormal = new THREE.Vector3(1, 0, 0);
+    const tickLen = 120 * scaleFactor;
+    dimGroup.add(new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints([
+        start.clone().addScaledVector(tickNormal, tickLen),
+        start.clone().addScaledVector(tickNormal, -tickLen)
+      ]),
+      dimLineMat
+    ));
+    dimGroup.add(new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints([
+        end.clone().addScaledVector(tickNormal, tickLen),
+        end.clone().addScaledVector(tickNormal, -tickLen)
+      ]),
+      dimLineMat
+    ));
+
+    // 寸法文字スプライト
     const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
     const textSprite = makeTextSprite(labelText, scaleFactor);
     textSprite.position.copy(mid).add(new THREE.Vector3(0, 160 * scaleFactor, 0));
     dimGroup.add(textSprite);
   };
+
 
   // -------------------------------------------------------------
   // 積算計算 & 計算式表示 (gemini-code 完全移植)
@@ -1079,122 +1164,338 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
   };
 
   // -------------------------------------------------------------
-  // 2Dベクトル製図 (SVG描画 - gemini-code 完全移植)
+  // 2Dベクトル製図 (SVG描画 - gemini-code 完全復元)
   // -------------------------------------------------------------
   const renderSvgDrawings = () => {
     const svg = svgRef.current;
     if (!svg) return;
     svg.innerHTML = '';
 
-    const { wFront: wF, wBack: wB, dLeft: dL, dRight: dR, eaveHeight: eaveH, foundationHeight: foundationH, roofSlope: slope } = dimensions;
+    const { wFront: wF, wBack: wB, dLeft: dL, dRight: dR, eaveHeight: eaveH, foundationHeight: foundationH, roofSlope: slope, slopeDirection: slopeDir } = dimensions;
 
-    const baseWidth = 850 * svgZoom;
-    const baseHeight = 650 * svgZoom;
-    svg.setAttribute('width', baseWidth);
-    svg.setAttribute('height', baseHeight);
+    const corePts = getCorePoints(wF, wB, dL, dR);
+    const outerPts = getOffsetPoints(corePts, WALL_OUTER_OFFSET);
+
+    const bounds = {
+      minX: Math.min(...outerPts.map(p => p.x)),
+      maxX: Math.max(...outerPts.map(p => p.x)),
+      minY: Math.min(...outerPts.map(p => p.y)),
+      maxY: Math.max(...outerPts.map(p => p.y))
+    };
+    const hPts = outerPts.map(p => getGirderHeight(p, bounds, eaveH, slope, slopeDir));
+    const roofThickness = Math.round(100 + (slope * 2));
+
+    let elements = [];
+    const baseFontSize = Math.round(135 * dimFontScale);
+    const tickLen = Math.round(40 * dimFontScale);
+
+    const drawDim2DLocal = (x1, y1, x2, y2, text, offset, isVertical = false) => {
+      let nx = isVertical ? offset : 0;
+      let ny = isVertical ? 0 : offset;
+      const sx = x1 + nx, sy = y1 + ny;
+      const ex = x2 + nx, ey = y2 + ny;
+
+      elements.push(`<line x1="${sx}" y1="${sy}" x2="${x1}" y2="${y1}" stroke="#94a3b8" stroke-width="4" stroke-dasharray="10,10"/>`);
+      elements.push(`<line x1="${ex}" y1="${ey}" x2="${x2}" y2="${y2}" stroke="#94a3b8" stroke-width="4" stroke-dasharray="10,10"/>`);
+      elements.push(`<line x1="${sx}" y1="${sy}" x2="${ex}" y2="${ey}" stroke="#0284c7" stroke-width="6"/>`);
+      
+      if (isVertical) {
+        elements.push(`<line x1="${sx - tickLen}" y1="${sy}" x2="${sx + tickLen}" y2="${sy}" stroke="#0284c7" stroke-width="6"/>`);
+        elements.push(`<line x1="${ex - tickLen}" y1="${ey}" x2="${ex + tickLen}" y2="${ey}" stroke="#0284c7" stroke-width="6"/>`);
+      } else {
+        elements.push(`<line x1="${sx}" y1="${sy - tickLen}" x2="${sx}" y2="${sy + tickLen}" stroke="#0284c7" stroke-width="6"/>`);
+        elements.push(`<line x1="${ex}" y1="${ey - tickLen}" x2="${ex}" y2="${ey + tickLen}" stroke="#0284c7" stroke-width="6"/>`);
+      }
+
+      const midX = (sx + ex) / 2;
+      const midY = (sy + ey) / 2;
+      const approxCharW = baseFontSize * 0.65;
+      const bgW = text.length * approxCharW + 50;
+      const bgH = baseFontSize + 36;
+
+      let tx = midX; let ty = midY;
+      if (isVertical) tx = sx + (offset > 0 ? (bgW / 2 + 35) : -(bgW / 2 + 35));
+      else ty = sy + (offset > 0 ? (bgH / 2 + 35) : -(bgH / 2 + 35));
+
+      elements.push(`<rect x="${tx - bgW/2}" y="${ty - bgH/2}" width="${bgW}" height="${bgH}" fill="rgba(255, 255, 255, 0.96)" stroke="#0284c7" stroke-width="3" rx="10"/>`);
+      elements.push(`<text x="${tx}" y="${ty}" fill="#0f172a" font-size="${baseFontSize}" font-weight="bold" text-anchor="middle" dominant-baseline="central">${text}</text>`);
+    };
+
+    let vbMinX, vbMinY, vbW, vbH;
 
     if (currentView === 'plan') {
-      svg.setAttribute('viewBox', '-4500 -7500 9000 8500');
+      const toSvg = p => ({ x: p.x, y: p.y });
+      const sc0 = toSvg(corePts[0]), sc1 = toSvg(corePts[1]), sc2 = toSvg(corePts[2]), sc3 = toSvg(corePts[3]);
+      const so0 = toSvg(outerPts[0]), so1 = toSvg(outerPts[1]), so2 = toSvg(outerPts[2]), so3 = toSvg(outerPts[3]);
 
-      const corePts = getCorePoints(wF, wB, dL, dR);
-      const outerPts = getOffsetPoints(corePts, WALL_OUTER_OFFSET);
+      // 外壁ライン
+      elements.push(`<polygon points="${so0.x},${so0.y} ${so1.x},${so1.y} ${so2.x},${so2.y} ${so3.x},${so3.y}" fill="#f8fafc" stroke="#64748b" stroke-width="6"/>`);
+      // 柱芯線 (赤一点鎖線)
+      elements.push(`<polygon points="${sc0.x},${sc0.y} ${sc1.x},${sc1.y} ${sc2.x},${sc2.y} ${sc3.x},${sc3.y}" fill="none" stroke="#ef4444" stroke-width="6" stroke-dasharray="24,8,6,8"/>`);
+
+      // 4隅の柱 (105mm角)
+      [sc0, sc1, sc2, sc3].forEach(pt => {
+        elements.push(`<rect x="${pt.x - 52.5}" y="${pt.y - 52.5}" width="105" height="105" fill="#cbd5e1" stroke="#1e293b" stroke-width="4"/>`);
+      });
+
+      // 水流方向矢印
+      const midDepthY = -(dL + dR) / 4;
+      let rotDeg = 0;
+      if (slopeDir === 'front-to-back') rotDeg = 180;
+      else if (slopeDir === 'back-to-front') rotDeg = 0;
+      else if (slopeDir === 'left-to-right') rotDeg = 90;
+      else if (slopeDir === 'right-to-left') rotDeg = -90;
+
+      elements.push(`
+        <g transform="translate(0, ${midDepthY})">
+          <g transform="rotate(${rotDeg})">
+            <line x1="0" y1="-250" x2="0" y2="250" stroke="#0284c7" stroke-width="12"/>
+            <polygon points="0,320 -70,220 70,220" fill="#0284c7"/>
+          </g>
+          <text x="0" y="-300" font-size="${baseFontSize * 1.1}" font-weight="bold" fill="#0284c7" text-anchor="middle">水流方向 (${slope}寸勾配)</text>
+        </g>
+      `);
+
+      // 平面図上の開口部
+      openings.forEach(op => {
+        let pA, pB;
+        if (op.wall === 'front') { pA = corePts[0]; pB = corePts[1]; }
+        else if (op.wall === 'right') { pA = corePts[1]; pB = corePts[2]; }
+        else if (op.wall === 'back') { pA = corePts[2]; pB = corePts[3]; }
+        else { pA = corePts[3]; pB = corePts[0]; }
+
+        const dir = new THREE.Vector2().subVectors(pB, pA).normalize();
+        const opStart = new THREE.Vector2().addVectors(pA, dir.clone().multiplyScalar(op.clearanceLeft));
+        const opEnd = new THREE.Vector2().addVectors(opStart, dir.clone().multiplyScalar(op.width));
+        const sopS = toSvg(opStart), sopE = toSvg(opEnd);
+
+        let strokeColor = (op.type === 'shutter') ? '#0f172a' : ((op.type === 'door' || op.type === 'sliding_door') ? '#059669' : '#0284c7');
+        elements.push(`<line x1="${sopS.x}" y1="${sopS.y}" x2="${sopE.x}" y2="${sopE.y}" stroke="#ffffff" stroke-width="26"/>`);
+        elements.push(`<line x1="${sopS.x}" y1="${sopS.y}" x2="${sopE.x}" y2="${sopE.y}" stroke="${strokeColor}" stroke-width="16"/>`);
+      });
+
+      // 車両フットプリント
+      vehicles.forEach(veh => {
+        let vW = 1850, vL = 4800, label = 'SUV';
+        if (veh.type === 'car_sport') { vW = 1800; vL = 4500; label = 'SPORT'; }
+        else if (veh.type === 'bike') { vW = 800; vL = 2100; label = 'BIKE'; }
+        else if (veh.type === 'tractor') { vW = 1600; vL = 3400; label = 'TRACTOR'; }
+        
+        elements.push(`
+          <g transform="translate(${veh.posX}, ${veh.posZ}) rotate(${veh.rotDeg || 0})">
+            <rect x="${-vW/2}" y="${-vL/2}" width="${vW}" height="${vL}" rx="60" fill="rgba(30, 41, 59, 0.15)" stroke="#0f172a" stroke-width="4"/>
+            <polygon points="0,${-vL/2 + 80} -50,${-vL/2 + 200} 50,${-vL/2 + 200}" fill="#0f172a"/>
+            <text x="0" y="20" font-size="100" font-weight="bold" fill="#0f172a" text-anchor="middle">${label}</text>
+          </g>
+        `);
+      });
+
+      const offFront = Math.max(650, baseFontSize * 4.0);
+      const offSide = Math.max(750, baseFontSize * 4.5);
+
+      drawDim2DLocal(sc0.x, sc0.y, sc1.x, sc1.y, `正面 柱芯: ${wF}mm`, offFront);
+      drawDim2DLocal(sc1.x, sc1.y, sc2.x, sc2.y, `右奥行 柱芯: ${dR}mm`, offSide, true);
+      drawDim2DLocal(sc3.x, sc3.y, sc2.x, sc2.y, `背面 柱芯: ${wB}mm`, -offFront);
+      drawDim2DLocal(sc0.x, sc0.y, sc3.x, sc3.y, `左奥行 柱芯: ${dL}mm`, -offSide, true);
+
+      const titleY = Math.min(-dL, -dR) - offFront - 500;
+      elements.push(`<text x="0" y="${titleY}" font-size="${baseFontSize * 1.3}" font-weight="bold" fill="#0f172a" text-anchor="middle">平面図 (赤破線: 柱芯 / 外側線: 仕上ふかし+100mm)</text>`);
+
+      const allX = [sc0.x, sc1.x, sc2.x, sc3.x, so0.x, so1.x, so2.x, so3.x];
+      const allY = [sc0.y, sc1.y, sc2.y, sc3.y, so0.y, so1.y, so2.y, so3.y];
+      const padX = offSide + 1500;
+      const padY = offFront + 1200;
+      vbMinX = Math.min(...allX) - padX;
+      vbW = Math.max(...allX) + padX - vbMinX;
+      vbMinY = titleY - 300;
+      vbH = Math.max(...allY) + padY - vbMinY;
+
+    } else if (currentView === 'front-elev' || currentView === 'back-elev') {
+      const isFront = currentView === 'front-elev';
+      const wallName = isFront ? 'front' : 'back';
+      const wSpan = isFront ? wF : wB;
+      const totalW = wSpan + WALL_OUTER_OFFSET * 2;
+      const idxL = isFront ? 0 : 3;
+      const idxR = isFront ? 1 : 2;
+
+      const hL = hPts[idxL], hR = hPts[idxR];
+
+      const coreX1 = -wSpan / 2;
+      const coreX2 = wSpan / 2;
+      const outerX1 = coreX1 - WALL_OUTER_OFFSET;
+      const outerX2 = coreX2 + WALL_OUTER_OFFSET;
+
+      const baseGL_Y = 0;
+      const fFoundY = -foundationH;
+      const fGirdY1 = -hL;
+      const fGirdY2 = -hR;
+      const fRoofY1 = fGirdY1 - roofThickness;
+      const fRoofY2 = fGirdY2 - roofThickness;
+
+      // GL地盤線
+      elements.push(`<line x1="${outerX1 - 1400}" y1="${baseGL_Y}" x2="${outerX2 + 1400}" y2="${baseGL_Y}" stroke="#64748b" stroke-width="6"/>`);
+      elements.push(`<text x="${outerX1 - 1300}" y="${baseGL_Y + 90}" font-size="${baseFontSize}" font-weight="bold" fill="#64748b">▼ 設計GL (±0)</text>`);
+
+      // 基礎コンクリート (床付け開口部の切り欠き連動)
+      const floorOps = openings.filter(op => op.wall === wallName && isFloorLevelOpening(op.type));
+      if (floorOps.length === 0) {
+        elements.push(`<rect x="${outerX1}" y="${fFoundY}" width="${totalW}" height="${foundationH}" fill="#94a3b8" stroke="#1e293b" stroke-width="4"/>`);
+      } else {
+        let curFoundX = outerX1;
+        floorOps.sort((a,b) => a.clearanceLeft - b.clearanceLeft).forEach(fOp => {
+          const sX1 = coreX1 + fOp.clearanceLeft;
+          const sX2 = sX1 + fOp.width;
+          if (sX1 > curFoundX) {
+            elements.push(`<rect x="${curFoundX}" y="${fFoundY}" width="${sX1 - curFoundX}" height="${foundationH}" fill="#94a3b8" stroke="#1e293b" stroke-width="4"/>`);
+          }
+          curFoundX = sX2;
+        });
+        if (curFoundX < outerX2) {
+          elements.push(`<rect x="${curFoundX}" y="${fFoundY}" width="${outerX2 - curFoundX}" height="${foundationH}" fill="#94a3b8" stroke="#1e293b" stroke-width="4"/>`);
+        }
+      }
 
       // 外壁ポリゴン
-      const pStr = outerPts.map(p => `${p.x},${p.y}`).join(' ');
-      const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-      poly.setAttribute('points', pStr);
-      poly.setAttribute('fill', '#f1f5f9');
-      poly.setAttribute('stroke', '#334155');
-      poly.setAttribute('stroke-width', '40');
-      svg.appendChild(poly);
+      elements.push(`<polygon points="${outerX1},${fFoundY} ${outerX2},${fFoundY} ${outerX2},${fGirdY2} ${outerX1},${fGirdY1}" fill="#f8fafc" stroke="#1e293b" stroke-width="4"/>`);
 
-      // 柱芯線
-      const cStr = corePts.map(p => `${p.x},${p.y}`).join(' ');
-      const cPoly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-      cPoly.setAttribute('points', cStr);
-      cPoly.setAttribute('fill', 'none');
-      cPoly.setAttribute('stroke', '#0284c7');
-      cPoly.setAttribute('stroke-width', '25');
-      cPoly.setAttribute('stroke-dasharray', '80,40');
-      svg.appendChild(cPoly);
+      // 柱芯線 (赤一点鎖線)
+      elements.push(`<line x1="${coreX1}" y1="${baseGL_Y + 100}" x2="${coreX1}" y2="${fRoofY1 - 100}" stroke="#ef4444" stroke-width="4" stroke-dasharray="18,6,4,6"/>`);
+      elements.push(`<line x1="${coreX2}" y1="${baseGL_Y + 100}" x2="${coreX2}" y2="${fRoofY2 - 100}" stroke="#ef4444" stroke-width="4" stroke-dasharray="18,6,4,6"/>`);
+      elements.push(`<text x="${coreX1}" y="${baseGL_Y + 150}" font-size="${baseFontSize * 0.9}" fill="#ef4444" font-weight="bold" text-anchor="middle">柱芯</text>`);
+      elements.push(`<text x="${coreX2}" y="${baseGL_Y + 150}" font-size="${baseFontSize * 0.9}" fill="#ef4444" font-weight="bold" text-anchor="middle">柱芯</text>`);
+
+      // 屋根スラブ
+      elements.push(`<polygon points="${outerX1},${fGirdY1} ${outerX2},${fGirdY2} ${outerX2},${fRoofY2} ${outerX1},${fRoofY1}" fill="#334155" stroke="#1e293b" stroke-width="4"/>`);
+
+      // 開口部 (シャッター / 建具)
+      openings.filter(op => op.wall === wallName).forEach(op => {
+        const opLeftX = coreX1 + op.clearanceLeft;
+        const opW = op.width;
+        const opTopY = -op.topHeightGL;
+        const opH = isFloorLevelOpening(op.type) ? op.topHeightGL - 50 : op.topHeightGL - Math.max(op.topHeightGL - op.height, 50);
+
+        let fillC = (op.type === 'shutter') ? '#334155' : ((op.type === 'door' || op.type === 'sliding_door') ? '#475569' : '#38bdf8');
+        elements.push(`<rect x="${opLeftX}" y="${opTopY}" width="${opW}" height="${opH}" fill="${fillC}" stroke="#1e293b" stroke-width="4"/>`);
+        elements.push(`<text x="${opLeftX + opW/2}" y="${opTopY + opH/2}" fill="#fff" font-size="${baseFontSize * 0.85}" font-weight="bold" text-anchor="middle" dominant-baseline="central">${op.width}×${op.height}</text>`);
+      });
 
       // 寸法線
-      drawDim2D(corePts[0].x, 0, corePts[1].x, 0, `正面幅 ${wF}mm`, 450);
-      drawDim2D(corePts[1].x, 0, corePts[2].x, -dR, `右奥行 ${dR}mm`, 550, true);
-      drawDim2D(corePts[3].x, -dL, corePts[2].x, -dR, `背面幅 ${wB}mm`, -550);
-      drawDim2D(corePts[0].x, 0, corePts[3].x, -dL, `左奥行 ${dL}mm`, -550, true);
+      const offH1 = Math.max(500, baseFontSize * 3.8);
+      const offH2 = offH1 + Math.max(450, baseFontSize * 3.2);
+      drawDim2DLocal(coreX1, baseGL_Y, coreX2, baseGL_Y, `柱芯間口: ${wSpan}mm`, offH1);
+      drawDim2DLocal(outerX1, baseGL_Y, outerX2, baseGL_Y, `仕上全幅: ${totalW}mm`, offH2);
+      drawDim2DLocal(outerX1, baseGL_Y, coreX1, baseGL_Y, `${WALL_OUTER_OFFSET}`, 220);
+      drawDim2DLocal(coreX2, baseGL_Y, outerX2, baseGL_Y, `${WALL_OUTER_OFFSET}`, 220);
 
-    } else {
-      // 立面図 (正面 / 裏 / 左 / 右)
-      svg.setAttribute('viewBox', '-4500 -1200 9000 6200');
+      const offV1 = Math.max(550, baseFontSize * 4.2);
+      const offV2 = offV1 + Math.max(550, baseFontSize * 4.2);
+      drawDim2DLocal(outerX1, baseGL_Y, outerX1, fFoundY, `基礎高: ${foundationH}mm`, -offV1, true);
+      drawDim2DLocal(outerX1, baseGL_Y, outerX1, fGirdY1, `左軒高: ${Math.round(hL)}mm`, -offV2, true);
+      drawDim2DLocal(outerX2, baseGL_Y, outerX2, fGirdY2, `右軒高: ${Math.round(hR)}mm`, offV1, true);
 
-      let span = wF;
-      let title = '正立面図 (南面)';
-      if (currentView === 'back-elev') { span = wB; title = '裏立面図 (北面)'; }
-      else if (currentView === 'left-elev') { span = dL; title = '左側立面図 (西面)'; }
-      else if (currentView === 'right-elev') { span = dR; title = '右側立面図 (東面)'; }
+      const titleY = Math.min(fRoofY1, fRoofY2) - 500;
+      elements.push(`<text x="0" y="${titleY}" font-size="${baseFontSize * 1.3}" font-weight="bold" fill="#0f172a" text-anchor="middle">${isFront ? '正立面図' : '裏立面図'} (両端柱芯より各100mmふかし施工)</text>`);
 
-      // 躯体矩形
-      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      rect.setAttribute('x', `${-span / 2}`);
-      rect.setAttribute('y', `${5000 - eaveH}`);
-      rect.setAttribute('width', `${span}`);
-      rect.setAttribute('height', `${eaveH}`);
-      rect.setAttribute('fill', '#e2e8f0');
-      rect.setAttribute('stroke', '#334155');
-      rect.setAttribute('stroke-width', '35');
-      svg.appendChild(rect);
+      vbMinX = outerX1 - offV2 - 1400;
+      vbW = totalW + offV2 * 2 + 2800;
+      vbMinY = titleY - 300;
+      vbH = baseGL_Y + offH2 + 1000 - vbMinY;
 
-      // GL線
-      const gl = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      gl.setAttribute('x1', '-4200'); gl.setAttribute('y1', '5000');
-      gl.setAttribute('x2', '4200'); gl.setAttribute('y2', '5000');
-      gl.setAttribute('stroke', '#15803d'); gl.setAttribute('stroke-width', '45');
-      svg.appendChild(gl);
+    } else if (currentView === 'left-elev' || currentView === 'right-elev') {
+      const isLeft = currentView === 'left-elev';
+      const sideWallName = isLeft ? 'left' : 'right';
+      const dSide = isLeft ? dL : dR;
+      const totalD = dSide + WALL_OUTER_OFFSET * 2;
+      const idxA = isLeft ? 0 : 1;
+      const idxB = isLeft ? 3 : 2;
+      const hA = hPts[idxA], hB = hPts[idxB];
 
-      const glTxt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      glTxt.setAttribute('x', '-4000'); glTxt.setAttribute('y', '4930');
-      glTxt.setAttribute('fill', '#15803d'); glTxt.setAttribute('font-size', `${140 * dimFontScale}`);
-      glTxt.setAttribute('font-weight', 'bold');
-      glTxt.textContent = '▼ 設計GL ±0';
-      svg.appendChild(glTxt);
+      const coreX1 = -dSide / 2;
+      const coreX2 = dSide / 2;
+      const outerX1 = coreX1 - WALL_OUTER_OFFSET;
+      const outerX2 = coreX2 + WALL_OUTER_OFFSET;
 
-      // タイトル
-      const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      t.setAttribute('x', '0'); t.setAttribute('y', '-600');
-      t.setAttribute('text-anchor', 'middle'); t.setAttribute('fill', '#1e293b');
-      t.setAttribute('font-size', `${240 * dimFontScale}`); t.setAttribute('font-weight', 'bold');
-      t.textContent = `${title} (スパン ${span}mm / 軒高 ${eaveH}mm)`;
-      svg.appendChild(t);
+      const baseGL_Y = 0;
+      const sFoundY = -foundationH;
+      const sGirdY1 = -hA;
+      const sGirdY2 = -hB;
+      const sRoofY1 = sGirdY1 - roofThickness;
+      const sRoofY2 = sGirdY2 - roofThickness;
+
+      // GL地盤線
+      elements.push(`<line x1="${outerX1 - 1400}" y1="${baseGL_Y}" x2="${outerX2 + 1400}" y2="${baseGL_Y}" stroke="#64748b" stroke-width="6"/>`);
+      elements.push(`<text x="${outerX1 - 1300}" y="${baseGL_Y + 90}" font-size="${baseFontSize}" font-weight="bold" fill="#64748b">▼ 設計GL (±0)</text>`);
+
+      // 基礎コンクリート
+      const floorOps = openings.filter(op => op.wall === sideWallName && isFloorLevelOpening(op.type));
+      if (floorOps.length === 0) {
+        elements.push(`<rect x="${outerX1}" y="${sFoundY}" width="${totalD}" height="${foundationH}" fill="#94a3b8" stroke="#1e293b" stroke-width="4"/>`);
+      } else {
+        let curFoundX = outerX1;
+        floorOps.sort((a,b) => a.clearanceLeft - b.clearanceLeft).forEach(fOp => {
+          const sX1 = coreX1 + fOp.clearanceLeft;
+          const sX2 = sX1 + fOp.width;
+          if (sX1 > curFoundX) {
+            elements.push(`<rect x="${curFoundX}" y="${sFoundY}" width="${sX1 - curFoundX}" height="${foundationH}" fill="#94a3b8" stroke="#1e293b" stroke-width="4"/>`);
+          }
+          curFoundX = sX2;
+        });
+        if (curFoundX < outerX2) {
+          elements.push(`<rect x="${curFoundX}" y="${sFoundY}" width="${outerX2 - curFoundX}" height="${foundationH}" fill="#94a3b8" stroke="#1e293b" stroke-width="4"/>`);
+        }
+      }
+
+      // 外壁ポリゴン
+      elements.push(`<polygon points="${outerX1},${sFoundY} ${outerX2},${sFoundY} ${outerX2},${sGirdY2} ${outerX1},${sGirdY1}" fill="#f8fafc" stroke="#1e293b" stroke-width="4"/>`);
+
+      // 柱芯線 (赤一点鎖線)
+      elements.push(`<line x1="${coreX1}" y1="${baseGL_Y + 100}" x2="${coreX1}" y2="${sRoofY1 - 100}" stroke="#ef4444" stroke-width="4" stroke-dasharray="18,6,4,6"/>`);
+      elements.push(`<line x1="${coreX2}" y1="${baseGL_Y + 100}" x2="${coreX2}" y2="${sRoofY2 - 100}" stroke="#ef4444" stroke-width="4" stroke-dasharray="18,6,4,6"/>`);
+      elements.push(`<text x="${coreX1}" y="${baseGL_Y + 150}" font-size="${baseFontSize * 0.9}" fill="#ef4444" font-weight="bold" text-anchor="middle">柱芯</text>`);
+      elements.push(`<text x="${coreX2}" y="${baseGL_Y + 150}" font-size="${baseFontSize * 0.9}" fill="#ef4444" font-weight="bold" text-anchor="middle">柱芯</text>`);
+
+      // 屋根スラブ
+      elements.push(`<polygon points="${outerX1},${sGirdY1} ${outerX2},${sGirdY2} ${outerX2},${sRoofY2} ${outerX1},${sRoofY1}" fill="#334155" stroke="#1e293b" stroke-width="4"/>`);
+
+      // 開口部
+      openings.filter(op => op.wall === sideWallName).forEach(op => {
+        const opLeftX = coreX1 + op.clearanceLeft;
+        const opW = op.width;
+        const opTopY = -op.topHeightGL;
+        const opH = isFloorLevelOpening(op.type) ? op.topHeightGL - 50 : op.topHeightGL - Math.max(op.topHeightGL - op.height, 50);
+
+        let fillC = (op.type === 'shutter') ? '#334155' : ((op.type === 'door' || op.type === 'sliding_door') ? '#475569' : '#38bdf8');
+        elements.push(`<rect x="${opLeftX}" y="${opTopY}" width="${opW}" height="${opH}" fill="${fillC}" stroke="#1e293b" stroke-width="4"/>`);
+        elements.push(`<text x="${opLeftX + opW/2}" y="${opTopY + opH/2}" fill="#fff" font-size="${baseFontSize * 0.85}" font-weight="bold" text-anchor="middle" dominant-baseline="central">${op.width}×${op.height}</text>`);
+      });
+
+      // 寸法線
+      const offH1 = Math.max(500, baseFontSize * 3.8);
+      const offH2 = offH1 + Math.max(450, baseFontSize * 3.2);
+      drawDim2DLocal(coreX1, baseGL_Y, coreX2, baseGL_Y, `柱芯奥行: ${dSide}mm`, offH1);
+      drawDim2DLocal(outerX1, baseGL_Y, outerX2, baseGL_Y, `仕上全奥行: ${totalD}mm`, offH2);
+      drawDim2DLocal(outerX1, baseGL_Y, coreX1, baseGL_Y, `${WALL_OUTER_OFFSET}`, 220);
+      drawDim2DLocal(coreX2, baseGL_Y, outerX2, baseGL_Y, `${WALL_OUTER_OFFSET}`, 220);
+
+      const offV1 = Math.max(550, baseFontSize * 4.2);
+      const offV2 = offV1 + Math.max(550, baseFontSize * 4.2);
+      drawDim2DLocal(outerX1, baseGL_Y, outerX1, sFoundY, `基礎高: ${foundationH}mm`, -offV1, true);
+      drawDim2DLocal(outerX1, baseGL_Y, outerX1, sGirdY1, `手前軒高: ${Math.round(hA)}mm`, -offV2, true);
+      drawDim2DLocal(outerX2, baseGL_Y, outerX2, sGirdY2, `奥側軒高: ${Math.round(hB)}mm`, offV1, true);
+
+      const titleY = Math.min(sRoofY1, sRoofY2) - 500;
+      elements.push(`<text x="0" y="${titleY}" font-size="${baseFontSize * 1.3}" font-weight="bold" fill="#0f172a" text-anchor="middle">${isLeft ? '左側立面図' : '右側立面図'} (勾配: ${slope}寸 / ふかし各100mm)</text>`);
+
+      vbMinX = outerX1 - offV2 - 1400;
+      vbW = totalD + offV2 * 2 + 2800;
+      vbMinY = titleY - 300;
+      vbH = baseGL_Y + offH2 + 1000 - vbMinY;
     }
+
+    svg.setAttribute('viewBox', `${vbMinX} ${vbMinY} ${vbW} ${vbH}`);
+    svg.innerHTML = elements.join('\n');
   };
 
-  const drawDim2D = (x1, y1, x2, y2, text, offset, isVertical = false) => {
-    const svg = svgRef.current;
-    if (!svg) return;
-
-    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-
-    if (!isVertical) {
-      line.setAttribute('x1', x1); line.setAttribute('y1', y1 + offset);
-      line.setAttribute('x2', x2); line.setAttribute('y2', y2 + offset);
-      txt.setAttribute('x', (x1 + x2) / 2); txt.setAttribute('y', y1 + offset - 60);
-    } else {
-      line.setAttribute('x1', x1 + offset); line.setAttribute('y1', y1);
-      line.setAttribute('x2', x2 + offset); line.setAttribute('y2', y2);
-      txt.setAttribute('x', x1 + offset + (offset > 0 ? 80 : -80)); txt.setAttribute('y', (y1 + y2) / 2);
-    }
-
-    line.setAttribute('stroke', '#0284c7'); line.setAttribute('stroke-width', '25');
-    txt.setAttribute('text-anchor', 'middle'); txt.setAttribute('fill', '#0284c7');
-    txt.setAttribute('font-size', `${170 * dimFontScale}`); txt.setAttribute('font-weight', 'bold');
-    txt.textContent = text;
-
-    g.appendChild(line); g.appendChild(txt);
-    svg.appendChild(g);
-  };
 
   // -------------------------------------------------------------
   // JSON保存 / 読込 / 画像保存
@@ -1240,8 +1541,9 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
   return (
     <div className="simulator-root" style={{
       display: 'flex',
-      height: 'calc(100vh - 65px)',
-      background: '#1e293b',
+      flexDirection: 'column',
+      height: '100vh',
+      background: '#0f172a',
       overflow: 'hidden',
       position: 'relative'
     }}>
@@ -1269,78 +1571,162 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
       {/* 隠しファイルインプット */}
       <input type="file" ref={fileInputRef} onChange={handleLoadJson} accept=".json" style={{ display: 'none' }} />
 
-      {/* =========================================================
-          操作パネル (PC: 左サイドバー 440px / スマホ: 下部ボトムシート)
-         ========================================================= */}
-      <div className="sim-control-panel" style={{
-        width: 440,
-        height: '100%',
-        background: '#f8fafc',
-        borderRight: '1px solid #e2e8f0',
-        padding: '14px',
-        overflowY: 'auto',
+      {/* 1. 極薄シミュレータートップバー (全幅, 高さ46px) */}
+      <header className="sim-top-bar" style={{
+        height: 46,
+        background: '#ffffff',
+        borderBottom: '1px solid #e2e8f0',
         display: 'flex',
-        flexDirection: 'column',
-        gap: 12,
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 12px',
         flexShrink: 0,
-        zIndex: 20
+        zIndex: 50,
+        boxShadow: '0 1px 4px rgba(0,0,0,0.06)'
       }}>
-        {/* トップバー（サイト戻る・マニュアル・パース依頼） */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
+        {/* 左: 戻る & タイトル & バージョン */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <button
             onClick={() => setCurrentRoute('top')}
-            style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, fontWeight: 700, color: 'var(--color-primary)' }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              fontSize: 12.5,
+              fontWeight: 700,
+              color: 'var(--color-primary)',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '4px 6px',
+              borderRadius: 4
+            }}
           >
             <ArrowLeft size={16} />
-            <span>サイトへ戻る</span>
+            <span>サイトへ</span>
           </button>
 
-          <div style={{ display: 'flex', gap: 6 }}>
-            <button
-              onClick={() => setIsChatOpen(true)}
-              className="btn-secondary"
-              style={{ padding: '6px 10px', fontSize: 11, borderRadius: 6 }}
-              title="相談チャットを開く"
-            >
-              <MessageSquare size={13} />
-              <span>相談チャット</span>
-            </button>
-            <button
-              onClick={() => setIsManualOpen(true)}
-              className="btn-primary"
-              style={{ padding: '6px 10px', fontSize: 11, borderRadius: 6 }}
-            >
-              <BookOpen size={13} />
-              <span>マニュアル</span>
-            </button>
+          <div style={{ height: 16, width: 1, background: '#cbd5e1' }} />
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 13, fontWeight: 800, color: '#1e293b' }}>
+              スマイチ3D
+            </span>
+            <span style={{
+              background: 'var(--color-primary-soft)',
+              color: 'var(--color-primary)',
+              fontSize: 10.5,
+              fontWeight: 800,
+              padding: '1px 6px',
+              borderRadius: 4
+            }}>
+              v{APP_VERSION}
+            </span>
           </div>
         </div>
 
-        {/* パース依頼 目立つCTA */}
-        <button
-          onClick={() => setIsParseRequestOpen(true)}
-          className="btn-accent"
-          style={{ padding: '11px 16px', fontSize: 13.5, borderRadius: 8, justifyContent: 'center', boxShadow: '0 4px 14px rgba(224, 122, 95, 0.4)' }}
-        >
-          <Sparkles size={16} color="#fde047" />
-          <span>✨ フォトリアルパースの作成を依頼 (無料)</span>
-        </button>
+        {/* 右: アクション（パース依頼 / 相談 / マニュアル / 全画面切替） */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <button
+            onClick={() => setIsParseRequestOpen(true)}
+            className="btn-accent"
+            style={{
+              padding: '5px 10px',
+              fontSize: 11.5,
+              borderRadius: 6,
+              boxShadow: '0 2px 8px rgba(224, 122, 95, 0.35)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4
+            }}
+          >
+            <Sparkles size={13} color="#fde047" />
+            <span>パース依頼 (無料)</span>
+          </button>
 
-        {/* 保存・読込 ＆ Undo/Redo */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 6 }}>
-          <button onClick={handleSaveJson} className="btn-secondary" style={{ padding: '6px 4px', fontSize: 11, borderRadius: 4, justifyContent: 'center' }}>
-            <Save size={13} /> 保存
+          <button
+            onClick={() => setIsChatOpen(true)}
+            className="btn-secondary"
+            style={{ padding: '5px 8px', fontSize: 11.5, borderRadius: 6, display: 'flex', alignItems: 'center', gap: 4 }}
+            title="相談チャットを開く"
+          >
+            <MessageSquare size={13} />
+            <span>相談</span>
           </button>
-          <button onClick={() => fileInputRef.current?.click()} className="btn-secondary" style={{ padding: '6px 4px', fontSize: 11, borderRadius: 4, justifyContent: 'center' }}>
-            <FolderOpen size={13} /> 読込
+
+          <button
+            onClick={() => setIsManualOpen(true)}
+            className="btn-primary"
+            style={{ padding: '5px 8px', fontSize: 11.5, borderRadius: 6, display: 'flex', alignItems: 'center', gap: 4 }}
+            title="マニュアルを見る"
+          >
+            <BookOpen size={13} />
+            <span>使い方</span>
           </button>
-          <button onClick={handleUndo} className="btn-secondary" style={{ padding: '6px 4px', fontSize: 11, borderRadius: 4, justifyContent: 'center' }}>
-            <Undo2 size={13} /> 戻る
-          </button>
-          <button onClick={handleRedo} className="btn-secondary" style={{ padding: '6px 4px', fontSize: 11, borderRadius: 4, justifyContent: 'center' }}>
-            <Redo2 size={13} /> 進む
+
+          {/* 3D全画面表示トグルボタン (スマホで特に大活躍) */}
+          <button
+            onClick={() => setIs3dFullScreen(!is3dFullScreen)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              padding: '5px 8px',
+              fontSize: 11.5,
+              fontWeight: 700,
+              borderRadius: 6,
+              border: '1px solid #cbd5e1',
+              background: is3dFullScreen ? '#0284c7' : '#f1f5f9',
+              color: is3dFullScreen ? '#ffffff' : '#334155',
+              cursor: 'pointer'
+            }}
+            title={is3dFullScreen ? '操作パネルを表示' : '3Dを画面いっぱいに広げる'}
+          >
+            {is3dFullScreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+            <span>{is3dFullScreen ? 'パネル' : '全画面'}</span>
           </button>
         </div>
+      </header>
+
+      {/* 2. ワークスペース (PC: 左右 / スマホ: 上下 3D最優先) */}
+      <div className="sim-workspace" style={{
+        flex: 1,
+        display: 'flex',
+        overflow: 'hidden',
+        position: 'relative'
+      }}>
+        {/* =========================================================
+            操作パネル (PC: 左サイドバー 440px / スマホ: 下部ボトムシート)
+           ========================================================= */}
+        <div className="sim-control-panel" style={{
+          width: 440,
+          height: '100%',
+          background: '#f8fafc',
+          borderRight: '1px solid #e2e8f0',
+          padding: '14px',
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 12,
+          flexShrink: 0,
+          zIndex: 20
+        }}>
+          {/* 保存・読込 ＆ Undo/Redo */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 6 }}>
+            <button onClick={handleSaveJson} className="btn-secondary" style={{ padding: '6px 4px', fontSize: 11, borderRadius: 4, justifyContent: 'center' }}>
+              <Save size={13} /> 保存
+            </button>
+            <button onClick={() => fileInputRef.current?.click()} className="btn-secondary" style={{ padding: '6px 4px', fontSize: 11, borderRadius: 4, justifyContent: 'center' }}>
+              <FolderOpen size={13} /> 読込
+            </button>
+            <button onClick={handleUndo} className="btn-secondary" style={{ padding: '6px 4px', fontSize: 11, borderRadius: 4, justifyContent: 'center' }}>
+              <Undo2 size={13} /> 戻る
+            </button>
+            <button onClick={handleRedo} className="btn-secondary" style={{ padding: '6px 4px', fontSize: 11, borderRadius: 4, justifyContent: 'center' }}>
+              <Redo2 size={13} /> 進む
+            </button>
+          </div>
+
 
         {/* スマホ用ボトムシート タブバー */}
         <div className="mobile-tab-bar" style={{
@@ -1387,6 +1773,51 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '2px solid var(--color-primary)', paddingBottom: 4, marginBottom: 8 }}>
             <h3 style={{ fontSize: 13, color: '#1e293b' }}>📐 柱芯寸法 (mm) - 台形変形対応</h3>
           </div>
+
+          {/* 3D寸法表示トグル & 文字倍率 (gemini-code 完全復元) */}
+          <div style={{
+            background: '#f0fdf4',
+            border: '1px solid #bbf7d0',
+            borderRadius: 6,
+            padding: '8px 10px',
+            marginBottom: 10,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-primary-dark)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <input 
+                  type="checkbox" 
+                  checked={show3dDimensions} 
+                  onChange={(e) => setShow3dDimensions(e.target.checked)} 
+                  style={{ width: 16, height: 16, cursor: 'pointer' }}
+                />
+                <span>📐 3D寸法を表示する</span>
+              </label>
+              <span style={{ fontSize: 11, color: '#15803d', fontWeight: 700 }}>
+                {show3dDimensions ? '表示中' : '非表示'}
+              </span>
+            </div>
+            {show3dDimensions && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, paddingTop: 4, borderTop: '1px dashed #86efac' }}>
+                <span style={{ fontSize: 11, color: '#166534', fontWeight: 600 }}>3D文字倍率</span>
+                <input 
+                  type="range" 
+                  min="0.5" 
+                  max="2.5" 
+                  step="0.1" 
+                  value={dim3dFontScale} 
+                  onChange={(e) => setDim3dFontScale(parseFloat(e.target.value))} 
+                  style={{ flex: 1 }}
+                />
+                <span style={{ fontSize: 11, fontWeight: 800, color: '#166534', width: 34, textAlign: 'right' }}>
+                  {dim3dFontScale.toFixed(1)}x
+                </span>
+              </div>
+            )}
+          </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
             <div>
               <label style={{ fontSize: 11, fontWeight: 700, color: '#475569' }}>正面幅 (mm)</label>
@@ -2019,25 +2450,49 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
           {/* 右側ヘルパー */}
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 4 }}>
             {currentView === '3d' && (
-              <button
-                onClick={() => setIsSeeThrough(!isSeeThrough)}
-                style={{
-                  background: isSeeThrough ? 'var(--color-primary)' : '#334155',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: 4,
-                  padding: '4px 8px',
-                  fontSize: 11,
-                  fontWeight: 700,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 4
-                }}
-              >
-                {isSeeThrough ? <Eye size={12} /> : <EyeOff size={12} />}
-                <span>透視:{isSeeThrough ? 'ON' : 'OFF'}</span>
-              </button>
+              <>
+                <button
+                  onClick={() => setShow3dDimensions(!show3dDimensions)}
+                  style={{
+                    background: show3dDimensions ? '#0284c7' : '#334155',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 4,
+                    padding: '4px 8px',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    cursor: 'pointer'
+                  }}
+                  title="3D寸法の表示/非表示をワンタップ切替"
+                >
+                  <span>📐 寸法:{show3dDimensions ? 'ON' : 'OFF'}</span>
+                </button>
+
+                <button
+                  onClick={() => setIsSeeThrough(!isSeeThrough)}
+                  style={{
+                    background: isSeeThrough ? 'var(--color-primary)' : '#334155',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 4,
+                    padding: '4px 8px',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {isSeeThrough ? <Eye size={12} /> : <EyeOff size={12} />}
+                  <span>透視:{isSeeThrough ? 'ON' : 'OFF'}</span>
+                </button>
+              </>
             )}
+
 
             {currentView !== '3d' && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#38bdf8', fontSize: 11, fontWeight: 700 }}>
@@ -2091,24 +2546,32 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
           </div>
         </div>
       </div>
+      </div>
 
-      {/* スマホレイアウト用スタイル */}
+
+      {/* スマホ9割前提レスポンシブ & 3D最優先スタイル */}
       <style>{`
         @media (max-width: 900px) {
           .simulator-root {
+            height: 100vh !important;
+          }
+          .sim-workspace {
             flex-direction: column !important;
-            height: calc(100vh - 58px) !important;
+            height: calc(100vh - 46px) !important;
           }
           .sim-main-stage {
-            height: 42vh !important;
+            order: 1 !important;
+            height: ${is3dFullScreen ? 'calc(100vh - 46px)' : '46vh'} !important;
             flex: none !important;
             border-bottom: 2px solid #334155;
           }
           .sim-control-panel {
+            order: 2 !important;
             width: 100% !important;
-            height: 58vh !important;
+            height: 54vh !important;
+            display: ${is3dFullScreen ? 'none' : 'flex'} !important;
             border-right: none !important;
-            padding: 10px 12px 24px !important;
+            padding: 10px 12px 28px !important;
           }
           .mobile-tab-bar {
             display: flex !important;
@@ -2120,7 +2583,16 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
             display: block !important;
           }
         }
+        @media (max-width: 480px) {
+          .sim-top-bar {
+            padding: 0 8px !important;
+          }
+          .hide-on-mobile-mini {
+            display: none !important;
+          }
+        }
       `}</style>
     </div>
   );
 }
+
