@@ -253,10 +253,22 @@ export function generateSvgDrawingData({
       const opTopY = -op.topHeightGL;
       const opH = isFloorLevelOpening(op.type) ? op.topHeightGL - 50 : op.topHeightGL - Math.max(op.topHeightGL - op.height, 50);
 
-      let fillC = (op.type === 'shutter') ? '#334155' : ((op.type === 'door' || op.type === 'sliding_door') ? '#475569' : '#38bdf8');
-      elements.push(`<rect x="${opLeftX}" y="${opTopY}" width="${opW}" height="${opH}" fill="${fillC}" stroke="#1e293b" stroke-width="4"/>`);
-      elements.push(`<text x="${opLeftX + opW / 2}" y="${opTopY + opH / 2}" fill="#fff" font-size="${baseFontSize * 0.85}" font-weight="bold" text-anchor="middle" dominant-baseline="central">${op.width}×${op.height}</text>`);
+      if (op.type === 'shutter') {
+        elements.push(`<rect x="${opLeftX}" y="${opTopY}" width="${opW}" height="${opH}" fill="#334155" stroke="#1e293b" stroke-width="4"/>`);
+        elements.push(`<text x="${opLeftX + opW / 2}" y="${opTopY + opH / 2}" fill="#fff" font-size="${baseFontSize * 0.85}" font-weight="bold" text-anchor="middle" dominant-baseline="central">シャッター ${op.width}×${op.height}</text>`);
+      } else if (op.type === 'window') {
+        // 引き違い窓: 外枠＋ガラス＋中央召し合わせ框
+        elements.push(`<rect x="${opLeftX}" y="${opTopY}" width="${opW}" height="${opH}" fill="#1e293b" stroke="#0f172a" stroke-width="4"/>`);
+        elements.push(`<rect x="${opLeftX + 25}" y="${opTopY + 25}" width="${opW - 50}" height="${opH - 50}" fill="#bae6fd" stroke="#38bdf8" stroke-width="2"/>`);
+        elements.push(`<line x1="${opLeftX + opW / 2}" y1="${opTopY + 25}" x2="${opLeftX + opW / 2}" y2="${opTopY + opH - 25}" stroke="#1e293b" stroke-width="8"/>`);
+        elements.push(`<text x="${opLeftX + opW / 2}" y="${opTopY + opH / 2}" fill="#0f172a" font-size="${baseFontSize * 0.75}" font-weight="bold" text-anchor="middle" dominant-baseline="central">${op.width}×${op.height}</text>`);
+      } else {
+        const fillC = (op.type === 'door' || op.type === 'sliding_door') ? '#475569' : '#38bdf8';
+        elements.push(`<rect x="${opLeftX}" y="${opTopY}" width="${opW}" height="${opH}" fill="${fillC}" stroke="#1e293b" stroke-width="4"/>`);
+        elements.push(`<text x="${opLeftX + opW / 2}" y="${opTopY + opH / 2}" fill="#fff" font-size="${baseFontSize * 0.85}" font-weight="bold" text-anchor="middle" dominant-baseline="central">${op.width}×${op.height}</text>`);
+      }
     });
+
 
     // 寸法線
     const offH1 = Math.max(500, baseFontSize * 3.8);
@@ -343,10 +355,22 @@ export function generateSvgDrawingData({
       const opTopY = -op.topHeightGL;
       const opH = isFloorLevelOpening(op.type) ? op.topHeightGL - 50 : op.topHeightGL - Math.max(op.topHeightGL - op.height, 50);
 
-      let fillC = (op.type === 'shutter') ? '#334155' : ((op.type === 'door' || op.type === 'sliding_door') ? '#475569' : '#38bdf8');
-      elements.push(`<rect x="${opLeftX}" y="${opTopY}" width="${opW}" height="${opH}" fill="${fillC}" stroke="#1e293b" stroke-width="4"/>`);
-      elements.push(`<text x="${opLeftX + opW / 2}" y="${opTopY + opH / 2}" fill="#fff" font-size="${baseFontSize * 0.85}" font-weight="bold" text-anchor="middle" dominant-baseline="central">${op.width}×${op.height}</text>`);
+      if (op.type === 'shutter') {
+        elements.push(`<rect x="${opLeftX}" y="${opTopY}" width="${opW}" height="${opH}" fill="#334155" stroke="#1e293b" stroke-width="4"/>`);
+        elements.push(`<text x="${opLeftX + opW / 2}" y="${opTopY + opH / 2}" fill="#fff" font-size="${baseFontSize * 0.85}" font-weight="bold" text-anchor="middle" dominant-baseline="central">シャッター ${op.width}×${op.height}</text>`);
+      } else if (op.type === 'window') {
+        // 引き違い窓: 外枠＋ガラス＋中央召し合わせ框
+        elements.push(`<rect x="${opLeftX}" y="${opTopY}" width="${opW}" height="${opH}" fill="#1e293b" stroke="#0f172a" stroke-width="4"/>`);
+        elements.push(`<rect x="${opLeftX + 25}" y="${opTopY + 25}" width="${opW - 50}" height="${opH - 50}" fill="#bae6fd" stroke="#38bdf8" stroke-width="2"/>`);
+        elements.push(`<line x1="${opLeftX + opW / 2}" y1="${opTopY + 25}" x2="${opLeftX + opW / 2}" y2="${opTopY + opH - 25}" stroke="#1e293b" stroke-width="8"/>`);
+        elements.push(`<text x="${opLeftX + opW / 2}" y="${opTopY + opH / 2}" fill="#0f172a" font-size="${baseFontSize * 0.75}" font-weight="bold" text-anchor="middle" dominant-baseline="central">${op.width}×${op.height}</text>`);
+      } else {
+        const fillC = (op.type === 'door' || op.type === 'sliding_door') ? '#475569' : '#38bdf8';
+        elements.push(`<rect x="${opLeftX}" y="${opTopY}" width="${opW}" height="${opH}" fill="${fillC}" stroke="#1e293b" stroke-width="4"/>`);
+        elements.push(`<text x="${opLeftX + opW / 2}" y="${opTopY + opH / 2}" fill="#fff" font-size="${baseFontSize * 0.85}" font-weight="bold" text-anchor="middle" dominant-baseline="central">${op.width}×${op.height}</text>`);
+      }
     });
+
 
     // 寸法線
     const offH1 = Math.max(500, baseFontSize * 3.8);

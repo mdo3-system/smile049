@@ -403,8 +403,13 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
       buildingGroup,
       edgeLineMat: materials.edgeLineMat,
       shutterBoxMat: materials.shutterBoxMat,
-      shutterMat: materials.shutterMat
+      shutterMat: materials.shutterMat,
+      sashFrameMat: materials.sashFrameMat,
+      windowGlassMat: materials.windowGlassMat,
+      doorFrameMat: materials.doorFrameMat,
+      doorPanelMat: materials.doorPanelMat
     });
+
 
     // 7. 内部棚・間仕切りユニット
     buildShelves3D({

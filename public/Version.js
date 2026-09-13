@@ -19,7 +19,9 @@
 // - 2026/09/13 v0.1.17: GitHub連携 (mdo3-system/smile049) & XServerワンコマンド同期デプロイ環境配備
 // - 2026/09/13 v0.1.18: Pre-Flight Check規約の刷新（FIXED_LOGIC.md必須読込・git pull/push・SSH本番同期・DBマイグレーション規約統合）
 // - 2026/09/13 v0.1.19: 重要ドキュメントスロット新設（パース/敷地申請図書/現況写真/CADファイル対応）、管理画面パース画像インライン表示整合、概算見積書7大枠＆薄墨オプション表示
+// - 2026/09/13 v0.1.20: 3Dシミュレーター窓の黒塗り不具合完全解消（四方サッシ枠＋引き違い2枚障子＋半透明スカイブルーガラスマテリアルの忠実再現）
 
-window.APP_VERSION = "0.1.19";
-export const APP_VERSION = "0.1.19";
+window.APP_VERSION = "0.1.20";
+export const APP_VERSION = "0.1.20";
+
 

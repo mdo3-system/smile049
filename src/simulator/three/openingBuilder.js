@@ -12,39 +12,117 @@ import * as THREE from 'three';
 import { WALL_OUTER_OFFSET, isFloorLevelOpening } from '../constants';
 
 /**
- * 引き違い窓メッシュ生成
+ * 引き違い窓メッシュ生成 (data/gemini-code 完全準拠)
+ * 四方枠（上枠・下枠・左右縦枠）＋前後段違いの2枚引き違い障子（ガラス＋召し合わせ框）
  */
-export function createSlidingWindowMesh(width, height) {
+export function createSlidingWindowMesh(width, height, {
+  sashFrameMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.35, metalness: 0.25 }),
+  windowGlassMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.08, metalness: 0.15, transparent: true, opacity: 0.65, side: THREE.DoubleSide }),
+  edgeLineMat
+} = {}) {
   const group = new THREE.Group();
-  const frameMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.5, roughness: 0.5 });
-  const glassMat = new THREE.MeshStandardMaterial({ color: 0x93c5fd, transparent: true, opacity: 0.65 });
+  const frameDepth = 65;
+  const frameThick = 40;
 
-  const outerFrameGeo = new THREE.BoxGeometry(width, height, 60);
-  group.add(new THREE.Mesh(outerFrameGeo, frameMat));
+  // 1. 上枠
+  const topFrame = new THREE.Mesh(new THREE.BoxGeometry(width, frameThick, frameDepth), sashFrameMat);
+  topFrame.position.set(0, height / 2 - frameThick / 2, 0);
+  group.add(topFrame);
 
-  const sW = (width - 60) / 2;
-  const sH = height - 60;
-  const pane1 = new THREE.Mesh(new THREE.BoxGeometry(sW, sH, 20), glassMat);
-  pane1.position.set(-sW / 2 + 10, 0, -10);
-  const pane2 = new THREE.Mesh(new THREE.BoxGeometry(sW, sH, 20), glassMat);
-  pane2.position.set(sW / 2 - 10, 0, 10);
+  // 2. 下枠
+  const bottomFrame = new THREE.Mesh(new THREE.BoxGeometry(width, frameThick, frameDepth), sashFrameMat);
+  bottomFrame.position.set(0, -height / 2 + frameThick / 2, 0);
+  group.add(bottomFrame);
 
-  group.add(pane1, pane2);
+  // 3. 左縦枠
+  const leftFrame = new THREE.Mesh(new THREE.BoxGeometry(frameThick, height - frameThick * 2, frameDepth), sashFrameMat);
+  leftFrame.position.set(-width / 2 + frameThick / 2, 0, 0);
+  group.add(leftFrame);
+
+  // 4. 右縦枠
+  const rightFrame = new THREE.Mesh(new THREE.BoxGeometry(frameThick, height - frameThick * 2, frameDepth), sashFrameMat);
+  rightFrame.position.set(width / 2 - frameThick / 2, 0, 0);
+  group.add(rightFrame);
+
+  // 障子寸法（左右2枚で中央をオーバーラップ +30mm）
+  const paneW = (width - frameThick * 2 + 30) / 2;
+  const paneH = height - frameThick * 2;
+
+  // 5. 左障子 (屋外側手前 Z: +10)
+  const paneLGroup = new THREE.Group();
+  const glassL = new THREE.Mesh(new THREE.BoxGeometry(paneW, paneH, 8), windowGlassMat);
+  paneLGroup.add(glassL);
+  
+  // 召し合わせ框（中央の縦框）
+  const barL = new THREE.Mesh(new THREE.BoxGeometry(28, paneH, 22), sashFrameMat);
+  barL.position.set(paneW / 2 - 14, 0, 0);
+  paneLGroup.add(barL);
+  
+  // 左端框
+  const leftBarL = new THREE.Mesh(new THREE.BoxGeometry(22, paneH, 20), sashFrameMat);
+  leftBarL.position.set(-paneW / 2 + 11, 0, 0);
+  paneLGroup.add(leftBarL);
+
+  paneLGroup.position.set(-width / 4 + 7, 0, 10);
+  group.add(paneLGroup);
+
+  // 6. 右障子 (屋内側奥 Z: -10)
+  const paneRGroup = new THREE.Group();
+  const glassR = new THREE.Mesh(new THREE.BoxGeometry(paneW, paneH, 8), windowGlassMat);
+  paneRGroup.add(glassR);
+
+  // 召し合わせ框（中央の縦框）
+  const barR = new THREE.Mesh(new THREE.BoxGeometry(28, paneH, 22), sashFrameMat);
+  barR.position.set(-paneW / 2 + 14, 0, 0);
+  paneRGroup.add(barR);
+
+  // 右端框
+  const rightBarR = new THREE.Mesh(new THREE.BoxGeometry(22, paneH, 20), sashFrameMat);
+  rightBarR.position.set(paneW / 2 - 11, 0, 0);
+  paneRGroup.add(rightBarR);
+
+  paneRGroup.position.set(width / 4 - 7, 0, -10);
+  group.add(paneRGroup);
+
   return group;
 }
 
 /**
- * Fix窓メッシュ生成
+ * Fix窓メッシュ生成 (data/gemini-code 完全準拠)
+ * 四方枠（上枠・下枠・左右枠）＋はめ殺しガラス
  */
-export function createFixWindowMesh(width, height) {
+export function createFixWindowMesh(width, height, {
+  sashFrameMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.35, metalness: 0.25 }),
+  windowGlassMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.08, metalness: 0.15, transparent: true, opacity: 0.65, side: THREE.DoubleSide })
+} = {}) {
   const group = new THREE.Group();
-  const frameMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.5, roughness: 0.5 });
-  const glassMat = new THREE.MeshStandardMaterial({ color: 0x93c5fd, transparent: true, opacity: 0.65 });
+  const frameDepth = 60;
+  const frameThick = 35;
 
-  group.add(new THREE.Mesh(new THREE.BoxGeometry(width, height, 60), frameMat));
-  group.add(new THREE.Mesh(new THREE.BoxGeometry(width - 60, height - 60, 20), glassMat));
+  const topFrame = new THREE.Mesh(new THREE.BoxGeometry(width, frameThick, frameDepth), sashFrameMat);
+  topFrame.position.set(0, height / 2 - frameThick / 2, 0);
+  group.add(topFrame);
+
+  const bottomFrame = new THREE.Mesh(new THREE.BoxGeometry(width, frameThick, frameDepth), sashFrameMat);
+  bottomFrame.position.set(0, -height / 2 + frameThick / 2, 0);
+  group.add(bottomFrame);
+
+  const leftFrame = new THREE.Mesh(new THREE.BoxGeometry(frameThick, height - frameThick * 2, frameDepth), sashFrameMat);
+  leftFrame.position.set(-width / 2 + frameThick / 2, 0, 0);
+  group.add(leftFrame);
+
+  const rightFrame = new THREE.Mesh(new THREE.BoxGeometry(frameThick, height - frameThick * 2, frameDepth), sashFrameMat);
+  rightFrame.position.set(width / 2 - frameThick / 2, 0, 0);
+  group.add(rightFrame);
+
+  // 透明ガラス
+  const glass = new THREE.Mesh(new THREE.BoxGeometry(width - frameThick * 2, height - frameThick * 2, 8), windowGlassMat);
+  glass.position.set(0, 0, 0);
+  group.add(glass);
+
   return group;
 }
+
 
 /**
  * 建物壁面の全開口部を3D空間に配置
@@ -56,6 +134,10 @@ export function buildOpenings3D({
   edgeLineMat,
   shutterBoxMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.5, roughness: 0.5 }),
   shutterMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.4, roughness: 0.6 }),
+  sashFrameMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.35, metalness: 0.25 }),
+  windowGlassMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.08, metalness: 0.15, transparent: true, opacity: 0.65, side: THREE.DoubleSide }),
+  doorFrameMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4, metalness: 0.2 }),
+  doorPanelMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.5, metalness: 0.2 }),
   insideOffset = 80
 }) {
   if (!openings || !buildingGroup) return;
@@ -115,26 +197,51 @@ export function buildOpenings3D({
       const semiOuterPos = corePos.clone().add(outNorm.clone().multiplyScalar(WALL_OUTER_OFFSET + 10));
 
       if (op.type === 'window') {
-        const winMesh = createSlidingWindowMesh(op.width, fullH);
+        const winMesh = createSlidingWindowMesh(op.width, fullH, { sashFrameMat, windowGlassMat, edgeLineMat });
         winMesh.position.set(semiOuterPos.x, bottomY + fullH / 2, semiOuterPos.y);
         winMesh.rotation.y = angle;
         buildingGroup.add(winMesh);
       } else if (op.type === 'fix') {
-        const fixMesh = createFixWindowMesh(op.width, fullH);
+        const fixMesh = createFixWindowMesh(op.width, fullH, { sashFrameMat, windowGlassMat });
         fixMesh.position.set(semiOuterPos.x, bottomY + fullH / 2, semiOuterPos.y);
         fixMesh.rotation.y = angle;
         buildingGroup.add(fixMesh);
+      } else if (op.type === 'sliding_door') {
+        // 片引き戸 (土間付け・半外付け)
+        const doorGroup = new THREE.Group();
+        const frameGeo = new THREE.BoxGeometry(op.width, fullH, 50);
+        const frameMesh = new THREE.Mesh(frameGeo, doorFrameMat);
+        doorGroup.add(frameMesh);
+        const panelGeo = new THREE.BoxGeometry(op.width - 60, fullH - 60, 28);
+        const panelMesh = new THREE.Mesh(panelGeo, doorPanelMat);
+        panelMesh.position.set(0, 0, 5);
+        doorGroup.add(panelMesh);
+        doorGroup.position.set(semiOuterPos.x, bottomY + fullH / 2, semiOuterPos.y);
+        doorGroup.rotation.y = angle;
+        buildingGroup.add(doorGroup);
       } else {
-        // ドア / 片引き戸 (土間付け・半外付け)
-        const doorGeo = new THREE.BoxGeometry(op.width, fullH, 40);
-        const doorMesh = new THREE.Mesh(doorGeo, new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.5 }));
-        doorMesh.position.set(semiOuterPos.x, bottomY + fullH / 2, semiOuterPos.y);
-        doorMesh.rotation.y = angle;
-        if (edgeLineMat) {
-          doorMesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(doorGeo), edgeLineMat));
-        }
-        buildingGroup.add(doorMesh);
+        // 框ドア (片開き・土間付け・半外付け)
+        const doorGroup = new THREE.Group();
+        const frameGeo = new THREE.BoxGeometry(op.width, fullH, 50);
+        const frameMesh = new THREE.Mesh(frameGeo, doorFrameMat);
+        doorGroup.add(frameMesh);
+        const panelGeo = new THREE.BoxGeometry(op.width - 60, fullH - 60, 30);
+        const panelMesh = new THREE.Mesh(panelGeo, doorPanelMat);
+        doorGroup.add(panelMesh);
+
+        // ドアノブ / レバーハンドル
+        const handleGeo = new THREE.CylinderGeometry(8, 8, 120, 16);
+        const handleMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.8, roughness: 0.2 });
+        const handleMesh = new THREE.Mesh(handleGeo, handleMat);
+        handleMesh.rotation.z = Math.PI / 2;
+        handleMesh.position.set(op.width / 2 - 80, 0, 25);
+        doorGroup.add(handleMesh);
+
+        doorGroup.position.set(semiOuterPos.x, bottomY + fullH / 2, semiOuterPos.y);
+        doorGroup.rotation.y = angle;
+        buildingGroup.add(doorGroup);
       }
     }
   });
 }
+

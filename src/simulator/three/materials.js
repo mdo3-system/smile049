@@ -54,6 +54,29 @@ export function createSimulatorMaterials({ isSeeThrough = false } = {}) {
       metalness: 0.4,
       roughness: 0.6
     }),
+    sashFrameMat: new THREE.MeshStandardMaterial({
+      color: 0x1e293b,
+      roughness: 0.35,
+      metalness: 0.25
+    }),
+    windowGlassMat: new THREE.MeshStandardMaterial({
+      color: 0x38bdf8,
+      roughness: 0.08,
+      metalness: 0.15,
+      transparent: true,
+      opacity: 0.65,
+      side: THREE.DoubleSide
+    }),
+    doorFrameMat: new THREE.MeshStandardMaterial({
+      color: 0x1e293b,
+      roughness: 0.4,
+      metalness: 0.2
+    }),
+    doorPanelMat: new THREE.MeshStandardMaterial({
+      color: 0x475569,
+      roughness: 0.5,
+      metalness: 0.2
+    }),
     edgeLineMat: new THREE.LineBasicMaterial({
       color: 0x1e293b,
       linewidth: 1
@@ -64,3 +87,4 @@ export function createSimulatorMaterials({ isSeeThrough = false } = {}) {
     })
   };
 }
+
