@@ -93,7 +93,7 @@ export default function ParseRequestModal({ isOpen, onClose, currentModelData, o
                 AIフォトリアルパース 作成依頼（無料）
               </h3>
               <div style={{ fontSize: 11.5, opacity: 0.85 }}>
-                作成中の3Dデータをもとに、建築士が本物の写真のようなパースを生成
+                作成中の3Dデータをもとに、専任スタッフが社内PC（Stable Diffusion）で写真のようなパースを生成
               </div>
             </div>
           </div>
@@ -141,22 +141,12 @@ export default function ParseRequestModal({ isOpen, onClose, currentModelData, o
               width: '100%',
               maxWidth: 440
             }}>
-              <div style={{
-                width: 70,
-                height: 70,
-                background: '#ffffff',
-                border: '1px solid #cbd5e1',
-                borderRadius: 8,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0
-              }}>
-                <QrCode size={48} color="#334155" />
+              <div style={{ background: '#ffffff', padding: 8, borderRadius: 8, border: '1px solid #cbd5e1' }}>
+                <QrCode size={48} color="#0f172a" />
               </div>
-              <div style={{ fontSize: 12, color: '#475569', lineHeight: 1.6 }}>
-                <strong>📱 スマホでやり取りする場合</strong><br />
-                スマホのカメラでこのQRを読み取ると、LINEのようにそのまま直通で図面や写真を送信いただけます。
+              <div style={{ fontSize: 12, color: '#475569', lineHeight: 1.5 }}>
+                <strong style={{ color: '#0f172a' }}>📱 スマホで今すぐ続きを見る</strong><br />
+                このQRコードをカメラで読み取ると、外出先でもチャット・パース確認が可能です。
               </div>
             </div>
 
@@ -172,23 +162,69 @@ export default function ParseRequestModal({ isOpen, onClose, currentModelData, o
           </div>
         ) : (
           /* 入力フォーム */
-          <form onSubmit={handleSubmit} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <form onSubmit={handleSubmit} style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14, maxHeight: '80vh', overflowY: 'auto' }}>
+            
+            {/* 生成イメージ見本カード (3Dモデル ➡️ ガルバリウム鋼板フォトリアル完成パース) */}
+            <div style={{
+              background: '#f8fafc',
+              border: '1px solid #cbd5e1',
+              borderRadius: 10,
+              padding: 10,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 6
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 11.5, fontWeight: 800, color: '#1e293b' }}>
+                  🎨 パース生成イメージ見本 (ガルバリウム鋼板・軒出0仕様)
+                </span>
+                <span style={{ fontSize: 10, background: '#e2e8f0', color: '#475569', padding: '1px 6px', borderRadius: 4 }}>
+                  社内PC作成例
+                </span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <div style={{ position: 'relative', borderRadius: 6, overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                  <img 
+                    src="/assets/plans/plan01.jpg" 
+                    alt="Plan01 ホビーガレージ完成見本" 
+                    style={{ width: '100%', height: 95, objectFit: 'cover', display: 'block' }} 
+                  />
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.65)', color: '#fff', fontSize: 9.5, padding: '2px 6px', textAlign: 'center' }}>
+                    Plan 01 愛車・バイクガレージ
+                  </div>
+                </div>
+                <div style={{ position: 'relative', borderRadius: 6, overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                  <img 
+                    src="/assets/plans/plan02.jpg" 
+                    alt="Plan02 大型ガレージ完成見本" 
+                    style={{ width: '100%', height: 95, objectFit: 'cover', display: 'block' }} 
+                  />
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.65)', color: '#fff', fontSize: 9.5, padding: '2px 6px', textAlign: 'center' }}>
+                    Plan 02 大型2台用ガレージ (車)
+                  </div>
+                </div>
+              </div>
+              <div style={{ fontSize: 9.5, color: '#64748b', lineHeight: 1.4 }}>
+                ※掲載モデルは、3Ｄシミュレーション・自動見積もりでは表現しきれない多数のオプション項目が含まれております。あらかじめご承知おきください。
+              </div>
+            </div>
+
             {/* 3Dデータ自動添付バッジ */}
             <div style={{
               background: 'var(--color-primary-soft)',
               border: '1px solid #b7e4c7',
               borderRadius: 8,
-              padding: '10px 14px',
+              padding: '8px 12px',
               display: 'flex',
               alignItems: 'center',
               gap: 10,
-              fontSize: 12.5,
+              fontSize: 12,
               color: 'var(--color-primary-dark)'
             }}>
               <FileText size={18} color="var(--color-primary)" />
               <div>
                 <strong>現在設計中の3Dモデルデータ（JSON）を自動添付しました</strong><br />
-                <span style={{ fontSize: 11, color: '#40916c' }}>寸法・屋根勾配・開口部・棚・車両配置がそのまま建築士に届きます。</span>
+                <span style={{ fontSize: 11, color: '#40916c' }}>寸法・屋根勾配・開口部・棚・車両配置がそのまま専任スタッフに届きます。</span>
               </div>
             </div>
 

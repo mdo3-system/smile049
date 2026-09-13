@@ -125,7 +125,7 @@ export default function ChatRoomModal({ isOpen, onClose, initialRoomId }) {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <h3 style={{ fontSize: 16, margin: 0, fontWeight: 700 }}>
-                  専任建築士・設計サポート窓口
+                  専任スタッフ・設計サポート窓口
                 </h3>
                 <span style={{ fontSize: 10, background: 'rgba(255,255,255,0.25)', padding: '2px 6px', borderRadius: 10 }}>
                   公式
@@ -213,7 +213,7 @@ export default function ChatRoomModal({ isOpen, onClose, initialRoomId }) {
               >
                 {!isMe && (
                   <div style={{ fontSize: 11, color: '#64748b', marginBottom: 3, marginLeft: 6, fontWeight: 700 }}>
-                    住ま居る 専任建築士
+                    住ま居る 専任スタッフ
                   </div>
                 )}
 
@@ -235,56 +235,97 @@ export default function ChatRoomModal({ isOpen, onClose, initialRoomId }) {
 
                     {/* 添付ファイル */}
                     {msg.attachments && msg.attachments.length > 0 && (
-                      <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                        {msg.attachments.map((att, aIdx) => (
-                          <div
-                            key={aIdx}
-                            style={{
-                              background: isMe ? 'rgba(255,255,255,0.7)' : '#f8fafc',
-                              border: '1px solid #cbd5e1',
-                              borderRadius: 8,
-                              padding: '8px 10px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              gap: 8,
-                              fontSize: 12
-                            }}
-                          >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
-                              {att.type === 'image' || att.isAiRender ? (
-                                <ImageIcon size={16} color="var(--color-primary)" />
-                              ) : (
-                                <FileText size={16} color="var(--color-wood)" />
+                      <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        {msg.attachments.map((att, aIdx) => {
+                          const isImg = att.type === 'image' || att.isAiRender;
+                          return (
+                            <div
+                              key={aIdx}
+                              style={{
+                                background: isMe ? 'rgba(255,255,255,0.85)' : '#f8fafc',
+                                border: '1px solid #cbd5e1',
+                                borderRadius: 10,
+                                overflow: 'hidden',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 6
+                              }}
+                            >
+                              {/* 画像の場合はインラインプレビュー表示 */}
+                              {isImg && att.url && (
+                                <div 
+                                  onClick={() => setPreviewImage(att.url)}
+                                  style={{ 
+                                    cursor: 'pointer', 
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                    maxHeight: 220,
+                                    background: '#0f172a'
+                                  }}
+                                >
+                                  <img 
+                                    src={att.url} 
+                                    alt={att.name} 
+                                    style={{ 
+                                      width: '100%', 
+                                      height: 'auto', 
+                                      display: 'block',
+                                      objectFit: 'cover',
+                                      transition: 'transform 0.2s ease'
+                                    }} 
+                                  />
+                                  <div style={{
+                                    position: 'absolute',
+                                    bottom: 6,
+                                    right: 6,
+                                    background: 'rgba(15, 23, 42, 0.75)',
+                                    color: '#ffffff',
+                                    padding: '3px 8px',
+                                    borderRadius: 6,
+                                    fontSize: 11,
+                                    fontWeight: 700,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 4
+                                  }}>
+                                    <Maximize2 size={12} />
+                                    <span>拡大・保存</span>
+                                  </div>
+                                </div>
                               )}
-                              <span style={{ fontWeight: 600, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                                {att.name}
-                              </span>
-                              {att.size && <small style={{ color: '#94a3b8' }}>({att.size})</small>}
-                            </div>
 
-                            {/* AIパース等の画像プレビュー・保存 */}
-                            {att.url && (
-                              <button
-                                onClick={() => setPreviewImage(att.url)}
-                                style={{
-                                  padding: '3px 8px',
-                                  borderRadius: 4,
-                                  background: 'var(--color-primary)',
-                                  color: '#fff',
-                                  fontSize: 11,
-                                  fontWeight: 700,
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: 4
-                                }}
-                              >
-                                <Maximize2 size={12} />
-                                <span>表示</span>
-                              </button>
-                            )}
-                          </div>
-                        ))}
+                              <div style={{ padding: '6px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 12 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
+                                  {isImg ? (
+                                    <ImageIcon size={16} color="var(--color-primary)" />
+                                  ) : (
+                                    <FileText size={16} color="var(--color-wood)" />
+                                  )}
+                                  <span style={{ fontWeight: 600, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                                    {att.name}
+                                  </span>
+                                  {att.size && <small style={{ color: '#94a3b8' }}>({att.size})</small>}
+                                </div>
+
+                                {!isImg && att.url && (
+                                  <button
+                                    onClick={() => setPreviewImage(att.url)}
+                                    style={{
+                                      padding: '3px 8px',
+                                      borderRadius: 4,
+                                      background: 'var(--color-primary)',
+                                      color: '#fff',
+                                      fontSize: 11,
+                                      fontWeight: 700
+                                    }}
+                                  >
+                                    表示
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </div>

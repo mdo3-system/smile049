@@ -104,15 +104,15 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
     }
   ]);
 
-  // 車両配置リスト (SUV / スポーツ / バイク / ★トラクター)
+  // 車両配置リスト (SUV / スポーツ / バイク / トラクター)
   const [vehicles, setVehicles] = useState([
     {
       id: 1,
-      type: 'tractor',
+      type: 'car_suv',
       posX: 0,
-      posZ: -3200,
+      posZ: -3000,
       rotDeg: 0,
-      color: '#dc2626'
+      color: '#2563eb'
     }
   ]);
 
@@ -1524,7 +1524,7 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
           </div>
         </div>
 
-        {/* 5. 車両配置 (★トラクター / SUV / スポーツ / バイク) */}
+        {/* 5. 車両配置 (SUV / スポーツ / バイク / トラクター) */}
         <div className={`control-section ${activeMobileTab === 'vehicles' ? 'mobile-show' : 'mobile-hide'}`} style={{
           background: '#ffffff',
           border: '1px solid #e2e8f0',
@@ -1532,10 +1532,10 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
           padding: 12
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '2px solid var(--color-accent)', paddingBottom: 4, marginBottom: 8 }}>
-            <h3 style={{ fontSize: 13, color: '#1e293b' }}>🚜 車両・トラクター配置</h3>
+            <h3 style={{ fontSize: 13, color: '#1e293b' }}>🚙 車両・バイク配置</h3>
             <button
               onClick={() => {
-                setVehicles([...vehicles, { id: Date.now(), type: 'tractor', posX: 0, posZ: -3200, rotDeg: 0, color: '#dc2626' }]);
+                setVehicles([...vehicles, { id: Date.now(), type: 'car_suv', posX: 0, posZ: -3000, rotDeg: 0, color: '#2563eb' }]);
               }}
               style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-primary)', background: 'var(--color-primary-soft)', padding: '2px 8px', borderRadius: 4 }}
             >

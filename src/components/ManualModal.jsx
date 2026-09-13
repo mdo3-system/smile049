@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { X, BookOpen, Layers, Maximize2, Compass, Move, Save, CheckCircle2, AlertCircle } from 'lucide-react';
+import { X, BookOpen, Layers, Maximize2, Compass, Move, Save, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
 
 export default function ManualModal({ isOpen, onClose }) {
   useEffect(() => {
@@ -59,23 +59,35 @@ export default function ManualModal({ isOpen, onClose }) {
     },
     {
       step: 'STEP 5',
+      title: '3Dモデルからフォトリアルパース作成（社内PC Stable Diffusion）',
+      icon: Sparkles,
+      desc: 'シミュレーターでモデリングしたデータをもとに、「パース依頼 (無料)」を行うと、専任スタッフが社内PC（Stable Diffusion）を用いて本物の写真のようなフォトリアルパースを作成し、専用チャットルームへお届けします。',
+      isPerspectiveStep: true,
+      points: [
+        '外壁・屋根はスタイリッシュなガルバリウム鋼板仕上げ、軒の出0のシャープなデザインを忠実に再現。',
+        'シミュレーターで配置した愛車（SUV・スポーツカー）やバイク、工具棚のサイズ感やレイアウトをそのままリアルにビジュアル化。',
+        '完成したパースはチャット画面からワンタップで高解像度ダウンロード・保存が可能です。'
+      ]
+    },
+    {
+      step: 'STEP 6',
       title: '2D図面（平面・立面4面）の確認と画像出力',
       icon: BookOpen,
       desc: '画面上部タブで「3Dパース」「平面図」「正立面図」「裏立面図」「左側立面図」「右側立面図」を瞬時に切り替え可能。仮想ミリキャンバス（SVG）により引出線付きで正確な寸法が自動描画されます。',
       points: [
         '図面縮尺（50%〜200%）と寸法文字サイズ（0.6x〜2.5x）をスライダーで自由調整。',
-        '「表示中の画面を画像保存」で、AIフォトリアルパース生成（ArchiX / Stable Diffusion）連携用PNGを書き出せます。'
+        '「表示中の画面を画像保存」で、手元の検討用PNG画像をいつでも書き出せます。'
       ]
     },
     {
-      step: 'STEP 6',
+      step: 'STEP 7',
       title: 'プロジェクトの保存と読込（JSON）',
       icon: Save,
       desc: '作成中の建物寸法、屋根・天井設定、開口部、棚、車両配置データをJSON形式でPCに保存できます。',
       points: [
         '「設定を保存」でいつでもバックアップをローカル保存。',
         '「設定を読み込む」で過去の検討データを瞬時に復元・再編集できます。',
-        '建築士へのオンライン相談時にも、このJSONデータをもとにスムーズなお打合せが可能です。'
+        '専任スタッフへのオンライン相談時にも、このJSONデータをもとにスムーズなお打合せが可能です。'
       ]
     }
   ];
@@ -200,25 +212,78 @@ export default function ManualModal({ isOpen, onClose }) {
                   {item.desc}
                 </p>
 
-                {/* 将来画像差し替え用プレースホルダー枠 */}
-                <div className="manual-img-placeholder" style={{
-                  width: '100%',
-                  height: 140,
-                  backgroundColor: '#edf2f7',
-                  border: '2px dashed #cbd5e1',
-                  borderRadius: 8,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 6,
-                  color: '#94a3b8',
-                  fontSize: 12
-                }}>
-                  <Icon size={24} opacity={0.5} />
-                  <span>【操作画面イメージ枠：{item.step}】</span>
-                  <small style={{ fontSize: 10, color: '#a0aec0' }}>※将来的な操作画面スクリーンショット差し替え用コンテナ</small>
-                </div>
+                {/* パース実例表示 または 画面イメージ枠 */}
+                {item.isPerspectiveStep ? (
+                  <div style={{
+                    background: '#ffffff',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: 10,
+                    padding: 12,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 10
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 12, fontWeight: 800, color: '#1e293b' }}>
+                        ✨ 3Dシミュレーター設計データ ➡️ 社内Stable Diffusion完成パース実例
+                      </span>
+                      <span style={{ fontSize: 10.5, background: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)', padding: '2px 8px', borderRadius: 4, fontWeight: 700 }}>
+                        ガルバリウム鋼板仕上げ・軒出0
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                      <div style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid #e2e8f0', background: '#0f172a' }}>
+                        <div style={{ height: 130, overflow: 'hidden' }}>
+                          <img 
+                            src="/assets/plans/plan01.jpg" 
+                            alt="Plan 01 ホビーガレージ" 
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          />
+                        </div>
+                        <div style={{ padding: '6px 8px', color: '#fff', fontSize: 11, fontWeight: 700, background: '#1e293b' }}>
+                          🏍 Plan 01: 愛車・バイク＆ホビーガレージ
+                        </div>
+                      </div>
+
+                      <div style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid #e2e8f0', background: '#0f172a' }}>
+                        <div style={{ height: 130, overflow: 'hidden' }}>
+                          <img 
+                            src="/assets/plans/plan02.jpg" 
+                            alt="Plan 02 大型ガレージ" 
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          />
+                        </div>
+                        <div style={{ padding: '6px 8px', color: '#fff', fontSize: 11, fontWeight: 700, background: '#1e293b' }}>
+                          🚙 Plan 02: 大型2台用ガレージ（SUV・乗用車）
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ fontSize: 10.5, color: '#64748b', lineHeight: 1.5, background: '#f8fafc', padding: '6px 10px', borderRadius: 6, border: '1px solid #e2e8f0' }}>
+                      ※掲載モデルは、3Ｄシミュレーション・自動見積もりでは表現しきれない多数のオプション項目が含まれております。あらかじめご承知おきください。
+                    </div>
+                  </div>
+                ) : (
+                  <div className="manual-img-placeholder" style={{
+                    width: '100%',
+                    height: 140,
+                    backgroundColor: '#edf2f7',
+                    border: '2px dashed #cbd5e1',
+                    borderRadius: 8,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6,
+                    color: '#94a3b8',
+                    fontSize: 12
+                  }}>
+                    <Icon size={24} opacity={0.5} />
+                    <span>【操作画面イメージ枠：{item.step}】</span>
+                    <small style={{ fontSize: 10, color: '#a0aec0' }}>※将来的な操作画面スクリーンショット差し替え用コンテナ</small>
+                  </div>
+                )}
 
                 <div style={{
                   background: '#ffffff',
