@@ -18,5 +18,5 @@
 // - 2026/09/13 v0.1.15: 【Phase 4 リファクタリング】3D躯体メインビルダーの分離 ＆ SimulatorPageのUIオーケストレーター化
 // - 2026/09/13 v0.1.16: 3Dシミュレーターモデル連動 AIフォトリアルパース即時生成＆チャット自動納品エンジン実装
 
-window.APP_VERSION = "0.1.16";
-export const APP_VERSION = "0.1.16";
+window.APP_VERSION = "0.1.17";
+export const APP_VERSION = "0.1.17";
