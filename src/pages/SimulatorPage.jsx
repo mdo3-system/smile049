@@ -21,11 +21,65 @@ import { buildDimensions3D } from '../simulator/three/dimension3dBuilder';
 import { createSimulatorMaterials } from '../simulator/three/materials';
 import { buildStructure3D } from '../simulator/three/building3dBuilder';
 
+// =========================================================
+// スカイブルーグラデーション Equirectangular テクスチャ生成
+// (上部が青く、地平線に向けて薄くなるスカイブルー ＆ 薄雲レイヤー)
+// =========================================================
+const createSkyGradientTexture = (groundType = 'asphalt') => {
+  const canvas = document.createElement('canvas');
+  canvas.width = 2048;
+  canvas.height = 1024;
+  const ctx = canvas.getContext('2d');
+
+  const groundBottomColor = groundType === 'soil' ? '#3b2819' : '#1e293b';
+  const groundHorizonColor = groundType === 'soil' ? '#654e38' : '#334155';
+
+  // 天頂 (V=0) から地平線 (V=0.5)、地面 (V=1.0) への滑らかなグラデーション
+  const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  grad.addColorStop(0.00, '#0369a1'); // 天頂: 鮮やかで深みのあるスカイブルー
+  grad.addColorStop(0.15, '#0284c7'); // 上空: 澄み渡る濃い青空
+  grad.addColorStop(0.30, '#0ea5e9'); // 中上空: 爽快なスカイブルー
+  grad.addColorStop(0.42, '#38bdf8'); // 中空: 明るい水色
+  grad.addColorStop(0.47, '#bae6fd'); // 地平線直上: 薄いペールスカイブルー
+  grad.addColorStop(0.495, '#f0f9ff'); // 地平線付近: 柔らかな霞・ペールホワイト
+  grad.addColorStop(0.505, groundHorizonColor); // 地平線直下
+  grad.addColorStop(1.00, groundBottomColor);  // 天底 (地面ダーク)
+
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // 柔らかな薄雲レイヤー (自然で立体的な青空)
+  ctx.save();
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.32)';
+  ctx.filter = 'blur(14px)';
+  const bands = [
+    { y: 280, h: 36, count: 6 },
+    { y: 350, h: 28, count: 8 },
+    { y: 420, h: 20, count: 10 }
+  ];
+  bands.forEach(b => {
+    for (let i = 0; i < b.count; i++) {
+      const cx = (i * (canvas.width / b.count)) + (Math.sin(i * 3.7) * 80);
+      const cw = 180 + Math.cos(i * 2.1) * 70;
+      ctx.beginPath();
+      ctx.ellipse(cx, b.y, cw, b.h, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  });
+  ctx.restore();
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.mapping = THREE.EquirectangularReflectionMapping;
+  tex.needsUpdate = true;
+  return tex;
+};
+
 export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
 
   const canvasContainerRef = useRef(null);
   const svgRef = useRef(null);
   const fileInputRef = useRef(null);
+  const realSkyTextureRef = useRef(null);
 
   // マニュアルモーダル
   const [isManualOpen, setIsManualOpen] = useState(false);
@@ -42,6 +96,9 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
 
   // 3D地面タイプ ('asphalt' | 'soil' | 'light') - Stable Diffusion パース生成用
   const [groundType, setGroundType] = useState('asphalt');
+
+  // 3D空・背景タイプ ('gradient' | 'real_sky' | 'light') - 上部が青く地平線に抜けるスカイブルー／リアル青空
+  const [skyType, setSkyType] = useState('gradient');
 
   // 表示モード ('3d', 'plan', 'front-elev', 'back-elev', 'left-elev', 'right-elev')
   const [currentView, setCurrentView] = useState('3d');
@@ -217,10 +274,10 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
     const height = container.clientHeight;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xf1f5f9);
+    scene.background = createSkyGradientTexture('asphalt');
 
-    const camera = new THREE.PerspectiveCamera(45, width / height, 100, 50000);
-    camera.position.set(6500, 6000, 8500);
+    const camera = new THREE.PerspectiveCamera(45, width / height, 100, 100000);
+    camera.position.set(6500, 3600, 7500);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     renderer.setSize(width, height);
@@ -232,7 +289,8 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.target.set(0, 1400, -2800);
+    controls.maxPolarAngle = Math.PI / 2 + 0.02; // 水平線より少し下まで（潜り込み防止）
+    controls.target.set(0, 1600, -2800);
 
     // 照明 (自然で温かみのある光源)
     const ambLight = new THREE.AmbientLight(0xffffff, 0.75);
@@ -243,8 +301,8 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
     dirLight.castShadow = true;
     scene.add(dirLight);
 
-    // 地面ベタ塗りプレーン (Stable Diffusion パース生成用: 60m四方)
-    const groundGeo = new THREE.PlaneGeometry(60000, 60000);
+    // 地面ベタ塗りプレーン (Stable Diffusion パース生成用: 120m四方・地平線までカバー)
+    const groundGeo = new THREE.PlaneGeometry(120000, 120000);
     groundGeo.rotateX(-Math.PI / 2);
     const groundMat = new THREE.MeshStandardMaterial({
       color: 0x334155, // 初期色: アスファルト色 (ダークグレー)
@@ -296,28 +354,47 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
     };
   }, []);
 
-  // 地面カラー切替エフェクト (Stable Diffusion パース生成用)
+  // 地面 ＆ 空・背景切替エフェクト (Stable Diffusion パース生成用)
   useEffect(() => {
-    if (!threeRef.current.groundMesh) return;
-    const colors = {
-      asphalt: 0x334155, // アスファルト色 (ダークグレー)
-      soil: 0x6e543c,    // 土色 (アースブラウン)
-      light: 0xcbd5e1    // 明るいグレー
-    };
-    const targetColor = colors[groundType] || 0x334155;
-    threeRef.current.groundMesh.material.color.setHex(targetColor);
-    
-    // 背景色も地面に馴染むトーンへ微調整
-    if (threeRef.current.scene) {
-      if (groundType === 'soil') {
-        threeRef.current.scene.background = new THREE.Color(0xfef3c7); // 温かみのある空
-      } else if (groundType === 'light') {
-        threeRef.current.scene.background = new THREE.Color(0xf8fafc);
-      } else {
-        threeRef.current.scene.background = new THREE.Color(0xe0f2fe); // 青空トーン
-      }
+    const scene = threeRef.current.scene;
+    if (!scene) return;
+
+    // 地面カラー更新
+    if (threeRef.current.groundMesh) {
+      const colors = {
+        asphalt: 0x334155, // アスファルト色 (ダークグレー)
+        soil: 0x6e543c,    // 土色 (アースブラウン)
+        light: 0xcbd5e1    // 明るいグレー
+      };
+      const targetColor = colors[groundType] || 0x334155;
+      threeRef.current.groundMesh.material.color.setHex(targetColor);
     }
-  }, [groundType]);
+    
+    // 空・背景更新
+    if (skyType === 'gradient') {
+      // 上部が青く、地平線に向けて薄くなるスカイブルーグラデーション
+      const gradTexture = createSkyGradientTexture(groundType);
+      scene.background = gradTexture;
+    } else if (skyType === 'real_sky') {
+      // 実際のリアル青空写真テクスチャ
+      if (!realSkyTextureRef.current) {
+        const loader = new THREE.TextureLoader();
+        loader.load('/assets/textures/sky_day.jpg', (tex) => {
+          tex.mapping = THREE.EquirectangularReflectionMapping;
+          tex.needsUpdate = true;
+          realSkyTextureRef.current = tex;
+          if (skyType === 'real_sky') {
+            scene.background = tex;
+          }
+        });
+      } else {
+        scene.background = realSkyTextureRef.current;
+      }
+    } else {
+      // シンプル（スタジオ調無地）
+      scene.background = new THREE.Color(0xf1f5f9);
+    }
+  }, [groundType, skyType]);
 
 
   // -------------------------------------------------------------
@@ -1946,6 +2023,59 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                     title="土色（アースブラウン） - 農業倉庫・更地パース推奨"
                   >
                     🏜️ 土色
+                  </button>
+                </div>
+
+                {/* 空・背景切替 (Stable Diffusion パース生成用) */}
+                <div style={{ display: 'flex', alignItems: 'center', background: '#1e293b', borderRadius: 4, padding: '2px 4px', gap: 2 }} title="3D背景・空の設定 (AIパース生成推奨)">
+                  <span style={{ fontSize: 10, color: '#94a3b8', marginRight: 2, fontWeight: 700 }}>空:</span>
+                  <button
+                    onClick={() => setSkyType('gradient')}
+                    style={{
+                      background: skyType === 'gradient' ? '#0284c7' : 'transparent',
+                      color: skyType === 'gradient' ? '#ffffff' : '#94a3b8',
+                      border: skyType === 'gradient' ? '1px solid #38bdf8' : 'none',
+                      borderRadius: 3,
+                      padding: '2px 6px',
+                      fontSize: 10.5,
+                      fontWeight: 700,
+                      cursor: 'pointer'
+                    }}
+                    title="スカイブルーグラデーション（上部が青く地平線へ薄くなる青空）"
+                  >
+                    🌤️ 青空グラデ
+                  </button>
+                  <button
+                    onClick={() => setSkyType('real_sky')}
+                    style={{
+                      background: skyType === 'real_sky' ? '#0284c7' : 'transparent',
+                      color: skyType === 'real_sky' ? '#ffffff' : '#94a3b8',
+                      border: skyType === 'real_sky' ? '1px solid #38bdf8' : 'none',
+                      borderRadius: 3,
+                      padding: '2px 6px',
+                      fontSize: 10.5,
+                      fontWeight: 700,
+                      cursor: 'pointer'
+                    }}
+                    title="実際の青空テクスチャ（本物の雲と青空の実写パノラマ）"
+                  >
+                    📸 リアル青空
+                  </button>
+                  <button
+                    onClick={() => setSkyType('light')}
+                    style={{
+                      background: skyType === 'light' ? '#475569' : 'transparent',
+                      color: skyType === 'light' ? '#ffffff' : '#94a3b8',
+                      border: skyType === 'light' ? '1px solid #94a3b8' : 'none',
+                      borderRadius: 3,
+                      padding: '2px 6px',
+                      fontSize: 10.5,
+                      fontWeight: 700,
+                      cursor: 'pointer'
+                    }}
+                    title="無地（スタジオ調ライトグレー）"
+                  >
+                    ☁️ 無地
                   </button>
                 </div>
               </>
