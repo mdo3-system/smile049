@@ -5,10 +5,18 @@ import {
   ExternalLink, Calendar, Mail, FileText, Image as ImageIcon, Box,
   Layers, Maximize2, X
 } from 'lucide-react';
-import { getChatRooms, sendMessageToRoom, updateRoomStatus, saveChatRooms } from '../services/chatService';
 import DocumentSlotPanel from '../components/DocumentSlotPanel';
+import { Lock, KeyRound } from 'lucide-react';
+
+const STAFF_PASSCODE = 'smile049';
 
 export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel }) {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return sessionStorage.getItem('wood_garage_staff_auth') === 'true';
+  });
+  const [inputPasscode, setInputPasscode] = useState('');
+  const [authError, setAuthError] = useState(false);
+
   const [rooms, setRooms] = useState(getChatRooms());
   const [selectedRoomId, setSelectedRoomId] = useState(rooms[0]?.roomId || null);
   const [replyText, setReplyText] = useState('');
@@ -16,6 +24,23 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
   const [previewImage, setPreviewImage] = useState(null);
   const [adminActiveTab, setAdminActiveTab] = useState('chat'); // 'chat' | 'documents'
   const fileInputRef = useRef(null);
+
+  const handleLogin = (e) => {
+    e?.preventDefault();
+    if (inputPasscode === STAFF_PASSCODE) {
+      setIsAuthenticated(true);
+      sessionStorage.setItem('wood_garage_staff_auth', 'true');
+      setAuthError(false);
+    } else {
+      setAuthError(true);
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    sessionStorage.removeItem('wood_garage_staff_auth');
+    setInputPasscode('');
+  };
 
 
   useEffect(() => {
@@ -133,6 +158,111 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
     setCurrentRoute('simulator');
   };
 
+  if (!isAuthenticated) {
+    return (
+      <div style={{
+        minHeight: 'calc(100vh - 80px)',
+        background: '#f8fafc',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '30px 20px'
+      }}>
+        <div style={{
+          background: '#ffffff',
+          borderRadius: 'var(--radius-lg)',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.08)',
+          border: '1px solid #e2e8f0',
+          maxWidth: 420,
+          width: '100%',
+          padding: '36px 32px',
+          textAlign: 'center'
+        }}>
+          <div style={{
+            width: 56,
+            height: 56,
+            borderRadius: '50%',
+            background: '#f1f5f9',
+            color: '#1e293b',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 16px'
+          }}>
+            <Lock size={26} color="#0f172a" />
+          </div>
+          <h2 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>
+            専任スタッフ管理認証
+          </h2>
+          <p style={{ fontSize: 13, color: '#64748b', lineHeight: 1.6, marginBottom: 24 }}>
+            本画面は専任スタッフ・管理者専用です。<br />
+            閲覧するにはスタッフ用パスコードを入力してください。
+          </p>
+
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div>
+              <div style={{ position: 'relative' }}>
+                <KeyRound size={18} color="#94a3b8" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
+                <input
+                  type="password"
+                  value={inputPasscode}
+                  onChange={(e) => { setInputPasscode(e.target.value); setAuthError(false); }}
+                  placeholder="スタッフ用パスコード"
+                  autoFocus
+                  style={{
+                    width: '100%',
+                    padding: '12px 14px 12px 38px',
+                    borderRadius: 'var(--radius-md)',
+                    border: authError ? '2px solid #ef4444' : '1px solid #cbd5e1',
+                    fontSize: 15,
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    background: '#f8fafc'
+                  }}
+                />
+              </div>
+              {authError && (
+                <div style={{ color: '#ef4444', fontSize: 12, marginTop: 6, textAlign: 'left', fontWeight: 600 }}>
+                  ✕ パスコードが正しくありません
+                </div>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              className="btn-primary"
+              style={{
+                width: '100%',
+                justifyContent: 'center',
+                padding: '12px',
+                fontSize: 15,
+                background: '#0f172a',
+                borderColor: '#0f172a'
+              }}
+            >
+              <span>認証して入室する</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setCurrentRoute('top')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#64748b',
+                fontSize: 13,
+                cursor: 'pointer',
+                marginTop: 6
+              }}
+            >
+              ← 一般トップページへ戻る
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{
       minHeight: 'calc(100vh - 65px)',
@@ -161,7 +291,7 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <Users size={18} color="#38bdf8" />
             <h2 style={{ fontSize: 16, margin: 0, fontWeight: 700 }}>
-              建築士・スタッフ専用 管理パネル
+              専任スタッフ・管理パネル
             </h2>
             <span style={{ fontSize: 11, background: '#1e293b', color: '#38bdf8', padding: '2px 8px', borderRadius: 4 }}>
               Xserver 連携運用モード
@@ -176,6 +306,25 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
           >
             <RefreshCw size={14} />
             <span>データ更新</span>
+          </button>
+
+          <button
+            onClick={handleLogout}
+            style={{
+              color: '#f87171',
+              background: 'rgba(239, 68, 68, 0.12)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              padding: '4px 10px',
+              borderRadius: 4,
+              fontSize: 12,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4
+            }}
+            title="管理セッションを終了"
+          >
+            <span>🔒 ログアウト</span>
           </button>
         </div>
       </div>

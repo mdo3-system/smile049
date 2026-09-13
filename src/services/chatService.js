@@ -143,8 +143,51 @@ export const saveChatRooms = (rooms) => {
   }
 };
 
+// 初めてのユーザー用の新規ゲスト相談ルームを取得または作成
 export const getCurrentUserRoomId = () => {
-  return localStorage.getItem(STORAGE_KEY_CURRENT_USER) || 'room-demo-01';
+  let roomId = localStorage.getItem(STORAGE_KEY_CURRENT_USER);
+  const rooms = getChatRooms();
+  
+  // 既に自分用のルームが存在する場合はそれを返す（ただしデモルームroom-demo-01は除く）
+  if (roomId && roomId !== 'room-demo-01' && rooms.some(r => r.roomId === roomId)) {
+    return roomId;
+  }
+
+  // 初めてのユーザー用にクリーンなゲスト相談ルームを作成
+  const now = new Date();
+  const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+  const dateStr = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${timeStr}`;
+  const newGuestRoomId = `room-guest-${Date.now().toString(36)}`;
+
+  const guestRoom = {
+    roomId: newGuestRoomId,
+    customerName: 'お客様（無料相談）',
+    email: '',
+    planType: '木造自由設計・個別相談窓口',
+    status: '相談受付中',
+    createdAt: dateStr,
+    modelData: null,
+    crmTransferred: false,
+    documents: {
+      perspectives: [],
+      sitePlans: [],
+      sitePhotos: []
+    },
+    messages: [
+      {
+        id: Date.now(),
+        sender: 'staff',
+        text: 'スマイチ 専任スタッフ・設計サポート窓口へようこそ！\n\nガレージや倉庫の設計、土地の法規制（市街化調整区域・境界離隔）、工期スケジュール、ご予算、事業用大スパン空間のご相談など、何でもお気軽にお尋ねください。\n\n左下のクリップマークから、敷地の写真やCAD図面、手書きのメモなども直接送信いただけます。専任スタッフが丁寧にお答えいたします。',
+        time: timeStr,
+        attachments: []
+      }
+    ]
+  };
+
+  rooms.push(guestRoom);
+  saveChatRooms(rooms);
+  localStorage.setItem(STORAGE_KEY_CURRENT_USER, newGuestRoomId);
+  return newGuestRoomId;
 };
 
 export const setCurrentUserRoomId = (roomId) => {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Compass, ArrowRight, Check, AlertTriangle, ShieldCheck, 
   Sparkles, Layers, FileText, ChevronRight, Ruler, Wrench, Home, Car, Warehouse, Trees,
-  ZoomIn, X, Building2
+  ZoomIn, X, Building2, HelpCircle, Calendar, Landmark, Scale, MessageSquare
 } from 'lucide-react';
 import InteractiveHeroShowcase from '../components/InteractiveHeroShowcase';
 
@@ -99,11 +99,16 @@ export default function TopPage({ setCurrentRoute }) {
                 <span>今すぐ触ってみる（無料 3D設計＋自動見積）</span>
               </button>
               <button 
-                onClick={() => navigateTo('simulator')}
+                onClick={() => {
+                  const el = document.getElementById('qa-section');
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
                 className="btn-secondary"
                 style={{ fontSize: 15 }}
               >
-                <span>建築士にプロ相談する</span>
+                <span>専任スタッフにプロ相談する（Q&A・個別相談）</span>
               </button>
             </div>
             <div style={{ fontSize: 12, color: '#8c7e72', marginTop: 10 }}>
@@ -889,6 +894,274 @@ export default function TopPage({ setCurrentRoute }) {
         }}>
           ※掲載モデルは、3Dシミュレーション・自動見積もりでは表現しきれない多数のオプション項目が含まれております。あらかじめご承知おきください。
         </p>
+      </section>
+
+      {/* =========================================================
+          専任スタッフ プロ相談 ＆ よくあるご質問（Q&A ＆ ワンストップ安心ガイド）
+         ========================================================= */}
+      <section id="qa-section" style={{ background: '#f8fafc', padding: '80px 24px', borderTop: '1px solid var(--border-light)' }}>
+        <div style={{ maxWidth: 960, margin: '0 auto' }}>
+          <div className="section-header">
+            <span className="section-tag" style={{ background: '#e0f2fe', color: '#0369a1' }}>
+              専任スタッフにプロ相談
+            </span>
+            <h2 className="section-title">
+              スケジュール・法規制・一括依頼・融資相談。<br />
+              ガレージ・倉庫建築の「不安」をワンストップで解消します。
+            </h2>
+            <p className="section-desc">
+              「土地の手続きが難しそう」「誰に頼めばいいかわからない」という心配は一切不要です。<br />
+              自社専任スタッフが窓口ひとつで、設計・申請・工事・融資まで責任を持って伴走いたします。
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24, marginBottom: 40 }}>
+            {/* Q1: スケジュール・工期 */}
+            <div style={{
+              background: '#ffffff',
+              borderRadius: 'var(--radius-lg)',
+              border: '1px solid #e2e8f0',
+              padding: '28px 32px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+                <div style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  background: '#eff6ff',
+                  color: '#2563eb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 800,
+                  fontSize: 16
+                }}>
+                  Q1
+                </div>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', margin: 0 }}>
+                  検討開始から完成・引き渡しまで、どのくらいのスケジュールがかかりますか？
+                </h3>
+              </div>
+              <div style={{ paddingLeft: 48 }}>
+                <p style={{ fontSize: 14.5, color: '#475569', lineHeight: 1.8, margin: 0 }}>
+                  一般的なオーダー建築と異なり、スマイチでは<strong>ご相談から完成まで最短約2.5〜3.5ヶ月</strong>で実現可能です。<br />
+                  3Dシミュレーションで初期プランを即日可視化し、自社専任スタッフが構造計算・確認申請・基礎工事・建て方まで一貫管理するため、<strong>設計事務所と工務店の間の引き継ぎ待ちや連絡ロスが一切ありません</strong>。事業用倉庫やスクール開業など、オープン時期が決まっている場合もお気軽にご相談ください。
+                </p>
+              </div>
+            </div>
+
+            {/* Q2: 法規制・敷地条件 */}
+            <div style={{
+              background: '#ffffff',
+              borderRadius: 'var(--radius-lg)',
+              border: '1px solid #e2e8f0',
+              padding: '28px 32px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+                <div style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  background: '#fef3c7',
+                  color: '#d97706',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 800,
+                  fontSize: 16
+                }}>
+                  Q2
+                </div>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', margin: 0 }}>
+                  市街化調整区域や農地、狭小地や境界線ギリギリでも建てられますか？
+                </h3>
+              </div>
+              <div style={{ paddingLeft: 48 }}>
+                <p style={{ fontSize: 14.5, color: '#475569', lineHeight: 1.8, margin: '0 0 10px' }}>
+                  <strong>はい、すべての手続きを自社専任スタッフが一括代行・対応いたします。</strong><br />
+                  既製品ガレージでは断られがちな「市街化調整区域での建築許可」や「農地転用手続き」、防火・準防火地域の仕様、道路斜線・北側斜線の制限調査まで完全対応。
+                </p>
+                <div style={{
+                  background: '#fffbeb',
+                  border: '1px solid #fde68a',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '10px 14px',
+                  fontSize: 13,
+                  color: '#92400e',
+                  lineHeight: 1.6
+                }}>
+                  💡 敷地境界ギリギリまで攻める「軒ゼロ（軒の出0mm）設計」や、道路が斜めの土地に合わせた「台形・偏芯設計」も自由設計ならではの強みです。
+                </div>
+              </div>
+            </div>
+
+            {/* Q3: 一括依頼の安心 vs バラバラ発注の心理的ハードル */}
+            <div style={{
+              background: '#ffffff',
+              borderRadius: 'var(--radius-lg)',
+              border: '2px solid var(--color-primary-soft)',
+              padding: '28px 32px',
+              boxShadow: '0 8px 24px rgba(64, 145, 108, 0.08)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+                <div style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  background: 'var(--color-primary-soft)',
+                  color: 'var(--color-primary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 800,
+                  fontSize: 16
+                }}>
+                  Q3
+                </div>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', margin: 0 }}>
+                  なぜ「一括依頼（ワンストップ）」を選ぶと心理的ハードルが圧倒的に下がるのですか？
+                </h3>
+              </div>
+              <div style={{ paddingLeft: 48 }}>
+                <p style={{ fontSize: 14.5, color: '#475569', lineHeight: 1.8, marginBottom: 16 }}>
+                  自分で業者を個別に手配する「バラバラ発注（分離発注）」は、専門知識のないお客様にとって<strong>精神的・時間的に極めて重い心理的ハードル</strong>となります。スマイチに一括依頼することで、その不安はすべて解消されます。
+                </p>
+
+                {/* 対比表カード */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                  gap: 16,
+                  marginBottom: 10
+                }}>
+                  {/* バラバラ発注のハードル */}
+                  <div style={{
+                    background: '#fef2f2',
+                    border: '1px solid #fecaca',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '16px'
+                  }}>
+                    <div style={{ fontWeight: 800, color: '#dc2626', fontSize: 14, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span>✕ バラバラ発注の過酷なハードル</span>
+                    </div>
+                    <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: '#7f1d1d', lineHeight: 1.7 }}>
+                      <li>設計士・工務店・基礎屋・確認申請代行・銀行を自分で探し回る</li>
+                      <li>業者間の板挟みになり、トラブル時に責任の押し付け合い</li>
+                      <li>工期が延び、予期せぬ追加費用が次々に発生する不安</li>
+                    </ul>
+                  </div>
+
+                  {/* スマイチ一括依頼の安心感 */}
+                  <div style={{
+                    background: '#f0fdf4',
+                    border: '1px solid #bbf7d0',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '16px'
+                  }}>
+                    <div style={{ fontWeight: 800, color: '#16a34a', fontSize: 14, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span>⭕ スマイチ一括依頼（心理的ハードルゼロ）</span>
+                    </div>
+                    <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: '#14532d', lineHeight: 1.7 }}>
+                      <li><strong>窓口は専任スタッフひとつだけ</strong>。想いを伝えるだけでOK</li>
+                      <li>3D設計・構造計算・申請・基礎・施工・保証まで一貫完結</li>
+                      <li>追加費用のない明瞭な積算見積もりと最短スケジュール</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Q4: 融資相談・ローンを含めたワンストップ利便性 */}
+            <div style={{
+              background: '#ffffff',
+              borderRadius: 'var(--radius-lg)',
+              border: '1px solid #e2e8f0',
+              padding: '28px 32px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+                <div style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  background: '#f3e8ff',
+                  color: '#9333ea',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 800,
+                  fontSize: 16
+                }}>
+                  Q4
+                </div>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', margin: 0 }}>
+                  銀行の融資やローンの相談もワンストップで任せられますか？
+                </h3>
+              </div>
+              <div style={{ paddingLeft: 48 }}>
+                <p style={{ fontSize: 14.5, color: '#475569', lineHeight: 1.8, margin: 0 }}>
+                  <strong>はい、資金計画・融資申請までトータルで強力にサポートいたします。</strong><br />
+                  ・<strong>BtoB・事業者様</strong>：日本政策金融公庫や地方銀行の事業性融資・創業融資への申請資料作成。<br />
+                  ・<strong>個人のお客様</strong>：マイカーローン、リフォームローン、住宅ローンへの組み込み支援。<br />
+                  スマイチなら<strong>初期段階から「正確な3D完成パース」「詳細な設計図面」「細目別積算見積書」がすべて揃っているため、金融機関への提出書類審査が圧倒的にスムーズで、融資承認率が大幅に向上</strong>します。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Q&Aセクション内 CTA */}
+          <div style={{
+            background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+            borderRadius: 'var(--radius-lg)',
+            padding: '36px 30px',
+            textAlign: 'center',
+            color: '#ffffff',
+            boxShadow: '0 12px 30px rgba(15, 23, 42, 0.2)'
+          }}>
+            <h3 style={{ fontSize: 21, color: '#ffffff', marginBottom: 10 }}>
+              「うちの土地でも建てられる？」「大体いくらになる？」
+            </h3>
+            <p style={{ fontSize: 14.5, color: '#94a3b8', lineHeight: 1.8, maxWidth: 640, margin: '0 auto 24px' }}>
+              疑問や図面の確認は、無料相談チャットから今すぐ専任スタッフへお気軽にどうぞ。<br />
+              敷地の写真や手書きの間取り図を添付していただくだけで、プロがその場でご案内します。
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, justifyContent: 'center' }}>
+              <button
+                onClick={() => {
+                  navigateTo('chat');
+                }}
+                className="btn-accent"
+                style={{
+                  fontSize: 15,
+                  padding: '14px 28px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  boxShadow: '0 4px 16px rgba(224, 122, 95, 0.4)'
+                }}
+              >
+                <MessageSquare size={18} />
+                <span>無料相談チャットを開く（敷地図面・写真も送信可能）</span>
+              </button>
+              <button
+                onClick={() => navigateTo('simulator')}
+                className="btn-secondary"
+                style={{
+                  fontSize: 15,
+                  padding: '14px 24px',
+                  background: 'rgba(255,255,255,0.1)',
+                  color: '#ffffff',
+                  borderColor: 'rgba(255,255,255,0.2)'
+                }}
+              >
+                <Compass size={18} />
+                <span>自分で3Dシミュレーターを動かしてみる</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* =========================================================
