@@ -312,7 +312,7 @@ export default function DocumentSlotPanel({ room, isStaff = false, onPreviewImag
           }}>
             <div style={{ position: 'relative', height: 160, background: '#0f172a' }}>
               <img 
-                src={p.url || '/assets/plans/plan01.jpg'} 
+                src={p.url || '/assets/plans/3d_sample.jpg'} 
                 alt={p.name}
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
@@ -334,7 +334,7 @@ export default function DocumentSlotPanel({ room, isStaff = false, onPreviewImag
               </div>
               <button
                 type="button"
-                onClick={() => onPreviewImage && onPreviewImage(p.url || '/assets/plans/plan01.jpg')}
+                onClick={() => onPreviewImage && onPreviewImage(p.url || '/assets/plans/3d_sample.jpg')}
                 style={{
                   position: 'absolute',
                   bottom: 8,
@@ -361,7 +361,7 @@ export default function DocumentSlotPanel({ room, isStaff = false, onPreviewImag
                 {p.name}
               </div>
               <div style={{ fontSize: 11, color: '#64748b' }}>
-                更新: {p.updatedAt} • {p.size || '1.2MB'}
+                更新: {p.updatedAt} • {p.size || '1.4MB'}
               </div>
               {p.memo && (
                 <div style={{ fontSize: 11, color: '#0369a1', background: '#f0f9ff', padding: '4px 6px', borderRadius: 4, marginTop: 4 }}>
@@ -371,7 +371,7 @@ export default function DocumentSlotPanel({ room, isStaff = false, onPreviewImag
               <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 10, color: '#94a3b8' }}>ガルバ・軒出0仕様</span>
                 <a 
-                  href={p.url || '/assets/plans/plan01.jpg'} 
+                  href={p.url || '/assets/plans/3d_sample.jpg'} 
                   download={p.name}
                   style={{ fontSize: 11, color: 'var(--color-primary)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}
                 >

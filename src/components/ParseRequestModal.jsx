@@ -185,12 +185,12 @@ export default function ParseRequestModal({ isOpen, onClose, currentModelData, o
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 <div style={{ position: 'relative', borderRadius: 6, overflow: 'hidden', border: '1px solid #e2e8f0' }}>
                   <img 
-                    src="/assets/plans/plan01.jpg" 
-                    alt="Plan01 ホビーガレージ完成見本" 
+                    src="/assets/plans/3d_sample.jpg" 
+                    alt="3Dモデリング反映フォトリアルパース完成見本" 
                     style={{ width: '100%', height: 95, objectFit: 'cover', display: 'block' }} 
                   />
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.65)', color: '#fff', fontSize: 9.5, padding: '2px 6px', textAlign: 'center' }}>
-                    Plan 01 愛車・バイクガレージ
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.72)', color: '#fff', fontSize: 9.5, padding: '2px 6px', textAlign: 'center', fontWeight: 700 }}>
+                    ✨ 3Dモデル生成実例（シャッター・窓・軒出0）
                   </div>
                 </div>
                 <div style={{ position: 'relative', borderRadius: 6, overflow: 'hidden', border: '1px solid #e2e8f0' }}>

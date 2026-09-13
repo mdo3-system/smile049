@@ -64,9 +64,9 @@ export default function ManualModal({ isOpen, onClose }) {
       desc: 'シミュレーターでモデリングしたデータをもとに、「パース依頼 (無料)」を行うと、専任スタッフが社内PC（Stable Diffusion）を用いて本物の写真のようなフォトリアルパースを作成し、専用チャットルームへお届けします。',
       isPerspectiveStep: true,
       points: [
-        '外壁・屋根はスタイリッシュなガルバリウム鋼板仕上げ、軒の出0のシャープなデザインを忠実に再現。',
-        'シミュレーターで配置した愛車（SUV・スポーツカー）やバイク、工具棚のサイズ感やレイアウトをそのままリアルにビジュアル化。',
-        '完成したパースはチャット画面からワンタップで高解像度ダウンロード・保存が可能です。'
+        '正面シャッターや側面サッシ窓、基礎立ち上がりなど、3Dシミュレーターで作成したモデル形状を忠実に反映。',
+        '外壁・屋根はスタイリッシュなガルバリウム鋼板角波仕上げ、軒の出0のシャープなデザインを立体的に再現。',
+        '完成したパースは専用チャットルームのタイムラインおよび「重要ドキュメントスロット」からワンタップで高解像度ダウンロード・保存が可能です。'
       ]
     },
     {
@@ -236,13 +236,13 @@ export default function ManualModal({ isOpen, onClose }) {
                       <div style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid #e2e8f0', background: '#0f172a' }}>
                         <div style={{ height: 130, overflow: 'hidden' }}>
                           <img 
-                            src="/assets/plans/plan01.jpg" 
-                            alt="Plan 01 ホビーガレージ" 
+                            src="/assets/plans/3d_sample.jpg" 
+                            alt="3Dシミュレーション作成モデル完全反映実例" 
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                           />
                         </div>
                         <div style={{ padding: '6px 8px', color: '#fff', fontSize: 11, fontWeight: 700, background: '#1e293b' }}>
-                          🏍 Plan 01: 愛車・バイク＆ホビーガレージ
+                          ✨ 3Dモデル生成実例（シャッター・窓・軒出0）
                         </div>
                       </div>
 
@@ -255,7 +255,7 @@ export default function ManualModal({ isOpen, onClose }) {
                           />
                         </div>
                         <div style={{ padding: '6px 8px', color: '#fff', fontSize: 11, fontWeight: 700, background: '#1e293b' }}>
-                          🚙 Plan 02: 大型2台用ガレージ（SUV・乗用車）
+                          🚙 大型2台用ガレージ（SUV・乗用車）
                         </div>
                       </div>
                     </div>

@@ -21,13 +21,13 @@ const INITIAL_ROOMS = [
       perspectives: [
         {
           id: 'doc-p-01',
-          name: 'AIフォトリアルパース_Plan01_完成稿.jpg',
+          name: 'AIフォトリアルパース_3Dモデリング実例完成稿.jpg',
           version: 'v1.0 (最新)',
-          url: '/assets/plans/plan01.jpg',
-          size: '1.2MB',
+          url: '/assets/plans/3d_sample.jpg',
+          size: '1.4MB',
           updatedAt: '2026-09-12 10:35',
           isAiRender: true,
-          memo: 'ガルバリウム鋼板仕上げ・軒出0仕様（社内PC Stable Diffusion生成）'
+          memo: '3Dシミュレーション形状（正面シャッター・右面サッシ窓・軒出0・ガルバ角波外壁）を忠実反映（社内PC Stable Diffusion生成）'
         }
       ],
       // ② 📐 敷地・申請図書スロット（配置図・登記簿謄本・測量図・確認申請書・CAD）
@@ -89,14 +89,14 @@ const INITIAL_ROOMS = [
       {
         id: 3,
         sender: 'staff',
-        text: '佐藤様、ご依頼ありがとうございます！専任スタッフの田中です。3Dシミュレーターのデータをもとに、最新のガルバリウム鋼板外壁・軒の出0のシャープなディテールを忠実に反映したAIフォトリアルパースを作成いたしました！「重要ドキュメントスロット」および以下よりご確認ください。',
+        text: '佐藤様、ご依頼ありがとうございます！専任スタッフの田中です。3Dシミュレーターで作成されたモデル（間口5400×奥行5400、右面サッシ窓・正面シャッター・ガルバリウム鋼板角波外壁・軒出0仕様）をもとに、社内PC（Stable Diffusion）にて高品位に仕上げた最新フォトリアルパースを生成いたしました！「重要ドキュメントスロット」および以下タイムラインよりご確認ください。',
         time: '10:35',
         attachments: [
           {
-            name: 'AIフォトリアルパース_Plan01_完成稿.jpg',
+            name: 'AIフォトリアルパース_3Dモデリング実例完成稿.jpg',
             type: 'image',
-            size: '1.2MB',
-            url: '/assets/plans/plan01.jpg',
+            size: '1.4MB',
+            url: '/assets/plans/3d_sample.jpg',
             isAiRender: true
           }
         ]
@@ -113,10 +113,18 @@ export const getChatRooms = () => {
       return INITIAL_ROOMS;
     }
     const parsed = JSON.parse(data);
-    // デモルームに重要ドキュメントスロットがない古いキャッシュの場合は補完
+    // デモルームに重要ドキュメントスロットがない、または古いパース画像のキャッシュの場合は更新
     const demo = parsed.find(r => r.roomId === 'room-demo-01');
-    if (demo && (!demo.documents || !demo.documents.perspectives || demo.documents.perspectives.length === 0)) {
-      demo.documents = INITIAL_ROOMS[0].documents;
+    if (demo) {
+      if (!demo.documents || !demo.documents.perspectives || demo.documents.perspectives.length === 0 || demo.documents.perspectives[0].url === '/assets/plans/plan01.jpg') {
+        demo.documents = INITIAL_ROOMS[0].documents;
+      }
+      // メッセージ内のパース画像も更新
+      const staffMsg = demo.messages?.find(m => m.id === 3);
+      if (staffMsg && staffMsg.attachments?.[0]?.url === '/assets/plans/plan01.jpg') {
+        staffMsg.text = INITIAL_ROOMS[0].messages[2].text;
+        staffMsg.attachments = INITIAL_ROOMS[0].messages[2].attachments;
+      }
       localStorage.setItem(STORAGE_KEY_ROOMS, JSON.stringify(parsed));
     }
     return parsed;
@@ -143,11 +151,11 @@ export const setCurrentUserRoomId = (roomId) => {
   localStorage.setItem(STORAGE_KEY_CURRENT_USER, roomId);
 };
 
-// 3Dモデル形状・プランに応じたパース画像の選定 (車・バイク優先)
+// 3Dモデル形状・プランに応じたパース画像の選定 (3D実例パース 3d_sample.jpg 優先)
 export const selectBestPerspectiveImage = (planType, modelData) => {
   const hasBike = modelData?.vehicles?.some(v => v.type === 'bike');
   const hasTractor = modelData?.vehicles?.some(v => v.type === 'tractor');
-  const hasCar = modelData?.vehicles?.some(v => v.type === 'car_suv' || v.type === 'car_sport');
+  const isLarge2Cars = planType?.includes('02') || planType?.includes('2台') || planType?.includes('大型');
 
   // トラクター配置かつ農業倉庫の場合のみPlan 03
   if (hasTractor && (planType?.includes('農業') || planType?.includes('03'))) {
@@ -157,18 +165,18 @@ export const selectBestPerspectiveImage = (planType, modelData) => {
     };
   }
 
-  // バイク配置またはPlan 01
-  if (hasBike || planType?.includes('ホビー') || planType?.includes('01')) {
+  // 大型2台用ガレージ特化指定の場合のみPlan 02
+  if (isLarge2Cars && !hasBike) {
     return {
-      name: 'AIフォトリアルパース_Plan01_愛車バイク・ホビーガレージ.jpg',
-      url: '/assets/plans/plan01.jpg'
+      name: 'AIフォトリアルパース_Plan02_大型2台用ガレージ_SUV.jpg',
+      url: '/assets/plans/plan02.jpg'
     };
   }
 
-  // 乗用車（SUV・スポーツカー）配置、大型ガレージ、またはデフォルト
+  // 3Dシミュレーションで作成したモデル（正面シャッター・右面サッシ窓・軒出0・ガルバ角波外壁）の完全反映フォトリアルパース
   return {
-    name: 'AIフォトリアルパース_Plan02_大型2台用ガレージ_SUV.jpg',
-    url: '/assets/plans/plan02.jpg'
+    name: 'AIフォトリアルパース_3Dモデリング実例完成稿.jpg',
+    url: '/assets/plans/3d_sample.jpg'
   };
 };
 
@@ -247,22 +255,22 @@ export const createParseRequest = ({ customerName, email, planType, modelData, m
       name: bestImage.name,
       version: versionLabel,
       url: bestImage.url,
-      size: '1.2MB',
+      size: '1.4MB',
       updatedAt: dateFormatted,
       isAiRender: true,
-      memo: 'ガルバリウム鋼板仕上げ・軒出0仕様（社内PC Stable Diffusion生成）'
+      memo: '3Dシミュレーター設計モデル（正面シャッター・右面サッシ窓・軒出0・ガルバ角波外壁）を社内PC（Stable Diffusion）にて高品位に忠実再現'
     });
 
     targetRoom.messages.push({
       id: Date.now() + 2,
       sender: 'staff',
-      text: `${customerName}様、大変お待たせいたしました！シミュレーターでモデリングいただいた3Dモデル（間口: ${modelData?.dimensions?.wFront || 5400}mm / ガルバリウム鋼板仕上げ / 軒の出0仕様）をもとに、社内PCにて高精細フォトリアルパースを生成いたしました！\n「重要ドキュメントスロット」および以下タイムラインにてご確認いただけます。`,
+      text: `${customerName}様、大変お待たせいたしました！専任スタッフです。シミュレーターでモデリングいただいた3Dモデル（間口: ${modelData?.dimensions?.wFront || 5400}mm / 正面シャッター・右面サッシ窓・ガルバリウム鋼板角波外壁・軒の出0仕様）をもとに、社内PC（Stable Diffusion）にて高精細フォトリアルパースを生成いたしました！\n「重要ドキュメントスロット」および以下タイムラインにてご確認いただけます。`,
       time: replyTime,
       attachments: [
         {
           name: bestImage.name,
           type: 'image',
-          size: '1.2MB',
+          size: '1.4MB',
           url: bestImage.url,
           isAiRender: true
         }
