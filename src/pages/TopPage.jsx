@@ -1,10 +1,31 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Compass, ArrowRight, Check, AlertTriangle, ShieldCheck, 
-  Sparkles, Layers, FileText, ChevronRight, Ruler, Wrench, Home, Car, Warehouse, Trees
+  Sparkles, Layers, FileText, ChevronRight, Ruler, Wrench, Home, Car, Warehouse, Trees,
+  ZoomIn, X
 } from 'lucide-react';
 
 export default function TopPage({ setCurrentRoute }) {
+  const [previewStep, setPreviewStep] = useState(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setPreviewStep(null);
+      }
+    };
+    if (previewStep) {
+      window.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [previewStep]);
+
   const navigateTo = (route) => {
     setCurrentRoute(route);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -254,29 +275,36 @@ export default function TopPage({ setCurrentRoute }) {
           border: '1px solid var(--border-card)',
           marginBottom: 44
         }}>
-          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{ textAlign: 'center', marginBottom: 36 }}>
             <span style={{
-              background: 'var(--color-primary-soft)',
-              color: 'var(--color-primary)',
-              padding: '4px 14px',
+              background: 'linear-gradient(135deg, rgba(45, 106, 79, 0.12), rgba(82, 183, 136, 0.2))',
+              color: 'var(--color-primary-dark)',
+              padding: '6px 18px',
               borderRadius: 20,
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: 800,
-              letterSpacing: '0.05em'
+              letterSpacing: '0.05em',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6
             }}>
-              実際の画面でわかる！体験ストーリー
+              <Sparkles size={15} color="var(--color-primary)" />
+              <span>実際の操作画面でわかる！体験ストーリー</span>
             </span>
             <h3 style={{
-              fontSize: 'clamp(20px, 3vw, 28px)',
+              fontSize: 'clamp(22px, 3.2vw, 30px)',
               color: 'var(--text-main)',
-              marginTop: 10,
-              marginBottom: 10
+              marginTop: 14,
+              marginBottom: 12,
+              fontWeight: 800,
+              lineHeight: 1.35
             }}>
-              0ベースの自由設計から、AIフォトリアルパース完成まで
+              自分で思い通りに描いて、プロ＆AIフォトリアルパースを無料ゲット！
             </h3>
-            <p style={{ fontSize: 14, color: 'var(--text-muted)', maxWidth: 640, margin: '0 auto' }}>
-              スマホやPCの画面上で、あなたの敷地に合わせたガレージがカタチになり、
-              プロ建築士監修の超リアルな完成予想パースがチャットに届くまでの一連の流れをご覧ください。
+            <p style={{ fontSize: 14.5, color: 'var(--text-muted)', maxWidth: 720, margin: '0 auto', lineHeight: 1.75 }}>
+              「まずはブラウザで自由に触ってシミュレーション」➡️「気に入ったらワンクリックで無料依頼」➡️「専任スタッフが光や愛車までリアルなAIパースを無料作成してお届け」。
+              <br />
+              誰でもかんたんに理想のガレージを形にできる一連の流れをご覧ください。（※ 各画像をクリックすると拡大表示できます）
             </p>
           </div>
 
@@ -285,65 +313,74 @@ export default function TopPage({ setCurrentRoute }) {
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))',
             gap: 24,
-            marginBottom: 20
+            marginBottom: 28
           }}>
             {[
               {
                 step: '01',
-                title: '幅・奥行・屋根勾配をミリ単位で設計',
-                desc: '敷地境界や変形地に合わせてミリ単位で入力。3D寸法線が連動し、立体空間が即座に立ち上がります。',
+                title: '【自分で設計】操作パネルで寸法調整！リアルタイム立体化',
+                desc: '敷地や用途に合わせて幅・奥行・高さを左パネルのスライダーや数値入力で直感調整。3D寸法線と連動し、敷地ぴったりにミリ単位でガレージが立ち上がります。',
                 img: './assets/steps/step1.png',
-                tag: '自由設計'
+                tag: '自由設計',
+                category: '自分でシミュレーション'
               },
               {
                 step: '02',
-                title: 'シャッター・ドア・サッシを自由配置',
-                desc: '大型電動シャッターや片開きドア、高所換気窓を直感配置。内付け・半外付け・基礎切欠きも自動連動。',
+                title: '【自分で配置】シャッターやサッシを好きな位置へワンタップ',
+                desc: 'ガレージ用軽量シャッター（細スリットリブ付）や採光窓、出入口ドアを自在に配置。位置やサイズの変更もリアルタイムに3D空間へ反映されます。',
                 img: './assets/steps/step2.png',
-                tag: '建具配置'
+                tag: '建具配置',
+                category: '自分でシミュレーション'
               },
               {
                 step: '03',
-                title: '内部の造作棚・ラックをレイアウト',
-                desc: '木造の柱間に合わせた収納棚を自由に設計。透視モードをONにすると内部の広がりが隅々まで見通せます。',
+                title: '【自分でレイアウト】内部造作棚＆「透視モード」で隅々まで確認',
+                desc: 'タイヤや工具をしまう造作棚を自由に設定。「透視モード」をONにすれば、壁を透過して柱梁の骨組みや内部の広がりをチェックできます。',
                 img: './assets/steps/step3.png',
-                tag: '内部空間'
+                tag: '内部空間',
+                category: '自分でシミュレーション'
               },
               {
                 step: '04',
-                title: '愛車・バイク・農機具を配置確認',
-                desc: 'SUVやスポーツカー、農業用トラクターをガレージ内に格納。車の出入り動線やクリアランスを実寸確認。',
+                title: '【自分で確認】愛車・SUVを配置して実寸サイズ感を体感',
+                desc: '愛車やSUVをガレージ内に格納。車のドア開閉スペースや出入り動線、作業クリアランスを実寸大の立体空間でリアルに確認できます。',
                 img: './assets/steps/step4.png',
-                tag: '車両格納'
+                tag: '車両格納',
+                category: '自分でシミュレーション'
               },
               {
                 step: '05',
-                title: 'ワンタップでAIパース作成を依頼',
-                desc: 'パスワード登録不要。作成した3Dデータが自動添付され、お名前とご連絡先だけで即座に無料依頼できます。',
+                title: '【完全無料・登録不要】作ったモデルのままワンタップでパース依頼！',
+                desc: '面倒な会員登録やパスワード設定は一切不要！あなたがシミュレーションした3Dモデルがそのまま届き、ワンクリックで専任スタッフへ無料パース作成を依頼できます。',
                 img: './assets/steps/step5.png',
-                tag: '無料依頼'
+                tag: '無料依頼',
+                category: 'プロ＆AIが無料作成'
               },
               {
                 step: '06',
-                title: 'LINE風チャットでAIパースを受領！',
-                desc: '専任建築士との専用チャットに超高画質フォトリアルパースが届きます。図面の相談や仕様変更もチャットで完結。',
-                img: './assets/steps/step6.png',
-                tag: 'パース完成'
+                title: '【専任スタッフ作成】専用チャットに超美麗AIパースをお届け！',
+                desc: '光や影、外壁ガルバリウムの金属感、愛車の映り込みまで忠実に再現された完成予想パース（3D sample）がチャットに届きます。仕様変更や見積相談もそのまま無料で相談OK！',
+                img: './assets/steps/step6.jpg',
+                tag: '無料パース完成',
+                category: 'プロ＆AIが無料作成'
               }
             ].map((item, idx) => (
               <div 
                 key={idx}
                 style={{
-                  background: '#f8fafc',
+                  background: '#ffffff',
                   border: '1px solid #e2e8f0',
                   borderRadius: 'var(--radius-lg)',
                   overflow: 'hidden',
                   display: 'flex',
                   flexDirection: 'column',
                   transition: 'all 0.25s ease',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
+                  boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
+                  cursor: 'pointer'
                 }}
                 className="step-card-hover"
+                onClick={() => setPreviewStep(item)}
+                title="クリックして拡大表示"
               >
                 {/* ステップ画像プレビュー枠 */}
                 <div style={{
@@ -351,7 +388,8 @@ export default function TopPage({ setCurrentRoute }) {
                   width: '100%',
                   paddingTop: '62%',
                   background: '#0f172a',
-                  overflow: 'hidden'
+                  overflow: 'hidden',
+                  cursor: 'zoom-in'
                 }}>
                   <img 
                     src={item.img} 
@@ -375,45 +413,81 @@ export default function TopPage({ setCurrentRoute }) {
                     position: 'absolute',
                     top: 10,
                     left: 10,
-                    background: 'rgba(30, 41, 59, 0.9)',
+                    background: 'rgba(15, 23, 42, 0.85)',
                     color: '#ffffff',
                     fontSize: 11,
                     fontWeight: 800,
-                    padding: '3px 9px',
+                    padding: '3px 10px',
                     borderRadius: 20,
                     display: 'flex',
                     alignItems: 'center',
                     gap: 5,
-                    backdropFilter: 'blur(4px)',
+                    backdropFilter: 'blur(6px)',
                     border: '1px solid rgba(255,255,255,0.2)'
                   }}>
-                    <span style={{ color: '#80ed99' }}>STEP</span>
+                    <span style={{ color: item.step === '05' || item.step === '06' ? '#fbbf24' : '#80ed99' }}>STEP</span>
                     <span>{item.step}</span>
                   </div>
 
+                  {/* カテゴリ/タグバッジ */}
                   <div style={{
                     position: 'absolute',
                     top: 10,
                     right: 10,
-                    background: 'rgba(45, 106, 79, 0.9)',
+                    background: item.step === '05' || item.step === '06' ? 'rgba(217, 119, 6, 0.92)' : 'rgba(45, 106, 79, 0.92)',
                     color: '#ffffff',
                     fontSize: 10.5,
-                    fontWeight: 700,
-                    padding: '2px 8px',
-                    borderRadius: 4
+                    fontWeight: 800,
+                    padding: '3px 8px',
+                    borderRadius: 6,
+                    backdropFilter: 'blur(4px)',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
                   }}>
                     {item.tag}
+                  </div>
+
+                  {/* 拡大インジケーター（右下） */}
+                  <div 
+                    className="zoom-badge"
+                    style={{
+                      position: 'absolute',
+                      bottom: 8,
+                      right: 8,
+                      background: 'rgba(15, 23, 42, 0.8)',
+                      color: '#ffffff',
+                      fontSize: 11,
+                      fontWeight: 700,
+                      padding: '4px 10px',
+                      borderRadius: 14,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      backdropFilter: 'blur(4px)',
+                      border: '1px solid rgba(255,255,255,0.15)',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <ZoomIn size={12} color="#93c5fd" />
+                    <span>拡大して見る</span>
                   </div>
                 </div>
 
                 {/* カードテキスト */}
                 <div style={{ padding: '16px 18px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ 
+                    fontSize: 11, 
+                    fontWeight: 700, 
+                    color: item.step === '05' || item.step === '06' ? '#d97706' : 'var(--color-primary)', 
+                    marginBottom: 4 
+                  }}>
+                    {item.category}
+                  </div>
                   <h4 style={{
-                    fontSize: 15.5,
+                    fontSize: 15,
                     fontWeight: 800,
                     color: 'var(--text-main)',
                     marginBottom: 8,
-                    lineHeight: 1.4
+                    lineHeight: 1.45
                   }}>
                     {item.title}
                   </h4>
@@ -911,20 +985,203 @@ export default function TopPage({ setCurrentRoute }) {
               className="btn-secondary"
               style={{ background: '#ffffff', color: 'var(--color-primary-dark)', border: 'none', fontSize: 15 }}
             >
-              <span>3Dデータ・図面を送って建築士に相談</span>
+              <span>3Dデータ・図面を送って専任スタッフに相談</span>
             </button>
           </div>
         </div>
       </section>
 
+      {/* =========================================================
+          ステップ画像拡大モーダル（ライトボックス）
+         ========================================================= */}
+      {previewStep && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            background: 'rgba(15, 23, 42, 0.88)',
+            backdropFilter: 'blur(8px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+            boxSizing: 'border-box',
+            animation: 'fadeInModal 0.2s ease-out'
+          }}
+          onClick={() => setPreviewStep(null)}
+        >
+          <div 
+            style={{
+              background: '#0f172a',
+              borderRadius: 'var(--radius-xl, 16px)',
+              border: '1px solid rgba(255,255,255,0.15)',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
+              maxWidth: 1040,
+              width: '100%',
+              maxHeight: '94vh',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* モーダルヘッダー */}
+            <div style={{
+              padding: '16px 20px',
+              background: '#1e293b',
+              borderBottom: '1px solid rgba(255,255,255,0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 16
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <span style={{
+                  background: previewStep.step === '05' || previewStep.step === '06' ? '#d97706' : 'var(--color-primary)',
+                  color: '#ffffff',
+                  fontSize: 12,
+                  fontWeight: 800,
+                  padding: '4px 10px',
+                  borderRadius: 20
+                }}>
+                  STEP {previewStep.step}
+                </span>
+                <h3 style={{ margin: 0, fontSize: 17, color: '#f8fafc', fontWeight: 700 }}>
+                  {previewStep.title}
+                </h3>
+              </div>
+              <button
+                onClick={() => setPreviewStep(null)}
+                style={{
+                  background: 'rgba(255,255,255,0.1)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: 36,
+                  height: 36,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#ffffff',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                className="modal-close-btn"
+                title="閉じる (Esc)"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* モーダル画像表示エリア */}
+            <div style={{
+              padding: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: '#020617',
+              flex: 1,
+              minHeight: 0,
+              overflow: 'hidden'
+            }}>
+              <img 
+                src={previewStep.img} 
+                alt={previewStep.title}
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: '66vh',
+                  objectFit: 'contain',
+                  borderRadius: 8,
+                  boxShadow: '0 8px 30px rgba(0,0,0,0.5)'
+                }}
+              />
+            </div>
+
+            {/* モーダルフッター（解説＋CTA） */}
+            <div style={{
+              padding: '16px 22px',
+              background: '#1e293b',
+              borderTop: '1px solid rgba(255,255,255,0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 20,
+              flexWrap: 'wrap'
+            }}>
+              <p style={{
+                margin: 0,
+                fontSize: 13.5,
+                color: '#cbd5e1',
+                lineHeight: 1.6,
+                flex: 1,
+                minWidth: 260
+              }}>
+                {previewStep.desc}
+              </p>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <button
+                  onClick={() => {
+                    setPreviewStep(null);
+                    navigateTo('simulator');
+                  }}
+                  className="btn-accent"
+                  style={{
+                    padding: '10px 20px',
+                    fontSize: 14,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6
+                  }}
+                >
+                  <Compass size={16} />
+                  <span>3Dシミュレーターで試す</span>
+                </button>
+                <button
+                  onClick={() => setPreviewStep(null)}
+                  style={{
+                    background: 'rgba(255,255,255,0.12)',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '10px 18px',
+                    borderRadius: 'var(--radius-md, 8px)',
+                    fontSize: 13.5,
+                    cursor: 'pointer',
+                    fontWeight: 600
+                  }}
+                >
+                  閉じる
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style>{`
         .step-card-hover:hover {
           transform: translateY(-4px);
-          box-shadow: 0 10px 24px rgba(0,0,0,0.08) !important;
+          box-shadow: 0 12px 28px rgba(0,0,0,0.1) !important;
           border-color: var(--color-primary-light) !important;
         }
         .step-card-hover:hover img {
           transform: scale(1.03);
+        }
+        .step-card-hover:hover .zoom-badge {
+          background: rgba(15, 23, 42, 0.95) !important;
+          color: #60a5fa !important;
+          border-color: rgba(96, 165, 250, 0.5) !important;
+        }
+        .modal-close-btn:hover {
+          background: rgba(239, 68, 68, 0.8) !important;
+          transform: rotate(90deg);
+        }
+        @keyframes fadeInModal {
+          from { opacity: 0; transform: scale(0.98); }
+          to { opacity: 1; transform: scale(1); }
         }
       `}</style>
     </div>

@@ -191,6 +191,34 @@ export function buildOpenings3D({
         if (edgeLineMat) {
           sMesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(sGeo), edgeLineMat));
         }
+
+        // シャッターのスラット横線（細いグレーの水平リブ 5〜10本を等間隔で引く）
+        const numLines = Math.max(6, Math.min(10, Math.round(currentH / 240)));
+        if (numLines > 0) {
+          const slatW = op.width - 20;
+          const stepY = currentH / (numLines + 1);
+          const startY = -currentH / 2 + stepY;
+          const ribMat = new THREE.MeshStandardMaterial({
+            color: 0x64748b,
+            roughness: 0.5,
+            metalness: 0.3
+          });
+          const ribGeo = new THREE.BoxGeometry(slatW, 6, 4);
+
+          for (let i = 0; i < numLines; i++) {
+            const y = startY + i * stepY;
+            // 表側リブ (z = 10.5)
+            const frontRib = new THREE.Mesh(ribGeo, ribMat);
+            frontRib.position.set(0, y, 10.5);
+            sMesh.add(frontRib);
+
+            // 裏側リブ (z = -10.5)
+            const backRib = new THREE.Mesh(ribGeo, ribMat);
+            backRib.position.set(0, y, -10.5);
+            sMesh.add(backRib);
+          }
+        }
+
         buildingGroup.add(sMesh);
       }
     } else {

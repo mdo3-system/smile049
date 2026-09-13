@@ -255,7 +255,14 @@ export function generateSvgDrawingData({
 
       if (op.type === 'shutter') {
         elements.push(`<rect x="${opLeftX}" y="${opTopY}" width="${opW}" height="${opH}" fill="#334155" stroke="#1e293b" stroke-width="4"/>`);
-        elements.push(`<text x="${opLeftX + opW / 2}" y="${opTopY + opH / 2}" fill="#fff" font-size="${baseFontSize * 0.85}" font-weight="bold" text-anchor="middle" dominant-baseline="central">シャッター ${op.width}×${op.height}</text>`);
+        // 等間隔の細いグレーの横線（スラット線 5〜10本）
+        const numLines = Math.max(6, Math.min(10, Math.round(opH / 240)));
+        const stepY = opH / (numLines + 1);
+        for (let i = 0; i < numLines; i++) {
+          const lineY = opTopY + stepY * (i + 1);
+          elements.push(`<line x1="${opLeftX + 4}" y1="${lineY}" x2="${opLeftX + opW - 4}" y2="${lineY}" stroke="#64748b" stroke-width="2"/>`);
+        }
+        elements.push(`<text x="${opLeftX + opW / 2}" y="${opTopY + opH / 2}" fill="#fff" font-size="${baseFontSize * 0.85}" font-weight="bold" text-anchor="middle" dominant-baseline="central" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.8))">シャッター ${op.width}×${op.height}</text>`);
       } else if (op.type === 'window') {
         // 引き違い窓: 外枠＋ガラス＋中央召し合わせ框
         elements.push(`<rect x="${opLeftX}" y="${opTopY}" width="${opW}" height="${opH}" fill="#1e293b" stroke="#0f172a" stroke-width="4"/>`);
