@@ -81,8 +81,8 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
   const fileInputRef = useRef(null);
   const realSkyTextureRef = useRef(null);
 
-  // マニュアルモーダル
-  const [isManualOpen, setIsManualOpen] = useState(false);
+  // マニュアルモーダル (初回アクセス時に自動表示)
+  const [isManualOpen, setIsManualOpen] = useState(true);
   // パース作成依頼モーダル
   const [isParseRequestOpen, setIsParseRequestOpen] = useState(false);
   // チャットモーダル

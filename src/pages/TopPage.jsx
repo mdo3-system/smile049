@@ -4,6 +4,7 @@ import {
   Sparkles, Layers, FileText, ChevronRight, Ruler, Wrench, Home, Car, Warehouse, Trees,
   ZoomIn, X
 } from 'lucide-react';
+import InteractiveHeroShowcase from '../components/InteractiveHeroShowcase';
 
 export default function TopPage({ setCurrentRoute }) {
   const [previewStep, setPreviewStep] = useState(null);
@@ -110,72 +111,9 @@ export default function TopPage({ setCurrentRoute }) {
             </div>
           </div>
 
-          {/* ヒーロービジュアル（親しみやすい3Dモック・カード風） */}
-          <div style={{
-            background: '#ffffff',
-            borderRadius: 'var(--radius-xl)',
-            padding: 24,
-            boxShadow: 'var(--shadow-lg)',
-            border: '1px solid var(--border-card)',
-            position: 'relative'
-          }}>
-            <div style={{
-              background: 'linear-gradient(135deg, #2d6a4f 0%, #1b4332 100%)',
-              borderRadius: 'var(--radius-lg)',
-              padding: '30px 24px',
-              color: '#ffffff',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 16
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 12, background: 'rgba(255,255,255,0.2)', padding: '4px 10px', borderRadius: 20 }}>
-                  リアルタイム積算連動
-                </span>
-                <span style={{ fontSize: 12, color: '#a7f3d0' }}>ミリ単位自動算出</span>
-              </div>
-              <div style={{ fontSize: 24, fontWeight: 800 }}>
-                幅 5,400mm × 奥行 6,000mm
-              </div>
-              <div style={{
-                background: 'rgba(0,0,0,0.25)',
-                padding: '12px 16px',
-                borderRadius: 'var(--radius-md)',
-                display: 'flex',
-                alignItems: 'baseline',
-                justifyContent: 'space-between'
-              }}>
-                <span style={{ fontSize: 13, color: '#cbd5e1' }}>概算建築費用目安</span>
-                <span style={{ fontSize: 28, fontWeight: 800, color: '#fde047' }}>
-                  2,560,000<span style={{ fontSize: 16, fontWeight: 500, color: '#fff' }}> 円〜</span>
-                </span>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, textAlign: 'center', fontSize: 11 }}>
-                <div style={{ background: 'rgba(255,255,255,0.1)', padding: '8px 4px', borderRadius: 6 }}>
-                  床面積: 9.8坪
-                </div>
-                <div style={{ background: 'rgba(255,255,255,0.1)', padding: '8px 4px', borderRadius: 6 }}>
-                  勾配: 1.5寸水流し
-                </div>
-                <div style={{ background: 'rgba(255,255,255,0.1)', padding: '8px 4px', borderRadius: 6 }}>
-                  シャッター+棚完備
-                </div>
-              </div>
-            </div>
-
-            <div style={{ marginTop: 18, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--color-wood)' }}>
-                <Trees size={16} />
-                <span>木造・金物工法 / 建築士専任設計</span>
-              </div>
-              <button 
-                onClick={() => navigateTo('simulator')}
-                style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: 4 }}
-              >
-                <span>3D画面へ</span>
-                <ArrowRight size={14} />
-              </button>
-            </div>
+          {/* ヒーロー動的ショーカー（①〜⑤敷地変形 ＆ 寸法/透過/地面/空 ライブツアー） */}
+          <div>
+            <InteractiveHeroShowcase onNavigateToSimulator={() => navigateTo('simulator')} />
           </div>
         </div>
       </section>
