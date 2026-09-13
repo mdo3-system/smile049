@@ -40,9 +40,12 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
   // 3D全画面表示モード (スマホで3Dモデルを最大化して鑑賞)
   const [is3dFullScreen, setIs3dFullScreen] = useState(false);
 
+  // 3D地面タイプ ('asphalt' | 'soil' | 'light') - Stable Diffusion パース生成用
+  const [groundType, setGroundType] = useState('asphalt');
 
   // 表示モード ('3d', 'plan', 'front-elev', 'back-elev', 'left-elev', 'right-elev')
   const [currentView, setCurrentView] = useState('3d');
+
   const [isSeeThrough, setIsSeeThrough] = useState(false);
   const [svgZoom, setSvgZoom] = useState(1.0);
   const [dimFontScale, setDimFontScale] = useState(1.0);
@@ -240,7 +243,21 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
     dirLight.castShadow = true;
     scene.add(dirLight);
 
-    const grid = new THREE.GridHelper(24000, 48, 0xa0aec0, 0xe2e8f0);
+    // 地面ベタ塗りプレーン (Stable Diffusion パース生成用: 60m四方)
+    const groundGeo = new THREE.PlaneGeometry(60000, 60000);
+    groundGeo.rotateX(-Math.PI / 2);
+    const groundMat = new THREE.MeshStandardMaterial({
+      color: 0x334155, // 初期色: アスファルト色 (ダークグレー)
+      roughness: 0.9,
+      metalness: 0.1
+    });
+    const groundMesh = new THREE.Mesh(groundGeo, groundMat);
+    groundMesh.position.y = -1;
+    groundMesh.receiveShadow = true;
+    scene.add(groundMesh);
+
+    // グリッドヘルパー (暗い地面上でも品よく見える微細ライン)
+    const grid = new THREE.GridHelper(24000, 48, 0x64748b, 0x475569);
     grid.position.y = 0;
     scene.add(grid);
 
@@ -250,7 +267,7 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
     const dimGroup = new THREE.Group();
     scene.add(dimGroup);
 
-    threeRef.current = { scene, camera, renderer, controls, buildingGroup, dimGroup, reqId: null };
+    threeRef.current = { scene, camera, renderer, controls, buildingGroup, dimGroup, groundMesh, grid, reqId: null };
 
     const animate = () => {
       threeRef.current.reqId = requestAnimationFrame(animate);
@@ -278,6 +295,30 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
       renderer.dispose();
     };
   }, []);
+
+  // 地面カラー切替エフェクト (Stable Diffusion パース生成用)
+  useEffect(() => {
+    if (!threeRef.current.groundMesh) return;
+    const colors = {
+      asphalt: 0x334155, // アスファルト色 (ダークグレー)
+      soil: 0x6e543c,    // 土色 (アースブラウン)
+      light: 0xcbd5e1    // 明るいグレー
+    };
+    const targetColor = colors[groundType] || 0x334155;
+    threeRef.current.groundMesh.material.color.setHex(targetColor);
+    
+    // 背景色も地面に馴染むトーンへ微調整
+    if (threeRef.current.scene) {
+      if (groundType === 'soil') {
+        threeRef.current.scene.background = new THREE.Color(0xfef3c7); // 温かみのある空
+      } else if (groundType === 'light') {
+        threeRef.current.scene.background = new THREE.Color(0xf8fafc);
+      } else {
+        threeRef.current.scene.background = new THREE.Color(0xe0f2fe); // 青空トーン
+      }
+    }
+  }, [groundType]);
+
 
   // -------------------------------------------------------------
   // 3Dモデル生成 & 完全建築ロジック (gemini-code 忠実再現)
@@ -1870,8 +1911,46 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                   {isSeeThrough ? <Eye size={12} /> : <EyeOff size={12} />}
                   <span>透視:{isSeeThrough ? 'ON' : 'OFF'}</span>
                 </button>
+
+                {/* 地面カラー切替 (Stable Diffusion パース生成用) */}
+                <div style={{ display: 'flex', alignItems: 'center', background: '#1e293b', borderRadius: 4, padding: '2px 4px', gap: 2 }} title="Stable Diffusion パース生成用 地面カラー切替">
+                  <span style={{ fontSize: 10, color: '#94a3b8', marginRight: 2, fontWeight: 700 }}>地面:</span>
+                  <button
+                    onClick={() => setGroundType('asphalt')}
+                    style={{
+                      background: groundType === 'asphalt' ? '#334155' : 'transparent',
+                      color: groundType === 'asphalt' ? '#38bdf8' : '#94a3b8',
+                      border: groundType === 'asphalt' ? '1px solid #38bdf8' : 'none',
+                      borderRadius: 3,
+                      padding: '2px 6px',
+                      fontSize: 10.5,
+                      fontWeight: 700,
+                      cursor: 'pointer'
+                    }}
+                    title="アスファルト舗装（ダークグレー） - 愛車ガレージパース推奨"
+                  >
+                    🛣️ アスファルト
+                  </button>
+                  <button
+                    onClick={() => setGroundType('soil')}
+                    style={{
+                      background: groundType === 'soil' ? '#6e543c' : 'transparent',
+                      color: groundType === 'soil' ? '#fde047' : '#94a3b8',
+                      border: groundType === 'soil' ? '1px solid #fde047' : 'none',
+                      borderRadius: 3,
+                      padding: '2px 6px',
+                      fontSize: 10.5,
+                      fontWeight: 700,
+                      cursor: 'pointer'
+                    }}
+                    title="土色（アースブラウン） - 農業倉庫・更地パース推奨"
+                  >
+                    🏜️ 土色
+                  </button>
+                </div>
               </>
             )}
+
 
 
             {currentView !== '3d' && (
