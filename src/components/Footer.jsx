@@ -98,23 +98,26 @@ export default function Footer({ setCurrentRoute }) {
           {/* 対応エリア・運営情報 */}
           <div>
             <h4 style={{ fontSize: 15, color: '#fff', marginBottom: 16, borderBottom: '1px solid #334155', paddingBottom: 8 }}>
-              対応エリア ＆ 運営案内
+              対応エリア ＆ 施工体制
             </h4>
             <div style={{ fontSize: 13, color: '#cbd5e1', lineHeight: 1.8, display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                 <MapPin size={16} color="var(--color-accent)" style={{ flexShrink: 0, marginTop: 4 }} />
-                <span>
-                  <strong>対応エリア：</strong>埼玉県内全域および近隣エリア<br />
-                  <small style={{ color: '#94a3b8' }}>（圏央道・関越自動車道・東北自動車道の各ICから30分圏内を中心に対応）</small>
-                </span>
+                <div>
+                  <strong style={{ color: '#fff' }}>関東・埼玉県全域対応：</strong><br />
+                  <span style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.6, display: 'block', marginTop: 2 }}>
+                    さいたま市、川越市、所沢市、熊谷市、川口市、深谷市、本庄市、秩父市、東松山市、坂戸市、鶴ヶ島市、飯能市、狭山市、入間市、朝霞市、志木市、和光市、新座市、富士見市、ふじみ野市、三芳町、越谷市、春日部市、上尾市、桶川市、北本市、鴻巣市、久喜市、加須市ほか埼玉県全域。<br />
+                    圏央道・関越道・東北道・外環道沿線の東京都（多摩・23区）、群馬県・栃木県・茨城県・千葉県の各エリアも迅速に対応いたします。
+                  </span>
+                </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Shield size={16} color="#80ed99" style={{ flexShrink: 0 }} />
-                <span>クラウド電子契約対応（来店・押印不要）</span>
+                <span>クラウド電子契約対応（ご来店・押印不要でスムーズ）</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <CheckCircle size={16} color="#80ed99" style={{ flexShrink: 0 }} />
-                <span>金物工法・建築士による構造計算実施</span>
+                <span>高耐震金物工法・自社専任スタッフによる構造計算実施</span>
               </div>
             </div>
           </div>

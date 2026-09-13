@@ -16,9 +16,23 @@ export default function App() {
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
   const [customerModelData, setCustomerModelData] = useState(null);
 
-  // ルート変更時に100%確実にページ最上部（Y=0）へ即座にスクロールリセット
+  // ルート変更時に100%確実にページ最上部（Y=0）へ即座にスクロールリセット ＆ タイトルを動的更新
   useEffect(() => {
     window.scrollTo(0, 0);
+
+    const titleMap = {
+      'top': '木造自由設計ガレージ・倉庫【スマイチ】関東・埼玉｜3Dシミュレーション＆自動見積もりで敷地にジャストフィット',
+      'simulator': '無料3Dシミュレーター＆自動見積もり｜木造自由設計ガレージ【スマイチ】埼玉・関東',
+      'plan-hobby': '愛車・大型バイク・ホビーガレージ｜木造自由設計【スマイチ】大人の秘密基地',
+      'plan-storage': '狭小地・変形地ストッカー倉庫｜木造自由設計【スマイチ】敷地境界ぴったり特注設計',
+      'plan-agri': '農機具・トラクター大型倉庫（アグリシェッド）｜木造自由設計【スマイチ】市街化調整区域対応',
+      'plan-workshop': '15m無柱大空間・スタジオ・道場・事業用倉庫｜木造自由設計【スマイチ】木造トラス構法',
+      'admin': '専任スタッフ管理ポータル｜スマイチ'
+    };
+
+    if (titleMap[currentRoute]) {
+      document.title = titleMap[currentRoute];
+    }
   }, [currentRoute]);
 
   const handleRouteNavigation = (route) => {

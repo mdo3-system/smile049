@@ -58,8 +58,13 @@ export default function TopPage({ setCurrentRoute }) {
 
         <div style={{ maxWidth: 1120, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 48, alignItems: 'center' }}>
           <div>
-            <div className="section-tag" style={{ background: 'var(--color-wood-light)', color: 'var(--color-wood-dark)' }}>
-              ★ 登録不要・ブラウザですぐ動く3Dシミュレーター
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+              <div className="section-tag" style={{ background: 'var(--color-wood-light)', color: 'var(--color-wood-dark)', margin: 0 }}>
+                ★ 登録不要・ブラウザですぐ動く3Dシミュレーター
+              </div>
+              <div className="section-tag" style={{ background: 'var(--color-primary-soft)', color: 'var(--color-primary-dark)', margin: 0, fontWeight: 700 }}>
+                関東・埼玉県全域対応
+              </div>
             </div>
             <h1 style={{
               fontSize: 'clamp(28px, 4vw, 42px)',
@@ -69,11 +74,11 @@ export default function TopPage({ setCurrentRoute }) {
             }}>
               あと少し大きく。<br />
               あと少し小さく。<br />
-              <span style={{ color: 'var(--color-primary)' }}>そのガレージ、自分で描いてみませんか？</span>
+              <span style={{ color: 'var(--color-primary)' }}>木造自由設計ガレージ、自分で描いてみませんか？</span>
             </h1>
             <p style={{ fontSize: 16, color: 'var(--text-muted)', lineHeight: 1.8, marginBottom: 24 }}>
               敷地に合わせて、サイズも形も棚も自由自在。<br />
-              画面の中で3D設計すると、概算金額までその場でわかります。<br />
+              画面の中で3D設計すると、リアルタイムに概算建築費用を自動見積もり。<br />
               規格サイズに土地を合わせるのではなく、あなたの土地に、あなたのガレージを合わせる。
             </p>
             <div style={{
@@ -85,7 +90,7 @@ export default function TopPage({ setCurrentRoute }) {
               boxShadow: 'var(--shadow-sm)'
             }}>
               <p style={{ fontSize: 13.5, color: '#334155', margin: 0, fontWeight: 500 }}>
-                木造だからできる自由設計。建築士による構造設計・確認申請から施工まで、まとめてワンストップでお任せいただけます。
+                変形地・狭小地・市街化調整区域も完全対応。自社専任スタッフによる構造計算・確認申請から施工・融資相談まで、ワンストップでお任せいただけます。
               </p>
             </div>
 
