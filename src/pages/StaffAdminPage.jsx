@@ -11,11 +11,15 @@ import { Lock, KeyRound } from 'lucide-react';
 const STAFF_PASSCODE = 'smile049';
 
 export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return sessionStorage.getItem('wood_garage_staff_auth') === 'true';
-  });
+  // 共有PCや一般ユーザーの誤アクセスを防ぐため、管理ページ入室時は常にパスコード認証を要求
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [inputPasscode, setInputPasscode] = useState('');
   const [authError, setAuthError] = useState(false);
+
+  // マウント時に過去のセッションストレージを念のためクリア
+  useEffect(() => {
+    sessionStorage.removeItem('wood_garage_staff_auth');
+  }, []);
 
   const [rooms, setRooms] = useState(getChatRooms());
   const [selectedRoomId, setSelectedRoomId] = useState(rooms[0]?.roomId || null);
@@ -29,7 +33,6 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
     e?.preventDefault();
     if (inputPasscode === STAFF_PASSCODE) {
       setIsAuthenticated(true);
-      sessionStorage.setItem('wood_garage_staff_auth', 'true');
       setAuthError(false);
     } else {
       setAuthError(true);
@@ -38,8 +41,13 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
 
   const handleLogout = () => {
     setIsAuthenticated(false);
-    sessionStorage.removeItem('wood_garage_staff_auth');
     setInputPasscode('');
+    sessionStorage.removeItem('wood_garage_staff_auth');
+  };
+
+  const handleBackToSite = () => {
+    handleLogout();
+    setCurrentRoute('top');
   };
 
 
@@ -281,7 +289,7 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <button
-            onClick={() => setCurrentRoute('top')}
+            onClick={handleBackToSite}
             style={{ color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}
           >
             <ArrowLeft size={16} />
