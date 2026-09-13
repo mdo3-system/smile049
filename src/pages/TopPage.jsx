@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Compass, ArrowRight, Check, AlertTriangle, ShieldCheck, 
   Sparkles, Layers, FileText, ChevronRight, Ruler, Wrench, Home, Car, Warehouse, Trees,
-  ZoomIn, X
+  ZoomIn, X, Building2
 } from 'lucide-react';
 import InteractiveHeroShowcase from '../components/InteractiveHeroShowcase';
 
@@ -640,19 +640,19 @@ export default function TopPage({ setCurrentRoute }) {
       </section>
 
       {/* =========================================================
-          目的別 3つの特化プラン紹介
+          目的別 4つの特化プラン紹介
          ========================================================= */}
       <section className="section-container">
         <div className="section-header">
           <span className="section-tag">プランを探す</span>
           <h2 className="section-title">あなたなら、何を入れますか？</h2>
-          <p className="section-desc">目的や敷地条件に特化した3つの代表的なプランをご提案しています。</p>
+          <p className="section-desc">目的や敷地条件に特化した4つの代表的なプランをご提案しています。</p>
         </div>
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-          gap: 28
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: 24
         }}>
           {/* Plan 1 */}
           <div className="nature-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: 0, overflow: 'hidden' }}>
@@ -684,28 +684,28 @@ export default function TopPage({ setCurrentRoute }) {
                   <span style={{ color: '#38bdf8' }}>愛車・ホビー</span>
                 </div>
               </div>
-              <div style={{ padding: '24px 24px 0' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-primary)' }}>屋根外壁ガルバリウム × 軒ゼロシャープ設計</span>
-                  <Car size={20} color="var(--color-primary)" />
+              <div style={{ padding: '20px 20px 0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--color-primary)' }}>屋根外壁ガルバリウム × 軒ゼロ</span>
+                  <Car size={18} color="var(--color-primary)" />
                 </div>
-                <h3 style={{ fontSize: 19, marginBottom: 8, color: 'var(--text-main)', lineHeight: 1.4 }}>
+                <h3 style={{ fontSize: 18, marginBottom: 8, color: 'var(--text-main)', lineHeight: 1.4 }}>
                   大人の秘密基地<br />
                   【愛車・大型バイク・ホビー】
                 </h3>
-                <p style={{ fontSize: 13.5, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 20 }}>
-                  「自分が一番長くいたくなる場所」を設計。屋根・外壁ガルバリウム鋼板仕上げと軒ゼロのシャープな外観、内部は温もりある木造梁現し。
+                <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 18 }}>
+                  「自分が一番長くいたくなる場所」を設計。ガルバリウム鋼板と軒ゼロのシャープな外観、内部は温もりある木造梁現し。
                 </p>
               </div>
             </div>
-            <div style={{ padding: '0 24px 24px' }}>
+            <div style={{ padding: '0 20px 20px' }}>
               <button
                 onClick={() => navigateTo('plan-hobby')}
                 className="btn-primary"
-                style={{ width: '100%', justifyContent: 'center' }}
+                style={{ width: '100%', justifyContent: 'center', padding: '10px 14px', fontSize: 13.5 }}
               >
-                <span>愛車・ホビーガレージを見る</span>
-                <ChevronRight size={16} />
+                <span>愛車ガレージを見る</span>
+                <ChevronRight size={15} />
               </button>
             </div>
           </div>
@@ -740,28 +740,28 @@ export default function TopPage({ setCurrentRoute }) {
                   <span style={{ color: '#fbbf24' }}>狭小・変形地</span>
                 </div>
               </div>
-              <div style={{ padding: '24px 24px 0' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-wood)' }}>ガルバリウム × 軒ゼロ台形ジャストフィット</span>
-                  <Home size={20} color="var(--color-wood)" />
+              <div style={{ padding: '20px 20px 0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--color-wood)' }}>ガルバリウム × 台形フィット</span>
+                  <Home size={18} color="var(--color-wood)" />
                 </div>
-                <h3 style={{ fontSize: 19, marginBottom: 8, color: 'var(--text-main)', lineHeight: 1.4 }}>
-                  デッドスペースを、収納に。<br />
-                  【狭小地・変形地向け特注ストッカー】
+                <h3 style={{ fontSize: 18, marginBottom: 8, color: 'var(--text-main)', lineHeight: 1.4 }}>
+                  デッドスペースを収納に<br />
+                  【狭小地・変形地ストッカー】
                 </h3>
-                <p style={{ fontSize: 13.5, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 20 }}>
-                  既製品では使えなかったスペースを活かし、軒の出ゼロで敷地境界ギリギリまで活用。耐久ガルバリウム外壁で長く美しく保ちます。
+                <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 18 }}>
+                  既製品では使えなかったスペースを活かし、軒の出ゼロで敷地境界ギリギリまで活用。耐久ガルバリウム外壁仕様。
                 </p>
               </div>
             </div>
-            <div style={{ padding: '0 24px 24px' }}>
+            <div style={{ padding: '0 20px 20px' }}>
               <button
                 onClick={() => navigateTo('plan-storage')}
                 className="btn-secondary"
-                style={{ width: '100%', justifyContent: 'center' }}
+                style={{ width: '100%', justifyContent: 'center', padding: '10px 14px', fontSize: 13.5 }}
               >
-                <span>狭小・変形地向けストッカーを見る</span>
-                <ChevronRight size={16} />
+                <span>狭小ストッカーを見る</span>
+                <ChevronRight size={15} />
               </button>
             </div>
           </div>
@@ -796,28 +796,84 @@ export default function TopPage({ setCurrentRoute }) {
                   <span style={{ color: '#4ade80' }}>農機具・大型倉庫</span>
                 </div>
               </div>
-              <div style={{ padding: '24px 24px 0' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-accent)' }}>外壁ガルバリウム × 大型木造トラス構法</span>
-                  <Warehouse size={20} color="var(--color-accent)" />
+              <div style={{ padding: '20px 20px 0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--color-accent)' }}>ガルバリウム × 木造トラス構法</span>
+                  <Warehouse size={18} color="var(--color-accent)" />
                 </div>
-                <h3 style={{ fontSize: 19, marginBottom: 8, color: 'var(--text-main)', lineHeight: 1.4 }}>
-                  作業動線から、逆算する。<br />
-                  【農機具・収穫物向けアグリシェッド】
+                <h3 style={{ fontSize: 18, marginBottom: 8, color: 'var(--text-main)', lineHeight: 1.4 }}>
+                  作業動線から逆算する<br />
+                  【農機具・大型アグリシェッド】
                 </h3>
-                <p style={{ fontSize: 13.5, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 20 }}>
-                  トラクターや農機具の出入り、収穫物保管など「何を入れるか」から逆算して設計。市街化調整区域や農地の面倒な手続きもワンストップ。
+                <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 18 }}>
+                  トラクターや農機具の出入り、収穫物保管を逆算設計。市街化調整区域や農地の面倒な手続きもワンストップ。
                 </p>
               </div>
             </div>
-            <div style={{ padding: '0 24px 24px' }}>
+            <div style={{ padding: '0 20px 20px' }}>
               <button
                 onClick={() => navigateTo('plan-agri')}
                 className="btn-accent"
-                style={{ width: '100%', justifyContent: 'center' }}
+                style={{ width: '100%', justifyContent: 'center', padding: '10px 14px', fontSize: 13.5 }}
               >
-                <span>農機具・大型倉庫を見る</span>
-                <ChevronRight size={16} />
+                <span>大型倉庫を見る</span>
+                <ChevronRight size={15} />
+              </button>
+            </div>
+          </div>
+
+          {/* Plan 4 */}
+          <div className="nature-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: 0, overflow: 'hidden' }}>
+            <div>
+              <div style={{ position: 'relative', width: '100%', height: 200, overflow: 'hidden' }}>
+                <img
+                  src="/assets/plans/plan04.jpg"
+                  alt="Plan 04 スマイチホール・大空間ワークショップ＆事業用倉庫"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                />
+                <div style={{
+                  position: 'absolute',
+                  top: 12,
+                  left: 12,
+                  background: 'rgba(15, 23, 42, 0.85)',
+                  backdropFilter: 'blur(6px)',
+                  color: '#fff',
+                  fontSize: 11,
+                  fontWeight: 800,
+                  padding: '4px 10px',
+                  borderRadius: 12,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6
+                }}>
+                  <span>PLAN 04</span>
+                  <span style={{ color: '#a78bfa' }}>無柱大空間・ホール</span>
+                </div>
+              </div>
+              <div style={{ padding: '20px 20px 0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <span style={{ fontSize: 11.5, fontWeight: 700, color: '#7c3aed' }}>15m×15m・桁下6m ガルバリウム</span>
+                  <Building2 size={18} color="#7c3aed" />
+                </div>
+                <h3 style={{ fontSize: 18, marginBottom: 8, color: 'var(--text-main)', lineHeight: 1.4 }}>
+                  中柱のない圧倒的大空間<br />
+                  【道場・スタジオ・学習塾・事業倉庫】
+                </h3>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 18 }}>
+                  トラス工法で間口15m超の完全無柱大空間を実現。高断熱・調湿性と22年早期償却で、スクールからBtoB事業まで対応。
+                </p>
+              </div>
+            </div>
+            <div style={{ padding: '0 20px 20px' }}>
+              <button
+                onClick={() => navigateTo('plan-workshop')}
+                className="btn-primary"
+                style={{ width: '100%', justifyContent: 'center', padding: '10px 14px', fontSize: 13.5, background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)' }}
+              >
+                <span>大空間ホール・倉庫を見る</span>
+                <ChevronRight size={15} />
               </button>
             </div>
           </div>

@@ -8,9 +8,10 @@ export default function Header({ currentRoute, setCurrentRoute }) {
 
   const navItems = [
     { id: 'top', label: 'トップ', icon: Home },
-    { id: 'plan-hobby', label: '愛車・ホビーガレージ', planNum: '01' },
-    { id: 'plan-storage', label: '狭小・変形地ストッカー', planNum: '02' },
-    { id: 'plan-agri', label: '農機具アグリシェッド', planNum: '03' },
+    { id: 'plan-hobby', label: '愛車・ホビー', planNum: '01' },
+    { id: 'plan-storage', label: '狭小・変形地', planNum: '02' },
+    { id: 'plan-agri', label: '農機具倉庫', planNum: '03' },
+    { id: 'plan-workshop', label: '大空間・ホール', planNum: '04' },
   ];
 
   const handleNav = (routeId) => {
@@ -24,18 +25,19 @@ export default function Header({ currentRoute, setCurrentRoute }) {
       position: 'sticky',
       top: 0,
       zIndex: 100,
-      background: 'rgba(251, 250, 248, 0.94)',
+      background: 'rgba(251, 250, 248, 0.95)',
       backdropFilter: 'blur(12px)',
       borderBottom: '1px solid var(--border-light)',
       transition: 'all 0.3s ease'
     }}>
       <div style={{
-        maxWidth: 1200,
+        maxWidth: 1240,
         margin: '0 auto',
-        padding: '12px 20px',
+        padding: '10px 20px',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        gap: 12
       }}>
         {/* ブランドロゴ */}
         <div 
@@ -44,12 +46,13 @@ export default function Header({ currentRoute, setCurrentRoute }) {
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: 12
+            gap: 10,
+            flexShrink: 0
           }}
         >
           <div style={{
-            width: 42,
-            height: 42,
+            width: 38,
+            height: 38,
             borderRadius: 'var(--radius-md)',
             background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%)',
             display: 'flex',
@@ -58,24 +61,25 @@ export default function Header({ currentRoute, setCurrentRoute }) {
             color: '#fff',
             boxShadow: 'var(--shadow-sm)'
           }}>
-            <Home size={22} />
+            <Home size={20} />
           </div>
           <div>
             <div style={{
-              fontSize: 11,
+              fontSize: 10.5,
               fontWeight: 700,
               color: 'var(--color-wood)',
-              letterSpacing: '0.08em',
+              letterSpacing: '0.06em',
               display: 'flex',
               alignItems: 'center',
-              gap: 6
+              gap: 6,
+              lineHeight: 1.2
             }}>
               <span>木造自由設計ガレージ・倉庫</span>
               <span style={{
                 background: 'var(--color-primary-soft)',
                 color: 'var(--color-primary)',
-                fontSize: 10,
-                padding: '1px 6px',
+                fontSize: 9.5,
+                padding: '1px 5px',
                 borderRadius: 4,
                 fontWeight: 800
               }}>
@@ -83,7 +87,7 @@ export default function Header({ currentRoute, setCurrentRoute }) {
               </span>
             </div>
             <div style={{
-              fontSize: 18,
+              fontSize: 17,
               fontWeight: 800,
               color: 'var(--text-main)',
               fontFamily: 'var(--font-family-heading)',
@@ -95,12 +99,11 @@ export default function Header({ currentRoute, setCurrentRoute }) {
           </div>
         </div>
 
-
-        {/* デスクトップナビ */}
+        {/* デスクトップナビ（P01〜P04） */}
         <nav style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 6
+          gap: 4
         }} className="desktop-nav">
           {navItems.map((item) => {
             const isActive = currentRoute === item.id;
@@ -109,25 +112,26 @@ export default function Header({ currentRoute, setCurrentRoute }) {
                 key={item.id}
                 onClick={() => handleNav(item.id)}
                 style={{
-                  padding: '8px 14px',
+                  padding: '7px 11px',
                   borderRadius: 'var(--radius-full)',
-                  fontSize: 14,
+                  fontSize: 13.5,
                   fontWeight: isActive ? 700 : 500,
                   color: isActive ? 'var(--color-primary)' : 'var(--text-main)',
                   background: isActive ? 'var(--color-primary-soft)' : 'transparent',
                   transition: 'all 0.2s ease',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 6
+                  gap: 5,
+                  whiteSpace: 'nowrap'
                 }}
               >
                 {item.planNum && (
                   <span style={{
                     fontSize: 10,
                     fontWeight: 800,
-                    color: isActive ? 'var(--color-primary)' : 'var(--color-wood)',
-                    background: isActive ? '#fff' : 'var(--color-wood-light)',
-                    padding: '2px 6px',
+                    color: isActive ? '#fff' : 'var(--color-wood)',
+                    background: isActive ? 'var(--color-primary)' : 'var(--color-wood-light)',
+                    padding: '1px 5px',
                     borderRadius: 4
                   }}>
                     P{item.planNum}
@@ -139,51 +143,23 @@ export default function Header({ currentRoute, setCurrentRoute }) {
           })}
         </nav>
 
-        {/* 右側CTA（チャット ＆ 3Dシミュレーター直通 ＆ 管理画面） */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <button
-            onClick={() => handleNav('chat')}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '8px 12px',
-              borderRadius: 'var(--radius-full)',
-              background: '#f1f5f9',
-              color: '#334155',
-              fontSize: 13,
-              fontWeight: 600
-            }}
-            title="個別相談チャットを開く"
-          >
-            <span>💬 相談チャット</span>
-          </button>
-
+        {/* 右側CTA（主役の3Dシミュレーターボタンを最優先強調） */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
           <button
             onClick={() => handleNav('simulator')}
             className="btn-accent"
             style={{
-              padding: '9px 18px',
-              fontSize: 13.5,
-              boxShadow: '0 3px 12px rgba(224, 122, 95, 0.35)'
+              padding: '9px 20px',
+              fontSize: 14,
+              fontWeight: 700,
+              boxShadow: '0 4px 14px rgba(224, 122, 95, 0.38)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 7
             }}
           >
-            <Compass size={16} />
-            <span>3Dシミュレーター</span>
-          </button>
-
-          <button
-            onClick={() => handleNav('admin')}
-            style={{
-              padding: '8px',
-              borderRadius: 'var(--radius-md)',
-              color: '#94a3b8',
-              fontSize: 12,
-              fontWeight: 600
-            }}
-            title="建築士・スタッフ管理パネル"
-          >
-            👤 管理
+            <Compass size={17} />
+            <span>3Dシミュレーター（無料）</span>
           </button>
 
           {/* モバイルハンバーガー */}

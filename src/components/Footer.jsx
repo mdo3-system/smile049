@@ -49,7 +49,7 @@ export default function Footer({ setCurrentRoute }) {
           {/* 目的別プランリンク */}
           <div>
             <h4 style={{ fontSize: 15, color: '#fff', marginBottom: 16, borderBottom: '1px solid #334155', paddingBottom: 8 }}>
-              目的別 3つの特化プラン
+              目的別 4つの特化プラン
             </h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10, fontSize: 14 }}>
               <li>
@@ -74,6 +74,14 @@ export default function Footer({ setCurrentRoute }) {
                   style={{ color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left' }}
                 >
                   <span style={{ color: 'var(--color-accent)' }}>▸</span> Plan 03: 農機具・大型倉庫【アグリシェッド】
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => { setCurrentRoute('plan-workshop'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  style={{ color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left' }}
+                >
+                  <span style={{ color: 'var(--color-accent)' }}>▸</span> Plan 04: 無柱大空間・ホール【スマイチワークショップ】
                 </button>
               </li>
               <li style={{ marginTop: 10 }}>
@@ -136,10 +144,28 @@ export default function Footer({ setCurrentRoute }) {
               v{APP_VERSION}
             </span>
           </div>
-          <div style={{ display: 'flex', gap: 16, marginTop: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 8 }}>
             <span>プライバシーポリシー</span>
             <span>特定商取引法に基づく表記</span>
             <span>運営会社概要</span>
+            <button
+              onClick={() => { setCurrentRoute('admin'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              style={{
+                color: '#64748b',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: 11,
+                padding: '2px 6px',
+                borderRadius: 4,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4
+              }}
+              title="専任スタッフ専用管理パネル"
+            >
+              <span>👤 スタッフ管理</span>
+            </button>
           </div>
         </div>
       </div>
