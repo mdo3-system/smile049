@@ -18,6 +18,8 @@
 // - 2026/09/13 v0.1.15: 【Phase 4 リファクタリング】3D躯体メインビルダーの分離 ＆ SimulatorPageのUIオーケストレーター化
 // - 2026/09/13 v0.1.17: GitHub連携 (mdo3-system/smile049) & XServerワンコマンド同期デプロイ環境配備
 // - 2026/09/13 v0.1.18: Pre-Flight Check規約の刷新（FIXED_LOGIC.md必須読込・git pull/push・SSH本番同期・DBマイグレーション規約統合）
+// - 2026/09/13 v0.1.19: 重要ドキュメントスロット新設（パース/敷地申請図書/現況写真/CADファイル対応）、管理画面パース画像インライン表示整合、概算見積書7大枠＆薄墨オプション表示
 
-window.APP_VERSION = "0.1.18";
-export const APP_VERSION = "0.1.18";
+window.APP_VERSION = "0.1.19";
+export const APP_VERSION = "0.1.19";
+

@@ -16,6 +16,58 @@ const INITIAL_ROOMS = [
     createdAt: '2026-09-12 10:30',
     modelData: null,
     crmTransferred: false,
+    documents: {
+      // ① 🏛 パース図スロット（バージョン管理・最新版）
+      perspectives: [
+        {
+          id: 'doc-p-01',
+          name: 'AIフォトリアルパース_Plan01_完成稿.jpg',
+          version: 'v1.0 (最新)',
+          url: '/assets/plans/plan01.jpg',
+          size: '1.2MB',
+          updatedAt: '2026-09-12 10:35',
+          isAiRender: true,
+          memo: 'ガルバリウム鋼板仕上げ・軒出0仕様（社内PC Stable Diffusion生成）'
+        }
+      ],
+      // ② 📐 敷地・申請図書スロット（配置図・登記簿謄本・測量図・確認申請書・CAD）
+      sitePlans: [
+        {
+          id: 'doc-s-01',
+          name: '敷地配置図_現況求積図.dxf',
+          version: 'v1.0',
+          type: 'cad',
+          extension: 'dxf',
+          size: '480KB',
+          updatedAt: '2026-09-12 10:32',
+          category: '配置図・CAD',
+          memo: '敷地境界線・接道幅員4.5m・オフセット離隔確認用'
+        },
+        {
+          id: 'doc-s-02',
+          name: '土地登記簿謄本_公図写し.pdf',
+          version: 'v1.0',
+          type: 'pdf',
+          extension: 'pdf',
+          size: '1.8MB',
+          updatedAt: '2026-09-12 10:33',
+          category: '登記簿・公図',
+          memo: '地目: 宅地 / 建ぺい率60% / 容積率200%'
+        }
+      ],
+      // ③ 📸 現地・現況写真スロット（前面道路、敷地全景、境界杭、障害物等）
+      sitePhotos: [
+        {
+          id: 'doc-ph-01',
+          name: '現地現況写真_南側道路全景.jpg',
+          version: 'v1.0',
+          url: '/assets/plans/plan02.jpg',
+          size: '2.4MB',
+          updatedAt: '2026-09-12 10:33',
+          caption: '南側接道（幅員4.5mアスファルト舗装・電柱位置確認）'
+        }
+      ]
+    },
     messages: [
       {
         id: 1,
@@ -27,16 +79,17 @@ const INITIAL_ROOMS = [
       {
         id: 2,
         sender: 'customer',
-        text: 'こんにちは！シミュレーターでバイクと工具棚を置いたガレージを作成しました。外壁ガルバリウム鋼板仕上げ、軒の出0のシャープなパースをお願いできますか？',
+        text: 'こんにちは！シミュレーターでバイクと工具棚を置いたガレージを作成しました。外壁ガルバリウム鋼板仕上げ、軒の出0のシャープなパースをお願いできますか？敷地配置のCADデータ(.dxf)もスロットに共有しました。',
         time: '10:32',
         attachments: [
-          { name: 'garage-design.json', type: 'json', size: '38KB' }
+          { name: 'garage-design.json', type: 'json', size: '38KB' },
+          { name: '敷地配置図_現況求積図.dxf', type: 'cad', size: '480KB' }
         ]
       },
       {
         id: 3,
         sender: 'staff',
-        text: '佐藤様、ご依頼ありがとうございます！専任スタッフの田中です。3Dシミュレーターのデータをもとに、最新のガルバリウム鋼板外壁・軒の出0のシャープなディテールを忠実に反映したAIフォトリアルパースを作成いたしました！以下よりご確認ください。',
+        text: '佐藤様、ご依頼ありがとうございます！専任スタッフの田中です。3Dシミュレーターのデータをもとに、最新のガルバリウム鋼板外壁・軒の出0のシャープなディテールを忠実に反映したAIフォトリアルパースを作成いたしました！「重要ドキュメントスロット」および以下よりご確認ください。',
         time: '10:35',
         attachments: [
           {
@@ -60,17 +113,18 @@ export const getChatRooms = () => {
       return INITIAL_ROOMS;
     }
     const parsed = JSON.parse(data);
-    // デモルームに画像がまだない古いキャッシュの場合は更新
+    // デモルームに重要ドキュメントスロットがない古いキャッシュの場合は補完
     const demo = parsed.find(r => r.roomId === 'room-demo-01');
-    if (demo && !demo.messages.some(m => m.attachments?.some(a => a.isAiRender))) {
-      localStorage.setItem(STORAGE_KEY_ROOMS, JSON.stringify(INITIAL_ROOMS));
-      return INITIAL_ROOMS;
+    if (demo && (!demo.documents || !demo.documents.perspectives || demo.documents.perspectives.length === 0)) {
+      demo.documents = INITIAL_ROOMS[0].documents;
+      localStorage.setItem(STORAGE_KEY_ROOMS, JSON.stringify(parsed));
     }
     return parsed;
   } catch (e) {
     return INITIAL_ROOMS;
   }
 };
+
 
 export const saveChatRooms = (rooms) => {
   try {
@@ -137,6 +191,11 @@ export const createParseRequest = ({ customerName, email, planType, modelData, m
     createdAt: dateStr,
     modelData: modelData || null,
     crmTransferred: false,
+    documents: {
+      perspectives: [],
+      sitePlans: [],
+      sitePhotos: []
+    },
     messages: [
       {
         id: Date.now(),
@@ -164,7 +223,7 @@ export const createParseRequest = ({ customerName, email, planType, modelData, m
   saveChatRooms(rooms);
   setCurrentUserRoomId(roomId);
 
-  // 1.5秒後に自動的にAIフォトリアルパースをチャットに納品！
+  // 1.5秒後に自動的にAIフォトリアルパースをチャットおよび重要ドキュメントスロットに納品！
   setTimeout(() => {
     const freshRooms = getChatRooms();
     const targetRoom = freshRooms.find(r => r.roomId === roomId);
@@ -172,12 +231,32 @@ export const createParseRequest = ({ customerName, email, planType, modelData, m
 
     const replyNow = new Date();
     const replyTime = `${replyNow.getHours().toString().padStart(2, '0')}:${replyNow.getMinutes().toString().padStart(2, '0')}`;
+    const dateFormatted = `${replyNow.getFullYear()}-${(replyNow.getMonth() + 1).toString().padStart(2, '0')}-${replyNow.getDate().toString().padStart(2, '0')} ${replyTime}`;
 
     targetRoom.status = '提案済';
+    
+    // パース図スロットに最新パースとして追加
+    if (!targetRoom.documents) {
+      targetRoom.documents = { perspectives: [], sitePlans: [], sitePhotos: [] };
+    }
+    const currentPerspectivesCount = targetRoom.documents.perspectives?.length || 0;
+    const versionLabel = `v1.${currentPerspectivesCount} (最新)`;
+
+    targetRoom.documents.perspectives.unshift({
+      id: `doc-p-${Date.now()}`,
+      name: bestImage.name,
+      version: versionLabel,
+      url: bestImage.url,
+      size: '1.2MB',
+      updatedAt: dateFormatted,
+      isAiRender: true,
+      memo: 'ガルバリウム鋼板仕上げ・軒出0仕様（社内PC Stable Diffusion生成）'
+    });
+
     targetRoom.messages.push({
       id: Date.now() + 2,
       sender: 'staff',
-      text: `${customerName}様、大変お待たせいたしました！シミュレーターでモデリングいただいた3Dモデル（間口: ${modelData?.dimensions?.wFront || 5400}mm / ガルバリウム鋼板仕上げ / 軒の出0仕様）をもとに、社内PCにて高精細フォトリアルパースを生成いたしました！\n実物さながらの重厚なガルバリウム鋼板の質感と光の陰影をご確認ください。`,
+      text: `${customerName}様、大変お待たせいたしました！シミュレーターでモデリングいただいた3Dモデル（間口: ${modelData?.dimensions?.wFront || 5400}mm / ガルバリウム鋼板仕上げ / 軒の出0仕様）をもとに、社内PCにて高精細フォトリアルパースを生成いたしました！\n「重要ドキュメントスロット」および以下タイムラインにてご確認いただけます。`,
       time: replyTime,
       attachments: [
         {
@@ -229,3 +308,50 @@ export const updateRoomStatus = (roomId, status) => {
   }
   saveChatRooms(rooms);
 };
+
+// 重要ドキュメントスロットへのファイル追加・更新
+export const addDocumentToSlot = (roomId, slotCategory, documentItem) => {
+  const rooms = getChatRooms();
+  const room = rooms.find(r => r.roomId === roomId);
+  if (!room) return null;
+
+  if (!room.documents) {
+    room.documents = { perspectives: [], sitePlans: [], sitePhotos: [] };
+  }
+  if (!room.documents[slotCategory]) {
+    room.documents[slotCategory] = [];
+  }
+
+  const now = new Date();
+  const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+  const dateFormatted = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${timeStr}`;
+
+  const doc = {
+    id: documentItem.id || `doc-${Date.now().toString(36)}`,
+    name: documentItem.name,
+    version: documentItem.version || `v1.${room.documents[slotCategory].length}`,
+    size: documentItem.size || '1.0MB',
+    url: documentItem.url || null,
+    type: documentItem.type || 'file',
+    extension: documentItem.extension || (documentItem.name.split('.').pop().toLowerCase()),
+    category: documentItem.category || (slotCategory === 'sitePlans' ? '敷地・申請図面' : slotCategory === 'perspectives' ? 'パース図' : '現況写真'),
+    memo: documentItem.memo || documentItem.caption || '',
+    updatedAt: dateFormatted,
+    isAiRender: documentItem.isAiRender || false
+  };
+
+  room.documents[slotCategory].unshift(doc);
+  saveChatRooms(rooms);
+  return doc;
+};
+
+// 重要ドキュメントスロットからの削除
+export const removeDocumentFromSlot = (roomId, slotCategory, docId) => {
+  const rooms = getChatRooms();
+  const room = rooms.find(r => r.roomId === roomId);
+  if (!room || !room.documents || !room.documents[slotCategory]) return;
+
+  room.documents[slotCategory] = room.documents[slotCategory].filter(d => d.id !== docId);
+  saveChatRooms(rooms);
+};
+

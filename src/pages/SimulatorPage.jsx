@@ -9,6 +9,7 @@ import {
 import ManualModal from '../components/ManualModal';
 import ParseRequestModal from '../components/ParseRequestModal';
 import ChatRoomModal from '../components/ChatRoomModal';
+import EstimateDetailModal from '../components/EstimateDetailModal';
 import { APP_VERSION } from '../version.js';
 import { WALL_KEYS, WALL_NAMES_JA, WALL_OUTER_OFFSET, WALL_INNER_OFFSET, isFloorLevelOpening } from '../simulator/constants';
 import { getCorePoints, getOffsetPoints, calculateAngles, getGirderHeight, getWallSpan } from '../simulator/geometry/buildingGeometry';
@@ -33,9 +34,12 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
   // チャットモーダル
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatRoomId, setChatRoomId] = useState(null);
+  // 概算見積書モーダル (7大枠 ＆ 薄墨オプション)
+  const [isEstimateModalOpen, setIsEstimateModalOpen] = useState(false);
 
   // 3D全画面表示モード (スマホで3Dモデルを最大化して鑑賞)
   const [is3dFullScreen, setIs3dFullScreen] = useState(false);
+
 
   // 表示モード ('3d', 'plan', 'front-elev', 'back-elev', 'left-elev', 'right-elev')
   const [currentView, setCurrentView] = useState('3d');
@@ -522,6 +526,16 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
         initialRoomId={chatRoomId}
       />
 
+      {/* 概算見積書モーダル (7大枠 ＆ 薄墨オプション) */}
+      <EstimateDetailModal 
+        isOpen={isEstimateModalOpen} 
+        onClose={() => setIsEstimateModalOpen(false)} 
+        quantities={calculations}
+        dimensions={dimensions}
+        openings={openings}
+        onOpenParseRequest={() => setIsParseRequestOpen(true)}
+      />
+
       {/* 隠しファイルインプット */}
       <input type="file" ref={fileInputRef} onChange={handleLoadJson} accept=".json" style={{ display: 'none' }} />
 
@@ -579,8 +593,18 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
           </div>
         </div>
 
-        {/* 右: アクション（パース依頼 / 相談 / マニュアル / 全画面切替） */}
+        {/* 右: アクション（見積書 / パース依頼 / 相談 / マニュアル / 全画面切替） */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <button
+            onClick={() => setIsEstimateModalOpen(true)}
+            className="btn-secondary"
+            style={{ padding: '5px 8px', fontSize: 11.5, borderRadius: 6, display: 'flex', alignItems: 'center', gap: 4 }}
+            title="概算建築御見積書（7大枠・薄墨オプション）を確認"
+          >
+            <FileText size={13} color="var(--color-primary)" />
+            <span>見積書(7大枠)</span>
+          </button>
+
           <button
             onClick={() => setIsParseRequestOpen(true)}
             className="btn-accent"
@@ -597,6 +621,7 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
             <Sparkles size={13} color="#fde047" />
             <span>パース依頼 (無料)</span>
           </button>
+
 
           <button
             onClick={() => setIsChatOpen(true)}
@@ -1708,11 +1733,36 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                 {calculations.approxCost.toLocaleString()} <span style={{ fontSize: 13, fontWeight: 500 }}>円〜</span>
               </div>
             </div>
+
+            {/* 概算御見積書モーダル表示ボタン */}
+            <button
+              type="button"
+              onClick={() => setIsEstimateModalOpen(true)}
+              style={{
+                background: '#0f172a',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: 6,
+                padding: '10px 14px',
+                fontSize: 12.5,
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
+                cursor: 'pointer',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              }}
+            >
+              <FileText size={15} color="#38bdf8" />
+              <span>📄 概算御見積書（7大枠・薄墨オプション）を確認</span>
+            </button>
           </div>
         </div>
 
         {/* AIパース用画像保存ボタン */}
         <button
+
           onClick={handleDownloadImage}
           className="btn-accent"
           style={{ padding: '12px', fontSize: 13, borderRadius: 8, width: '100%', justifyContent: 'center' }}

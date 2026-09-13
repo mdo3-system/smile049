@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   X, Send, Paperclip, Image as ImageIcon, FileText, CheckCheck, 
-  Sparkles, Download, ArrowLeft, User, Shield, Info, Maximize2 
+  Sparkles, Download, ArrowLeft, User, Shield, Info, Maximize2, Layers 
 } from 'lucide-react';
 import { getChatRooms, sendMessageToRoom, getCurrentUserRoomId } from '../services/chatService';
+import DocumentSlotPanel from './DocumentSlotPanel';
 
 export default function ChatRoomModal({ isOpen, onClose, initialRoomId }) {
   const [roomId, setRoomId] = useState(initialRoomId || getCurrentUserRoomId());
@@ -11,8 +12,10 @@ export default function ChatRoomModal({ isOpen, onClose, initialRoomId }) {
   const [inputText, setInputText] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
+  const [activeViewTab, setActiveViewTab] = useState('chat'); // 'chat' | 'documents'
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
+
 
   useEffect(() => {
     if (initialRoomId) setRoomId(initialRoomId);
@@ -164,16 +167,87 @@ export default function ChatRoomModal({ isOpen, onClose, initialRoomId }) {
           </div>
         </div>
 
-        {/* メッセージエリア */}
+        {/* タイムライン vs 重要図書スロット タブ切替 */}
         <div style={{
-          flex: 1,
-          padding: '16px',
-          overflowY: 'auto',
           display: 'flex',
-          flexDirection: 'column',
-          gap: 14,
-          background: '#e4e8ec'
+          background: '#f8fafc',
+          borderBottom: '1px solid #cbd5e1',
+          padding: '0 12px'
         }}>
+          <button
+            type="button"
+            onClick={() => setActiveViewTab('chat')}
+            style={{
+              flex: 1,
+              padding: '10px 12px',
+              fontSize: 13,
+              fontWeight: activeViewTab === 'chat' ? 700 : 500,
+              color: activeViewTab === 'chat' ? 'var(--color-primary-dark)' : '#64748b',
+              borderBottom: activeViewTab === 'chat' ? '3px solid var(--color-primary)' : '3px solid transparent',
+              background: 'none',
+              borderTop: 'none',
+              borderLeft: 'none',
+              borderRight: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 6
+            }}
+          >
+            <span>💬 トークタイムライン</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveViewTab('documents')}
+            style={{
+              flex: 1,
+              padding: '10px 12px',
+              fontSize: 13,
+              fontWeight: activeViewTab === 'documents' ? 700 : 500,
+              color: activeViewTab === 'documents' ? 'var(--color-primary-dark)' : '#64748b',
+              borderBottom: activeViewTab === 'documents' ? '3px solid var(--color-primary)' : '3px solid transparent',
+              background: 'none',
+              borderTop: 'none',
+              borderLeft: 'none',
+              borderRight: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 6
+            }}
+          >
+            <Layers size={14} />
+            <span>📂 重要図書スロット ({
+              (currentRoom.documents?.perspectives?.length || 0) +
+              (currentRoom.documents?.sitePlans?.length || 0) +
+              (currentRoom.documents?.sitePhotos?.length || 0)
+            })</span>
+          </button>
+        </div>
+
+        {activeViewTab === 'documents' ? (
+          <div style={{ flex: 1, padding: 16, overflowY: 'auto', background: '#f1f5f9' }}>
+            <DocumentSlotPanel
+              room={currentRoom}
+              isStaff={false}
+              onPreviewImage={(url) => setPreviewImage(url)}
+            />
+          </div>
+        ) : (
+          <>
+            {/* メッセージエリア */}
+            <div style={{
+              flex: 1,
+              padding: '16px',
+              overflowY: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 14,
+              background: '#e4e8ec'
+            }}>
+
           {currentRoom.messages.map((msg) => {
             const isMe = msg.sender === 'customer';
             const isSystem = msg.sender === 'system';
@@ -378,7 +452,7 @@ export default function ChatRoomModal({ isOpen, onClose, initialRoomId }) {
             type="file"
             ref={fileInputRef}
             onChange={handleFileChange}
-            accept="image/*,.pdf,.json"
+            accept="image/*,.pdf,.json,.dxf,.dwg,.jww,.fcbz"
             style={{ display: 'none' }}
           />
 
@@ -396,14 +470,14 @@ export default function ChatRoomModal({ isOpen, onClose, initialRoomId }) {
               color: '#475569',
               transition: 'background 0.2s'
             }}
-            title="敷地図面や写真を添付"
+            title="敷地図面やCAD、写真を添付"
           >
             <Paperclip size={18} />
           </button>
 
           <input
             type="text"
-            placeholder="メッセージを入力（敷地の写真・図面も送れます）"
+            placeholder="メッセージを入力（敷地の写真・CAD図面も送れます）"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             style={{
@@ -436,7 +510,10 @@ export default function ChatRoomModal({ isOpen, onClose, initialRoomId }) {
             <Send size={18} />
           </button>
         </form>
+        </>
+        )}
       </div>
+
 
       {/* 高解像度画像プレビューモーダル */}
       {previewImage && (

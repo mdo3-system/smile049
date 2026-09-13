@@ -2,16 +2,21 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Users, MessageSquare, Send, Paperclip, Sparkles, CheckCircle, 
   ArrowUpRight, ArrowLeft, RefreshCw, Download, Database, ShieldCheck, 
-  ExternalLink, Calendar, Mail, FileText, Image as ImageIcon, Box
+  ExternalLink, Calendar, Mail, FileText, Image as ImageIcon, Box,
+  Layers, Maximize2, X
 } from 'lucide-react';
 import { getChatRooms, sendMessageToRoom, updateRoomStatus, saveChatRooms } from '../services/chatService';
+import DocumentSlotPanel from '../components/DocumentSlotPanel';
 
 export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel }) {
   const [rooms, setRooms] = useState(getChatRooms());
   const [selectedRoomId, setSelectedRoomId] = useState(rooms[0]?.roomId || null);
   const [replyText, setReplyText] = useState('');
   const [isAiGenerating, setIsAiGenerating] = useState(false);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [adminActiveTab, setAdminActiveTab] = useState('chat'); // 'chat' | 'documents'
   const fileInputRef = useRef(null);
+
 
   useEffect(() => {
     const handleUpdate = () => {
@@ -339,129 +344,249 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
               </div>
             </div>
 
-            {/* チャットタイムライン */}
+            {/* チャットタイムライン ＆ 重要図書スロット 切り替えサブタブ */}
             <div style={{
-              flex: 1,
-              padding: '20px',
-              overflowY: 'auto',
-              background: '#f8fafc',
               display: 'flex',
-              flexDirection: 'column',
-              gap: 14,
-              maxHeight: '480px'
+              background: '#f1f5f9',
+              borderBottom: '1px solid #e2e8f0',
+              padding: '0 20px'
             }}>
-              {activeRoom.messages.map((msg) => {
-                const isStaff = msg.sender === 'staff';
-                const isSystem = msg.sender === 'system';
-
-                if (isSystem) {
-                  return (
-                    <div key={msg.id} style={{
-                      background: '#f1f5f9',
-                      border: '1px dashed #cbd5e1',
-                      borderRadius: 8,
-                      padding: '8px 12px',
-                      fontSize: 12,
-                      color: '#475569',
-                      textAlign: 'center'
-                    }}>
-                      {msg.text}
-                    </div>
-                  );
-                }
-
-                return (
-                  <div
-                    key={msg.id}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: isStaff ? 'flex-end' : 'flex-start',
-                      maxWidth: '80%',
-                      alignSelf: isStaff ? 'flex-end' : 'flex-start'
-                    }}
-                  >
-                    <div style={{ fontSize: 11, color: '#64748b', marginBottom: 2 }}>
-                      {isStaff ? '自社（建築士・スタッフ）' : activeRoom.customerName} • {msg.time}
-                    </div>
-
-                    <div style={{
-                      background: isStaff ? 'var(--color-primary)' : '#ffffff',
-                      color: isStaff ? '#ffffff' : '#1e293b',
-                      padding: '12px 16px',
-                      borderRadius: 12,
-                      border: isStaff ? 'none' : '1px solid #e2e8f0',
-                      fontSize: 13.5,
-                      lineHeight: 1.6,
-                      boxShadow: 'var(--shadow-sm)'
-                    }}>
-                      {msg.text}
-
-                      {/* 添付ファイル */}
-                      {msg.attachments && msg.attachments.length > 0 && (
-                        <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                          {msg.attachments.map((att, aIdx) => (
-                            <div key={aIdx} style={{
-                              background: isStaff ? 'rgba(255,255,255,0.15)' : '#f1f5f9',
-                              padding: '6px 10px',
-                              borderRadius: 6,
-                              fontSize: 12,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              gap: 10
-                            }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                {att.type === 'image' ? <ImageIcon size={14} /> : <FileText size={14} />}
-                                <span>{att.name}</span>
-                              </div>
-                              {att.url && (
-                                <a href={att.url} download={att.name} style={{ color: isStaff ? '#a7f3d0' : 'var(--color-primary)', fontWeight: 700, fontSize: 11 }}>
-                                  ダウンロード
-                                </a>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+              <button
+                type="button"
+                onClick={() => setAdminActiveTab('chat')}
+                style={{
+                  padding: '12px 18px',
+                  fontSize: 13,
+                  fontWeight: adminActiveTab === 'chat' ? 700 : 500,
+                  color: adminActiveTab === 'chat' ? 'var(--color-primary-dark)' : '#64748b',
+                  borderBottom: adminActiveTab === 'chat' ? '3px solid var(--color-primary)' : '3px solid transparent',
+                  background: 'none',
+                  borderTop: 'none',
+                  borderLeft: 'none',
+                  borderRight: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6
+                }}
+              >
+                <MessageSquare size={15} />
+                <span>💬 トークタイムライン ({activeRoom.messages.length})</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setAdminActiveTab('documents')}
+                style={{
+                  padding: '12px 18px',
+                  fontSize: 13,
+                  fontWeight: adminActiveTab === 'documents' ? 700 : 500,
+                  color: adminActiveTab === 'documents' ? 'var(--color-primary-dark)' : '#64748b',
+                  borderBottom: adminActiveTab === 'documents' ? '3px solid var(--color-primary)' : '3px solid transparent',
+                  background: 'none',
+                  borderTop: 'none',
+                  borderLeft: 'none',
+                  borderRight: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6
+                }}
+              >
+                <Layers size={15} />
+                <span>📂 重要ドキュメント・図書スロット ({
+                  (activeRoom.documents?.perspectives?.length || 0) +
+                  (activeRoom.documents?.sitePlans?.length || 0) +
+                  (activeRoom.documents?.sitePhotos?.length || 0)
+                })</span>
+              </button>
             </div>
 
-            {/* 返信入力フォーム */}
-            <form onSubmit={handleSendReply} style={{
-              padding: '14px 20px',
-              borderTop: '1px solid #e2e8f0',
-              background: '#ffffff',
-              display: 'flex',
-              gap: 10,
-              alignItems: 'center'
-            }}>
-              <input
-                type="text"
-                placeholder={`${activeRoom.customerName} へ返信メッセージを入力...`}
-                value={replyText}
-                onChange={(e) => setReplyText(e.target.value)}
-                style={{
+            {adminActiveTab === 'documents' ? (
+              <div style={{ padding: '20px', flex: 1, overflowY: 'auto' }}>
+                <DocumentSlotPanel 
+                  room={activeRoom} 
+                  isStaff={true} 
+                  onPreviewImage={(url) => setPreviewImage(url)} 
+                />
+              </div>
+            ) : (
+              <>
+                {/* チャットタイムライン */}
+                <div style={{
                   flex: 1,
-                  padding: '10px 14px',
-                  borderRadius: 8,
-                  border: '1px solid #cbd5e1',
-                  fontSize: 14,
-                  outline: 'none'
-                }}
-              />
-              <button
-                type="submit"
-                className="btn-primary"
-                style={{ padding: '10px 20px', fontSize: 14, borderRadius: 8 }}
-              >
-                <Send size={15} />
-                <span>返信する</span>
-              </button>
-            </form>
+                  padding: '20px',
+                  overflowY: 'auto',
+                  background: '#f8fafc',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 14,
+                  maxHeight: '480px'
+                }}>
+                  {activeRoom.messages.map((msg) => {
+                    const isStaff = msg.sender === 'staff';
+                    const isSystem = msg.sender === 'system';
+
+                    if (isSystem) {
+                      return (
+                        <div key={msg.id} style={{
+                          background: '#f1f5f9',
+                          border: '1px dashed #cbd5e1',
+                          borderRadius: 8,
+                          padding: '8px 12px',
+                          fontSize: 12,
+                          color: '#475569',
+                          textAlign: 'center'
+                        }}>
+                          {msg.text}
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div
+                        key={msg.id}
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: isStaff ? 'flex-end' : 'flex-start',
+                          maxWidth: '80%',
+                          alignSelf: isStaff ? 'flex-end' : 'flex-start'
+                        }}
+                      >
+                        <div style={{ fontSize: 11, color: '#64748b', marginBottom: 2 }}>
+                          {isStaff ? '専任スタッフ' : activeRoom.customerName} • {msg.time}
+                        </div>
+
+                        <div style={{
+                          background: isStaff ? 'var(--color-primary)' : '#ffffff',
+                          color: isStaff ? '#ffffff' : '#1e293b',
+                          padding: '12px 16px',
+                          borderRadius: 12,
+                          border: isStaff ? 'none' : '1px solid #e2e8f0',
+                          fontSize: 13.5,
+                          lineHeight: 1.6,
+                          boxShadow: 'var(--shadow-sm)'
+                        }}>
+                          {msg.text}
+
+                          {/* 添付ファイル（画像はサムネイルカード＋拡大表示） */}
+                          {msg.attachments && msg.attachments.length > 0 && (
+                            <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                              {msg.attachments.map((att, aIdx) => {
+                                const isImg = att.type === 'image' || att.isAiRender;
+                                return (
+                                  <div key={aIdx} style={{
+                                    background: isStaff ? 'rgba(255,255,255,0.18)' : '#f1f5f9',
+                                    borderRadius: 8,
+                                    overflow: 'hidden',
+                                    border: isStaff ? '1px solid rgba(255,255,255,0.25)' : '1px solid #e2e8f0'
+                                  }}>
+                                    {/* 画像インラインサムネイルカード */}
+                                    {isImg && att.url && (
+                                      <div
+                                        onClick={() => setPreviewImage(att.url)}
+                                        style={{
+                                          cursor: 'pointer',
+                                          position: 'relative',
+                                          maxHeight: 180,
+                                          overflow: 'hidden',
+                                          background: '#0f172a'
+                                        }}
+                                      >
+                                        <img
+                                          src={att.url}
+                                          alt={att.name}
+                                          style={{
+                                            width: '100%',
+                                            height: 'auto',
+                                            display: 'block',
+                                            objectFit: 'cover'
+                                          }}
+                                        />
+                                        <div style={{
+                                          position: 'absolute',
+                                          bottom: 6,
+                                          right: 6,
+                                          background: 'rgba(15, 23, 42, 0.75)',
+                                          color: '#ffffff',
+                                          padding: '2px 8px',
+                                          borderRadius: 4,
+                                          fontSize: 11,
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: 4
+                                        }}>
+                                          <Maximize2 size={11} />
+                                          <span>拡大表示</span>
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    <div style={{
+                                      padding: '6px 10px',
+                                      fontSize: 12,
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'space-between',
+                                      gap: 10
+                                    }}>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
+                                        {isImg ? <ImageIcon size={14} /> : <FileText size={14} />}
+                                        <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                                          {att.name}
+                                        </span>
+                                      </div>
+                                      {att.url && (
+                                        <a href={att.url} download={att.name} style={{ color: isStaff ? '#a7f3d0' : 'var(--color-primary)', fontWeight: 700, fontSize: 11, whiteSpace: 'nowrap' }}>
+                                          ダウンロード
+                                        </a>
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* 返信入力フォーム */}
+                <form onSubmit={handleSendReply} style={{
+                  padding: '14px 20px',
+                  borderTop: '1px solid #e2e8f0',
+                  background: '#ffffff',
+                  display: 'flex',
+                  gap: 10,
+                  alignItems: 'center'
+                }}>
+                  <input
+                    type="text"
+                    placeholder={`${activeRoom.customerName} へ返信メッセージを入力...`}
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    style={{
+                      flex: 1,
+                      padding: '10px 14px',
+                      borderRadius: 8,
+                      border: '1px solid #cbd5e1',
+                      fontSize: 14,
+                      outline: 'none'
+                    }}
+                  />
+                  <button
+                    type="submit"
+                    className="btn-primary"
+                    style={{ padding: '10px 20px', fontSize: 14, borderRadius: 8 }}
+                  >
+                    <Send size={15} />
+                    <span>返信する</span>
+                  </button>
+                </form>
+              </>
+            )}
           </div>
         ) : (
           <div style={{ background: '#fff', borderRadius: 12, padding: 40, textAlign: 'center', color: '#94a3b8' }}>
@@ -469,6 +594,90 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
           </div>
         )}
       </div>
+
+      {/* 全画面画像プレビューモーダル */}
+      {previewImage && (
+        <div 
+          onClick={() => setPreviewImage(null)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.9)',
+            zIndex: 9999,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 20
+          }}
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: 'relative',
+              maxWidth: '90vw',
+              maxHeight: '85vh',
+              background: '#0f172a',
+              borderRadius: 12,
+              overflow: 'hidden',
+              boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '10px 16px',
+              background: '#1e293b',
+              color: '#ffffff'
+            }}>
+              <span style={{ fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <ImageIcon size={16} color="#38bdf8" />
+                高精細パース・現況写真 プレビュー
+              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <a
+                  href={previewImage}
+                  download="garage_preview.jpg"
+                  style={{
+                    color: '#38bdf8',
+                    fontSize: 12,
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4
+                  }}
+                >
+                  <Download size={14} />
+                  高画質保存
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setPreviewImage(null)}
+                  style={{ background: 'none', border: 'none', color: '#ffffff', cursor: 'pointer', padding: 4 }}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+
+            <div style={{ overflow: 'auto', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#020617' }}>
+              <img
+                src={previewImage}
+                alt="Enlarged preview"
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: '75vh',
+                  objectFit: 'contain'
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
