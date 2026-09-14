@@ -12,6 +12,7 @@ coverage/
 .DS_Store
 Thumbs.db
 *.log
+vite.config.js.timestamp-*
 
 # Env
 .env
