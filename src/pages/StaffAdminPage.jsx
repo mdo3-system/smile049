@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import DocumentSlotPanel from '../components/DocumentSlotPanel';
 import { Lock, KeyRound } from 'lucide-react';
+import { getChatRooms, sendMessageToRoom, updateRoomStatus } from '../services/chatService';
 
 const STAFF_PASSCODE = 'smile049';
 
@@ -21,8 +22,22 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
     sessionStorage.removeItem('wood_garage_staff_auth');
   }, []);
 
-  const [rooms, setRooms] = useState(getChatRooms());
-  const [selectedRoomId, setSelectedRoomId] = useState(rooms[0]?.roomId || null);
+  const [rooms, setRooms] = useState(() => {
+    try {
+      return getChatRooms() || [];
+    } catch (err) {
+      console.error('Failed to load chat rooms:', err);
+      return [];
+    }
+  });
+  const [selectedRoomId, setSelectedRoomId] = useState(() => {
+    try {
+      const initRooms = getChatRooms();
+      return initRooms?.[0]?.roomId || null;
+    } catch (e) {
+      return null;
+    }
+  });
   const [replyText, setReplyText] = useState('');
   const [isAiGenerating, setIsAiGenerating] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);

@@ -35,9 +35,10 @@
 // - 2026/09/14 v0.1.33: Google Search Console所有権確認HTML（google8b846360a3bf8842.html）の配備および本番Webサーバー反映
 // - 2026/09/14 v0.1.34: SPAルーティングとブラウザアドレスバーURLの完全同期実装（/plan-hobby等の個別URL自動更新、直接アクセス認識、ブラウザ戻る・進むpopstate対応、.htaccess配備）
 // - 2026/09/14 v0.1.35: トップページSTEP02文言改修（リアルフォトパース作成依頼）、公式マニュアル対比図文字切れ・改行解消、スマホトップバーはみ出し防止レスポンシブ化、2D平面図・立面図の縮尺スライダー完全連動
+// - 2026/09/14 v0.1.36: スタッフ管理画面（/admin）のReferenceError解消（chatServiceインポート補完・セーフガード初期化によるパスコード認証画面＆ダッシュボード表示完全復旧）
 
-window.APP_VERSION = '0.1.35';
-export const APP_VERSION = '0.1.35';
+window.APP_VERSION = '0.1.36';
+export const APP_VERSION = '0.1.36';
 
 
 
