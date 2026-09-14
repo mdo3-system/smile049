@@ -20,6 +20,7 @@ import { buildShelves3D, buildVehicles3D, buildCornerCutZone3D } from '../simula
 import { buildDimensions3D } from '../simulator/three/dimension3dBuilder';
 import { createSimulatorMaterials } from '../simulator/three/materials';
 import { buildStructure3D } from '../simulator/three/building3dBuilder';
+import { Analytics, trackEvent } from '../utils/analytics';
 
 // =========================================================
 // スカイブルーグラデーション Equirectangular テクスチャ生成
@@ -255,6 +256,12 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
     if (s.shelfUnits) setShelfUnits(s.shelfUnits);
     if (s.vehicles) setVehicles(s.vehicles);
   };
+
+  useEffect(() => {
+    // GA4 3Dシミュレーター起動トラッキング
+    Analytics.trackSimulatorStart('simulator_route');
+    Analytics.trackManualOpen('auto_initial_popup');
+  }, []);
 
   useEffect(() => {
     if (externalModelData) {
@@ -721,7 +728,10 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
         {/* 右: アクション（見積書 / パース依頼 / 相談 / マニュアル / 全画面切替） */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 5, overflowX: 'auto', paddingLeft: 4 }}>
           <button
-            onClick={() => setIsEstimateModalOpen(true)}
+            onClick={() => {
+              trackEvent('estimate_modal_open', { source: 'simulator_topbar' });
+              setIsEstimateModalOpen(true);
+            }}
             className="btn-secondary sim-top-btn"
             style={{ padding: '5px 8px', fontSize: 11.5, borderRadius: 6, display: 'flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap' }}
             title="概算建築御見積書（7大枠・薄墨オプション）を確認"
@@ -732,7 +742,10 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
           </button>
 
           <button
-            onClick={() => setIsParseRequestOpen(true)}
+            onClick={() => {
+              Analytics.trackPerspectiveModalOpen('simulator_topbar');
+              setIsParseRequestOpen(true);
+            }}
             className="btn-accent sim-top-btn"
             style={{
               padding: '5px 9px',
@@ -751,7 +764,10 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
           </button>
 
           <button
-            onClick={() => setIsChatOpen(true)}
+            onClick={() => {
+              Analytics.trackChatOpen('simulator_topbar');
+              setIsChatOpen(true);
+            }}
             className="btn-secondary sim-top-btn"
             style={{ padding: '5px 7px', fontSize: 11.5, borderRadius: 6, display: 'flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap' }}
             title="相談チャットを開く"
@@ -761,7 +777,10 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
           </button>
 
           <button
-            onClick={() => setIsManualOpen(true)}
+            onClick={() => {
+              Analytics.trackManualOpen('simulator_topbar');
+              setIsManualOpen(true);
+            }}
             className="btn-primary sim-top-btn"
             style={{ padding: '5px 7px', fontSize: 11.5, borderRadius: 6, display: 'flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap' }}
             title="マニュアルを見る"

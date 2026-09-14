@@ -1,8 +1,12 @@
 import React from 'react';
 import { Compass, ArrowRight, Check, Warehouse, ShieldCheck, ChevronRight, Wrench, Trees, Sparkles } from 'lucide-react';
+import { Analytics } from '../utils/analytics';
 
 export default function PlanAgriPage({ setCurrentRoute }) {
   const navigateTo = (route) => {
+    if (route === 'simulator') {
+      Analytics.trackSimulatorStart('plan_agri');
+    }
     setCurrentRoute(route);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

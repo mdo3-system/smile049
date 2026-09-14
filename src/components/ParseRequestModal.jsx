@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Sparkles, Send, CheckCircle2, QrCode, FileText, Lock, MessageSquare, ArrowRight } from 'lucide-react';
 import { createParseRequest } from '../services/chatService';
+import { Analytics } from '../utils/analytics';
 
 export default function ParseRequestModal({ isOpen, onClose, currentModelData, onOpenChat }) {
   const [name, setName] = useState('');
@@ -10,6 +11,12 @@ export default function ParseRequestModal({ isOpen, onClose, currentModelData, o
   const [memo, setMemo] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [createdRoom, setCreatedRoom] = useState(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      Analytics.trackPerspectiveModalOpen('simulator_or_page', { plan_type: planType });
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -23,9 +30,16 @@ export default function ParseRequestModal({ isOpen, onClose, currentModelData, o
     const room = createParseRequest({
       customerName: `${name} 様`,
       email,
+      phone,
       planType,
       modelData: currentModelData,
       memo
+    });
+
+    // GA4 最重要コンバージョン（リード獲得）イベント発火
+    Analytics.trackLeadGenerated(planType, {
+      has_memo: Boolean(memo),
+      has_phone: Boolean(phone)
     });
 
     setCreatedRoom(room);

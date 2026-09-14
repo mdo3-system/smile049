@@ -1,8 +1,12 @@
 import React from 'react';
 import { Compass, ArrowRight, Check, Home, ShieldCheck, ChevronRight, Layers, Maximize, Sparkles } from 'lucide-react';
+import { Analytics } from '../utils/analytics';
 
 export default function PlanStoragePage({ setCurrentRoute }) {
   const navigateTo = (route) => {
+    if (route === 'simulator') {
+      Analytics.trackSimulatorStart('plan_storage');
+    }
     setCurrentRoute(route);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

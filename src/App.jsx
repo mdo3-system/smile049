@@ -10,6 +10,7 @@ import SimulatorPage from './pages/SimulatorPage';
 import StaffAdminPage from './pages/StaffAdminPage';
 import ChatRoomModal from './components/ChatRoomModal';
 import { MessageSquare } from 'lucide-react';
+import { trackPageView, Analytics } from './utils/analytics';
 
 // パスとルート識別子の相互変換マップ
 const ROUTE_MAP = {
@@ -77,10 +78,16 @@ export default function App() {
     if (titleMap[currentRoute]) {
       document.title = titleMap[currentRoute];
     }
+
+    // Google Analytics 4 (GA4) 仮想ページビュー送信
+    const currentPath = getPathFromRoute(currentRoute);
+    const pageTitle = titleMap[currentRoute] || document.title;
+    trackPageView(currentPath, pageTitle);
   }, [currentRoute]);
 
   const handleRouteNavigation = (route) => {
     if (route === 'chat') {
+      Analytics.trackChatOpen('navigation');
       setIsChatModalOpen(true);
       return;
     }
@@ -137,7 +144,10 @@ export default function App() {
       {/* 画面右下固定の「💬 無料相談チャット」フローティングボタン（シミュレーター・管理画面以外） */}
       {currentRoute !== 'simulator' && currentRoute !== 'admin' && (
         <button
-          onClick={() => setIsChatModalOpen(true)}
+          onClick={() => {
+            Analytics.trackChatOpen('floating_button');
+            setIsChatModalOpen(true);
+          }}
           style={{
             position: 'fixed',
             bottom: 24,

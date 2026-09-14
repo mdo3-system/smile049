@@ -1,8 +1,12 @@
 import React from 'react';
 import { Compass, ArrowRight, Check, Car, Wrench, ShieldCheck, ChevronRight, Sparkles } from 'lucide-react';
+import { Analytics } from '../utils/analytics';
 
 export default function PlanHobbyPage({ setCurrentRoute }) {
   const navigateTo = (route) => {
+    if (route === 'simulator') {
+      Analytics.trackSimulatorStart('plan_hobby');
+    }
     setCurrentRoute(route);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

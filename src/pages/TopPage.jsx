@@ -5,6 +5,7 @@ import {
   ZoomIn, X, Building2, HelpCircle, Calendar, Landmark, Scale, MessageSquare
 } from 'lucide-react';
 import InteractiveHeroShowcase from '../components/InteractiveHeroShowcase';
+import { Analytics } from '../utils/analytics';
 
 export default function TopPage({ setCurrentRoute }) {
   const [previewStep, setPreviewStep] = useState(null);
@@ -27,7 +28,12 @@ export default function TopPage({ setCurrentRoute }) {
     };
   }, [previewStep]);
 
-  const navigateTo = (route) => {
+  const navigateTo = (route, context = 'top') => {
+    if (route === 'simulator') {
+      Analytics.trackSimulatorStart(context);
+    } else if (typeof route === 'string' && route.startsWith('plan-')) {
+      Analytics.trackPlanSelect(route, route);
+    }
     setCurrentRoute(route);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

@@ -1,8 +1,12 @@
 import React from 'react';
 import { Compass, ArrowRight, Check, Warehouse, ShieldCheck, ChevronRight, Sparkles, Building2, Users, Flame, Award, Ruler } from 'lucide-react';
+import { Analytics } from '../utils/analytics';
 
 export default function PlanWorkshopPage({ setCurrentRoute }) {
   const navigateTo = (route) => {
+    if (route === 'simulator') {
+      Analytics.trackSimulatorStart('plan_workshop');
+    }
     setCurrentRoute(route);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
