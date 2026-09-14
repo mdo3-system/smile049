@@ -32,9 +32,10 @@
 // - 2026/09/14 v0.1.30: スタッフ管理認証保護の厳格化（セッション自動残存を廃止し、管理画面アクセス時は毎回必ずパスコード入力画面を表示、サイト離脱時も即時再ロックする安心仕様へ強化）
 // - 2026/09/14 v0.1.31: ヘッダーブランドロゴ（角丸フォレストグリーングラデーション×白抜き家マーク）のファビコン化（SVG、マルチサイズPNG、ICO、Apple Touch Icon完全対応＆index.html配備）
 // - 2026/09/14 v0.1.32: 関東・埼玉特化SEO全面実装（Title/Meta最適化、FAQ・LocalBusiness・SoftwareApplication構造化データJSON-LDリッチリザルト配備、sitemap.xml/robots.txt配置、SPA動的タイトル更新、フッター・Hero地域キーワード強化）
+// - 2026/09/14 v0.1.33: Google Search Console所有権確認HTML（google8b846360a3bf8842.html）の配備および本番Webサーバー反映
 
-window.APP_VERSION = '0.1.32';
-export const APP_VERSION = '0.1.32';
+window.APP_VERSION = '0.1.33';
+export const APP_VERSION = '0.1.33';
 
 
 
