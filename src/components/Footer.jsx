@@ -1,9 +1,11 @@
-import React from 'react';
-import { Shield, Phone, Mail, MapPin, CheckCircle, ExternalLink } from 'lucide-react';
+import React, { useState } from 'react';
+import { Shield, Phone, Mail, MapPin, CheckCircle, ExternalLink, Building2 } from 'lucide-react';
 import { APP_VERSION } from '../version.js';
-
+import CompanyInfoModal from './CompanyInfoModal';
 
 export default function Footer({ setCurrentRoute }) {
+  const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
+  const [companyModalTab, setCompanyModalTab] = useState('company');
 
   return (
     <footer style={{
@@ -119,6 +121,22 @@ export default function Footer({ setCurrentRoute }) {
                 <CheckCircle size={16} color="#80ed99" style={{ flexShrink: 0 }} />
                 <span>高耐震金物工法・自社専任スタッフによる構造計算実施</span>
               </div>
+
+              {/* 運営事業者情報 */}
+              <div style={{
+                marginTop: 14,
+                paddingTop: 14,
+                borderTop: '1px solid #334155',
+                fontSize: 12.5,
+                color: '#94a3b8',
+                lineHeight: 1.7
+              }}>
+                <div style={{ color: '#f1f5f9', fontWeight: 700 }}>運営事業者：株式会社 住ま居る</div>
+                <div>所在地：〒350-2227 埼玉県鶴ヶ島市町屋176番地5</div>
+                <div style={{ marginTop: 4, color: '#38bdf8', fontSize: 11.5 }}>
+                  ※設計データやパース画像を迅速・正確に共有するため、お問合せ・ご相談は専用オンライン相談チャット（24時間受付）にて承っております。
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -135,7 +153,7 @@ export default function Footer({ setCurrentRoute }) {
           color: '#64748b'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span>© 住ま居る / スマイチ ガレージ プロジェクト All Rights Reserved.</span>
+            <span>© 株式会社 住ま居る / スマイチ ガレージ プロジェクト All Rights Reserved.</span>
             <span style={{
               background: '#334155',
               color: '#94a3b8',
@@ -148,9 +166,24 @@ export default function Footer({ setCurrentRoute }) {
             </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 8 }}>
-            <span>プライバシーポリシー</span>
-            <span>特定商取引法に基づく表記</span>
-            <span>運営会社概要</span>
+            <button
+              onClick={() => { setCompanyModalTab('privacy'); setIsCompanyModalOpen(true); }}
+              style={{ color: '#94a3b8', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 12, padding: 0 }}
+            >
+              プライバシーポリシー
+            </button>
+            <button
+              onClick={() => { setCompanyModalTab('legal'); setIsCompanyModalOpen(true); }}
+              style={{ color: '#94a3b8', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 12, padding: 0 }}
+            >
+              特定商取引法に基づく表記
+            </button>
+            <button
+              onClick={() => { setCompanyModalTab('company'); setIsCompanyModalOpen(true); }}
+              style={{ color: '#94a3b8', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 12, padding: 0 }}
+            >
+              運営会社概要
+            </button>
             <button
               onClick={() => { setCurrentRoute('admin'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               style={{
@@ -172,6 +205,13 @@ export default function Footer({ setCurrentRoute }) {
           </div>
         </div>
       </div>
+
+      {/* 会社情報・規約モーダル */}
+      <CompanyInfoModal 
+        isOpen={isCompanyModalOpen} 
+        onClose={() => setIsCompanyModalOpen(false)} 
+        initialTab={companyModalTab} 
+      />
     </footer>
   );
 }
