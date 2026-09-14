@@ -11,10 +11,54 @@ import StaffAdminPage from './pages/StaffAdminPage';
 import ChatRoomModal from './components/ChatRoomModal';
 import { MessageSquare } from 'lucide-react';
 
+// パスとルート識別子の相互変換マップ
+const ROUTE_MAP = {
+  'top': '/',
+  'simulator': '/simulator',
+  'plan-hobby': '/plan-hobby',
+  'plan-storage': '/plan-storage',
+  'plan-agri': '/plan-agri',
+  'plan-workshop': '/plan-workshop',
+  'admin': '/admin'
+};
+
+const getRouteFromPath = (pathname) => {
+  const cleanPath = (pathname || '').replace(/\/+$/, '').toLowerCase();
+  if (!cleanPath || cleanPath === '') return 'top';
+  if (cleanPath === '/simulator') return 'simulator';
+  if (cleanPath === '/plan-hobby') return 'plan-hobby';
+  if (cleanPath === '/plan-storage') return 'plan-storage';
+  if (cleanPath === '/plan-agri') return 'plan-agri';
+  if (cleanPath === '/plan-workshop') return 'plan-workshop';
+  if (cleanPath === '/admin') return 'admin';
+  return 'top';
+};
+
+const getPathFromRoute = (route) => {
+  return ROUTE_MAP[route] || '/';
+};
+
 export default function App() {
-  const [currentRoute, setCurrentRoute] = useState('top');
+  const [currentRoute, setCurrentRoute] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return getRouteFromPath(window.location.pathname);
+    }
+    return 'top';
+  });
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
   const [customerModelData, setCustomerModelData] = useState(null);
+
+  // ブラウザの「戻る」「進む」ボタン操作（popstate）の検知と画面同期
+  useEffect(() => {
+    const handlePopState = () => {
+      const route = getRouteFromPath(window.location.pathname);
+      setCurrentRoute(route);
+      window.scrollTo(0, 0);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // ルート変更時に100%確実にページ最上部（Y=0）へ即座にスクロールリセット ＆ タイトルを動的更新
   useEffect(() => {
@@ -39,6 +83,10 @@ export default function App() {
     if (route === 'chat') {
       setIsChatModalOpen(true);
       return;
+    }
+    const newPath = getPathFromRoute(route);
+    if (window.location.pathname !== newPath) {
+      window.history.pushState(null, '', newPath);
     }
     window.scrollTo(0, 0);
     setCurrentRoute(route);
@@ -75,7 +123,7 @@ export default function App() {
             setCurrentRoute={handleRouteNavigation}
             onLoadCustomerModel={(model) => {
               setCustomerModelData(model);
-              setCurrentRoute('simulator');
+              handleRouteNavigation('simulator');
             }}
           />
         )}
