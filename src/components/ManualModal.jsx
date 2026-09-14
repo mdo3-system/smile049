@@ -560,8 +560,9 @@ export default function ManualModal({ isOpen, onClose }) {
                               {/* 通常の四角形（Before：デッドスペース発生） */}
                               <rect x="50" y="30" width="260" height="95" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeDasharray="4,4" />
                               <polygon points="310,30 405,30 320,125 310,125" fill="rgba(239, 68, 68, 0.15)" stroke="#ef4444" strokeWidth="1" strokeDasharray="2,2" />
-                              <text x="345" y="75" fontSize="10.5" fill="#b91c1c" fontWeight="bold" textAnchor="middle">
-                                ✕ 大手規格品だと<br/>大きな無駄スペース！
+                              <text x="355" y="68" fontSize="10" fill="#b91c1c" fontWeight="bold" textAnchor="middle">
+                                <tspan x="355" dy="0">✕ 大手規格品だと</tspan>
+                                <tspan x="355" dy="16">大きな無駄スペース！</tspan>
                               </text>
 
                               {/* スマイチ変形後（After：右壁105°開き） */}
@@ -584,8 +585,9 @@ export default function ManualModal({ isOpen, onClose }) {
                               {/* 通常の四角形（Before：左にデッドスペース） */}
                               <rect x="150" y="30" width="260" height="95" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeDasharray="4,4" />
                               <polygon points="55,30 150,30 150,125 130,125" fill="rgba(239, 68, 68, 0.15)" stroke="#ef4444" strokeWidth="1" strokeDasharray="2,2" />
-                              <text x="110" y="75" fontSize="10.5" fill="#b91c1c" fontWeight="bold" textAnchor="middle">
-                                ✕ 通常だと<br/>左がムダに余る
+                              <text x="105" y="68" fontSize="10" fill="#b91c1c" fontWeight="bold" textAnchor="middle">
+                                <tspan x="105" dy="0">✕ 通常だと</tspan>
+                                <tspan x="105" dy="16">左がムダに余る</tspan>
                               </text>
 
                               {/* スマイチ変形後（After：左壁開き） */}
@@ -634,16 +636,16 @@ export default function ManualModal({ isOpen, onClose }) {
 
                               {/* 通常のガレージ（Before：全体を小さくせざるを得ない） */}
                               <rect x="45" y="75" width="270" height="60" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeDasharray="4,4" />
-                              <text x="170" y="110" fontSize="10" fill="#64748b" textAnchor="middle">
+                              <text x="180" y="112" fontSize="9.5" fill="#64748b" textAnchor="middle">
                                 ✕ 通常：電柱を避けるため建物全体を大幅縮小（車が1台しか入らない）
                               </text>
 
                               {/* スマイチ隅欠き（After：角だけL字型にくり抜き） */}
                               <polygon points="45,135 45,25 315,25 315,75 410,75 410,135" fill="rgba(34, 197, 94, 0.2)" stroke="#16a34a" strokeWidth="2.5" />
-                              <text x="180" y="55" fontSize="12.5" fill="#15803d" fontWeight="bold" textAnchor="middle">
+                              <text x="180" y="55" fontSize="12" fill="#15803d" fontWeight="bold" textAnchor="middle">
                                 ★ スマイチ障害物・隅欠き（角だけL字回避）
                               </text>
-                              <text x="210" y="80" fontSize="10.5" fill="#334155">
+                              <text x="180" y="80" fontSize="10" fill="#334155" textAnchor="middle">
                                 障害物をジャストで避け、本体は大容量2台用を完全キープ！
                               </text>
                             </svg>

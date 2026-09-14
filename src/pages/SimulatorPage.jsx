@@ -676,14 +676,14 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
         boxShadow: '0 1px 4px rgba(0,0,0,0.06)'
       }}>
         {/* 左: 戻る & タイトル & バージョン */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           <button
             onClick={() => setCurrentRoute('top')}
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: 4,
-              fontSize: 12.5,
+              fontSize: 12,
               fontWeight: 700,
               color: 'var(--color-primary)',
               background: 'transparent',
@@ -694,22 +694,24 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
             }}
           >
             <ArrowLeft size={16} />
-            <span>サイトへ</span>
+            <span className="sim-btn-text-full">サイトへ</span>
+            <span className="sim-btn-text-short">戻る</span>
           </button>
 
           <div style={{ height: 16, width: 1, background: '#cbd5e1' }} />
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 13, fontWeight: 800, color: '#1e293b' }}>
+            <span style={{ fontSize: 13, fontWeight: 800, color: '#1e293b', whiteSpace: 'nowrap' }}>
               スマイチ3D
             </span>
-            <span style={{
+            <span className="sim-hide-mobile" style={{
               background: 'var(--color-primary-soft)',
               color: 'var(--color-primary)',
               fontSize: 10.5,
               fontWeight: 800,
               padding: '1px 6px',
-              borderRadius: 4
+              borderRadius: 4,
+              whiteSpace: 'nowrap'
             }}>
               v{APP_VERSION}
             </span>
@@ -717,39 +719,41 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
         </div>
 
         {/* 右: アクション（見積書 / パース依頼 / 相談 / マニュアル / 全画面切替） */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5, overflowX: 'auto', paddingLeft: 4 }}>
           <button
             onClick={() => setIsEstimateModalOpen(true)}
-            className="btn-secondary"
-            style={{ padding: '5px 8px', fontSize: 11.5, borderRadius: 6, display: 'flex', alignItems: 'center', gap: 4 }}
+            className="btn-secondary sim-top-btn"
+            style={{ padding: '5px 8px', fontSize: 11.5, borderRadius: 6, display: 'flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap' }}
             title="概算建築御見積書（7大枠・薄墨オプション）を確認"
           >
             <FileText size={13} color="var(--color-primary)" />
-            <span>見積書(7大枠)</span>
+            <span className="sim-btn-text-full">見積書(7大枠)</span>
+            <span className="sim-btn-text-short">見積</span>
           </button>
 
           <button
             onClick={() => setIsParseRequestOpen(true)}
-            className="btn-accent"
+            className="btn-accent sim-top-btn"
             style={{
-              padding: '5px 10px',
+              padding: '5px 9px',
               fontSize: 11.5,
               borderRadius: 6,
               boxShadow: '0 2px 8px rgba(224, 122, 95, 0.35)',
               display: 'flex',
               alignItems: 'center',
-              gap: 4
+              gap: 4,
+              whiteSpace: 'nowrap'
             }}
           >
             <Sparkles size={13} color="#fde047" />
-            <span>パース依頼 (無料)</span>
+            <span className="sim-btn-text-full">パース依頼 (無料)</span>
+            <span className="sim-btn-text-short">パース依頼</span>
           </button>
-
 
           <button
             onClick={() => setIsChatOpen(true)}
-            className="btn-secondary"
-            style={{ padding: '5px 8px', fontSize: 11.5, borderRadius: 6, display: 'flex', alignItems: 'center', gap: 4 }}
+            className="btn-secondary sim-top-btn"
+            style={{ padding: '5px 7px', fontSize: 11.5, borderRadius: 6, display: 'flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap' }}
             title="相談チャットを開く"
           >
             <MessageSquare size={13} />
@@ -758,29 +762,32 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
 
           <button
             onClick={() => setIsManualOpen(true)}
-            className="btn-primary"
-            style={{ padding: '5px 8px', fontSize: 11.5, borderRadius: 6, display: 'flex', alignItems: 'center', gap: 4 }}
+            className="btn-primary sim-top-btn"
+            style={{ padding: '5px 7px', fontSize: 11.5, borderRadius: 6, display: 'flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap' }}
             title="マニュアルを見る"
           >
             <BookOpen size={13} />
-            <span>使い方</span>
+            <span className="sim-btn-text-full">使い方</span>
+            <span className="sim-btn-text-short">説明</span>
           </button>
 
           {/* 3D全画面表示トグルボタン (スマホで特に大活躍) */}
           <button
             onClick={() => setIs3dFullScreen(!is3dFullScreen)}
+            className="sim-top-btn"
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: 4,
-              padding: '5px 8px',
+              padding: '5px 7px',
               fontSize: 11.5,
               fontWeight: 700,
               borderRadius: 6,
               border: '1px solid #cbd5e1',
               background: is3dFullScreen ? '#0284c7' : '#f1f5f9',
               color: is3dFullScreen ? '#ffffff' : '#334155',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              whiteSpace: 'nowrap'
             }}
             title={is3dFullScreen ? '操作パネルを表示' : '3Dを画面いっぱいに広げる'}
           >
@@ -2084,17 +2091,37 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
 
 
             {currentView !== '3d' && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#38bdf8', fontSize: 11, fontWeight: 700 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#38bdf8', fontSize: 11, fontWeight: 700 }}>
                 <span>縮尺:</span>
                 <input
                   type="range"
                   min="0.5"
-                  max="2.0"
+                  max="2.5"
                   step="0.1"
                   value={svgZoom}
                   onChange={(e) => setSvgZoom(parseFloat(e.target.value))}
-                  style={{ width: 60 }}
+                  style={{ width: 65, cursor: 'pointer' }}
+                  title="2D図面の縮尺（表示倍率）を拡大・縮小"
                 />
+                <span style={{ minWidth: 36, textAlign: 'right', color: '#f8fafc', fontSize: 10.5 }}>
+                  {Math.round(svgZoom * 100)}%
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSvgZoom(1.0)}
+                  style={{
+                    background: '#334155',
+                    color: '#cbd5e1',
+                    border: '1px solid #475569',
+                    borderRadius: 3,
+                    padding: '2px 5px',
+                    fontSize: 9.5,
+                    cursor: 'pointer'
+                  }}
+                  title="縮尺を100%（標準）に戻す"
+                >
+                  標準
+                </button>
               </div>
             )}
           </div>
@@ -2114,10 +2141,30 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
               alignItems: 'center', 
               justifyContent: 'center',
               background: '#ffffff',
-              overflow: 'auto'
+              overflow: 'auto',
+              padding: 20
             }}
           >
-            <svg ref={svgRef} style={{ display: 'block', margin: 'auto' }} />
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minWidth: '100%',
+              minHeight: '100%',
+              padding: 20
+            }}>
+              <svg 
+                ref={svgRef} 
+                style={{ 
+                  display: 'block', 
+                  margin: 'auto',
+                  width: `${Math.round(95 * svgZoom)}%`,
+                  maxWidth: `${Math.round(1400 * svgZoom)}px`,
+                  height: 'auto',
+                  transition: 'width 0.1s ease-out, max-width 0.1s ease-out'
+                }} 
+              />
+            </div>
           </div>
 
           <div style={{
@@ -2131,7 +2178,7 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
             fontSize: 10.5,
             pointerEvents: 'none'
           }}>
-            {currentView === '3d' ? 'ドラッグ: 回転 | ホイール: ズーム' : '2Dベクトル製図モード'}
+            {currentView === '3d' ? 'ドラッグ: 回転 | ホイール: ズーム' : '2Dベクトル製図モード (縮尺スライダーで自在に拡大縮小)'}
           </div>
         </div>
       </div>
@@ -2140,6 +2187,39 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
 
       {/* レスポンシブ & タブ切り替えスタイル */}
       <style>{`
+        .sim-btn-text-full {
+          display: inline;
+        }
+        .sim-btn-text-short {
+          display: none;
+        }
+        .sim-top-bar::-webkit-scrollbar {
+          height: 3px;
+        }
+        .sim-top-bar::-webkit-scrollbar-thumb {
+          background: #cbd5e1;
+          border-radius: 3px;
+        }
+
+        @media (max-width: 640px) {
+          .sim-top-bar {
+            padding: 0 6px !important;
+            gap: 4px !important;
+          }
+          .sim-btn-text-full {
+            display: none !important;
+          }
+          .sim-btn-text-short {
+            display: inline !important;
+          }
+          .sim-hide-mobile {
+            display: none !important;
+          }
+          .sim-top-btn {
+            padding: 4px 6px !important;
+            font-size: 11px !important;
+          }
+        }
         .sim-tab-bar::-webkit-scrollbar {
           height: 4px;
         }
