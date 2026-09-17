@@ -120,14 +120,31 @@ export default function CompanyInfoModal({ isOpen, onClose, initialTab = 'compan
                       <td style={{ padding: '10px 0', fontWeight: 700, color: '#0f172a' }}>株式会社 住ま居る</td>
                     </tr>
                     <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-                      <th style={{ textAlign: 'left', padding: '10px 0', color: '#64748b' }}>プロジェクト</th>
-                      <td style={{ padding: '10px 0', color: '#0f172a' }}>木造自由設計ガレージ・倉庫 プラットフォーム【スマイチ (smile049.jp)】</td>
+                      <th style={{ textAlign: 'left', padding: '10px 0', color: '#64748b' }}>代表者</th>
+                      <td style={{ padding: '10px 0', color: '#0f172a' }}>代表取締役 菅原 功樹</td>
                     </tr>
                     <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
                       <th style={{ textAlign: 'left', padding: '10px 0', color: '#64748b' }}>本社所在地</th>
                       <td style={{ padding: '10px 0', color: '#0f172a' }}>
-                        〒350-2227 埼玉県鶴ヶ島市町屋176番地5
+                        〒350-2224 埼玉県鶴ヶ島市町屋176番地5
                       </td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                      <th style={{ textAlign: 'left', padding: '10px 0', color: '#64748b' }}>電話番号</th>
+                      <td style={{ padding: '10px 0', color: '#0f172a' }}>
+                        049-271-2350
+                      </td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                      <th style={{ textAlign: 'left', padding: '10px 0', color: '#64748b' }}>許認可・登録</th>
+                      <td style={{ padding: '10px 0', color: '#0f172a', lineHeight: 1.6 }}>
+                        建設業許可：埼玉県知事 許可（般）第60650号<br />
+                        宅地建物取引業者免許：埼玉県知事 (2) 第22198号
+                      </td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                      <th style={{ textAlign: 'left', padding: '10px 0', color: '#64748b' }}>プロジェクト</th>
+                      <td style={{ padding: '10px 0', color: '#0f172a' }}>木造自由設計ガレージ・倉庫 プラットフォーム【スマイチ (smile049.jp)】</td>
                     </tr>
                     <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
                       <th style={{ textAlign: 'left', padding: '10px 0', color: '#64748b' }}>事業内容</th>
@@ -201,8 +218,16 @@ export default function CompanyInfoModal({ isOpen, onClose, initialTab = 'compan
                     <td style={{ padding: '9px 0', fontWeight: 700, color: '#0f172a' }}>株式会社 住ま居る</td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                    <th style={{ textAlign: 'left', padding: '9px 0', color: '#64748b' }}>運営統括責任者</th>
+                    <td style={{ padding: '9px 0', color: '#0f172a' }}>代表取締役 菅原 功樹</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
                     <th style={{ textAlign: 'left', padding: '9px 0', color: '#64748b' }}>所在地</th>
-                    <td style={{ padding: '9px 0', color: '#0f172a' }}>〒350-2227 埼玉県鶴ヶ島市町屋176番地5</td>
+                    <td style={{ padding: '9px 0', color: '#0f172a' }}>〒350-2224 埼玉県鶴ヶ島市町屋176番地5</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                    <th style={{ textAlign: 'left', padding: '9px 0', color: '#64748b' }}>電話番号</th>
+                    <td style={{ padding: '9px 0', color: '#0f172a' }}>049-271-2350</td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
                     <th style={{ textAlign: 'left', padding: '9px 0', color: '#64748b' }}>連絡先窓口</th>

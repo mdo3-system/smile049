@@ -132,7 +132,7 @@ export default function Footer({ setCurrentRoute }) {
                 lineHeight: 1.7
               }}>
                 <div style={{ color: '#f1f5f9', fontWeight: 700 }}>運営事業者：株式会社 住ま居る</div>
-                <div>所在地：〒350-2227 埼玉県鶴ヶ島市町屋176番地5</div>
+                <div>所在地：〒350-2224 埼玉県鶴ヶ島市町屋176番地5</div>
                 <div style={{ marginTop: 4, color: '#38bdf8', fontSize: 11.5 }}>
                   ※設計データやパース画像を迅速・正確に共有するため、お問合せ・ご相談は専用オンライン相談チャット（24時間受付）にて承っております。
                 </div>
