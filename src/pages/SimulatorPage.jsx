@@ -1407,9 +1407,9 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                 type="number" 
                 value={dimensions.roofSlope} 
                 step="0.1" 
-                min="1.0" 
+                min="0.1" 
                 max="10.0"
-                onChange={(e) => setDimensions({ ...dimensions, roofSlope: parseFloat(e.target.value) || 1.0 })}
+                onChange={(e) => setDimensions({ ...dimensions, roofSlope: parseFloat(e.target.value) || 0.1 })}
                 style={{ width: '100%', padding: '5px 8px', borderRadius: 4, border: '1px solid #cbd5e1', fontSize: 12 }}
               />
             </div>
@@ -1516,8 +1516,14 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                       <select
                         value={op.type}
                         onChange={(e) => {
+                          const newType = e.target.value;
                           const updated = [...openings];
-                          updated[idx].type = e.target.value;
+                          updated[idx].type = newType;
+                          if (isFloorLevelOpening(newType)) {
+                            updated[idx].topHeightGL = 50 + (updated[idx].height || 2400);
+                          } else if (!updated[idx].topHeightGL || updated[idx].topHeightGL === 2450) {
+                            updated[idx].topHeightGL = 2100;
+                          }
                           setOpenings(updated);
                         }}
                         style={{ width: '100%', padding: '3px 6px', fontSize: 11, borderRadius: 4, border: '1px solid #cbd5e1' }}
@@ -1553,8 +1559,12 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                         value={op.height}
                         step="10"
                         onChange={(e) => {
+                          const val = parseFloat(e.target.value) || 0;
                           const updated = [...openings];
-                          updated[idx].height = parseFloat(e.target.value) || 0;
+                          updated[idx].height = val;
+                          if (isFloorLevelOpening(op.type) && (!op.topHeightGL || op.topHeightGL === 50 + op.height)) {
+                            updated[idx].topHeightGL = 50 + val;
+                          }
                           setOpenings(updated);
                         }}
                         style={{ width: '100%', padding: '3px 6px', fontSize: 11, borderRadius: 4, border: '1px solid #cbd5e1' }}
@@ -1562,7 +1572,26 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 6 }}>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <label style={{ fontSize: 10, color: '#64748b' }}>設置高 (上端 GL+ mm)</label>
+                        {!isFloorLevelOpening(op.type) && (
+                          <span style={{ fontSize: 9, color: '#94a3b8' }}>下端:{Math.max(50, ((op.topHeightGL ?? 2100) - op.height))}</span>
+                        )}
+                      </div>
+                      <input
+                        type="number"
+                        value={op.topHeightGL !== undefined ? op.topHeightGL : (isFloorLevelOpening(op.type) ? 50 + op.height : 2100)}
+                        step="10"
+                        onChange={(e) => {
+                          const updated = [...openings];
+                          updated[idx].topHeightGL = parseFloat(e.target.value) || 0;
+                          setOpenings(updated);
+                        }}
+                        style={{ width: '100%', padding: '3px 6px', fontSize: 11, borderRadius: 4, border: '1px solid #cbd5e1' }}
+                      />
+                    </div>
                     <div>
                       <label style={{ fontSize: 10, color: '#64748b' }}>左柱芯逃げ (mm)</label>
                       <input
@@ -1577,22 +1606,26 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                         style={{ width: '100%', padding: '3px 6px', fontSize: 11, borderRadius: 4, border: '1px solid #cbd5e1' }}
                       />
                     </div>
-                    <div>
-                      <label style={{ fontSize: 10, color: '#64748b' }}>開閉率: {((op.openRatio || 0) * 100).toFixed(0)}%</label>
-                      <input
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.05"
-                        value={op.openRatio || 0}
-                        onChange={(e) => {
-                          const updated = [...openings];
-                          updated[idx].openRatio = parseFloat(e.target.value);
-                          setOpenings(updated);
-                        }}
-                        style={{ width: '100%' }}
-                      />
+                  </div>
+
+                  <div style={{ marginBottom: 2 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+                      <label style={{ fontSize: 10, color: '#64748b' }}>開閉率</label>
+                      <span style={{ fontSize: 10, fontWeight: 700, color: '#475569' }}>{((op.openRatio || 0) * 100).toFixed(0)}%</span>
                     </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.05"
+                      value={op.openRatio || 0}
+                      onChange={(e) => {
+                        const updated = [...openings];
+                        updated[idx].openRatio = parseFloat(e.target.value);
+                        setOpenings(updated);
+                      }}
+                      style={{ width: '100%' }}
+                    />
                   </div>
                 </div>
               );

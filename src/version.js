@@ -1,8 +1,8 @@
 /**
  * アプリケーション バージョン管理 (src内部用)
  */
-export const APP_VERSION = '0.1.39';
-window.APP_VERSION = '0.1.39';
+export const APP_VERSION = '0.1.40';
+window.APP_VERSION = '0.1.40';
 
 
 
