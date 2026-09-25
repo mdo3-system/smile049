@@ -45,9 +45,10 @@
 // - 2026/09/25 v0.1.43: X（旧Twitter）公式アカウント開設キット配備、StoryStudioモーダル内X設定追加、FooterにX公式リンク設置
 // - 2026/09/25 v0.1.44: StoryStudioにX（旧Twitter）専用ポスト成形・直接ツイートボタン・X投稿完了管理を追加、secrets配備完了
 // - 2026/09/26 v0.1.45: StoryStudioにシナリオライター（自由生成）機能・プリセット切替タブ追加、見積書詳細モーダルに宛名入力欄およびA4縦印刷用スタイル最適化
+// - 2026/09/26 v0.1.46: StoryStudioのshowKitModal未定義エラー修正（クラッシュ完全解消・公式アカウント開設キット復元・X投稿初期値補完）
 
-window.APP_VERSION = '0.1.45';
-export const APP_VERSION = '0.1.45';
+window.APP_VERSION = '0.1.46';
+export const APP_VERSION = '0.1.46';
 
 
 

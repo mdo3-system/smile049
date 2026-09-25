@@ -278,6 +278,7 @@ const generateStoriesByAi = (themeTitle, protagonist, storyCount, themeDesc, pre
       quizAnswerHint: answerHint,
       isPostedInstagram: false,
       isPostedNote: false,
+      isPostedX: false,
       scheduledDate: new Date(Date.now() + (i - 1) * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     });
   }
@@ -292,6 +293,7 @@ export default function StoryStudioPanel() {
   const [customProtagonist, setCustomProtagonist] = useState(PRESET_THEMES[0].protagonist);
   const [customThemeDesc, setCustomThemeDesc] = useState(PRESET_THEMES[0].theme);
   const [storyMode, setStoryMode] = useState('preset'); // 'preset' | 'scenario'
+  const [showKitModal, setShowKitModal] = useState(false);
 
   // シナリオライター専用フィールド
   const [scTarget, setScTarget] = useState(''); // 訂跢層・誦求対象
@@ -428,6 +430,7 @@ export default function StoryStudioPanel() {
       quizAnswerHint: fakePreset.answerHint,
       isPostedInstagram: false,
       isPostedNote: false,
+      isPostedX: false,
       scheduledDate: new Date(Date.now() + idx * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     }));
     setStories(newStories);
@@ -586,7 +589,27 @@ export default function StoryStudioPanel() {
           </p>
         </div>
 
-
+        <button
+          onClick={() => setShowKitModal(true)}
+          style={{
+            background: 'rgba(255, 255, 255, 0.1)',
+            color: '#fff',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            padding: '10px 18px',
+            borderRadius: 8,
+            fontSize: 13,
+            fontWeight: 700,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            whiteSpace: 'nowrap',
+            transition: 'all 0.2s'
+          }}
+        >
+          <HelpCircle size={16} />
+          <span>アカウント開設完全キット・画像アセット</span>
+        </button>
       </div>
 
 
