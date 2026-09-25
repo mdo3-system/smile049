@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { 
   Sparkles, Copy, Check, ExternalLink, Image as ImageIcon, Download, 
   Trash2, RefreshCw, Layers, CheckCircle2, ChevronDown, ChevronRight, 
-  BookOpen, HelpCircle, Upload, ShieldCheck, ArrowRight
+  BookOpen, HelpCircle, Upload, ShieldCheck, ArrowRight, DollarSign, Vote
 } from 'lucide-react';
 import { InstagramIcon, YoutubeIcon, NoteIcon } from './SnsIcons';
 
-const STORAGE_KEY = 'smile049_story_studio_data';
+const STORAGE_KEY = 'smile049_story_studio_data_v2';
 
 // プリセットテーマ
 const PRESET_THEMES = [
@@ -14,31 +14,61 @@ const PRESET_THEMES = [
     id: 'porsche_hobby',
     title: '愛車ポルシェと過ごす終の棲家（50代・大人の秘密基地）',
     protagonist: '佐々木 健一 (52歳 / 会社経営 / 愛車: ポルシェ911 カレラ & ツールキャビネット)',
-    theme: '既製品スチールガレージでは愛車のサイズと敷地境界が合わず諦めかけていたが、木造自由設計でミリ単位の隙間にガルバリウム×木造現しの贅沢な秘密基地を実現する物語。'
+    theme: '既製品スチールガレージでは愛車のサイズと敷地境界が合わず諦めかけていたが、木造自由設計でミリ単位の隙間にガルバリウム×木造現しの贅沢な秘密基地を実現する物語。',
+    defaultPriceOptions: [
+      'A. 190万円〜220万円（既製品スチール並み）',
+      'B. 230万円〜260万円（木造標準・高コスパ）',
+      'C. 270万円〜300万円（OSB造作棚・こだわり仕様）',
+      'D. 310万円以上（一生モノのプレミアム仕様）'
+    ],
+    answerHint: '約248万円（3Dシミュレーター積算目安）'
   },
   {
     id: 'bike_flagpole',
     title: '変形旗竿地を活かしたヴィンテージバイクガレージ（40代・趣味人）',
     protagonist: '高橋 涼介 (41歳 / ITエンジニア / 愛車: ハーレーダビッドソン & 大型ツールワゴン)',
-    theme: '入り口が狭く台形に変形した旗竿地の奥。規格品は設置不可と断られた敷地に、敷地形状に合わせた台形木造ガレージを建築。雨音を吸う木造の静寂とオイルの香りに包まれる物語。'
+    theme: '入り口が狭く台形に変形した旗竿地の奥。規格品は設置不可と断られた敷地に、敷地形状に合わせた台形木造ガレージを建築。雨音を吸う木造の静寂とオイルの香りに包まれる物語。',
+    defaultPriceOptions: [
+      'A. 150万円〜180万円（ミニマム設計）',
+      'B. 190万円〜220万円（変形地ジャストフィット）',
+      'C. 230万円〜260万円（バイク2台＋整備ピット）',
+      'D. 270万円以上（防音断熱＋電動シャッター）'
+    ],
+    answerHint: '約215万円（3Dシミュレーター積算目安）'
   },
   {
     id: 'agri_shed',
     title: '先祖代々の農地と大型トラクターを守る木造アグリシェッド（60代・専業農家）',
     protagonist: '木村 喜一 (64歳 / 農業経営 / 所有車両: 4WD大型トラクター & コンバイン & 軽トラ)',
-    theme: '市街化調整区域で農機具の大型化に伴い建て替えを検討。鉄骨の見積もり高騰に悩む中、大空間木造トラスと確認申請ワンストップ対応で、美しく長持ちする農業用大倉庫を完成させる物語。'
+    theme: '市街化調整区域で農機具の大型化に伴い建て替えを検討。鉄骨の見積もり高騰に悩む中、大空間木造トラスと確認申請ワンストップ対応で、美しく長持ちする農業用大倉庫を完成させる物語。',
+    defaultPriceOptions: [
+      'A. 350万円〜400万円（木造大空間高コスパ）',
+      'B. 410万円〜480万円（トラクター＋作業場標準）',
+      'C. 490万円〜560万円（大型トラス構法・堅牢仕様）',
+      'D. 570万円以上（鉄骨と同等規模）'
+    ],
+    answerHint: '約440万円（3Dシミュレーター積算目安）'
   },
   {
     id: 'diy_woodwork',
     title: '週末木工DIYスタジオとSUVが共存するガレージハウス（30代・子育て世代）',
     protagonist: '松田 翔太 (38歳 / 建築デザイナー / 愛車: ランドクルーザー & スライド丸鋸)',
-    theme: '結露しやすい鉄板ガレージを避け、木造ならではの調湿性とOSB合板仕上げの壁面収納を活かし、家族でDIYを楽しみながら愛車を愛でる週末の豊かな暮らしを描く物語。'
+    theme: '結露しやすい鉄板ガレージを避け、木造ならではの調湿性とOSB合板仕上げの壁面収納を活かし、家族でDIYを楽しみながら愛車を愛でる週末の豊かな暮らしを描く物語。',
+    defaultPriceOptions: [
+      'A. 200万円〜230万円（セルフDIY併用）',
+      'B. 240万円〜270万円（断熱調湿＋OSB仕上げ）',
+      'C. 280万円〜310万円（大型作業台・動力200V）',
+      'D. 320万円以上（フルスペックスタジオ）'
+    ],
+    answerHint: '約265万円（3Dシミュレーター積算目安）'
   }
 ];
 
-// ストーリー生成ロジック（テーマ・登場人物・話数に応じた生成）
-const generateStoriesByAi = (themeTitle, protagonist, storyCount, themeDesc) => {
+// ストーリー生成ロジック（テーマ・登場人物・話数・アンケート付き）
+const generateStoriesByAi = (themeTitle, protagonist, storyCount, themeDesc, presetData) => {
   const generated = [];
+  const priceOptions = presetData?.defaultPriceOptions || PRESET_THEMES[0].defaultPriceOptions;
+  const answerHint = presetData?.answerHint || PRESET_THEMES[0].answerHint;
   
   for (let i = 1; i <= storyCount; i++) {
     let phase = '';
@@ -86,6 +116,11 @@ const generateStoriesByAi = (themeTitle, protagonist, storyCount, themeDesc) => 
       englishPrompt,
       imageUrl: null,
       hashtags,
+      // 読者参加型アンケート設定
+      quizEnabled: true,
+      quizQuestion: 'あなたはこの木造ガレージ、総額いくらだと思いますか？（いくらなら欲しいですか？）',
+      quizOptions: [...priceOptions],
+      quizAnswerHint: answerHint,
       isPostedInstagram: false,
       isPostedNote: false,
       scheduledDate: new Date(Date.now() + (i - 1) * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // 週1ペース
@@ -108,7 +143,7 @@ export default function StoryStudioPanel() {
     } catch (e) {
       console.error(e);
     }
-    return generateStoriesByAi(PRESET_THEMES[0].title, PRESET_THEMES[0].protagonist, 3, PRESET_THEMES[0].theme);
+    return generateStoriesByAi(PRESET_THEMES[0].title, PRESET_THEMES[0].protagonist, 3, PRESET_THEMES[0].theme, PRESET_THEMES[0]);
   });
 
   const [copiedKey, setCopiedKey] = useState(null);
@@ -138,7 +173,8 @@ export default function StoryStudioPanel() {
     if (!window.confirm('新しいストーリーと作画プロンプトを生成しますか？（現在の編集内容は上書きされます）')) {
       return;
     }
-    const newStories = generateStoriesByAi(customTitle, customProtagonist, storyCount, customThemeDesc);
+    const currentPreset = PRESET_THEMES.find(p => p.id === selectedPreset) || PRESET_THEMES[0];
+    const newStories = generateStoriesByAi(customTitle, customProtagonist, storyCount, customThemeDesc, currentPreset);
     setStories(newStories);
   };
 
@@ -173,14 +209,53 @@ export default function StoryStudioPanel() {
     }
   };
 
-  // Instagram用キャプション成形
+  // Instagram用キャプション成形（価格アンケート・コメント促進付き）
   const formatInstagramCaption = (story) => {
-    return `${story.phase}\n${story.title}\n\n${story.plot}\n\n―――――――――――――――\n■ 木造自由設計ガレージ・倉庫【スマイチ】\n規格サイズに土地を合わせるのではなく、\nあなたの敷地にガレージを合わせる。\n\n・登録不要の3Dシミュレーター＆リアルタイム積算見積もり\n・ガルバリウム鋼板×木造現しの洗練されたモダンデザイン\n・専任スタッフによる構造計算・確認申請ワンストップ施工\n\nプロフィールのリンク（@smile049_garage）から3D設計をお試しいただけます。\nhttps://smile049.jp/\n\n${story.hashtags}`;
+    let caption = `${story.phase}\n${story.title}\n\n${story.plot}\n\n`;
+
+    if (story.quizEnabled) {
+      caption += `―――――――――――――――\n`;
+      caption += `💬【読者アンケート・コメントで教えてください！】\n`;
+      caption += `Q. ${story.quizQuestion}\n\n`;
+      story.quizOptions.forEach((opt, idx) => {
+        caption += `${opt}\n`;
+      });
+      caption += `\n👉 あなたの予想や「この金額なら建てたい！」をぜひコメント欄（またはストーリーズ投票）で教えてください！\n`;
+      caption += `※ プロフィールの3Dシミュレーター（@smile049_garage）で実際のリアルタイム積算見積もりがその場で答え合わせできます。\n\n`;
+    }
+
+    caption += `―――――――――――――――\n■ 木造自由設計ガレージ・倉庫【スマイチ】\n規格サイズに土地を合わせるのではなく、\nあなたの敷地にガレージを合わせる。\n\n・登録不要の3Dシミュレーター＆リアルタイム積算見積もり\n・ガルバリウム鋼板×木造現しの洗練されたモダンデザイン\n・専任スタッフによる構造計算・確認申請ワンストップ施工\n\nプロフィールのリンク（@smile049_garage）から3D設計をお試しいただけます。\nhttps://smile049.jp/\n\n${story.hashtags}`;
+    return caption;
   };
 
-  // note用記事成形
+  // note用記事成形（大見出し＋仕様解説＋読者参加型アンケート＋答え合わせCTA導線）
   const formatNoteMarkdown = (story) => {
-    return `# ${story.title}\n\n${story.phase}\n\n${story.plot}\n\n---\n\n## 規格サイズに敷地を合わせるのではなく、敷地にガレージを合わせる\n\n木造自由設計ガレージ・倉庫「スマイチ」では、既製品スチールガレージでは対応できない狭小地・台形変形地・旗竿地に合わせて、ミリ単位での設計が可能です。\n\n### スマイチが選ばれる3つの理由\n1. **ブラウザ上で動く3Dシミュレーター**: 登録不要で、寸法や屋根勾配、開口部を変更するとリアルタイムで見積もり金額が変動。\n2. **木造ならではの快適性**: ガルバリウム鋼板仕上げ（軒出ゼロ）のスタイリッシュな外観と、結露を防ぐ木造構造・断熱仕様。\n3. **専任スタッフによる安心施工**: 複雑な確認申請や構造安全検討もワンストップでお任せ。\n\n▼ 無料3Dシミュレーター＆自動見積もりはこちら\nhttps://smile049.jp/\n\n${story.hashtags}`;
+    let md = `# ${story.title}\n\n${story.phase}\n\n${story.plot}\n\n---\n\n`;
+    
+    md += `## 規格サイズに敷地を合わせるのではなく、敷地にガレージを合わせる\n\n`;
+    md += `木造自由設計ガレージ・倉庫「スマイチ」では、既製品スチールガレージでは対応できない狭小地・台形変形地・旗竿地に合わせて、ミリ単位での設計が可能です。\n\n`;
+    md += `### スマイチが選ばれる3つの理由\n`;
+    md += `1. **ブラウザ上で動く3Dシミュレーター**: 登録不要で、寸法や屋根勾配、開口部を変更するとリアルタイムで見積もり金額が変動。\n`;
+    md += `2. **木造ならではの快適性**: ガルバリウム鋼板仕上げ（軒出ゼロ）のスタイリッシュな外観と、結露を防ぐ木造構造・断熱仕様。\n`;
+    md += `3. **専任スタッフによる安心施工**: 複雑な確認申請や構造安全検討もワンストップでお任せ。\n\n`;
+
+    if (story.quizEnabled) {
+      md += `---\n\n`;
+      md += `### 🗳️【読者参加型アンケート】このガレージ、いくらだと思いますか？（いくらなら欲しいですか？）\n\n`;
+      md += `今回ご紹介したガレージ（ガルバリウム鋼板軒出ゼロ・木造現し構造・電動リモコンシャッター完備）について、読者の皆さまにアンケートです！\n\n`;
+      md += `**Q. ${story.quizQuestion}**\n\n`;
+      story.quizOptions.forEach((opt) => {
+        md += `- **${opt}**\n`;
+      });
+      md += `\nぜひ、noteのコメント欄や「スキ❤️」のリアクションで、あなたの予想や「この価格帯なら手に入れたい！」というご意見を教えてください！\n\n`;
+      md += `#### 💡 答え合わせ：3Dシミュレーターでリアルタイム積算中！\n`;
+      md += `実はこのガレージ、スマイチの無料WEBシミュレーター上で幅・奥行き・高さをミリ単位で変更しながら、**その場ですぐに概算建築費用を自動積算**できます。\n`;
+      md += `「実際の建築費用の答え合わせ（目安: ${story.quizAnswerHint}）」や「ご自身の敷地ならいくらになるか」を、ぜひ登録不要のシミュレーターで確かめてみてください。\n\n`;
+      md += `👉 [無料3Dシミュレーター＆リアルタイム積算で答え合わせをする](https://smile049.jp/simulator)\n\n`;
+    }
+
+    md += `▼ スマイチ公式サイト（無料3Dシミュレーター＆自動見積もり）\nhttps://smile049.jp/\n\n${story.hashtags}`;
+    return md;
   };
 
   return (
@@ -208,17 +283,25 @@ export default function StoryStudioPanel() {
               fontSize: 11.5,
               fontWeight: 700
             }}>
-              SNS & SEO マーケティング
+              SNS ＆ SEO マーケティング
             </span>
-            <span style={{ fontSize: 13, color: '#94a3b8' }}>
-              推奨頻度: 週1〜2回定期連載（note ＆ Instagram）
+            <span style={{
+              background: 'rgba(234, 179, 8, 0.2)',
+              color: '#fde047',
+              padding: '3px 8px',
+              borderRadius: 4,
+              fontSize: 11.5,
+              fontWeight: 700
+            }}>
+              ★ 読者参加型 価格アンケート・希望価格リサーチ連動
             </span>
           </div>
           <h2 style={{ fontSize: 22, fontWeight: 800, margin: 0, color: '#f8fafc' }}>
             Story Studio ｜ ガレージ連載・NanoBanana2 作画＆自動投稿アシスト
           </h2>
-          <p style={{ margin: '8px 0 0', fontSize: 13.5, color: '#cbd5e1', maxWidth: 680, lineHeight: 1.6 }}>
-            ユーザーがテーマと登場人物を設定し、AIエージェントが各話ストーリーとNanoBanana2（Google AI Pro）用作画プロンプトを自動生成。BANリスクのない方式A（ワンクリック成形コピー＆画像取り込み）でnoteとInstagramへの投稿を最短化します。
+          <p style={{ margin: '8px 0 0', fontSize: 13.5, color: '#cbd5e1', maxWidth: 740, lineHeight: 1.6 }}>
+            ユーザーがテーマと登場人物を設定し、AIエージェントが各話ストーリーとNanoBanana2（Google AI Pro）用作画プロンプトを自動生成。
+            <strong>「あなたはこのガレージいくらだと思いますか？いくらなら欲しいですか？」</strong>という読者参加型アンケートを自動付与し、コメント獲得・SEO滞在時間・3Dシミュレーターへの答え合わせ送客を最大化します。
           </p>
         </div>
 
@@ -389,14 +472,14 @@ export default function StoryStudioPanel() {
             }}
           >
             <Sparkles size={18} />
-            <span>AIストーリー＆NanoBanana2作画プロンプト一括生成</span>
+            <span>AIストーリー＆作画プロンプト＆価格アンケート一括生成</span>
           </button>
         </div>
       </div>
 
-      {/* ステップ2：ストーリー各話＆NanoBanana2作画・投稿カード */}
+      {/* ステップ2：ストーリー各話＆NanoBanana2作画・価格アンケート・投稿カード */}
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
           <h3 style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{
               width: 24, height: 24, borderRadius: '50%', background: 'var(--color-primary)', color: '#fff',
@@ -450,7 +533,7 @@ export default function StoryStudioPanel() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           {stories.map((story, idx) => (
             <div
               key={story.id}
@@ -505,29 +588,106 @@ export default function StoryStudioPanel() {
 
               {/* カードメインコンテンツ */}
               <div style={{ padding: 20, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24 }}>
-                {/* 左列：ストーリー本文 */}
+                {/* 左列：ストーリー本文 ＆ 価格アンケート */}
                 <div>
                   <div style={{ fontSize: 12, fontWeight: 700, color: '#64748b', marginBottom: 6 }}>
                     ストーリー本文（SEO配慮・木造自由設計の強みを網羅）
                   </div>
                   <div style={{
                     background: '#f8fafc',
-                    padding: '14px 16px',
+                    padding: '12px 14px',
                     borderRadius: 8,
                     fontSize: 13.5,
                     lineHeight: 1.8,
                     color: '#1e293b',
                     whiteSpace: 'pre-wrap',
                     border: '1px solid #e2e8f0',
-                    maxHeight: 220,
+                    maxHeight: 180,
                     overflowY: 'auto'
                   }}>
                     {story.plot}
                   </div>
 
+                  {/* 読者参加型 価格アンケート・希望価格リサーチ枠 */}
+                  <div style={{
+                    marginTop: 16,
+                    background: 'rgba(234, 179, 8, 0.06)',
+                    borderRadius: 8,
+                    border: '1px solid rgba(234, 179, 8, 0.3)',
+                    padding: '12px 14px'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, fontWeight: 700, color: '#b45309' }}>
+                        <Vote size={15} />
+                        <span>読者参加型 価格アンケート・希望価格リサーチ</span>
+                      </div>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11.5, cursor: 'pointer', color: '#78350f' }}>
+                        <input
+                          type="checkbox"
+                          checked={story.quizEnabled}
+                          onChange={(e) => {
+                            const updated = [...stories];
+                            updated[idx].quizEnabled = e.target.checked;
+                            setStories(updated);
+                          }}
+                        />
+                        <span>記事・投稿に含める</span>
+                      </label>
+                    </div>
+
+                    {story.quizEnabled && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        <input
+                          type="text"
+                          value={story.quizQuestion}
+                          onChange={(e) => {
+                            const updated = [...stories];
+                            updated[idx].quizQuestion = e.target.value;
+                            setStories(updated);
+                          }}
+                          placeholder="質問文"
+                          style={{
+                            width: '100%',
+                            padding: '6px 10px',
+                            fontSize: 12,
+                            borderRadius: 4,
+                            border: '1px solid #cbd5e1',
+                            background: '#fff'
+                          }}
+                        />
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 6 }}>
+                          {story.quizOptions.map((opt, optIdx) => (
+                            <input
+                              key={optIdx}
+                              type="text"
+                              value={opt}
+                              onChange={(e) => {
+                                const updated = [...stories];
+                                updated[idx].quizOptions[optIdx] = e.target.value;
+                                setStories(updated);
+                              }}
+                              style={{
+                                padding: '4px 8px',
+                                fontSize: 11.5,
+                                borderRadius: 4,
+                                border: '1px solid #cbd5e1',
+                                background: '#fff'
+                              }}
+                            />
+                          ))}
+                        </div>
+                        <div style={{ fontSize: 11, color: '#78350f', display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
+                          <span>💡 答え合わせ目安:</span>
+                          <strong>{story.quizAnswerHint}</strong>
+                          <span style={{ color: '#92400e' }}>（3Dシミュレーター導線で即座に答え合わせ）</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
                   {/* ハッシュタグプレビュー */}
-                  <div style={{ marginTop: 10, fontSize: 11.5, color: '#64748b', lineHeight: 1.6 }}>
-                    <strong>付与ハッシュタグ:</strong> {story.hashtags}
+                  <div style={{ marginTop: 10, fontSize: 11, color: '#64748b', lineHeight: 1.5 }}>
+                    <strong>付与タグ:</strong> {story.hashtags}
                   </div>
                 </div>
 
@@ -568,7 +728,7 @@ export default function StoryStudioPanel() {
                     lineHeight: 1.6,
                     fontFamily: 'monospace',
                     marginBottom: 12,
-                    maxHeight: 80,
+                    maxHeight: 75,
                     overflowY: 'auto'
                   }}>
                     {story.englishPrompt}
@@ -702,7 +862,7 @@ export default function StoryStudioPanel() {
                         }}
                       >
                         {copiedKey === `ig_${story.id}` ? <Check size={14} /> : <Copy size={14} />}
-                        <span>{copiedKey === `ig_${story.id}` ? 'Instagram本文をコピー済' : 'Instagram投稿テキストをコピー'}</span>
+                        <span>{copiedKey === `ig_${story.id}` ? 'Instagram本文をコピー済' : 'Instagram投稿テキスト（アンケート付）をコピー'}</span>
                       </button>
                       <a
                         href="https://www.instagram.com/"
@@ -745,7 +905,7 @@ export default function StoryStudioPanel() {
                         }}
                       >
                         {copiedKey === `note_${story.id}` ? <Check size={14} /> : <Copy size={14} />}
-                        <span>{copiedKey === `note_${story.id}` ? 'note記事をコピー済' : 'note記事テキストをコピー'}</span>
+                        <span>{copiedKey === `note_${story.id}` ? 'note記事をコピー済' : 'note記事テキスト（アンケート・答え合わせCTA付）をコピー'}</span>
                       </button>
                       <a
                         href="https://note.com/notes/new"
