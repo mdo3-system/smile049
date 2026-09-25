@@ -43,9 +43,10 @@
 // - 2026/09/25 v0.1.41: SNS連載Story Studio新設（ユーザー設定・AIストーリー自動生成・NanoBanana2/Google AI Pro用英語作画プロンプト・方式Aワンクリック投稿アシスト・5アカウント管理）、Instagram/note/YouTube公式SNS開設完全登録キット配備、公式ブランディング画像アセット（アイコン・バナー）配置、Footer公式SNSリンク設置
 // - 2026/09/25 v0.1.42: 読者参加型「価格予想・希望価格アンケート＆3Dシミュレーター答え合わせ連動」機能新設（Instagramコメント/ストーリーズ投票・noteアンケート＆リアルタイム積算CTAの自動生成）
 // - 2026/09/25 v0.1.43: X（旧Twitter）公式アカウント開設キット配備、StoryStudioモーダル内X設定追加、FooterにX公式リンク設置
+// - 2026/09/25 v0.1.44: StoryStudioにX（旧Twitter）専用ポスト成形・直接ツイートボタン・X投稿完了管理を追加、secrets配備完了
 
-window.APP_VERSION = '0.1.43';
-export const APP_VERSION = '0.1.43';
+window.APP_VERSION = '0.1.44';
+export const APP_VERSION = '0.1.44';
 
 
 

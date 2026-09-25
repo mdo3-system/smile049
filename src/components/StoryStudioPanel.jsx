@@ -258,6 +258,22 @@ export default function StoryStudioPanel() {
     return md;
   };
 
+  // X（旧Twitter）用ポスト成形（アンケート・短縮URL・ハッシュタグ）
+  const formatXPost = (story) => {
+    let text = `【木造自由設計ガレージ連載 第${story.episodeNum}話】\n`;
+    text += `${story.title}\n\n`;
+    if (story.quizEnabled) {
+      text += `💬 Q. ${story.quizQuestion}\n`;
+      story.quizOptions.slice(0, 4).forEach((opt) => {
+        text += `・${opt}\n`;
+      });
+      text += `\n正解は3Dシミュレーターでリアルタイム積算中👇\n`;
+    }
+    text += `https://smile049.jp/simulator\n\n`;
+    text += `#スマイチ #木造ガレージ #ガレージハウス #秘密基地`;
+    return text;
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       {/* 上部ヘッダーバナー */}
@@ -529,6 +545,26 @@ export default function StoryStudioPanel() {
             >
               <NoteIcon size={14} color={activeStoryTab === 'note' ? '#10b981' : '#64748b'} />
               <span>note用表示</span>
+            </button>
+            <button
+              onClick={() => setActiveStoryTab('x')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 14px',
+                borderRadius: 6,
+                border: 'none',
+                background: activeStoryTab === 'x' ? '#fff' : 'transparent',
+                color: activeStoryTab === 'x' ? '#0f172a' : '#64748b',
+                fontWeight: 700,
+                fontSize: 12.5,
+                cursor: 'pointer',
+                boxShadow: activeStoryTab === 'x' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+              }}
+            >
+              <XIcon size={14} color={activeStoryTab === 'x' ? '#0f172a' : '#64748b'} />
+              <span>X (Twitter)用表示</span>
             </button>
           </div>
         </div>
@@ -929,6 +965,49 @@ export default function StoryStudioPanel() {
                         <span>note新規作成を開く</span>
                       </a>
                     </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => copyToClipboard(formatXPost(story), `x_${story.id}`)}
+                        style={{
+                          background: copiedKey === `x_${story.id}` ? '#10b981' : '#0f172a',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 6,
+                          padding: '8px 14px',
+                          fontSize: 12.5,
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6
+                        }}
+                      >
+                        {copiedKey === `x_${story.id}` ? <Check size={14} /> : <Copy size={14} />}
+                        <span>{copiedKey === `x_${story.id}` ? 'Xポストをコピー済' : 'X (Twitter) ポストをコピー'}</span>
+                      </button>
+                      <a
+                        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(formatXPost(story))}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          background: '#fff',
+                          color: '#475569',
+                          border: '1px solid #cbd5e1',
+                          borderRadius: 6,
+                          padding: '8px 12px',
+                          fontSize: 12.5,
+                          fontWeight: 600,
+                          textDecoration: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 4
+                        }}
+                      >
+                        <ExternalLink size={13} />
+                        <span>Xでポストする</span>
+                      </a>
+                    </>
                   )}
                 </div>
 
@@ -957,6 +1036,18 @@ export default function StoryStudioPanel() {
                       }}
                     />
                     <span>note投稿済</span>
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, cursor: 'pointer', color: '#475569' }}>
+                    <input
+                      type="checkbox"
+                      checked={story.isPostedX}
+                      onChange={(e) => {
+                        const updated = [...stories];
+                        updated[idx].isPostedX = e.target.checked;
+                        setStories(updated);
+                      }}
+                    />
+                    <span>X投稿済</span>
                   </label>
                 </div>
               </div>
