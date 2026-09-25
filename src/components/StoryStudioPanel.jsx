@@ -922,7 +922,7 @@ export default function StoryStudioPanel() {
                         <span>Instagramを開く</span>
                       </a>
                     </>
-                  ) : (
+                  ) : activeStoryTab === 'note' ? (
                     <>
                       <button
                         onClick={() => copyToClipboard(formatNoteMarkdown(story), `note_${story.id}`)}
