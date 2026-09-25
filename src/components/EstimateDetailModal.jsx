@@ -1,12 +1,21 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { 
   X, Printer, Download, Sparkles, CheckCircle2, ShieldCheck, 
-  HelpCircle, ChevronRight, FileText, ArrowRight, Building2
+  HelpCircle, ChevronRight, FileText, ArrowRight, Building2, User
 } from 'lucide-react';
 import { generate7CategoriesEstimate } from '../simulator/pricing/costEstimator';
 
 export default function EstimateDetailModal({ isOpen, onClose, quantities, dimensions, openings, onOpenParseRequest }) {
   const printRef = useRef(null);
+  const [customerName, setCustomerName] = useState('');
+  const [estimateDate] = useState(() => {
+    const d = new Date();
+    return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`;
+  });
+  const [estimateNo] = useState(() => {
+    const d = new Date();
+    return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}-${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}`;
+  });
 
   if (!isOpen) return null;
 
@@ -17,6 +26,39 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
   const totalWithTax = grandTotal + taxAmount;
 
   const handlePrint = () => {
+    // 印刷用スタイルを動的に注入してA4縦でモーダルコンテンツのみ印刷
+    const styleId = 'smile049-print-style';
+    let existing = document.getElementById(styleId);
+    if (!existing) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.innerHTML = `
+        @media print {
+          @page { size: A4 portrait; margin: 12mm 12mm 14mm 12mm; }
+          body > * { display: none !important; }
+          body { background: #fff !important; }
+          #estimate-print-area {
+            display: block !important;
+            position: static !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow: visible !important;
+            background: #fff !important;
+            box-shadow: none !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-size: 11pt;
+            font-family: 'Noto Sans JP', sans-serif;
+            color: #000 !important;
+          }
+          #estimate-print-area table { page-break-inside: auto; }
+          #estimate-print-area tr { page-break-inside: avoid; }
+          #estimate-no-print { display: none !important; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
     window.print();
   };
 
@@ -97,8 +139,61 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
         </div>
 
         {/* 見積書本体スクロールエリア */}
-        <div ref={printRef} style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
-          
+        <div id="estimate-print-area" ref={printRef} style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+
+          {/* 宛先・見積番号・発行日 ヘッダー */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            marginBottom: 20,
+            gap: 16,
+            flexWrap: 'wrap'
+          }}>
+            {/* 宛先入力 */}
+            <div style={{ flex: 1, minWidth: 240 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+                <User size={13} />
+                <span>宛先（お客様名）<span style={{ color: '#94a3b8', fontWeight: 400, marginLeft: 4 }}>※ PDF出力前に入力してください</span></span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <input
+                  type="text"
+                  placeholder="例：田中 さおり　様"
+                  value={customerName}
+                  onChange={e => setCustomerName(e.target.value)}
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    borderRadius: 6,
+                    border: '1.5px solid #cbd5e1',
+                    fontSize: 15,
+                    fontWeight: 700,
+                    color: '#0f172a',
+                    background: '#fafafa',
+                    outline: 'none'
+                  }}
+                />
+                <span style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', whiteSpace: 'nowrap' }}>御中 / 様</span>
+              </div>
+              {customerName && (
+                <div style={{ marginTop: 6, fontSize: 16, fontWeight: 800, color: '#0f172a', borderBottom: '2px solid #0f172a', paddingBottom: 4 }}>
+                  {customerName}　御中 / 様
+                </div>
+              )}
+            </div>
+
+            {/* 見積番号・日付・発行者 */}
+            <div style={{ textAlign: 'right', fontSize: 12, color: '#475569', lineHeight: 1.8 }}>
+              <div><span style={{ fontWeight: 700 }}>見積番号：</span>{estimateNo}</div>
+              <div><span style={{ fontWeight: 700 }}>発行日：</span>{estimateDate}</div>
+              <div><span style={{ fontWeight: 700 }}>有効期限：</span>発行日より30日間</div>
+              <div style={{ marginTop: 6, fontWeight: 700, color: '#0f172a' }}>株式会社 住ま居る</div>
+              <div style={{ fontSize: 11 }}>〒350-2224 埼玉県鶴ヶ島市町屋176番地5</div>
+              <div style={{ fontSize: 11 }}>https://smile049.jp/</div>
+            </div>
+          </div>
+
           {/* 見積サマリーカード */}
           <div style={{
             background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',

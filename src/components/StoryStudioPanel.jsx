@@ -8,103 +8,259 @@ import { InstagramIcon, YoutubeIcon, NoteIcon, XIcon } from './SnsIcons';
 
 const STORAGE_KEY = 'smile049_story_studio_data_v2';
 
-// プリセットテーマ
+// プリセットテーマ（女性・家族・一般生活目線）
 const PRESET_THEMES = [
   {
-    id: 'porsche_hobby',
-    title: '愛車ポルシェと過ごす終の棲家（50代・大人の秘密基地）',
-    protagonist: '佐々木 健一 (52歳 / 会社経営 / 愛車: ポルシェ911 カレラ & ツールキャビネット)',
-    theme: '既製品スチールガレージでは愛車のサイズと敷地境界が合わず諦めかけていたが、木造自由設計でミリ単位の隙間にガルバリウム×木造現しの贅沢な秘密基地を実現する物語。',
+    id: 'family_storage',
+    title: '子育て家族の「もう捨てなくていい」収納革命（30代・共働き主婦）',
+    protagonist: '田中 さおり (34歳 / パート勤務・2児の母 / 悩み: 自転車4台・子供用品・季節物で玄関・庭が常に散らかる)',
+    theme: '既製品の物置は敷地の角地形状に合わず、「どうせ入らない」と諦めていた。木造自由設計なら台形の敷地にぴったり収まる収納を、家族が笑顔になれる価格帯で実現できた物語。「結局、新築より快適だった」という気づきを描く。',
     defaultPriceOptions: [
-      'A. 190万円〜220万円（既製品スチール並み）',
-      'B. 230万円〜260万円（木造標準・高コスパ）',
-      'C. 270万円〜300万円（OSB造作棚・こだわり仕様）',
-      'D. 310万円以上（一生モノのプレミアム仕様）'
+      'A. 80万円〜120万円（小型収納・自転車置場）',
+      'B. 130万円〜160万円（家族4人分の収納＋趣味スペース）',
+      'C. 170万円〜200万円（車1台＋大容量収納）',
+      'D. 210万円以上（車2台＋室内作業スペース付き）'
+    ],
+    answerHint: '約148万円（3Dシミュレーター積算目安）'
+  },
+  {
+    id: 'used_home_plus_garage',
+    title: '中古住宅＋木造ガレージで新築以上の暮らしを（40代・家族で賢い選択）',
+    protagonist: '山本 恵子 (42歳 / フルタイム共働き・夫と子2人 / 新築は予算オーバーで中古住宅を購入)',
+    theme: '新築4,500万円か中古2,500万円か迷っていた家族が「中古住宅2,500万円＋スマイチガレージ250万円」という選択をした話。敷地形状に合わせたガレージで、新築以上に快適で豊かな暮らしが実現した。既存建物の外壁ラインに合わせ、数センチ単位で設計できる自由設計の強みが刺さった物語。',
+    defaultPriceOptions: [
+      'A. 180万円〜220万円（駐車1台＋収納）',
+      'B. 230万円〜270万円（駐車2台対応）',
+      'C. 280万円〜320万円（ガレージ＋趣味スペース）',
+      'D. 330万円以上（ガレージハウス仕様）'
     ],
     answerHint: '約248万円（3Dシミュレーター積算目安）'
   },
   {
-    id: 'bike_flagpole',
-    title: '変形旗竿地を活かしたヴィンテージバイクガレージ（40代・趣味人）',
-    protagonist: '高橋 涼介 (41歳 / ITエンジニア / 愛車: ハーレーダビッドソン & 大型ツールワゴン)',
-    theme: '入り口が狭く台形に変形した旗竿地の奥。規格品は設置不可と断られた敷地に、敷地形状に合わせた台形木造ガレージを建築。雨音を吸う木造の静寂とオイルの香りに包まれる物語。',
+    id: 'womens_garden_storage',
+    title: '庭仕事好きな主婦が手に入れた「全部入るガーデンシェッド」（50代・専業主婦）',
+    protagonist: '鈴木 陽子 (51歳 / 専業主婦・ガーデニング歴20年 / 悩み: 土・肥料・鉢・道具が雨ざらしで劣化)',
+    theme: '大手通販の物置は敷地の変形スペースに合わず、結露でガーデニング道具が錆びていた。木造だから湿気に優しく、台形の残地にもジャストフィット。夫が「やっと庭が片付いた」と感激し、家族仲も改善した物語。',
     defaultPriceOptions: [
-      'A. 150万円〜180万円（ミニマム設計）',
-      'B. 190万円〜220万円（変形地ジャストフィット）',
-      'C. 230万円〜260万円（バイク2台＋整備ピット）',
-      'D. 270万円以上（防音断熱＋電動シャッター）'
+      'A. 70万円〜100万円（小型シェッド）',
+      'B. 110万円〜140万円（ガーデン収納フルサイズ）',
+      'C. 150万円〜180万円（作業スペース＋収納）',
+      'D. 190万円以上（温室機能付き特注仕様）'
     ],
-    answerHint: '約215万円（3Dシミュレーター積算目安）'
+    answerHint: '約125万円（3Dシミュレーター積算目安）'
   },
   {
-    id: 'agri_shed',
-    title: '先祖代々の農地と大型トラクターを守る木造アグリシェッド（60代・専業農家）',
-    protagonist: '木村 喜一 (64歳 / 農業経営 / 所有車両: 4WD大型トラクター & コンバイン & 軽トラ)',
-    theme: '市街化調整区域で農機具の大型化に伴い建て替えを検討。鉄骨の見積もり高騰に悩む中、大空間木造トラスと確認申請ワンストップ対応で、美しく長持ちする農業用大倉庫を完成させる物語。',
+    id: 'narrow_lot_garage',
+    title: '「入らない」と言われた狭小変形地に、夫婦の車が2台収まった話（30〜40代・共働き夫婦）',
+    protagonist: '伊藤 美香 (38歳 / 看護師・夫は会社員 / 悩み: 駐車場代が月3万円、でも自宅敷地は変形で車が入らない)',
+    theme: '不動産業者に「この形の土地には既製品は無理」と断言されたが、スマイチなら台形地にミリ単位で合わせた木造ガレージが建てられた。月3万円の駐車場代がゼロになり、7年で元が取れる計算に家族全員が驚いた物語。',
     defaultPriceOptions: [
-      'A. 350万円〜400万円（木造大空間高コスパ）',
-      'B. 410万円〜480万円（トラクター＋作業場標準）',
-      'C. 490万円〜560万円（大型トラス構法・堅牢仕様）',
-      'D. 570万円以上（鉄骨と同等規模）'
+      'A. 150万円〜190万円（1台＋収納）',
+      'B. 200万円〜250万円（2台対応・変形地対応）',
+      'C. 260万円〜300万円（2台＋作業スペース）',
+      'D. 310万円以上（EV充電設備付き）'
     ],
-    answerHint: '約440万円（3Dシミュレーター積算目安）'
-  },
-  {
-    id: 'diy_woodwork',
-    title: '週末木工DIYスタジオとSUVが共存するガレージハウス（30代・子育て世代）',
-    protagonist: '松田 翔太 (38歳 / 建築デザイナー / 愛車: ランドクルーザー & スライド丸鋸)',
-    theme: '結露しやすい鉄板ガレージを避け、木造ならではの調湿性とOSB合板仕上げの壁面収納を活かし、家族でDIYを楽しみながら愛車を愛でる週末の豊かな暮らしを描く物語。',
-    defaultPriceOptions: [
-      'A. 200万円〜230万円（セルフDIY併用）',
-      'B. 240万円〜270万円（断熱調湿＋OSB仕上げ）',
-      'C. 280万円〜310万円（大型作業台・動力200V）',
-      'D. 320万円以上（フルスペックスタジオ）'
-    ],
-    answerHint: '約265万円（3Dシミュレーター積算目安）'
+    answerHint: '約225万円（3Dシミュレーター積算目安）'
   }
 ];
 
-// ストーリー生成ロジック（テーマ・登場人物・話数・アンケート付き）
+
+// ─────────────────────────────────────────────────────
+// プリセット別ストーリーアーク定義
+// ─────────────────────────────────────────────────────
+const STORY_ARCS = {
+
+  // ① 中古住宅＋ガレージ → 最重要テーマ
+  used_home_plus_garage: {
+    hashtags: '#スマイチ #中古住宅ガレージ #中古住宅リノベ #ガレージのある暮らし #木造ガレージ #自由設計 #変形地ガレージ #ガルバリウム外壁 #中古戸建 #埼玉不動産 #一次取得層 #家づくり #マイホーム計画 #住まいの知恵 #3Dシミュレーター #smile049',
+    quizQuestion: '中古住宅を買ってガレージを建てる場合、新築購入と比べて総額はどのくらい変わると思いますか？',
+    phases: [
+      {
+        phase: '【第1話：新築か中古か、2,000万円の分岐点】',
+        subTitle: '〜住宅展示場を回り続けた末に気づいた、もうひとつの選択肢〜',
+        plot: (p) => `${p}は、週末のたびに住宅展示場を訪れていた。営業担当者に「土地込み4,500万円が標準ですよ」と言われるたびに、胸の奥で何かが引っかかる。「本当にこれしか選択肢はないのだろうか？」帰り道、スマホで「中古住宅 ガレージ 埼玉」と検索したその瞬間、スマイチの3Dシミュレーターに出会った。`,
+        englishPrompt: `8k cinematic photograph, warm suburban Japanese family neighborhood at dusk, young Japanese family of four walking together, beautiful modern dark charcoal wooden garage attached to a renovated mid-century Japanese house, warm garden lights, hopeful atmosphere, photorealistic.`
+      },
+      {
+        phase: '【第2話：「ガレージが建てられる土地」から物件を探す逆転発想】',
+        subTitle: '〜シミュレーターが教えてくれた、土地の見方が変わる瞬間〜',
+        plot: (p) => `${p}はスマイチのシミュレーターで「幅5m×奥行き6m、台形地対応」のガレージを試作してみた。概算248万円。「この金額でガレージが建つなら、中古住宅でも全然アリじゃない？」物件探しの基準が変わった。不動産サイトで変形地や旗竿地の安い物件を見る目が、全く変わった。「ガレージが建てられるかどうか」で土地を選べばいい。`,
+        englishPrompt: `8k illustration style, split screen comparison, left side shows expensive new-build Japanese house, right side shows used Japanese house with beautiful custom wooden garage addition, family car parked inside, price difference highlighted, clean modern infographic style, photorealistic rendering.`
+      },
+      {
+        phase: '【第3話：中古3,800万円＋ガレージ300万円。新築4,500万円と「ほぼ同じ予算」でガレージ付きを選んだ夜】',
+        subTitle: '〜同じお金を使うなら、ガレージも付いてくる選択がある〜',
+        plot: (p) => `夜、ダイニングテーブルに向かい合って座った${p}夫婦。スマイチのシミュレーターを開き、希望のガレージを3D設計する。概算建築費が画面に目安300万円と表示された。「中古住宅3,800万円＋リノベ300万円＋ガレージ300万円＋諸費用…合計でおよそ4,400万円。さっきまで考えていた新築4,500万円とほぼ同じ想定の中で、ガレージが入っている」。夜更けに笑い合った夫婦のその夜が、大きな決断の出発点になった。`,
+        englishPrompt: `8k intimate lifestyle photography, Japanese couple sitting at dining table at night, laptop screen showing 3D garage simulator with real-time price calculator, warm kitchen lighting, family planning atmosphere, notebooks and house listing papers on table, hopeful and decisive mood, photorealistic.`
+      },
+
+      {
+        phase: '【第4話：既存建物の外壁ラインに、数センチ単位で合わせるガレージ設計】',
+        subTitle: '〜「規格品では無理」と言われた変形敷地に、ぴったり収まった木造の奇跡〜',
+        plot: (p) => `購入した中古住宅の敷地は、南側が台形に斜めになっていた。不動産会社の担当者に「既製品の物置やガレージは入りませんよ」と言われていた部分だ。しかしスマイチの専任スタッフが現地測量を行い、既存外壁のラインに合わせ、その台形の角まで余すことなく使い切る木造ガレージを設計。数センチ単位の精度で、まるでそこに最初からあったかのように建物は収まった。`,
+        englishPrompt: `8k architectural photography, top-down aerial view of Japanese suburban house plot showing a perfectly fitted custom wooden garage built to match the irregular trapezoidal shape of the land, dark galvalume cladding, zero-eave design, fitting seamlessly between property boundaries, crisp sunlight, photorealistic.`
+      },
+      {
+        phase: '【第5話：月3万円の駐車場代がゼロになった日、7年で元が取れる試算】',
+        subTitle: '〜ガレージを建てたことで、毎月の生活費が変わった〜',
+        plot: (p) => `完成から3ヶ月。${p}の家計簿に「駐車場代 ¥0」と書かれた月が初めて訪れた。それまで月3万円、年間36万円を払い続けていた駐車場代が消えた。ガレージの建設費250万円を単純計算すると、約7年で元が取れる。しかし実際のメリットはそれだけではなかった。雨の日に車に乗り込む手間がなくなり、荷物の積み下ろしが楽になり、休日の家族の動き方そのものが変わっていた。`,
+        englishPrompt: `8k warm lifestyle photography, happy Japanese mother loading groceries from car directly into wooden garage attached to house on a rainy day, covered walkway, family dog sitting nearby, suburban garden background, sense of everyday comfort and convenience, photorealistic.`
+      },
+      {
+        phase: '【第6話：「新築じゃなくてよかった」と思った瞬間】',
+        subTitle: '〜1,750万円の差額で、暮らしはこんなに変わった〜',
+        plot: (p) => `新築同期の友人宅を訪ねた${p}は、ふと感じた。お互いに4,000万円台の住宅ローンだと思っていたのに、自分の家にはガレージがあり、庭にはウッドデッキがあり、将来のリノベーション資金も手元に残っている。「中古住宅を選んで、ガレージを建てて、残った1,750万円で人生を豊かにする。これが令和の賢い家の作り方だったんだ」と、${p}は静かに確信した。`,
+        englishPrompt: `8k cinematic lifestyle photography, happy Japanese family evening scene outside their renovated house with custom wooden garage, string lights in garden, children playing, parents with coffee cups, warm golden hour light, sense of contentment and good life choices, photorealistic.`
+      },
+      {
+        phase: '【第7話：この家を選んで良かった、ガレージを建てて正解だった】',
+        subTitle: '〜中古住宅×木造ガレージという選択が、家族の未来を広げた〜',
+        plot: (p) => `休日の朝、電動シャッターをゆっくり開けると、整然と並んだ家族の自転車と、愛車の濡れていないボディが迎えてくれる。${p}は振り返る——新築の展示場を回り続けた日々、シミュレーターで夜中に試算した夜、専任スタッフと敷地を測った日。「敷地の形に、数センチ単位で合わせてもらったガレージ。新築ではこうはいかなかった」。令和の豊かな暮らしは、中古住宅から始まった。`,
+        englishPrompt: `8k cinematic wide shot, sunrise morning scene of a beautiful renovated Japanese house with custom-built dark wooden garage, garage door slowly opening, silhouette of a family car inside, golden morning light, dew on the garden grass, peaceful suburban street, sense of a life well-chosen, photorealistic masterpiece.`
+      }
+    ]
+  },
+
+  // ② 子育て家族の収納革命
+  family_storage: {
+    hashtags: '#スマイチ #収納革命 #木造物置 #ガーデンシェッド #子育て家族 #変形地物置 #自由設計 #ガルバリウム外壁 #主婦の味方 #家族のある暮らし #収納アイデア #ガレージのある暮らし #埼玉建築 #3Dシミュレーター #smile049',
+    quizQuestion: '家族4人分の荷物（自転車4台・子供用品・季節物）が全部入る木造収納、総額いくらだと思いますか？',
+    phases: [
+      {
+        phase: '【第1話：玄関が散らかる家は、家族の心も散らかっていた】',
+        subTitle: '〜子育てと仕事の間で積み上がった「どうにかしたい」〜',
+        plot: (p) => `${p}の朝は戦場だ。玄関には自転車4台分のヘルメット、習い事のバッグ、使い終わったスポーツ用品。庭には季節外れの子供用プール、スコップ、植木鉢。「既製品の物置を買っても、どうせ入らないし……」と諦めていたある日、スマイチの3Dシミュレーターをたまたまスマホで見かけた。`,
+        englishPrompt: `8k lifestyle photography, chaotic Japanese suburban house entrance with bicycles helmets sports bags overflowing, stressed but hopeful young Japanese mother looking at smartphone screen showing 3D garage planner, warm morning light, photorealistic.`
+      },
+      {
+        phase: '【第2話：台形の残地に、家族全員分の収納が入った日】',
+        subTitle: '〜「どうせ無理」が「これなら入る」に変わった3Dシミュレーターの夜〜',
+        plot: (p) => `${p}はスマイチのシミュレーターで、家の西側にある台形のデッドスペースを入力した。4辺の長さをミリ単位で設定すると、3Dモデルがぴたりとはまる。「ここなら自転車4台と、子供用品全部と、季節物も入る」。画面に表示された概算金額を見て、夫に見せた。「これ、絶対やろう」。それが決断の夜だった。`,
+        englishPrompt: `8k intimate lifestyle photography, Japanese couple at kitchen table at night, laptop screen showing 3D simulator of compact wooden storage shed perfectly fitting trapezoidal garden corner, excited expressions, warm kitchen lighting, photorealistic.`
+      },
+      {
+        phase: '【第3話：完成。玄関が変わると、家族の空気が変わった】',
+        subTitle: '〜片付いた玄関が生んだ、予想外の家族時間〜',
+        plot: (p) => `木造シェッドが完成してから3週間。${p}の家の玄関は、生まれて初めて「すっきり」した状態を保っている。自転車はシェッドへ、子供用品も季節物も全部収まった。夕方、子供たちが「お母さん、玄関広くなったね」と言った。その言葉が、一番の正解だったと確信させてくれた。`,
+        englishPrompt: `8k warm lifestyle photography, beautifully organized wooden storage shed attached to Japanese suburban house, family bicycles neatly arranged inside, children helping organize, garden flowers visible, tidy suburban home exterior, warm afternoon light, photorealistic.`
+      }
+    ]
+  },
+
+  // ③ 女性のガーデンシェッド
+  womens_garden_storage: {
+    hashtags: '#スマイチ #ガーデンシェッド #木造物置 #ガーデニング #主婦の味方 #変形地物置 #湿気に強い木造 #自由設計 #庭収納 #ガルバリウム外壁 #女性の家づくり #埼玉建築 #3Dシミュレーター #smile049',
+    quizQuestion: '変形した残地にぴったり収まる木造ガーデンシェッド、総額いくらだと思いますか？',
+    phases: [
+      {
+        phase: '【第1話：20年のガーデニング道具が、ついに雨ざらしを卒業する日】',
+        subTitle: '〜錆びていくシャベルを眺めながら思ったこと〜',
+        plot: (p) => `${p}のガーデニング歴は20年。愛着のある道具たちは毎年、梅雨の雨ざらしで少しずつ錆びていく。大手通販の物置を買ったこともある。でも敷地の角が斜めになっていて、どうしてもすき間ができてしまった。「この角の形に合う収納は、世の中に存在しないのかもしれない」。そう諦めかけていたとき、スマイチの3Dシミュレーターを見つけた。`,
+        englishPrompt: `8k lifestyle photography, Japanese woman in her 50s looking sadly at rusty garden tools left in the rain, suburban garden corner with irregular trapezoidal shape, overcast day, sense of resignation about to change, photorealistic.`
+      },
+      {
+        phase: '【第2話：台形の残地が、夢のガーデンスタジオに変わった】',
+        subTitle: '〜木造だから湿気に優しい、道具を大切にする暮らし〜',
+        plot: (p) => `${p}が設計したガーデンシェッドは、家の南西角の台形スペースにぴったり収まる木造建築だ。木造ならではの調湿効果で、土も肥料も錆びにくい環境が生まれた。専任スタッフが既存外壁のラインに合わせ、数センチ単位で設計した建物は、まるで最初からそこにあったかのよう。夫が「やっと庭が片付いたな」と言ったとき、20年のガーデニング人生で一番嬉しかった。`,
+        englishPrompt: `8k architectural lifestyle photography, beautiful compact wooden garden shed with dark galvalume exterior perfectly fitting the angled corner of a Japanese suburban garden, neatly organized gardening tools visible through open door, woman arranging plants inside, warm sunlight, photorealistic.`
+      },
+      {
+        phase: '【第3話：道具が守られる空間で、ガーデニングがもっと好きになった】',
+        subTitle: '〜毎朝シェッドのドアを開ける瞬間が、一日の楽しみになった〜',
+        plot: (p) => `完成から半年が経った。${p}の愛用のシャベルは、今も光っている。錆ひとつない。「道具を大切にできる場所があるだけで、こんなに気持ちが変わるとは思わなかった」。毎朝シェッドのドアを開ける瞬間が、一日の楽しみになった。家族も庭に出てくるようになった。ガーデンシェッドは、家族の「庭時間」を取り戻してくれた。`,
+        englishPrompt: `8k warm lifestyle photography, happy Japanese woman in her 50s opening the door of her new wooden garden shed in the morning sunlight, shiny well-maintained garden tools inside, lush garden surroundings, husband watching from porch with coffee, sense of contentment and daily joy, photorealistic.`
+      }
+    ]
+  },
+
+  // ④ 狭小変形地に車2台
+  narrow_lot_garage: {
+    hashtags: '#スマイチ #変形地ガレージ #狭小地ガレージ #駐車場代節約 #木造ガレージ #自由設計 #ガルバリウム外壁 #EV充電 #共働き夫婦 #台形地 #旗竿地ガレージ #埼玉建築 #3Dシミュレーター #smile049',
+    quizQuestion: '台形の変形地に木造ガレージを建てて月3万円の駐車場代をゼロにする場合、元が取れるのは何年後だと思いますか？',
+    phases: [
+      {
+        phase: '【第1話：「この土地には無理」と言われた変形地の、もうひとつの可能性】',
+        subTitle: '〜不動産会社が諦めた角地に、スマイチなら答えがあった〜',
+        plot: (p) => `${p}の自宅敷地は南側が台形に斜めになっている。「ここには規格品のガレージは入りません」と不動産会社の担当者にはっきり言われた。月3万円の駐車場代を払いながら、毎朝雨の中で車に乗り込む日々が続いていた。ある日、スマイチのサイトで「変形地・台形地対応」という文字を見つけた。`,
+        englishPrompt: `8k lifestyle photography, aerial view of Japanese suburban house with irregular trapezoidal land shape, currently used as parking with rain puddles, Japanese woman holding umbrella loading groceries into wet car, sense of daily inconvenience about to change, photorealistic.`
+      },
+      {
+        phase: '【第2話：3Dシミュレーターで「入った」と確信した瞬間】',
+        subTitle: '〜ミリ単位の設計が、「無理」を「可能」に変えた〜',
+        plot: (p) => `${p}はスマイチのシミュレーターで、台形の敷地の4辺の長さをそのまま入力した。3Dモデルが形になっていく。車2台が並んで入る幅、既存の外壁ラインとの整合、斜めの角との精度——全て画面で確認できた。「これ、本当に建てられる……！」。概算金額も即座に表示された。月3万円の駐車場代と比べると、7年で元が取れる計算だった。`,
+        englishPrompt: `8k detail shot, hands holding smartphone showing a 3D wooden garage simulator perfectly fitting a trapezoidal land shape, two cars fitting inside the 3D model, price calculator visible on screen, excited Japanese woman's face reflected in screen, photorealistic.`
+      },
+      {
+        phase: '【第3話：月3万円の駐車場代がゼロになった、その後の暮らし】',
+        subTitle: '〜7年で元が取れる試算が現実になった日〜',
+        plot: (p) => `完成から1年。${p}の家計から「駐車場代 ¥30,000」の行が消えた。年間36万円、7年で252万円の節約。でも数字より大きかったのは、生活の質の変化だ。雨の日も荷物を車に積みやすく、子供の送迎も楽になった。「変形地だからこそ安く買えた土地が、こんなに豊かな暮らしの土台になるとは」。${p}は今、この家を選んで本当に良かったと思っている。`,
+        englishPrompt: `8k warm lifestyle photography, happy Japanese woman carrying grocery bags from car into dark wooden garage on a rainy day, completely dry, smiling, suburban garden, sense of daily comfort and financial freedom, photorealistic.`
+      }
+    ]
+  }
+};
+
+// デフォルトアーク（カスタムテーマや未定義のプリセット用）
+const DEFAULT_ARC_PHASES = [
+  {
+    phase: '【第1話：出会いと規格の壁】',
+    subTitle: '〜既製品では届かなかった「あと20cm」の理想〜',
+    plot: (p) => `${p}は、長年の夢であった専用ガレージの設置を検討し始めた。しかし、敷地境界の変形や必要な幅を測ると、大手既製品スチールガレージの規格モジュールではどうしても敷地からはみ出すことが判明する。「土地にガレージを合わせるしかないのか……」と諦めかけたその時、木造自由設計ガレージ【スマイチ】のブラウザ3Dシミュレーターに出会う。`,
+    englishPrompt: `8k architectural photograph, cinematic shot of a modern wooden garage project, contemporary dark charcoal galvalume steel facade, zero-eave minimalist roof edge, exposed wooden structural posts visible, dusk twilight warm ambient lighting, realistic concrete floor, highly detailed architectural masterpiece.`
+  },
+  {
+    phase: '【第2話：ミリ単位の3D設計】',
+    subTitle: '〜夜更けに画面で描いた、自分だけの空間〜',
+    plot: (p) => `スマホとPCで無料シミュレーターを立ち上げた${p}。敷地の形状をそのまま入力し、屋根の勾配や柱芯の逃げをミリ単位で調整していく。画面の中でリアルタイムに積算費用が更新される安心感。専任スタッフによる無料パース依頼ボタンを押すと、翌日届いたのはまるで実写のような高精細パースだった。`,
+    englishPrompt: `8k ultra-detailed interior architectural photography, modern luxury wooden garage workshop, warm wooden timber ceiling beams, built-in OSB plywood workbench, glowing warm recessed LED strip lights, polished concrete floor, cozy atmospheric evening, architectural digest style.`
+  },
+  {
+    phase: '【第3話：建築士のワンストップ対応】',
+    subTitle: '〜面倒な確認申請と構造計算をプロが一括解決〜',
+    plot: (p) => `市街化調整区域や防火地域の法規制限、基礎の高低差など、素人では乗り越えられない壁も、スマイチの専任スタッフが迅速に現地調査と構造安全確認を実施。ワンストップ施工体制に確信を持ち、電子契約でスムーズに着工を迎えた。`,
+    englishPrompt: `8k architectural detail photograph, construction of wooden timber frame garage, high precision steel connector hardware, heavy cedar pine wooden columns, pristine charcoal galvalume metal cladding, zero eaves detail, clean Japanese modern architecture craftsmanship, bright daylight.`
+  },
+  {
+    phase: '【第4話：完成。木の温もりと静寂に包まれた空間】',
+    subTitle: '〜鉄板ガレージにはない、調湿と木の香り〜',
+    plot: (p) => `上棟から数週間、ついに完成した。外観はシャープなブラックガルバリウム鋼板の軒出0スタイル。一歩室内に入ると、木造ならではの爽やかな木の香りと断熱材による穏やかな室温が広がる。鉄板ガレージのような冬場の結露もサビの心配もない。`,
+    englishPrompt: `8k wide angle shot of a completed custom wooden garage interior, spacious ceiling with natural wood rafters, ambient floor spotlights, comfortable armchair, peaceful sanctuary, cinematic photorealism.`
+  },
+  {
+    phase: '【第5話：一生モノの至福の時間】',
+    subTitle: '〜作って良かった、と思える毎日〜',
+    plot: (p) => `休日、電動リモコンシャッターを開け放ち、朝の光の中で空間を楽しむ${p}。敷地にミリ単位で合わせたからこそ生まれた無駄のない空間は、人生を豊かにする場所となった。「作って本当に良かった」。${p}は満足そうに微笑んだ。`,
+    englishPrompt: `8k cinematic lifestyle architectural photography, evening view of modern wooden custom garage, wide open black roll-up shutter, warm interior light spilling onto stone driveway, tranquil suburban garden backdrop, photorealistic.`
+  }
+];
+
+// ─────────────────────────────────────────────────────
+// ストーリー生成ロジック（プリセットID対応・テーマ別ストーリーアーク）
+// ─────────────────────────────────────────────────────
 const generateStoriesByAi = (themeTitle, protagonist, storyCount, themeDesc, presetData) => {
   const generated = [];
   const priceOptions = presetData?.defaultPriceOptions || PRESET_THEMES[0].defaultPriceOptions;
   const answerHint = presetData?.answerHint || PRESET_THEMES[0].answerHint;
-  
+  const presetId = presetData?.id || '';
+
+  // プリセット専用アーク or デフォルトアーク
+  const arc = STORY_ARCS[presetId] || null;
+  const phases = arc?.phases || DEFAULT_ARC_PHASES;
+  const hashtags = arc?.hashtags ||
+    '#スマイチ #木造ガレージ #ガレージハウス #ビルトインガレージ #自由設計 #愛車のある暮らし #変形地ガレージ #ガルバリウム外壁 #木造建築 #埼玉建築 #3Dシミュレーター #smile049';
+  const quizQuestion = arc?.quizQuestion ||
+    'あなたはこの木造ガレージ・収納、総額いくらだと思いますか？（いくらなら欲しいですか？）';
+
   for (let i = 1; i <= storyCount; i++) {
-    let phase = '';
-    let epTitle = '';
-    let plot = '';
-    let englishPrompt = '';
-
-    if (i === 1) {
-      phase = '【第1話：出会いと規格の壁】';
-      epTitle = `${themeTitle} 〜既製品では届かなかった「あと20cm」の理想〜`;
-      plot = `${protagonist}は、長年の夢であった専用ガレージの設置を検討し始めた。しかし、敷地境界の変形や愛車のドア開閉に必要な幅を測ると、大手既製品スチールガレージの規格モジュールではどうしても敷地からはみ出すか、車内から降りられないことが判明する。「土地にガレージを合わせるしかないのか……」と諦めかけたその時、木造自由設計ガレージ【スマイチ】のブラウザ3Dシミュレーターに出会う。`;
-      englishPrompt = `8k architectural photograph, cinematic shot of a modern wooden garage project, ultra sharp, contemporary dark charcoal galvalume steel facade, standing seam, zero-eave minimalist roof edge, exposed Douglas fir wooden structural posts and beams visible through large glass doors, dusk twilight warm ambient lighting, realistic concrete floor, high-end sports vehicle parked partially outside, highly detailed architectural masterpiece.`;
-    } else if (i === 2) {
-      phase = '【第2話：ミリ単位の3D設計】';
-      epTitle = `${themeTitle} 〜夜更けに画面で描いた、自分だけの秘密基地〜`;
-      plot = `スマホとPCで無料シミュレーターを立ち上げた${protagonist}。敷地の台形形状をそのまま入力し、水流し屋根の勾配や柱芯の逃げをミリ単位で調整していく。「ここに出幅600mmの作業棚を入れれば、工具もジャストで収まる」。画面の中でリアルタイムに積算費用が更新される安心感。専任スタッフによる無料パース依頼ボタンを押すと、翌日届いたのはまるで実写のような高精細ガルバリウム鋼板パースだった。`;
-      englishPrompt = `8k ultra-detailed interior architectural photography, modern luxury wooden garage workshop, warm wooden timber ceiling beams with exposed framing, built-in OSB plywood workbench with organized tool rack, glowing warm recessed LED strip lights, polished clean concrete floor with epoxy finish, sports vehicle parked inside, cozy atmospheric evening, architectural digest style.`;
-    } else if (i === 3) {
-      phase = '【第3話：建築士のワンストップ対応】';
-      epTitle = `${themeTitle} 〜面倒な確認申請と構造計算をプロが一括解決〜`;
-      plot = `市街化調整区域や防火地域の法規制限、基礎の高低差など、素人では乗り越えられない壁も、スマイチの専任スタッフ（建築士）が迅速に現地調査と構造安全確認を実施。メーカー・基礎屋・申請行政書士とバラバラに交渉する必要のない「ワンストップ施工体制」に確信を持ち、電子契約でスムーズに着工を迎えた。`;
-      englishPrompt = `8k architectural detail photograph, construction and structural excellence of wooden timber frame garage, high precision steel connector hardware, heavy cedar and pine wooden columns, pristine charcoal galvalume metal cladding, zero eaves detail, clean Japanese modern architecture craftsmanship, bright daylight.`;
-    } else if (i === 4) {
-      phase = '【第4話：木の温もりと結露のない快適空間】';
-      epTitle = `${themeTitle} 〜鉄板ガレージにはない、調湿と静寂に包まれて〜`;
-      plot = `上棟から数週間、ついに完成したガレージ。外観はシャープなブラックガルバリウム鋼板の軒出0スタイル。一歩室内に入ると、木造ならではの爽やかな木の香りと断熱材による穏やかな室温が広がる。鉄板ガレージのような冬場の滴る結露もサビの心配もない。愛車のボディは常に乾いた清潔な空気で守られている。`;
-      englishPrompt = `8k wide angle shot of a completed custom wooden garage interior, spacious ceiling with natural wood rafters, ambient floor spotlights illuminating a pristine vehicle, sleek rolling tool chest, comfortable leather armchair in the corner lounge, peaceful masculine sanctuary, cinematic photorealism.`;
-    } else {
-      phase = `【第${i}話：一生モノの至福の時間】`;
-      epTitle = `${themeTitle} 〜ガレージで飲む一杯の珈琲が、明日への活力〜`;
-      plot = `休日、電動リモコンシャッターを開け放ち、朝の光の中で愛車を手入れする。好きな音楽を流し、自作の棚からオイルを取り出す時間。敷地にミリ単位で合わせたからこそ生まれた無駄のない空間は、ただの車庫ではなく人生を豊かにする最高の秘密基地となった。「作って本当に良かった」。${protagonist}は満足そうに微笑んだ。`;
-      englishPrompt = `8k cinematic lifestyle architectural photography, evening view of modern wooden custom garage, wide open black roll-up shutter, warm interior light spilling onto stone driveway, silhouetted luxury car inside with ambient lights, tranquil forest or suburban garden backdrop, photorealistic, luxury dwelling.`;
-    }
-
-    // Instagram用ハッシュタグ
-    const hashtags = `#スマイチ #木造ガレージ #ガレージハウス #ビルトインガレージ #自由設計 #大人の秘密基地 #愛車のある暮らし #変形地ガレージ #ガルバリウム外壁 #注文住宅 #ガレージライフ #世田谷ベース風 #バイクガレージ #農業倉庫 #アグリシェッド #木造建築 #埼玉建築 #3Dシミュレーター #smile049`;
+    const phaseData = phases[i - 1] || phases[phases.length - 1];
+    const phase = phaseData.phase || `【第${i}話】`;
+    const subTitle = phaseData.subTitle || '';
+    const epTitle = `${themeTitle} ${subTitle}`;
+    const plot = typeof phaseData.plot === 'function'
+      ? phaseData.plot(protagonist)
+      : (phaseData.plot || '');
+    const englishPrompt = phaseData.englishPrompt ||
+      `8k architectural lifestyle photography, beautiful modern wooden custom garage, dark galvalume steel exterior, Japanese suburban setting, warm natural lighting, photorealistic.`;
 
     generated.push({
       id: `story_${Date.now()}_${i}`,
@@ -116,26 +272,34 @@ const generateStoriesByAi = (themeTitle, protagonist, storyCount, themeDesc, pre
       englishPrompt,
       imageUrl: null,
       hashtags,
-      // 読者参加型アンケート設定
       quizEnabled: true,
-      quizQuestion: 'あなたはこの木造ガレージ、総額いくらだと思いますか？（いくらなら欲しいですか？）',
+      quizQuestion,
       quizOptions: [...priceOptions],
       quizAnswerHint: answerHint,
       isPostedInstagram: false,
       isPostedNote: false,
-      scheduledDate: new Date(Date.now() + (i - 1) * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // 週1ペース
+      scheduledDate: new Date(Date.now() + (i - 1) * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     });
   }
 
   return generated;
 };
 
+
 export default function StoryStudioPanel() {
   const [selectedPreset, setSelectedPreset] = useState(PRESET_THEMES[0].id);
   const [customTitle, setCustomTitle] = useState(PRESET_THEMES[0].title);
   const [customProtagonist, setCustomProtagonist] = useState(PRESET_THEMES[0].protagonist);
   const [customThemeDesc, setCustomThemeDesc] = useState(PRESET_THEMES[0].theme);
-  const [storyCount, setStoryCount] = useState(3);
+  const [storyMode, setStoryMode] = useState('preset'); // 'preset' | 'scenario'
+
+  // シナリオライター専用フィールド
+  const [scTarget, setScTarget] = useState(''); // 訂跢層・誦求対象
+  const [scProblem, setScProblem] = useState(''); // 誰のどんな悩み
+  const [scResolution, setScResolution] = useState(''); // ガレージ・倉庫による解決
+  const [scTone, setScTone] = useState('emotional'); // emotional | data | humor | comparison
+  const [scKeyword, setScKeyword] = useState(''); // 必ず入れたいキーワード・数字
+  const [scEpisodeCount, setScEpisodeCount] = useState(3);
   const [stories, setStories] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -148,7 +312,7 @@ export default function StoryStudioPanel() {
 
   const [copiedKey, setCopiedKey] = useState(null);
   const [activeStoryTab, setActiveStoryTab] = useState('instagram'); // 'instagram' | 'note'
-  const [showKitModal, setShowKitModal] = useState(false);
+
 
   // ローカル保存
   useEffect(() => {
@@ -169,6 +333,106 @@ export default function StoryStudioPanel() {
     }
   };
 
+  const [storyCount, setStoryCount] = useState(3);
+
+  // シナリオライター自由生成
+  const handleScenarioGenerate = () => {
+    if (!scTarget.trim() || !scProblem.trim() || !scResolution.trim()) {
+      alert('訂跢層・悩み・解決ストーリーの3項目を入力してください。');
+      return;
+    }
+    if (!window.confirm('シナリオライターでストーリーを自由生成しますか？（現在のストーリーは上書きされます）')) return;
+
+    const toneLabel = { emotional: '感動・共感系', data: 'データ・論理系', humor: 'わかりやすコミカル系', comparison: '新築vs中古・比較系' }[scTone] || '感動系';
+    const themeTitle = `${scTarget}の「${scProblem.slice(0, 15)}」を解決する物語`;
+    const protagonist = scTarget;
+    const keywordNote = scKeyword ? `キーワード: ${scKeyword}` : '';
+
+    // シナリオライター自由アークを動的生成
+    const scenarioPhases = Array.from({ length: scEpisodeCount }, (_, idx) => {
+      const i = idx + 1;
+      let phase, subTitle, plot, englishPrompt;
+
+      if (i === 1) {
+        phase = `《第${i}話：${scTarget}の「${scProblem.slice(0, 18)}」という措り》`;
+        subTitle = `〜どうかしたかった、その思いが変わった日〜`;
+        plot = (scTone === 'data')
+          ? `${scTarget}が直面していた最大の問題―「${scProblem}」。既製品や大手メーカーに相談しても「解決できません」の一言。年間平均コストを計算すると、現状のままでは10年後も同じ問題を抱えていることに気づいた。その数字が、スマイチの3Dシミュレーターを調べるきっかけになった。${keywordNote}`
+          : scTone === 'humor'
+          ? `${scTarget}にとって「${scProblem}」はもはや笑えないレベルの問題だった。「どうせたいしてこうなるんだ」と諦めていた日々。そんなとき、かわいい感じのスマイチの広告をたまたま見かけた。「もしかして渡りに裁をつけてる？」という轻い気持ちで、この物語は始まった。${keywordNote}`
+          : `${scTarget}のある日、「${scProblem}」という悩みは頂点に達した。既製品は割高で酷い。プロに相談しても「難しいですね」と言われる。そんなとき、スマイチの3Dシミュレーターをスマホで触れた。画面の中で場所と建物がリアルタイムに形になっていく。「これならどうかなるかも」。${keywordNote}`;
+        englishPrompt = `8k lifestyle photography, Japanese ${scTarget}, scene of daily struggle with: ${scProblem}, feeling of change about to happen, warm residential suburban Japan setting, hopeful mood, photorealistic.`;
+      } else if (i === scEpisodeCount) {
+        phase = `《第${i}話：${scResolution.slice(0, 20)}で実現した新しい日常》`;
+        subTitle = `〜作って本当に良かった、と思える毎日〜`;
+        plot = (scTone === 'data')
+          ? `${scTarget}の生活から「${scProblem}」に関わるコストが消えた。${scResolution}のおかげで、年間简略計算でおよぐ36万円以上の節約に成功。建設費を制御するまでの期間も年単位で計算ができ、論理的に「正解」であると確信している。`
+          : `スマイチの木造自由設計による${scResolution}が完成してから、${scTarget}の日常は明らかに変わった。「${scProblem}」がもはや毎日のストレスではなくなり、代わりにわくわくする日常が広がった。「作って本当に良かった」。その一言が、すべての答えだった。`;
+        englishPrompt = `8k warm lifestyle photography, happy Japanese ${scTarget} enjoying everyday life after solving their problem, beautiful wooden custom structure by Sumaichi visible, warm suburban Japanese home setting, golden hour light, sense of life improvement and satisfaction, photorealistic.`;
+      } else {
+        const midLabels = [
+          ['3D設計と見積もり', '〜ミリ単位の設計が「無理」を「可能」に変えた〜'],
+          ['専任スタッフとの現地調査', '〜確認申請・構造計算をプロが一括解決〜'],
+          ['各所に割り入る設計の妙味', '〜敷地の形状に、數センチ単位で共存させる〜'],
+          ['大工とき、完成の前夜に', '〜山になった木材を見山ごしに、封印の夜を贇った〜']
+        ];
+        const midIdx = (i - 2) % midLabels.length;
+        phase = `《第${i}話：${midLabels[midIdx][0]}》`;
+        subTitle = midLabels[midIdx][1];
+        plot = `${scTarget}は、スマイチの3Dシミュレーターで${scResolution}の設計を進める。敷地の形と既存建物の外壁ラインに合わせ、数センチ単位で調整することで、「入らない」と言われた場所にめどあの空間が生まれることを確信する。専任スタッフが現地を訪れ、構造安全や確認申請もワンストップで対応。「これは本当に建てられるんだ」。`;
+        englishPrompt = `8k architectural photography, custom wooden garage or storage building under construction in Japan, professional timber frame, dark galvalume cladding panels being fitted, craftsmen at work, clear blue sky, sense of progress and precision construction, photorealistic.`;
+      }
+
+      return { phase, subTitle, plot: () => plot, englishPrompt };
+    });
+
+    // ハッシュタグをトーン別に調整
+    const scHashtags = scTone === 'comparison'
+      ? '#スマイチ #中古住宅ガレージ #中古戦略 #新築vs中古 #ガレージのある暮らし #木造ガレージ #自由設計 #変形地ガレージ #ガルバリウム外壁 #家づくり #3Dシミュレーター #smile049'
+      : scTone === 'data'
+      ? '#スマイチ #ガレージ建築 #決断のデータ #起業コスト節約 #駐車場代節約 #木造ガレージ #自由設計 #変形地対応 #埼玉建築 #3Dシミュレーター #smile049'
+      : '#スマイチ #木造ガレージ #ガレージのある暮らし #変形地ガレージ #自由設計 #ガルバリウム外壁 #木造建築 #埼玉建築 #3Dシミュレーター #smile049';
+
+    const scQuiz = scTone === 'data' || scTone === 'comparison'
+      ? `${scTarget}の「${scProblem.slice(0, 15)}」を解決するスマイチの木造建築、总額いくらだと思いますか？`
+      : `この建築、いくらなら買いたいですか？`;
+
+    const fakePreset = {
+      id: '_scenario_free',
+      title: themeTitle,
+      protagonist,
+      theme: scProblem,
+      defaultPriceOptions: [
+        'A. 50万円〜100万円（小型コンパクト）',
+        'B. 110万円〜180万円（標準サイズ）',
+        'C. 190万円〜270万円（中大型＋趣味スペース）',
+        'D. 280万円以上（建築・車広フル仕様）'
+      ],
+      answerHint: 'スマイチの3Dシミュレーターで確認できます！'
+    };
+
+    // STORY_ARCSをバイパスして直接生成
+    const newStories = scenarioPhases.map((ph, idx) => ({
+      id: `story_${Date.now()}_${idx + 1}`,
+      episodeNum: idx + 1,
+      phase: ph.phase,
+      title: `${themeTitle} ${ph.subTitle}`,
+      plot: ph.plot(protagonist),
+      assignedAccount: `Google AI Pro アカウント ${((idx + 1) % 5) || 5}`,
+      englishPrompt: ph.englishPrompt,
+      imageUrl: null,
+      hashtags: scHashtags,
+      quizEnabled: true,
+      quizQuestion: scQuiz,
+      quizOptions: fakePreset.defaultPriceOptions,
+      quizAnswerHint: fakePreset.answerHint,
+      isPostedInstagram: false,
+      isPostedNote: false,
+      scheduledDate: new Date(Date.now() + idx * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    }));
+    setStories(newStories);
+  }; // end handleScenarioGenerate
+
   const handleGenerateAll = () => {
     if (!window.confirm('新しいストーリーと作画プロンプトを生成しますか？（現在の編集内容は上書きされます）')) {
       return;
@@ -177,6 +441,7 @@ export default function StoryStudioPanel() {
     const newStories = generateStoriesByAi(customTitle, customProtagonist, storyCount, customThemeDesc, currentPreset);
     setStories(newStories);
   };
+
 
   const copyToClipboard = (text, key) => {
     navigator.clipboard.writeText(text);
@@ -321,29 +586,147 @@ export default function StoryStudioPanel() {
           </p>
         </div>
 
+
+      </div>
+
+
+      {/* ── モード切り替えタブ ── */}
+      <div style={{ display: 'flex', gap: 0, borderRadius: 10, overflow: 'hidden', border: '1.5px solid #e2e8f0' }}>
         <button
-          onClick={() => setShowKitModal(true)}
+          onClick={() => setStoryMode('preset')}
           style={{
-            background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 8,
-            padding: '12px 18px',
-            fontSize: 13.5,
-            fontWeight: 700,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)'
+            flex: 1, padding: '11px 0', fontSize: 13.5, fontWeight: 700, cursor: 'pointer',
+            background: storyMode === 'preset' ? 'var(--color-primary)' : '#f8fafc',
+            color: storyMode === 'preset' ? '#fff' : '#64748b',
+            border: 'none', transition: 'all 0.2s'
           }}
         >
-          <HelpCircle size={16} />
-          <span>アカウント開設完全キット・画像アセット</span>
+          📋 プリセット起動
+        </button>
+        <button
+          onClick={() => setStoryMode('scenario')}
+          style={{
+            flex: 1, padding: '11px 0', fontSize: 13.5, fontWeight: 700, cursor: 'pointer',
+            background: storyMode === 'scenario' ? '#7c3aed' : '#f8fafc',
+            color: storyMode === 'scenario' ? '#fff' : '#64748b',
+            border: 'none', borderLeft: '1.5px solid #e2e8f0', transition: 'all 0.2s'
+          }}
+        >
+          ✍️ シナリオライター（自由生成）
         </button>
       </div>
 
-      {/* ステップ1：ストーリー設定フォーム */}
+      {/* ── シナリオライターパネル ── */}
+      {storyMode === 'scenario' && (
+        <div style={{
+          background: 'linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%)',
+          borderRadius: 12, border: '1.5px solid #c4b5fd', padding: 24
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
+            <span style={{ fontSize: 22 }}>✍️</span>
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: '#5b21b6' }}>シナリオライター</div>
+              <div style={{ fontSize: 12, color: '#7c3aed', marginTop: 2 }}>プリセット無視で、あらゆるターゲット・悩み・解決ストーリーを自由に設定してSNS連載を生成</div>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14, marginBottom: 14 }}>
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#5b21b6', marginBottom: 5 }}>
+                ① 訴求ターゲット・主人公 <span style={{ color: '#ef4444' }}>*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="例：30代共働き夫婦、50代ガーデニング主婦、EV乗りの会社員"
+                value={scTarget}
+                onChange={e => setScTarget(e.target.value)}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1.5px solid #c4b5fd', fontSize: 13, background: '#fff' }}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#5b21b6', marginBottom: 5 }}>
+                ② 誰のどんな悩み・課題 <span style={{ color: '#ef4444' }}>*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="例：月3万円の駐車場代が無駄、変形地に既製品が入らない、ガーデン道具が雨ざらし"
+                value={scProblem}
+                onChange={e => setScProblem(e.target.value)}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1.5px solid #c4b5fd', fontSize: 13, background: '#fff' }}
+              />
+            </div>
+          </div>
+
+          <div style={{ marginBottom: 14 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#5b21b6', marginBottom: 5 }}>
+              ③ ガレージ・倉庫建築でどう解決したか <span style={{ color: '#ef4444' }}>*</span>
+            </label>
+            <textarea
+              placeholder="例：中古住宅3,800万＋ガレージ300万で、新築4,500万と同程度の総額でガレージ付き生活を実現。台形の残地にぴったり収まる木造ガレージで駐車場代もゼロに。"
+              value={scResolution}
+              onChange={e => setScResolution(e.target.value)}
+              rows={2}
+              style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1.5px solid #c4b5fd', fontSize: 13, lineHeight: 1.6, background: '#fff' }}
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 18 }}>
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#5b21b6', marginBottom: 5 }}>④ ストーリーのトーン</label>
+              <select
+                value={scTone}
+                onChange={e => setScTone(e.target.value)}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1.5px solid #c4b5fd', fontSize: 13, background: '#fff' }}
+              >
+                <option value="emotional">😢 感動・共感系（暮らしが変わった）</option>
+                <option value="comparison">⚖️ 比較訴求系（新築vs中古＋ガレージ）</option>
+                <option value="data">📊 データ・論理系（数字で見る節約効果）</option>
+                <option value="humor">😄 コミカル系（クスッとして気づく）</option>
+              </select>
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#5b21b6', marginBottom: 5 }}>⑤ 必ず入れたい数字・キーワード（任意）</label>
+              <input
+                type="text"
+                placeholder="例：7年で元が取れる、1,750万円の差、数センチ単位"
+                value={scKeyword}
+                onChange={e => setScKeyword(e.target.value)}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1.5px solid #c4b5fd', fontSize: 13, background: '#fff' }}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#5b21b6', marginBottom: 5 }}>⑥ 生成話数</label>
+              <select
+                value={scEpisodeCount}
+                onChange={e => setScEpisodeCount(Number(e.target.value))}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1.5px solid #c4b5fd', fontSize: 13, background: '#fff' }}
+              >
+                <option value={3}>全3話（ミニ連載）</option>
+                <option value={5}>全5話（標準連載）</option>
+                <option value={7}>全7話（大型連載）</option>
+              </select>
+            </div>
+          </div>
+
+          <button
+            onClick={handleScenarioGenerate}
+            style={{
+              width: '100%', padding: '13px 0', borderRadius: 8, border: 'none',
+              background: 'linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%)',
+              color: '#fff', fontSize: 15, fontWeight: 800, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              boxShadow: '0 4px 14px rgba(124, 58, 237, 0.35)'
+            }}
+          >
+            <Sparkles size={18} />
+            シナリオライターで全話を自由生成する
+          </button>
+        </div>
+      )}
+
+      {/* ステップ1：ストーリー設定フォーム（プリセットモード） */}
+      {storyMode === 'preset' && (
+
       <div style={{
         background: '#ffffff',
         borderRadius: 12,
@@ -492,8 +875,10 @@ export default function StoryStudioPanel() {
           </button>
         </div>
       </div>
+      )} {/* end preset mode */}
 
       {/* ステップ2：ストーリー各話＆NanoBanana2作画・価格アンケート・投稿カード */}
+
       <div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
           <h3 style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>

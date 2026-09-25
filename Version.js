@@ -44,9 +44,10 @@
 // - 2026/09/25 v0.1.42: 読者参加型「価格予想・希望価格アンケート＆3Dシミュレーター答え合わせ連動」機能新設（Instagramコメント/ストーリーズ投票・noteアンケート＆リアルタイム積算CTAの自動生成）
 // - 2026/09/25 v0.1.43: X（旧Twitter）公式アカウント開設キット配備、StoryStudioモーダル内X設定追加、FooterにX公式リンク設置
 // - 2026/09/25 v0.1.44: StoryStudioにX（旧Twitter）専用ポスト成形・直接ツイートボタン・X投稿完了管理を追加、secrets配備完了
+// - 2026/09/26 v0.1.45: StoryStudioにシナリオライター（自由生成）機能・プリセット切替タブ追加、見積書詳細モーダルに宛名入力欄およびA4縦印刷用スタイル最適化
 
-window.APP_VERSION = '0.1.44';
-export const APP_VERSION = '0.1.44';
+window.APP_VERSION = '0.1.45';
+export const APP_VERSION = '0.1.45';
 
 
 
