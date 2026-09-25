@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Shield, Phone, Mail, MapPin, CheckCircle, ExternalLink, Building2 } from 'lucide-react';
-import { InstagramIcon, YoutubeIcon, NoteIcon } from './SnsIcons';
+import { InstagramIcon, YoutubeIcon, NoteIcon, XIcon } from './SnsIcons';
 import { APP_VERSION } from '../version.js';
 import CompanyInfoModal from './CompanyInfoModal';
 
@@ -127,6 +127,29 @@ export default function Footer({ setCurrentRoute }) {
                 >
                   <YoutubeIcon size={14} />
                   <span>YouTube</span>
+                </a>
+                <a
+                  href="https://twitter.com/smile049_garage"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '6px 12px',
+                    borderRadius: 6,
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    color: '#f8fafc',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    transition: 'all 0.2s ease'
+                  }}
+                  title="X (旧Twitter) 公式アカウント"
+                >
+                  <XIcon size={14} />
+                  <span>X (Twitter)</span>
                 </a>
               </div>
             </div>

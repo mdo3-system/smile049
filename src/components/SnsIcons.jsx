@@ -60,3 +60,24 @@ export function NoteIcon({ size = 16, color = 'currentColor', ...props }) {
     </svg>
   );
 }
+
+// X (旧Twitter) アイコン (SVG)
+export function XIcon({ size = 16, color = 'currentColor', ...props }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path d="M4 4l11.733 16h4.267l-11.733 -16z" />
+      <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" />
+    </svg>
+  );
+}
+

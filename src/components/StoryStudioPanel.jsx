@@ -4,7 +4,7 @@ import {
   Trash2, RefreshCw, Layers, CheckCircle2, ChevronDown, ChevronRight, 
   BookOpen, HelpCircle, Upload, ShieldCheck, ArrowRight, DollarSign, Vote
 } from 'lucide-react';
-import { InstagramIcon, YoutubeIcon, NoteIcon } from './SnsIcons';
+import { InstagramIcon, YoutubeIcon, NoteIcon, XIcon } from './SnsIcons';
 
 const STORAGE_KEY = 'smile049_story_studio_data_v2';
 
@@ -1106,6 +1106,31 @@ export default function StoryStudioPanel() {
                     style={{ position: 'absolute', top: 8, right: 8, padding: '3px 8px', fontSize: 11, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}
                   >
                     {copiedKey === 'yt_profile' ? 'コピー済' : 'コピー'}
+                  </button>
+                </div>
+              </div>
+
+              {/* X（旧Twitter）設定 */}
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 700, color: '#0f172a', marginBottom: 6 }}>
+                  <XIcon size={16} color="#0f172a" />
+                  <span>X（旧Twitter） アカウント開設キット</span>
+                </div>
+                <div style={{ fontSize: 12, color: '#475569', marginBottom: 4 }}>
+                  <strong>ユーザー名:</strong> <code>@smile049_garage</code> | <strong>名前:</strong> <code>スマイチ | 木造自由設計ガレージ・倉庫</code>
+                </div>
+                <div style={{ position: 'relative' }}>
+                  <textarea
+                    readOnly
+                    rows={4}
+                    value={`規格サイズに土地を合わせない。敷地に合わせてミリ単位で描く「木造自由設計ガレージ・倉庫 スマイチ」公式X。🚗愛車・大型バイクの秘密基地／狭小変形地ストッカー／農機具倉庫。登録不要の3Dシミュレーター＆自動見積もり公開中！埼玉・関東全域対応。専任スタッフが構造計算から施工までワンストップ。\nhttps://smile049.jp/`}
+                    style={{ width: '100%', fontSize: 12, padding: '8px 10px', borderRadius: 6, border: '1px solid #cbd5e1', background: '#f8fafc', lineHeight: 1.5 }}
+                  />
+                  <button
+                    onClick={() => copyToClipboard(`規格サイズに土地を合わせない。敷地に合わせてミリ単位で描く「木造自由設計ガレージ・倉庫 スマイチ」公式X。🚗愛車・大型バイクの秘密基地／狭小変形地ストッカー／農機具倉庫。登録不要の3Dシミュレーター＆自動見積もり公開中！埼玉・関東全域対応。専任スタッフが構造計算から施工までワンストップ。\nhttps://smile049.jp/`, 'x_profile')}
+                    style={{ position: 'absolute', top: 8, right: 8, padding: '3px 8px', fontSize: 11, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}
+                  >
+                    {copiedKey === 'x_profile' ? 'コピー済' : 'コピー'}
                   </button>
                 </div>
               </div>
