@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Shield, Phone, Mail, MapPin, CheckCircle, ExternalLink, Building2 } from 'lucide-react';
+import { InstagramIcon, YoutubeIcon, NoteIcon } from './SnsIcons';
 import { APP_VERSION } from '../version.js';
 import CompanyInfoModal from './CompanyInfoModal';
 
@@ -43,8 +44,91 @@ export default function Footer({ setCurrentRoute }) {
               規格サイズに土地を合わせるのではなく、敷地に合わせて自分で描くガレージ。
               木造ならではの断熱・調湿を考えた仕様で、結露や湿気にも配慮しながら、安心の構造計算と確認申請一括対応でお届けします。
             </p>
-            <div style={{ fontSize: 12, color: '#64748b' }}>
+            <div style={{ fontSize: 12, color: '#64748b', marginBottom: 14 }}>
               ※行政手続き・構造計算の窓口および主体は自社専任の「建築士」が行います。
+            </div>
+
+            {/* 公式SNS・Webメディアリンク */}
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.04)',
+              borderRadius: 8,
+              padding: '12px 14px',
+              border: '1px solid rgba(255, 255, 255, 0.08)'
+            }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', marginBottom: 8, letterSpacing: '0.06em' }}>
+                OFFICIAL SNS & STORY MEDIA
+              </div>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <a
+                  href="https://www.instagram.com/smile049_garage"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '6px 12px',
+                    borderRadius: 6,
+                    background: 'rgba(225, 48, 108, 0.15)',
+                    color: '#f472b6',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                    border: '1px solid rgba(225, 48, 108, 0.3)',
+                    transition: 'all 0.2s ease'
+                  }}
+                  title="Instagram公式アカウント"
+                >
+                  <InstagramIcon size={14} />
+                  <span>Instagram</span>
+                </a>
+                <a
+                  href="https://note.com/smile049"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '6px 12px',
+                    borderRadius: 6,
+                    background: 'rgba(34, 197, 94, 0.15)',
+                    color: '#86efac',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                    border: '1px solid rgba(34, 197, 94, 0.3)',
+                    transition: 'all 0.2s ease'
+                  }}
+                  title="note公式アカウント（ガレージ物語連載）"
+                >
+                  <NoteIcon size={14} />
+                  <span>note連載</span>
+                </a>
+                <a
+                  href="https://www.youtube.com/@smile049_garage"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '6px 12px',
+                    borderRadius: 6,
+                    background: 'rgba(239, 68, 68, 0.15)',
+                    color: '#fca5a5',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                    border: '1px solid rgba(239, 68, 68, 0.3)',
+                    transition: 'all 0.2s ease'
+                  }}
+                  title="YouTube公式チャンネル（操作解説動画・施工動画）"
+                >
+                  <YoutubeIcon size={14} />
+                  <span>YouTube</span>
+                </a>
+              </div>
             </div>
           </div>
 

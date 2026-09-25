@@ -6,6 +6,7 @@ import {
   Layers, Maximize2, X
 } from 'lucide-react';
 import DocumentSlotPanel from '../components/DocumentSlotPanel';
+import StoryStudioPanel from '../components/StoryStudioPanel';
 import { Lock, KeyRound } from 'lucide-react';
 import { getChatRooms, sendMessageToRoom, updateRoomStatus } from '../services/chatService';
 
@@ -16,6 +17,7 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [inputPasscode, setInputPasscode] = useState('');
   const [authError, setAuthError] = useState(false);
+  const [mainAdminTab, setMainAdminTab] = useState('crm'); // 'crm' | 'storyStudio'
 
   // マウント時に過去のセッションストレージを念のためクリア
   useEffect(() => {
@@ -352,17 +354,69 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
         </div>
       </div>
 
-      {/* メインレイアウト (左: 顧客一覧 / 右: チャット＆アクション) */}
+      {/* 管理画面メイン切り替えナビゲーションバー */}
       <div style={{
-        flex: 1,
-        maxWidth: 1300,
-        width: '100%',
-        margin: '0 auto',
-        padding: '20px',
-        display: 'grid',
-        gridTemplateColumns: '360px 1fr',
-        gap: 20
+        background: '#1e293b',
+        borderBottom: '1px solid #334155',
+        padding: '0 24px'
       }}>
+        <div style={{ maxWidth: 1300, margin: '0 auto', display: 'flex', gap: 16 }}>
+          <button
+            onClick={() => setMainAdminTab('crm')}
+            style={{
+              padding: '12px 18px',
+              fontSize: 13.5,
+              fontWeight: 700,
+              background: 'transparent',
+              border: 'none',
+              borderBottom: mainAdminTab === 'crm' ? '3px solid #38bdf8' : '3px solid transparent',
+              color: mainAdminTab === 'crm' ? '#38bdf8' : '#94a3b8',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <MessageSquare size={16} />
+            <span>顧客相談・パース依頼管理 (CRM)</span>
+          </button>
+
+          <button
+            onClick={() => setMainAdminTab('storyStudio')}
+            style={{
+              padding: '12px 18px',
+              fontSize: 13.5,
+              fontWeight: 700,
+              background: 'transparent',
+              border: 'none',
+              borderBottom: mainAdminTab === 'storyStudio' ? '3px solid #80ed99' : '3px solid transparent',
+              color: mainAdminTab === 'storyStudio' ? '#80ed99' : '#94a3b8',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <Sparkles size={16} />
+            <span>ガレージ連載・Story Studio (Instagram / note / NanoBanana2)</span>
+          </button>
+        </div>
+      </div>
+
+      {/* タブ1: CRM顧客一覧 ＆ チャット管理 */}
+      {mainAdminTab === 'crm' && (
+        <div style={{
+          flex: 1,
+          maxWidth: 1300,
+          width: '100%',
+          margin: '0 auto',
+          padding: '20px',
+          display: 'grid',
+          gridTemplateColumns: '360px 1fr',
+          gap: 20
+        }}>
         {/* 左: 依頼・顧客リスト */}
         <div style={{
           background: '#ffffff',
@@ -766,6 +820,20 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
           </div>
         )}
       </div>
+      )}
+
+      {/* タブ2: ガレージ連載・Story Studio (Instagram / note / NanoBanana2) */}
+      {mainAdminTab === 'storyStudio' && (
+        <div style={{
+          flex: 1,
+          maxWidth: 1300,
+          width: '100%',
+          margin: '0 auto',
+          padding: '24px 20px'
+        }}>
+          <StoryStudioPanel />
+        </div>
+      )}
 
       {/* 全画面画像プレビューモーダル */}
       {previewImage && (
