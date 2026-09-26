@@ -50,9 +50,10 @@
 // - 2026/09/26 v0.1.48: StoryStudioのCalendarアイコン未インポートによる描画クラッシュ（ReferenceError）を修正
 // - 2026/09/26 v0.1.49: StoryStudioに公式運用手順・操作マニュアル（方式③ハイブリッドモデル・シナリオライター・NanoBanana2作画・予約公開連動・アンケート送客・SNS投稿フロー）を完全配備
 // - 2026/09/26 v0.1.50: Instagram向け動画・画像ハイブリッドカルーセル対応（StoryStudioに動画アップロード枠新設・プレビュー・Instagram構成ガイド・特設ページ動画プレイヤー連動）
+// - 2026/09/26 v0.1.51: Veo 3（Google AI Pro / VideoFX）用シネマティック4K動画生成プロンプト自動生成・切替タブ・ワンクリックコピー機能配備
 
-window.APP_VERSION = '0.1.50';
-export const APP_VERSION = '0.1.50';
+window.APP_VERSION = '0.1.51';
+export const APP_VERSION = '0.1.51';
 
 
 

@@ -186,6 +186,40 @@ export const DEFAULT_STORIES = [
 ];
 
 /**
+ * Veo 3（Google AI Pro / VideoFX）用シネマティック4K動画生成プロンプトを生成
+ */
+export const generateVeoPrompt = (englishPrompt, title = '', episodeNum = 1) => {
+  const cameraMotions = [
+    'Cinematic 4k 24fps drone push-in tracking shot, smooth cinematic motion',
+    'Cinematic 4k 24fps slow orbiting camera movement, shallow depth of field',
+    'Cinematic 4k 24fps low-angle tracking shot, dramatic golden lighting',
+    'Cinematic 4k 24fps high-angle downward crane shot, architectural precision',
+    'Cinematic 4k 24fps slow-motion dolly-in shot, atmospheric soft lighting',
+    'Cinematic 4k 24fps wide panoramic panning shot, golden hour sunlight',
+    'Cinematic 4k 24fps sunrise push-in camera shot, uplifting cinematic lighting'
+  ];
+  const motion = cameraMotions[(episodeNum - 1) % cameraMotions.length];
+
+  let clean = (englishPrompt || '')
+    .replace(/^8k (cinematic photograph|illustration style|intimate lifestyle photography|architectural photography|warm lifestyle photography|cinematic wide shot),?\s*/i, '')
+    .replace(/photorealistic( rendering| masterpiece)?\.?/gi, '')
+    .trim();
+
+  const dynamicActions = [
+    'electric motorized garage door smoothly rolling open, revealing illuminated warm timber interior, gentle wind blowing nearby trees',
+    'warm interior lighting turning on sequentially, realistic metallic reflections on dark galvalume panels',
+    'family walking together towards the garage, car headlights turning on, warm atmospheric dusk',
+    'gentle sunlight rays shifting across the wooden timber frame, seamless architectural details',
+    'rain softly falling on galvalume roofline, family car smoothly parking inside clean dry garage shelter',
+    'cozy evening string lights glowing outside, children running happily in garden, father admiring car inside garage',
+    'morning golden hour light breaking through trees, electric shutter rising, inspiring garage life beginning'
+  ];
+  const action = dynamicActions[(episodeNum - 1) % dynamicActions.length];
+
+  return `${motion}, ${clean}, ${action}, photorealistic 4k video, realistic physics and dynamic lighting.`;
+};
+
+/**
  * 全ストーリーを取得（ローカルストレージ優先、なければデフォルト）
  */
 export const getAllStories = () => {
@@ -194,13 +228,19 @@ export const getAllStories = () => {
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
+        return parsed.map((s, idx) => ({
+          ...s,
+          veoPrompt: s.veoPrompt || generateVeoPrompt(s.englishPrompt, s.title, s.episodeNum || idx + 1)
+        }));
       }
     }
   } catch (e) {
     console.error('Failed to load stories from localStorage:', e);
   }
-  return DEFAULT_STORIES;
+  return DEFAULT_STORIES.map((s, idx) => ({
+    ...s,
+    veoPrompt: s.veoPrompt || generateVeoPrompt(s.englishPrompt, s.title, s.episodeNum || idx + 1)
+  }));
 };
 
 /**

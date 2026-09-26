@@ -6,7 +6,7 @@ import {
   Calendar, Video, Film, Play
 } from 'lucide-react';
 import { InstagramIcon, YoutubeIcon, NoteIcon, XIcon } from './SnsIcons';
-import { getAllStories, saveAllStories, isStoryPublished, STORY_STORAGE_KEY } from '../services/storyService';
+import { getAllStories, saveAllStories, isStoryPublished, generateVeoPrompt, STORY_STORAGE_KEY } from '../services/storyService';
 
 const STORAGE_KEY = STORY_STORAGE_KEY;
 
@@ -309,6 +309,7 @@ export default function StoryStudioPanel() {
 
   const [copiedKey, setCopiedKey] = useState(null);
   const [activeStoryTab, setActiveStoryTab] = useState('instagram'); // 'instagram' | 'note' | 'x'
+  const [promptType, setPromptType] = useState('veo'); // 'veo' | 'nano'
 
 
   // 共有ストレージ保存
@@ -413,7 +414,9 @@ export default function StoryStudioPanel() {
       plot: ph.plot(protagonist),
       assignedAccount: `Google AI Pro アカウント ${((idx + 1) % 5) || 5}`,
       englishPrompt: ph.englishPrompt,
+      veoPrompt: generateVeoPrompt(ph.englishPrompt, `${themeTitle} ${ph.subTitle}`, idx + 1),
       imageUrl: null,
+      videoUrl: null,
       hashtags: scHashtags,
       quizEnabled: true,
       quizQuestion: scQuiz,
@@ -1279,18 +1282,62 @@ export default function StoryStudioPanel() {
                   </div>
                 </div>
 
-                {/* 右列：NanoBanana2作画プロンプト ＆ 画像ドロップゾーン */}
+                {/* 右列：AIプロンプト（Veo 3 動画 ＆ NanoBanana2 静止画） ＆ メディアスロット */}
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: '#64748b' }}>
-                      NanoBanana2 (Google AI Pro) 用 英語作画プロンプト
+                    {/* タブ切り替え（Veo 3 / NanoBanana2） */}
+                    <div style={{ display: 'flex', gap: 4, background: '#f1f5f9', padding: 2, borderRadius: 6 }}>
+                      <button
+                        onClick={() => setPromptType('veo')}
+                        style={{
+                          background: promptType === 'veo' ? '#2563eb' : 'transparent',
+                          color: promptType === 'veo' ? '#fff' : '#64748b',
+                          border: 'none',
+                          borderRadius: 4,
+                          padding: '3px 8px',
+                          fontSize: 11,
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 4
+                        }}
+                      >
+                        <Video size={12} />
+                        <span>🎥 Veo 3 (4K動画)</span>
+                      </button>
+                      <button
+                        onClick={() => setPromptType('nano')}
+                        style={{
+                          background: promptType === 'nano' ? '#0f172a' : 'transparent',
+                          color: promptType === 'nano' ? '#fff' : '#64748b',
+                          border: 'none',
+                          borderRadius: 4,
+                          padding: '3px 8px',
+                          fontSize: 11,
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 4
+                        }}
+                      >
+                        <ImageIcon size={12} />
+                        <span>🖼️ NanoBanana2 (静止画)</span>
+                      </button>
                     </div>
+
                     <button
-                      onClick={() => copyToClipboard(story.englishPrompt, `prompt_${story.id}`)}
+                      onClick={() => {
+                        const targetText = promptType === 'veo' 
+                          ? (story.veoPrompt || generateVeoPrompt(story.englishPrompt, story.title, story.episodeNum))
+                          : story.englishPrompt;
+                        copyToClipboard(targetText, `prompt_${story.id}_${promptType}`);
+                      }}
                       style={{
-                        background: copiedKey === `prompt_${story.id}` ? '#10b981' : '#f1f5f9',
-                        color: copiedKey === `prompt_${story.id}` ? '#fff' : '#0f172a',
-                        border: '1px solid #cbd5e1',
+                        background: copiedKey === `prompt_${story.id}_${promptType}` ? '#10b981' : (promptType === 'veo' ? '#eff6ff' : '#f1f5f9'),
+                        color: copiedKey === `prompt_${story.id}_${promptType}` ? '#fff' : (promptType === 'veo' ? '#2563eb' : '#0f172a'),
+                        border: promptType === 'veo' ? '1px solid #bfdbfe' : '1px solid #cbd5e1',
                         borderRadius: 4,
                         padding: '4px 10px',
                         fontSize: 11.5,
@@ -1301,15 +1348,16 @@ export default function StoryStudioPanel() {
                         gap: 4
                       }}
                     >
-                      {copiedKey === `prompt_${story.id}` ? <Check size={12} /> : <Copy size={12} />}
-                      <span>{copiedKey === `prompt_${story.id}` ? 'コピー完了' : 'プロンプトをコピー'}</span>
+                      {copiedKey === `prompt_${story.id}_${promptType}` ? <Check size={12} /> : <Copy size={12} />}
+                      <span>{copiedKey === `prompt_${story.id}_${promptType}` ? 'コピー完了' : (promptType === 'veo' ? 'Veo 3 プロンプトをコピー' : '作画プロンプトをコピー')}</span>
                     </button>
                   </div>
 
                   {/* 英語プロンプト枠 */}
                   <div style={{
-                    background: '#0f172a',
-                    color: '#94a3b8',
+                    background: promptType === 'veo' ? '#0b1329' : '#0f172a',
+                    color: promptType === 'veo' ? '#93c5fd' : '#94a3b8',
+                    border: promptType === 'veo' ? '1px solid rgba(59, 130, 246, 0.3)' : '1px solid transparent',
                     padding: '10px 12px',
                     borderRadius: 6,
                     fontSize: 11.5,
@@ -1319,7 +1367,10 @@ export default function StoryStudioPanel() {
                     maxHeight: 75,
                     overflowY: 'auto'
                   }}>
-                    {story.englishPrompt}
+                    {promptType === 'veo' 
+                      ? (story.veoPrompt || generateVeoPrompt(story.englishPrompt, story.title, story.episodeNum))
+                      : story.englishPrompt
+                    }
                   </div>
 
                   {/* メディアスロット（動画枠 ＆ 画像枠のハイブリッド2列） */}
