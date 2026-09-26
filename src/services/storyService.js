@@ -28,6 +28,7 @@ export const DEFAULT_STORIES = [
     ],
     quizAnswerHint: '約248万円（3Dシミュレーター積算目安）',
     isPostedInstagram: true,
+    isPostedYouTube: true,
     isPostedNote: true,
     isPostedX: true,
     // 過去日付にして第1話は即時公開
@@ -53,6 +54,7 @@ export const DEFAULT_STORIES = [
     ],
     quizAnswerHint: '正解は B & D！ミリ単位で土地境界に合わせられます',
     isPostedInstagram: true,
+    isPostedYouTube: false,
     isPostedNote: true,
     isPostedX: true,
     // 過去日付にして第2話も即時公開
@@ -78,6 +80,7 @@ export const DEFAULT_STORIES = [
     ],
     quizAnswerHint: '3Dシミュレーター上でいつでもリアルタイム積算中！',
     isPostedInstagram: false,
+    isPostedYouTube: false,
     isPostedNote: false,
     isPostedX: false,
     // 本日公開
@@ -103,6 +106,7 @@ export const DEFAULT_STORIES = [
     ],
     quizAnswerHint: 'B & D！敷地境界に沿って壁を斜めに作れます',
     isPostedInstagram: false,
+    isPostedYouTube: false,
     isPostedNote: false,
     isPostedX: false,
     // 7日後公開予定（次回予告）
@@ -128,6 +132,7 @@ export const DEFAULT_STORIES = [
     ],
     quizAnswerHint: 'B（計算上7年）＆ D（毎日の快適さはプライスレス）！',
     isPostedInstagram: false,
+    isPostedYouTube: false,
     isPostedNote: false,
     isPostedX: false,
     // 14日後公開予定
@@ -153,6 +158,7 @@ export const DEFAULT_STORIES = [
     ],
     quizAnswerHint: '木造なら内装DIYやエアコン設置も自由自在です',
     isPostedInstagram: false,
+    isPostedYouTube: false,
     isPostedNote: false,
     isPostedX: false,
     // 21日後公開予定
@@ -178,6 +184,7 @@ export const DEFAULT_STORIES = [
     ],
     quizAnswerHint: 'すべてWeb上で今すぐ無料・登録不要でお試しいただけます！',
     isPostedInstagram: false,
+    isPostedYouTube: false,
     isPostedNote: false,
     isPostedX: false,
     // 28日後公開予定
@@ -186,37 +193,48 @@ export const DEFAULT_STORIES = [
 ];
 
 /**
- * Veo 3（Google AI Pro / VideoFX）用シネマティック4K動画生成プロンプトを生成
+ * Veo 3（Google AI Pro / VideoFX）用シネマティック4K動画生成プロンプト（単一・メインカット）
  */
 export const generateVeoPrompt = (englishPrompt, title = '', episodeNum = 1) => {
-  const cameraMotions = [
-    'Cinematic 4k 24fps drone push-in tracking shot, smooth cinematic motion',
-    'Cinematic 4k 24fps slow orbiting camera movement, shallow depth of field',
-    'Cinematic 4k 24fps low-angle tracking shot, dramatic golden lighting',
-    'Cinematic 4k 24fps high-angle downward crane shot, architectural precision',
-    'Cinematic 4k 24fps slow-motion dolly-in shot, atmospheric soft lighting',
-    'Cinematic 4k 24fps wide panoramic panning shot, golden hour sunlight',
-    'Cinematic 4k 24fps sunrise push-in camera shot, uplifting cinematic lighting'
-  ];
-  const motion = cameraMotions[(episodeNum - 1) % cameraMotions.length];
+  const cuts = generateVeo3CutPrompts(englishPrompt, title, episodeNum);
+  return cuts.scene1;
+};
 
+/**
+ * Veo 3（Google AI Pro / VideoFX）用 3カット連動・絵コンテプロンプト生成
+ * 1アカウントあたり3つの異なるシネマティックカット（外観全景 / 開口木造ディテール / 生活実感雨の日）を生成
+ */
+export const generateVeo3CutPrompts = (englishPrompt, title = '', episodeNum = 1) => {
   let clean = (englishPrompt || '')
     .replace(/^8k (cinematic photograph|illustration style|intimate lifestyle photography|architectural photography|warm lifestyle photography|cinematic wide shot),?\s*/i, '')
     .replace(/photorealistic( rendering| masterpiece)?\.?/gi, '')
     .trim();
 
-  const dynamicActions = [
-    'electric motorized garage door smoothly rolling open, revealing illuminated warm timber interior, gentle wind blowing nearby trees',
-    'warm interior lighting turning on sequentially, realistic metallic reflections on dark galvalume panels',
-    'family walking together towards the garage, car headlights turning on, warm atmospheric dusk',
-    'gentle sunlight rays shifting across the wooden timber frame, seamless architectural details',
-    'rain softly falling on galvalume roofline, family car smoothly parking inside clean dry garage shelter',
-    'cozy evening string lights glowing outside, children running happily in garden, father admiring car inside garage',
-    'morning golden hour light breaking through trees, electric shutter rising, inspiring garage life beginning'
+  // カット1: 外観・ドローン全景（建築カメラマン＆ドローンパイロット視点）
+  const scene1Motions = [
+    'Cinematic 4k 24fps smooth drone push-in tracking shot over Japanese suburban neighborhood, revealing dark charcoal galvalume custom wooden garage attached to renovated house',
+    'Cinematic 4k 24fps majestic low-angle wide tilt-up camera movement showing zero-eave roofline and timber structure fitting perfectly on lot',
+    'Cinematic 4k 24fps slow orbiting panoramic crane shot around modern wooden garage at dusk twilight'
   ];
-  const action = dynamicActions[(episodeNum - 1) % dynamicActions.length];
+  const scene1 = `${scene1Motions[(episodeNum - 1) % scene1Motions.length]}, ${clean}, crisp architectural symmetry, realistic natural lighting, photorealistic 4k video.`;
 
-  return `${motion}, ${clean}, ${action}, photorealistic 4k video, realistic physics and dynamic lighting.`;
+  // カット2: シャッター開閉・木造現し構造（建築シネマグラファー＆カラリスト視点）
+  const scene2Actions = [
+    'Cinematic 4k 24fps eye-level dolly shot moving into garage interior, electric motorized roller shutter smoothly rising, warm LED strip lights illuminating exposed wooden rafters and OSB plywood workbench',
+    'Cinematic 4k 24fps slow-motion tracking shot inside garage, warm wood grain textures, tool wall neatly organized, gentle golden light spilling across polished concrete floor',
+    'Cinematic 4k 24fps panning shot across ceiling wooden timber trusses and dark metallic walls, modern high-end architectural finish'
+  ];
+  const scene2 = `${scene2Actions[(episodeNum - 1) % scene2Actions.length]}, authentic Japanese timber craftsmanship, realistic physics, 4k 24fps video.`;
+
+  // カット3: 雨の日入庫・生活実感の豊かさ（映像ディレクター＆サウンドデザイナー視点）
+  const scene3Lifestyles = [
+    'Cinematic 4k 24fps slow dolly tracking shot on rainy evening, raindrops softly trickling off galvalume eaves, family car smoothly parking inside dry warm garage, family stepping out without getting wet, warm smiling faces',
+    'Cinematic 4k 24fps heartwarming dusk lifestyle shot, Japanese couple admiring their organized garage space with steaming mugs of coffee, tranquil suburban rain outside',
+    'Cinematic 4k 24fps uplifting morning shot, golden sunrise breaking through morning mist, electric shutter rolling open, family preparing bicycles and car for weekend outing'
+  ];
+  const scene3 = `${scene3Lifestyles[(episodeNum - 1) % scene3Lifestyles.length]}, cozy heartfelt atmosphere, no luxury exaggeration, honest Japanese suburban lifestyle, photorealistic 4k.`;
+
+  return { scene1, scene2, scene3 };
 };
 
 /**
@@ -228,19 +246,33 @@ export const getAllStories = () => {
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed.map((s, idx) => ({
-          ...s,
-          veoPrompt: s.veoPrompt || generateVeoPrompt(s.englishPrompt, s.title, s.episodeNum || idx + 1)
-        }));
+        return parsed.map((s, idx) => {
+          const cuts = generateVeo3CutPrompts(s.englishPrompt, s.title, s.episodeNum || idx + 1);
+          return {
+            ...s,
+            veoPrompt: s.veoPrompt || cuts.scene1,
+            veoPromptScene1: cuts.scene1,
+            veoPromptScene2: cuts.scene2,
+            veoPromptScene3: cuts.scene3,
+            isPostedYouTube: typeof s.isPostedYouTube === 'boolean' ? s.isPostedYouTube : false
+          };
+        });
       }
     }
   } catch (e) {
     console.error('Failed to load stories from localStorage:', e);
   }
-  return DEFAULT_STORIES.map((s, idx) => ({
-    ...s,
-    veoPrompt: s.veoPrompt || generateVeoPrompt(s.englishPrompt, s.title, s.episodeNum || idx + 1)
-  }));
+  return DEFAULT_STORIES.map((s, idx) => {
+    const cuts = generateVeo3CutPrompts(s.englishPrompt, s.title, s.episodeNum || idx + 1);
+    return {
+      ...s,
+      veoPrompt: s.veoPrompt || cuts.scene1,
+      veoPromptScene1: cuts.scene1,
+      veoPromptScene2: cuts.scene2,
+      veoPromptScene3: cuts.scene3,
+      isPostedYouTube: typeof s.isPostedYouTube === 'boolean' ? s.isPostedYouTube : false
+    };
+  });
 };
 
 /**

@@ -52,9 +52,10 @@
 // - 2026/09/26 v0.1.50: Instagram向け動画・画像ハイブリッドカルーセル対応（StoryStudioに動画アップロード枠新設・プレビュー・Instagram構成ガイド・特設ページ動画プレイヤー連動）
 // - 2026/09/26 v0.1.51: Veo 3（Google AI Pro / VideoFX）用シネマティック4K動画生成プロンプト自動生成・切替タブ・ワンクリックコピー機能配備
 // - 2026/09/26 v0.1.52: src/version.jsのバージョン同期乖離解消（全画面v0.1.52統一）、Instagram投稿ペースト先図解ガイド・日本語予約投稿URL（Meta Business Suite ja_JP）配備、FIXED_LOGIC.md仕様同期
+// - 2026/09/26 v0.1.53: ワンソース・マルチユース自動連鎖投稿モデル・YouTube用タブ＆概要欄成形・全SNS初心者向け貼り付け先ガイド・Veo 3絵コンテ3カット生成・クリエイティブ制作スタジオ体制（3部門7スペシャリスト）配備、マニュアル全面更新
 
-window.APP_VERSION = '0.1.52';
-export const APP_VERSION = '0.1.52';
+window.APP_VERSION = '0.1.53';
+export const APP_VERSION = '0.1.53';
 
 
 

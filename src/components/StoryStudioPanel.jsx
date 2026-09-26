@@ -6,7 +6,7 @@ import {
   Calendar, Video, Film, Play
 } from 'lucide-react';
 import { InstagramIcon, YoutubeIcon, NoteIcon, XIcon } from './SnsIcons';
-import { getAllStories, saveAllStories, isStoryPublished, generateVeoPrompt, STORY_STORAGE_KEY } from '../services/storyService';
+import { getAllStories, saveAllStories, isStoryPublished, generateVeoPrompt, generateVeo3CutPrompts, STORY_STORAGE_KEY } from '../services/storyService';
 
 const STORAGE_KEY = STORY_STORAGE_KEY;
 
@@ -298,19 +298,23 @@ export default function StoryStudioPanel() {
   const [showKitModal, setShowKitModal] = useState(false);
   const [kitModalTab, setKitModalTab] = useState('manual'); // 'manual' | 'snsKit'
 
-  // シナリオライター専用フィールド
-  const [scTarget, setScTarget] = useState(''); // 訂跢層・誦求対象
-  const [scProblem, setScProblem] = useState(''); // 誰のどんな悩み
-  const [scResolution, setScResolution] = useState(''); // ガレージ・倉庫による解決
+  // シナリオライター専用フィールド（クリエイティブスタジオ3部門体制 ＆ 5大要素連動）
+  const [scTarget, setScTarget] = useState('新築予算で中古購入＋リノベ＋木造ガレージで暮らしの豊かさを優先する層'); // ターゲット像・ペルソナ
+  const [scProblem, setScProblem] = useState('住宅展示場を回っても4,500万円と高額で手が出ず、駐車場代も月3万円かかっている'); // 誰のどんな悩み
+  const [scResolution, setScResolution] = useState('中古住宅3,800万＋ガレージ300万で新築と同予算内でガレージ付き生活を実現し駐車場代ゼロへ'); // ガレージ・建築による解決
+  const [scEmotionBenefit, setScEmotionBenefit] = useState('雨に濡れずに外出して帰宅できる贅沢、毎日の暮らしのゆとり'); // 住み手が手に入れる感情の変化
+  const [scNgLine, setScNgLine] = useState('高級路線・派手な演出はNG（等身大の生活実感・賢い選択を重視）'); // 避けたい表現・NGライン
+  const [scCta, setScCta] = useState('3Dシミュレーターでリアルタイム積算＆答え合わせ'); // 視聴した後のCTA
+  const [scDuration, setScDuration] = useState(30); // 90 | 60 | 30 | 15 (ワンソース・マルチユース尺設計)
   const [scTone, setScTone] = useState('emotional'); // emotional | data | humor | comparison
-  const [scKeyword, setScKeyword] = useState(''); // 必ず入れたいキーワード・数字
+  const [scKeyword, setScKeyword] = useState('雨に濡れない贅沢、月3万円の駐車場代ゼロ、ミリ単位設計'); // 必ず入れたいキーワード・数字
   const [scEpisodeCount, setScEpisodeCount] = useState(3);
   const [stories, setStories] = useState(() => getAllStories());
 
   const [copiedKey, setCopiedKey] = useState(null);
-  const [activeStoryTab, setActiveStoryTab] = useState('instagram'); // 'instagram' | 'note' | 'x'
+  const [activeStoryTab, setActiveStoryTab] = useState('instagram'); // 'instagram' | 'youtube' | 'note' | 'x'
   const [promptType, setPromptType] = useState('veo'); // 'veo' | 'nano'
-
+  const [selectedVeoCut, setSelectedVeoCut] = useState('scene1'); // 'scene1' | 'scene2' | 'scene3' | 'all'
 
   // 共有ストレージ保存
   useEffect(() => {
@@ -406,27 +410,34 @@ export default function StoryStudioPanel() {
     };
 
     // STORY_ARCSをバイパスして直接生成
-    const newStories = scenarioPhases.map((ph, idx) => ({
-      id: `story_${Date.now()}_${idx + 1}`,
-      episodeNum: idx + 1,
-      phase: ph.phase,
-      title: `${themeTitle} ${ph.subTitle}`,
-      plot: ph.plot(protagonist),
-      assignedAccount: `Google AI Pro アカウント ${((idx + 1) % 5) || 5}`,
-      englishPrompt: ph.englishPrompt,
-      veoPrompt: generateVeoPrompt(ph.englishPrompt, `${themeTitle} ${ph.subTitle}`, idx + 1),
-      imageUrl: null,
-      videoUrl: null,
-      hashtags: scHashtags,
-      quizEnabled: true,
-      quizQuestion: scQuiz,
-      quizOptions: fakePreset.defaultPriceOptions,
-      quizAnswerHint: fakePreset.answerHint,
-      isPostedInstagram: false,
-      isPostedNote: false,
-      isPostedX: false,
-      scheduledDate: new Date(Date.now() + idx * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-    }));
+    const newStories = scenarioPhases.map((ph, idx) => {
+      const cuts = generateVeo3CutPrompts(ph.englishPrompt, `${themeTitle} ${ph.subTitle}`, idx + 1);
+      return {
+        id: `story_${Date.now()}_${idx + 1}`,
+        episodeNum: idx + 1,
+        phase: ph.phase,
+        title: `${themeTitle} ${ph.subTitle}`,
+        plot: ph.plot(protagonist),
+        assignedAccount: `Google AI Pro アカウント ${((idx + 1) % 5) || 5}`,
+        englishPrompt: ph.englishPrompt,
+        veoPrompt: cuts.scene1,
+        veoPromptScene1: cuts.scene1,
+        veoPromptScene2: cuts.scene2,
+        veoPromptScene3: cuts.scene3,
+        imageUrl: null,
+        videoUrl: null,
+        hashtags: scHashtags,
+        quizEnabled: true,
+        quizQuestion: scQuiz,
+        quizOptions: fakePreset.defaultPriceOptions,
+        quizAnswerHint: fakePreset.answerHint,
+        isPostedInstagram: false,
+        isPostedYouTube: false,
+        isPostedNote: false,
+        isPostedX: false,
+        scheduledDate: new Date(Date.now() + idx * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+      };
+    });
     setStories(newStories);
   }; // end handleScenarioGenerate
 
@@ -510,6 +521,34 @@ export default function StoryStudioPanel() {
 
     caption += `―――――――――――――――\n■ 木造自由設計ガレージ・倉庫【スマイチ】\n規格サイズに土地を合わせるのではなく、\nあなたの敷地にガレージを合わせる。\n\n・登録不要の3Dシミュレーター＆リアルタイム積算見積もり\n・ガルバリウム鋼板×木造現しの洗練されたモダンデザイン\n・専任スタッフによる構造計算・確認申請ワンストップ施工\n\nプロフィールのリンク（@smile049_garage）から3D設計をお試しいただけます。\nhttps://smile049.jp/\n\n${story.hashtags}`;
     return caption;
+  };
+
+  // YouTube用動画概要欄（Shorts / 通常動画対応、最初の3秒フック、あらすじ、アンケート、3D答え合わせリンク、仕様タグ）
+  const formatYouTubeDescription = (story) => {
+    let desc = `【木造自由設計ガレージ連載 第${story.episodeNum}話】\n`;
+    desc += `${story.title}\n\n`;
+    desc += `▼ 本編あらすじ\n${story.plot}\n\n`;
+    desc += `――――――――――――――――――――――\n`;
+    if (story.quizEnabled) {
+      desc += `🗳️【視聴者アンケート】この木造ガレージ、いくらだと思いますか？\n`;
+      desc += `Q. ${story.quizQuestion}\n`;
+      story.quizOptions.forEach((opt) => {
+        desc += `・${opt}\n`;
+      });
+      desc += `\nぜひ、コメント欄であなたの予想や「この仕様なら欲しい！」を教えてください！\n\n`;
+      desc += `💡【答え合わせ】無料3Dシミュレーターでリアルタイム積算中！\n`;
+      desc += `（概算目安: ${story.quizAnswerHint}）\n`;
+      desc += `ご自身の敷地サイズを入力して、その場で建築費用を3D積算できます👇\n`;
+      desc += `https://smile049.jp/simulator\n\n`;
+    }
+    desc += `――――――――――――――――――――――\n`;
+    desc += `■ 木造自由設計ガレージ・倉庫「スマイチ」\n`;
+    desc += `・敷地にガレージを合わせるミリ単位の自由設計（台形地・狭小地・変形地対応）\n`;
+    desc += `・結露を防ぎ木の温もりを感じる木造構造 × ガルバリウム鋼板（軒出ゼロ）\n`;
+    desc += `・登録不要！ブラウザ3Dシミュレーターで誰でもすぐ概算見積もり\n`;
+    desc += `公式サイト: https://smile049.jp/\n\n`;
+    desc += `${story.hashtags} #YouTubeShorts #Shorts #ガレージライフ`;
+    return desc;
   };
 
   // note用記事成形（大見出し＋仕様解説＋読者参加型アンケート＋答え合わせCTA導線）
@@ -711,94 +750,235 @@ export default function StoryStudioPanel() {
         </button>
       </div>
 
-      {/* ── シナリオライターパネル ── */}
+      {/* ── シナリオライターパネル（クリエイティブ制作スタジオ体制 ＆ ワンソース・マルチユース） ── */}
       {storyMode === 'scenario' && (
         <div style={{
           background: 'linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%)',
           borderRadius: 12, border: '1.5px solid #c4b5fd', padding: 24
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
-            <span style={{ fontSize: 22 }}>✍️</span>
+          {/* ヘッダー */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 18 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 24 }}>🎬</span>
+              <div>
+                <div style={{ fontSize: 16.5, fontWeight: 800, color: '#5b21b6' }}>
+                  クリエイティブ制作スタジオ ｜ シナリオライター（自由生成・マスター企画）
+                </div>
+                <div style={{ fontSize: 12, color: '#7c3aed', marginTop: 2 }}>
+                  3部門・7大スペシャリストの視点を統合し、1つのマスター企画から全尺（90秒〜15秒）と全SNSへ自動連鎖展開
+                </div>
+              </div>
+            </div>
+            <div style={{ background: '#ede9fe', padding: '4px 10px', borderRadius: 6, fontSize: 11.5, color: '#6d28d9', fontWeight: 700 }}>
+              ★ 建築プロデューサー伴走モデル
+            </div>
+          </div>
+
+          {/* クリエイティブ制作スタジオ体制（3部門・7大スペシャリスト）解説バナー */}
+          <div style={{
+            background: '#ffffff',
+            borderRadius: 10,
+            border: '1px solid #ddd6fe',
+            padding: '14px 18px',
+            marginBottom: 20
+          }}>
+            <div style={{ fontSize: 12.5, fontWeight: 800, color: '#5b21b6', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span>👥</span>
+              <span>スタジオ制作体制（各専門スタッフの連携ワークフロー）</span>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12, fontSize: 11.5 }}>
+              {/* ① 企画・ディレクション部門 */}
+              <div style={{ background: '#f5f3ff', borderRadius: 8, padding: 10, border: '1px solid #e9d5ff' }}>
+                <strong style={{ color: '#6d28d9', display: 'block', marginBottom: 4 }}>
+                  (1) 企画・ディレクション部門
+                </strong>
+                <div style={{ color: '#4c1d95', lineHeight: 1.5 }}>
+                  ・<strong>建築プロデューサー / CD:</strong> 建築意図・自然素材・機能美の世界観を統括<br />
+                  ・<strong>映像ディレクター:</strong> 限られた尺での見どころ絵コンテ設計<br />
+                  ・<strong>シナリオライター:</strong> 「最初の3秒のフック」＆数値を情緒体験へ翻訳
+                </div>
+              </div>
+
+              {/* ② 撮影部門 */}
+              <div style={{ background: '#f5f3ff', borderRadius: 8, padding: 10, border: '1px solid #e9d5ff' }}>
+                <strong style={{ color: '#6d28d9', display: 'block', marginBottom: 4 }}>
+                  (2) 撮影部門（建築・空間スペシャリスト）
+                </strong>
+                <div style={{ color: '#4c1d95', lineHeight: 1.5 }}>
+                  ・<strong>建築シネマグラファー:</strong> 歪みのないレンズ選定、自然光と間接照明の美しさ<br />
+                  ・<strong>ドローンパイロット:</strong> 敷地全体の広がり、変形地境界、周辺環境を俯瞰撮影
+                </div>
+              </div>
+
+              {/* ③ 編集・ポストプロダクション部門 */}
+              <div style={{ background: '#f5f3ff', borderRadius: 8, padding: 10, border: '1px solid #e9d5ff' }}>
+                <strong style={{ color: '#6d28d9', display: 'block', marginBottom: 4 }}>
+                  (3) 編集・ポストプロダクション部門
+                </strong>
+                <div style={{ color: '#4c1d95', lineHeight: 1.5 }}>
+                  ・<strong>カラリスト:</strong> 木目の温もり、ガルバリウム鋼板の重厚感<br />
+                  ・<strong>モーショングラフィックス:</strong> 無音視聴対応のフォント・テロップ<br />
+                  ・<strong>サウンドデザイナー:</strong> 生活実感ある環境音（雨音・木肌の温もり。※高級路線NG）
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ワンソース・マルチユース 尺セレクター */}
+          <div style={{
+            background: '#ffffff',
+            borderRadius: 10,
+            border: '1px solid #ddd6fe',
+            padding: '12px 18px',
+            marginBottom: 20
+          }}>
+            <label style={{ display: 'block', fontSize: 12.5, fontWeight: 800, color: '#5b21b6', marginBottom: 8 }}>
+              ⏱️ ワンソース・マルチユース展開（マスター企画から引き算する尺の選択）
+            </label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 8 }}>
+              {[
+                { sec: 90, label: '90秒（施工事例・YouTube長尺）', desc: '深い理解・世界観型' },
+                { sec: 60, label: '60秒（WEBメインビュー）', desc: 'ブランド・共感型ショート' },
+                { sec: 30, label: '30秒（Shorts / リール王道）', desc: '興味・3D動線型（推奨）' },
+                { sec: 15, label: '15秒（ストーリーズ / 広告）', desc: '認知・衝立型' }
+              ].map(d => (
+                <button
+                  key={d.sec}
+                  type="button"
+                  onClick={() => setScDuration(d.sec)}
+                  style={{
+                    padding: '8px 10px',
+                    borderRadius: 6,
+                    border: `2px solid ${scDuration === d.sec ? '#7c3aed' : '#e2e8f0'}`,
+                    background: scDuration === d.sec ? '#f5f3ff' : '#fff',
+                    color: scDuration === d.sec ? '#6d28d9' : '#475569',
+                    cursor: 'pointer',
+                    textAlign: 'left'
+                  }}
+                >
+                  <div style={{ fontSize: 12, fontWeight: 800 }}>{d.label}</div>
+                  <div style={{ fontSize: 10.5, color: '#8b5cf6', marginTop: 2 }}>{d.desc}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* シナリオライターに伝えるべき5大重要要素入力フォーム */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14, marginBottom: 14 }}>
             <div>
-              <div style={{ fontSize: 16, fontWeight: 800, color: '#5b21b6' }}>シナリオライター</div>
-              <div style={{ fontSize: 12, color: '#7c3aed', marginTop: 2 }}>プリセット無視で、あらゆるターゲット・悩み・解決ストーリーを自由に設定してSNS連載を生成</div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#5b21b6', marginBottom: 5 }}>
+                ① 誰に届けたいか（ターゲット像・ペルソナ） <span style={{ color: '#ef4444' }}>*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="例：新築住宅の予算で、中古住宅購入＋リノベ＋木造ガレージで暮らしの豊かさを優先する層"
+                value={scTarget}
+                onChange={e => setScTarget(e.target.value)}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1.5px solid #c4b5fd', fontSize: 12.5, background: '#fff' }}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#5b21b6', marginBottom: 5 }}>
+                ② 誰のどんな悩み・課題（現状の不満・不自由） <span style={{ color: '#ef4444' }}>*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="例：住宅展示場を回っても4,500万円と高額。変形地で既製品物置が入らず、駐車場代も月3万円"
+                value={scProblem}
+                onChange={e => setScProblem(e.target.value)}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1.5px solid #c4b5fd', fontSize: 12.5, background: '#fff' }}
+              />
             </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14, marginBottom: 14 }}>
             <div>
               <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#5b21b6', marginBottom: 5 }}>
-                ① 訴求ターゲット・主人公 <span style={{ color: '#ef4444' }}>*</span>
+                ③ ガレージ・建築による解決（どう解決したか） <span style={{ color: '#ef4444' }}>*</span>
               </label>
               <input
                 type="text"
-                placeholder="例：30代共働き夫婦、50代ガーデニング主婦、EV乗りの会社員"
-                value={scTarget}
-                onChange={e => setScTarget(e.target.value)}
-                style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1.5px solid #c4b5fd', fontSize: 13, background: '#fff' }}
+                placeholder="例：中古住宅3,800万＋ガレージ300万で新築と同予算内でガレージ付き生活を実現。駐車場代ゼロへ"
+                value={scResolution}
+                onChange={e => setScResolution(e.target.value)}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1.5px solid #c4b5fd', fontSize: 12.5, background: '#fff' }}
               />
             </div>
             <div>
               <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#5b21b6', marginBottom: 5 }}>
-                ② 誰のどんな悩み・課題 <span style={{ color: '#ef4444' }}>*</span>
+                ④ 住み手が手に入れる「感情の変化（ベネフィット）」 <span style={{ color: '#ef4444' }}>*</span>
               </label>
               <input
                 type="text"
-                placeholder="例：月3万円の駐車場代が無駄、変形地に既製品が入らない、ガーデン道具が雨ざらし"
-                value={scProblem}
-                onChange={e => setScProblem(e.target.value)}
-                style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1.5px solid #c4b5fd', fontSize: 13, background: '#fff' }}
+                placeholder="例：雨に濡れずに外出して帰宅できる贅沢、毎日の暮らしのゆとり、家族との団らん"
+                value={scEmotionBenefit}
+                onChange={e => setScEmotionBenefit(e.target.value)}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1.5px solid #c4b5fd', fontSize: 12.5, background: '#fff' }}
               />
             </div>
           </div>
 
-          <div style={{ marginBottom: 14 }}>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#5b21b6', marginBottom: 5 }}>
-              ③ ガレージ・倉庫建築でどう解決したか <span style={{ color: '#ef4444' }}>*</span>
-            </label>
-            <textarea
-              placeholder="例：中古住宅3,800万＋ガレージ300万で、新築4,500万と同程度の総額でガレージ付き生活を実現。台形の残地にぴったり収まる木造ガレージで駐車場代もゼロに。"
-              value={scResolution}
-              onChange={e => setScResolution(e.target.value)}
-              rows={2}
-              style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1.5px solid #c4b5fd', fontSize: 13, lineHeight: 1.6, background: '#fff' }}
-            />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14, marginBottom: 14 }}>
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#5b21b6', marginBottom: 5 }}>
+                ⑤ 避けたい表現・NGライン（ブランドのトーン＆マナー）
+              </label>
+              <input
+                type="text"
+                placeholder="例：きらびやかな高級路線・億ション風の演出はNG（等身大の暮らしの豊かさを重視）"
+                value={scNgLine}
+                onChange={e => setScNgLine(e.target.value)}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1.5px solid #c4b5fd', fontSize: 12.5, background: '#fff' }}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#5b21b6', marginBottom: 5 }}>
+                ⑥ 視聴した後にどうなってほしいか（CTA・次の行動）
+              </label>
+              <input
+                type="text"
+                placeholder="例：3Dシミュレーターでリアルタイム積算見積もり＆答え合わせ、または専任スタッフ無料相談"
+                value={scCta}
+                onChange={e => setScCta(e.target.value)}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1.5px solid #c4b5fd', fontSize: 12.5, background: '#fff' }}
+              />
+            </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 18 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14, marginBottom: 18 }}>
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#5b21b6', marginBottom: 5 }}>④ ストーリーのトーン</label>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#5b21b6', marginBottom: 5 }}>⑦ ストーリーのトーン</label>
               <select
                 value={scTone}
                 onChange={e => setScTone(e.target.value)}
-                style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1.5px solid #c4b5fd', fontSize: 13, background: '#fff' }}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1.5px solid #c4b5fd', fontSize: 12.5, background: '#fff' }}
               >
-                <option value="emotional">😢 感動・共感系（暮らしが変わった）</option>
+                <option value="emotional">😢 感動・共感系（雨に濡れない贅沢・暮らしの豊かさ）</option>
                 <option value="comparison">⚖️ 比較訴求系（新築vs中古＋ガレージ）</option>
-                <option value="data">📊 データ・論理系（数字で見る節約効果）</option>
-                <option value="humor">😄 コミカル系（クスッとして気づく）</option>
+                <option value="data">📊 データ・論理系（月3万円削減・7年回収）</option>
+                <option value="humor">😄 コミカル系（クスッとして気づく逆転発想）</option>
               </select>
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#5b21b6', marginBottom: 5 }}>⑤ 必ず入れたい数字・キーワード（任意）</label>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#5b21b6', marginBottom: 5 }}>⑧ 必ず入れたいキーワード・数字（任意）</label>
               <input
                 type="text"
-                placeholder="例：7年で元が取れる、1,750万円の差、数センチ単位"
+                placeholder="例：雨に濡れない贅沢、月3万円の駐車場代ゼロ、ミリ単位設計"
                 value={scKeyword}
                 onChange={e => setScKeyword(e.target.value)}
-                style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1.5px solid #c4b5fd', fontSize: 13, background: '#fff' }}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1.5px solid #c4b5fd', fontSize: 12.5, background: '#fff' }}
               />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#5b21b6', marginBottom: 5 }}>⑥ 生成話数</label>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#5b21b6', marginBottom: 5 }}>⑨ 生成話数</label>
               <select
                 value={scEpisodeCount}
                 onChange={e => setScEpisodeCount(Number(e.target.value))}
-                style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1.5px solid #c4b5fd', fontSize: 13, background: '#fff' }}
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1.5px solid #c4b5fd', fontSize: 12.5, background: '#fff' }}
               >
-                <option value={3}>全3話（ミニ連載）</option>
-                <option value={5}>全5話（標準連載）</option>
-                <option value={7}>全7話（大型連載）</option>
+                <option value={3}>全3話（ミニ連載 / 1アカウント3カット×全話）</option>
+                <option value={5}>全5話（標準連載 / 5アカウント×3カット=最大15動画）</option>
+                <option value={7}>全7話（大型連載 / 中古＋ガレージ全景）</option>
               </select>
             </div>
           </div>
@@ -814,7 +994,7 @@ export default function StoryStudioPanel() {
             }}
           >
             <Sparkles size={18} />
-            シナリオライターで全話を自由生成する
+            マスター企画 ＆ Veo 3（3カット×全話）プロンプトを一括生成する
           </button>
         </div>
       )}
@@ -985,7 +1165,7 @@ export default function StoryStudioPanel() {
           </h3>
 
           {/* 媒体タブ切り替え */}
-          <div style={{ display: 'flex', background: '#e2e8f0', padding: 3, borderRadius: 8, gap: 4 }}>
+          <div style={{ display: 'flex', background: '#e2e8f0', padding: 3, borderRadius: 8, gap: 4, flexWrap: 'wrap' }}>
             <button
               onClick={() => setActiveStoryTab('instagram')}
               style={{
@@ -1005,6 +1185,26 @@ export default function StoryStudioPanel() {
             >
               <InstagramIcon size={14} color={activeStoryTab === 'instagram' ? '#e1306c' : '#64748b'} />
               <span>Instagram用表示</span>
+            </button>
+            <button
+              onClick={() => setActiveStoryTab('youtube')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 14px',
+                borderRadius: 6,
+                border: 'none',
+                background: activeStoryTab === 'youtube' ? '#fff' : 'transparent',
+                color: activeStoryTab === 'youtube' ? '#ef4444' : '#64748b',
+                fontWeight: 700,
+                fontSize: 12.5,
+                cursor: 'pointer',
+                boxShadow: activeStoryTab === 'youtube' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+              }}
+            >
+              <YoutubeIcon size={14} color={activeStoryTab === 'youtube' ? '#ef4444' : '#64748b'} />
+              <span>YouTube用表示</span>
             </button>
             <button
               onClick={() => setActiveStoryTab('note')}
@@ -1282,9 +1482,9 @@ export default function StoryStudioPanel() {
                   </div>
                 </div>
 
-                {/* 右列：AIプロンプト（Veo 3 動画 ＆ NanoBanana2 静止画） ＆ メディアスロット */}
+                {/* 右列：AIプロンプト（Veo 3 動画 3カット絵コンテ ＆ NanoBanana2 静止画） ＆ メディアスロット */}
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6, flexWrap: 'wrap', gap: 6 }}>
                     {/* タブ切り替え（Veo 3 / NanoBanana2） */}
                     <div style={{ display: 'flex', gap: 4, background: '#f1f5f9', padding: 2, borderRadius: 6 }}>
                       <button
@@ -1304,7 +1504,7 @@ export default function StoryStudioPanel() {
                         }}
                       >
                         <Video size={12} />
-                        <span>🎥 Veo 3 (4K動画)</span>
+                        <span>🎥 Veo 3 (4K絵コンテ 3カット)</span>
                       </button>
                       <button
                         onClick={() => setPromptType('nano')}
@@ -1327,31 +1527,84 @@ export default function StoryStudioPanel() {
                       </button>
                     </div>
 
-                    <button
-                      onClick={() => {
-                        const targetText = promptType === 'veo' 
-                          ? (story.veoPrompt || generateVeoPrompt(story.englishPrompt, story.title, story.episodeNum))
-                          : story.englishPrompt;
-                        copyToClipboard(targetText, `prompt_${story.id}_${promptType}`);
-                      }}
-                      style={{
-                        background: copiedKey === `prompt_${story.id}_${promptType}` ? '#10b981' : (promptType === 'veo' ? '#eff6ff' : '#f1f5f9'),
-                        color: copiedKey === `prompt_${story.id}_${promptType}` ? '#fff' : (promptType === 'veo' ? '#2563eb' : '#0f172a'),
-                        border: promptType === 'veo' ? '1px solid #bfdbfe' : '1px solid #cbd5e1',
-                        borderRadius: 4,
-                        padding: '4px 10px',
-                        fontSize: 11.5,
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 4
-                      }}
-                    >
-                      {copiedKey === `prompt_${story.id}_${promptType}` ? <Check size={12} /> : <Copy size={12} />}
-                      <span>{copiedKey === `prompt_${story.id}_${promptType}` ? 'コピー完了' : (promptType === 'veo' ? 'Veo 3 プロンプトをコピー' : '作画プロンプトをコピー')}</span>
-                    </button>
+                    {/* コピーボタン */}
+                    {(() => {
+                      const cuts = generateVeo3CutPrompts(story.englishPrompt, story.title, story.episodeNum);
+                      const targetText = promptType === 'nano'
+                        ? story.englishPrompt
+                        : selectedVeoCut === 'scene1'
+                        ? (story.veoPromptScene1 || cuts.scene1)
+                        : selectedVeoCut === 'scene2'
+                        ? (story.veoPromptScene2 || cuts.scene2)
+                        : selectedVeoCut === 'scene3'
+                        ? (story.veoPromptScene3 || cuts.scene3)
+                        : `[Cut 1: Drone Wide Shot]\n${story.veoPromptScene1 || cuts.scene1}\n\n[Cut 2: Timber & Shutter Detail]\n${story.veoPromptScene2 || cuts.scene2}\n\n[Cut 3: Rainy Day Lifestyle]\n${story.veoPromptScene3 || cuts.scene3}`;
+
+                      const copyKeyId = `prompt_${story.id}_${promptType}_${selectedVeoCut}`;
+
+                      return (
+                        <button
+                          onClick={() => copyToClipboard(targetText, copyKeyId)}
+                          style={{
+                            background: copiedKey === copyKeyId ? '#10b981' : (promptType === 'veo' ? '#eff6ff' : '#f1f5f9'),
+                            color: copiedKey === copyKeyId ? '#fff' : (promptType === 'veo' ? '#2563eb' : '#0f172a'),
+                            border: promptType === 'veo' ? '1px solid #bfdbfe' : '1px solid #cbd5e1',
+                            borderRadius: 4,
+                            padding: '4px 10px',
+                            fontSize: 11.5,
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 4
+                          }}
+                        >
+                          {copiedKey === copyKeyId ? <Check size={12} /> : <Copy size={12} />}
+                          <span>
+                            {copiedKey === copyKeyId 
+                              ? 'コピー完了' 
+                              : (promptType === 'veo' 
+                                  ? (selectedVeoCut === 'all' ? '全3カット一括コピー' : `${selectedVeoCut.toUpperCase()}をコピー`)
+                                  : '作画プロンプトをコピー')}
+                          </span>
+                        </button>
+                      );
+                    })()}
                   </div>
+
+                  {/* Veo 3 選択時の絵コンテ 3カット切り替えセレクター */}
+                  {promptType === 'veo' && (
+                    <div style={{ display: 'flex', gap: 4, marginBottom: 6, flexWrap: 'wrap' }}>
+                      {[
+                        { key: 'scene1', label: 'Scene 1: 外観・ドローン全景', role: '建築カメラマン/ドローン' },
+                        { key: 'scene2', label: 'Scene 2: シャッター・木造現し', role: 'シネマグラファー/カラリスト' },
+                        { key: 'scene3', label: 'Scene 3: 雨の日入庫・生活実感', role: 'ディレクター/選曲' },
+                        { key: 'all', label: '📋 全3カット一括', role: '結合マスター' }
+                      ].map(tab => (
+                        <button
+                          key={tab.key}
+                          type="button"
+                          onClick={() => setSelectedVeoCut(tab.key)}
+                          style={{
+                            padding: '3px 8px',
+                            borderRadius: 4,
+                            fontSize: 10.5,
+                            fontWeight: 700,
+                            border: 'none',
+                            cursor: 'pointer',
+                            background: selectedVeoCut === tab.key ? '#2563eb' : '#e0e7ff',
+                            color: selectedVeoCut === tab.key ? '#fff' : '#3730a3',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 4
+                          }}
+                          title={tab.role}
+                        >
+                          <span>{tab.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
 
                   {/* 英語プロンプト枠 */}
                   <div style={{
@@ -1363,15 +1616,27 @@ export default function StoryStudioPanel() {
                     fontSize: 11.5,
                     lineHeight: 1.6,
                     fontFamily: 'monospace',
-                    marginBottom: 12,
-                    maxHeight: 75,
+                    marginBottom: 8,
+                    maxHeight: 85,
                     overflowY: 'auto'
                   }}>
-                    {promptType === 'veo' 
-                      ? (story.veoPrompt || generateVeoPrompt(story.englishPrompt, story.title, story.episodeNum))
-                      : story.englishPrompt
-                    }
+                    {(() => {
+                      if (promptType === 'nano') return story.englishPrompt;
+                      const cuts = generateVeo3CutPrompts(story.englishPrompt, story.title, story.episodeNum);
+                      if (selectedVeoCut === 'scene1') return `[Scene 1 / 建築全景] ${story.veoPromptScene1 || cuts.scene1}`;
+                      if (selectedVeoCut === 'scene2') return `[Scene 2 / 木造美] ${story.veoPromptScene2 || cuts.scene2}`;
+                      if (selectedVeoCut === 'scene3') return `[Scene 3 / 生活実感] ${story.veoPromptScene3 || cuts.scene3}`;
+                      return `[Scene 1]\n${story.veoPromptScene1 || cuts.scene1}\n\n[Scene 2]\n${story.veoPromptScene2 || cuts.scene2}\n\n[Scene 3]\n${story.veoPromptScene3 || cuts.scene3}`;
+                    })()}
                   </div>
+
+                  {/* Veo 3 制作連携ガイダンス */}
+                  {promptType === 'veo' && (
+                    <div style={{ fontSize: 10.5, color: '#3b82f6', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <span>🎬</span>
+                      <span>1アカウントで3カット生成し、最大5アカウントで最大15シーンの動画を組み合わせて30〜90秒のマスター動画に仕上げます</span>
+                    </div>
+                  )}
 
                   {/* メディアスロット（動画枠 ＆ 画像枠のハイブリッド2列） */}
                   <div style={{
@@ -1620,7 +1885,7 @@ export default function StoryStudioPanel() {
                 flexWrap: 'wrap',
                 gap: 12
               }}>
-                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
                   {activeStoryTab === 'instagram' ? (
                     <>
                       <button
@@ -1684,6 +1949,49 @@ export default function StoryStudioPanel() {
                       >
                         <Calendar size={13} />
                         <span>予約投稿（Meta Suite・日本語）</span>
+                      </a>
+                    </>
+                  ) : activeStoryTab === 'youtube' ? (
+                    <>
+                      <button
+                        onClick={() => copyToClipboard(formatYouTubeDescription(story), `yt_${story.id}`)}
+                        style={{
+                          background: copiedKey === `yt_${story.id}` ? '#10b981' : '#ef4444',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 6,
+                          padding: '8px 14px',
+                          fontSize: 12.5,
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6
+                        }}
+                      >
+                        {copiedKey === `yt_${story.id}` ? <Check size={14} /> : <Copy size={14} />}
+                        <span>{copiedKey === `yt_${story.id}` ? 'YouTube概要欄をコピー済' : 'YouTube概要欄テキスト（Shorts・アンケート付）をコピー'}</span>
+                      </button>
+                      <a
+                        href="https://studio.youtube.com/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          background: '#fff',
+                          color: '#ef4444',
+                          border: '1px solid #fecaca',
+                          borderRadius: 6,
+                          padding: '8px 12px',
+                          fontSize: 12.5,
+                          fontWeight: 700,
+                          textDecoration: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 4
+                        }}
+                      >
+                        <ExternalLink size={13} />
+                        <span>YouTube Studioを開く</span>
                       </a>
                     </>
                   ) : activeStoryTab === 'note' ? (
@@ -1775,9 +2083,9 @@ export default function StoryStudioPanel() {
                   )}
                 </div>
 
-                {/* 投稿完了トグル */}
-                <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, cursor: 'pointer', color: '#475569' }}>
+                {/* 投稿完了トグル（全4大SNS） */}
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, cursor: 'pointer', color: '#475569' }}>
                     <input
                       type="checkbox"
                       checked={story.isPostedInstagram}
@@ -1789,7 +2097,19 @@ export default function StoryStudioPanel() {
                     />
                     <span>Instagram投稿済</span>
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, cursor: 'pointer', color: '#475569' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, cursor: 'pointer', color: '#ef4444', fontWeight: 600 }}>
+                    <input
+                      type="checkbox"
+                      checked={story.isPostedYouTube || false}
+                      onChange={(e) => {
+                        const updated = [...stories];
+                        updated[idx].isPostedYouTube = e.target.checked;
+                        setStories(updated);
+                      }}
+                    />
+                    <span>YouTube投稿済</span>
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, cursor: 'pointer', color: '#475569' }}>
                     <input
                       type="checkbox"
                       checked={story.isPostedNote}
@@ -1801,7 +2121,7 @@ export default function StoryStudioPanel() {
                     />
                     <span>note投稿済</span>
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, cursor: 'pointer', color: '#475569' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, cursor: 'pointer', color: '#475569' }}>
                     <input
                       type="checkbox"
                       checked={story.isPostedX}
@@ -1816,7 +2136,9 @@ export default function StoryStudioPanel() {
                 </div>
               </div>
 
-              {/* Instagram用 テキスト貼り付け先（ペースト場所）の完全手順ガイド */}
+              {/* ── 初心者向け：各SNSテキスト貼り付け先（ペースト場所）の完全手順ガイド ── */}
+              
+              {/* ① Instagram用ガイド */}
               {activeStoryTab === 'instagram' && (
                 <div style={{
                   background: '#fdf4ff',
@@ -1837,7 +2159,7 @@ export default function StoryStudioPanel() {
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
                       <span style={{ background: '#c026d3', color: '#fff', fontSize: 10.5, fontWeight: 800, padding: '2px 6px', borderRadius: 4 }}>
-                        貼り付け先ガイド
+                        Instagram 貼り付け先
                       </span>
                       <strong style={{ color: '#86198f', fontSize: 12.5 }}>
                         📋 Instagramを開いた後の「テキスト貼り付け（ペースト）」場所と手順
@@ -1845,7 +2167,7 @@ export default function StoryStudioPanel() {
                     </div>
                     <ol style={{ margin: '4px 0 0', paddingLeft: 20 }}>
                       <li>【<strong>Instagramを開く</strong>】ボタンを押してInstagramを開く ➡ 左メニューの【<strong>＋ 作成</strong>】をクリック。</li>
-                      <li>ダウンロードした動画や画像をドラッグ＆ドロップ（※動画と画像の両方を投稿する場合は、選択後に右下の「複数選択」アイコンから追加）。</li>
+                      <li>ダウンロードした動画や画像をドラッグ＆ドロップ（※動画と画像の両方をカルーセル投稿する場合は、1枚目選択後に右下の「複数選択（重なった四角）」アイコンから追加）。</li>
                       <li>アスペクト比・フィルター画面で「<strong>次へ</strong>」を2回クリック。</li>
                       <li>
                         画面右側に表示される【<span style={{ background: '#fbcfe8', color: '#86198f', padding: '1px 6px', borderRadius: 3, fontWeight: 800 }}>キャプションを入力...</span>】という大きな入力枠をクリックし、<br />
@@ -1854,9 +2176,148 @@ export default function StoryStudioPanel() {
                       <li>右上の青い【<strong>シェア</strong>】ボタンを押せば投稿完了です！</li>
                     </ol>
                   </div>
-
                   <div style={{ fontSize: 11.5, color: '#701a75' }}>
                     ⏰ <strong>予約投稿について:</strong> 上の【予約投稿（Meta Suite・日本語）】リンクから日時指定予約を行うか、またはスマホInstagramアプリの投稿最終画面最下部【詳細設定】➡【この投稿を日時指定】をONにするとアプリ単体で簡単に予約投稿が可能です。
+                  </div>
+                </div>
+              )}
+
+              {/* ② YouTube用ガイド */}
+              {activeStoryTab === 'youtube' && (
+                <div style={{
+                  background: '#fef2f2',
+                  padding: '12px 20px',
+                  borderTop: '1px solid #fecaca',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 8
+                }}>
+                  <div style={{
+                    background: '#fff',
+                    borderRadius: 8,
+                    padding: '10px 14px',
+                    border: '1px solid #f87171',
+                    fontSize: 12,
+                    color: '#7f1d1d',
+                    lineHeight: 1.65
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                      <span style={{ background: '#ef4444', color: '#fff', fontSize: 10.5, fontWeight: 800, padding: '2px 6px', borderRadius: 4 }}>
+                        YouTube 貼り付け先
+                      </span>
+                      <strong style={{ color: '#b91c1c', fontSize: 12.5 }}>
+                        📋 YouTube Studioを開いた後の「動画アップロード ＆ 概要欄貼り付け」場所と手順
+                      </strong>
+                    </div>
+                    <ol style={{ margin: '4px 0 0', paddingLeft: 20 }}>
+                      <li>【<strong>YouTube Studioを開く</strong>】ボタンを押す ➡ 画面右上の【<strong>＋ 作成</strong>】アイコン ➡【<strong>動画をアップロード</strong>】をクリック。</li>
+                      <li>作成・ダウンロードした動画ファイル（MP4）を画面中央にドラッグ＆ドロップします。</li>
+                      <li>
+                        【<strong>タイトル（必須）</strong>】枠に、エピソードタイトル（例: <span style={{ background: '#fee2e2', color: '#991b1b', padding: '1px 5px', borderRadius: 3 }}>第{story.episodeNum}話：{story.title}</span>）を入力。
+                      </li>
+                      <li>
+                        その下の【<span style={{ background: '#fee2e2', color: '#991b1b', padding: '1px 6px', borderRadius: 3, fontWeight: 800 }}>説明</span>】という大きな枠をクリックし、<br />
+                        先ほどコピーしたYouTube概要欄テキストを貼り付け（キーボードの <kbd style={{ background: '#0f172a', color: '#fff', padding: '1px 5px', borderRadius: 3, fontSize: 11 }}>Ctrl + V</kbd> または右クリック貼り付け）します。
+                      </li>
+                      <li>【<strong>サムネイル</strong>】で静止画パース画像を選択（または動画から自動生成された好みのコマを選択）。</li>
+                      <li>「次へ」を何度か押し、最後の【<strong>公開設定</strong>】で「公開」または「スケジュール設定（日時指定予約）」を選んで右下の【<strong>保存 / 公開</strong>】をクリックで完了！</li>
+                    </ol>
+                  </div>
+                  <div style={{ fontSize: 11.5, color: '#991b1b' }}>
+                    💡 <strong>Shorts動画の自動認識:</strong> 縦型（9:16）または60秒以内の動画はYouTube Shortsとして自動公開され、通常の何倍もの拡散・再生回数が見込めます！概要欄の3D答え合わせリンク（smile049.jp/simulator）から読者が直接流入します。
+                  </div>
+                </div>
+              )}
+
+              {/* ③ note用ガイド */}
+              {activeStoryTab === 'note' && (
+                <div style={{
+                  background: '#f0fdf4',
+                  padding: '12px 20px',
+                  borderTop: '1px solid #bbf7d0',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 8
+                }}>
+                  <div style={{
+                    background: '#fff',
+                    borderRadius: 8,
+                    padding: '10px 14px',
+                    border: '1px solid #4ade80',
+                    fontSize: 12,
+                    color: '#14532d',
+                    lineHeight: 1.65
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                      <span style={{ background: '#10b981', color: '#fff', fontSize: 10.5, fontWeight: 800, padding: '2px 6px', borderRadius: 4 }}>
+                        note 貼り付け先
+                      </span>
+                      <strong style={{ color: '#166534', fontSize: 12.5 }}>
+                        📋 note新規作成画面での「タイトル ＆ 本文貼り付け」場所と手順
+                      </strong>
+                    </div>
+                    <ol style={{ margin: '4px 0 0', paddingLeft: 20 }}>
+                      <li>【<strong>note新規作成を開く</strong>】ボタンを押してnoteのエディタ画面を開きます。</li>
+                      <li>
+                        画面最上部の【<span style={{ background: '#dcfce7', color: '#166534', padding: '1px 6px', borderRadius: 3, fontWeight: 800 }}>記事タイトル</span>】枠に、エピソードタイトル（例: <span style={{ background: '#dcfce7', color: '#166534', padding: '1px 5px', borderRadius: 3 }}>{story.title}</span>）を貼り付けます。
+                      </li>
+                      <li>
+                        タイトル下の【<span style={{ background: '#dcfce7', color: '#166534', padding: '1px 6px', borderRadius: 3, fontWeight: 800 }}>ここに文章を入力してください</span>】という大きな白い本文エリアをクリック。
+                      </li>
+                      <li>
+                        先ほどコピーしたnote記事テキストをそのまま貼り付け（キーボードの <kbd style={{ background: '#0f172a', color: '#fff', padding: '1px 5px', borderRadius: 3, fontSize: 11 }}>Ctrl + V</kbd> または右クリック貼り付け）します。<br />
+                        ※ 見出し・アンケートリスト・3D答え合わせリンクが自動で美しく整形されます。
+                      </li>
+                      <li>タイトルの上にある【<strong>＋ 見出し画像を追加</strong>】をクリックし、ダウンロードした静止画パースを選択して設定。</li>
+                      <li>画面右上の緑色の【<strong>公開に進む</strong>】ボタンを押し、ハッシュタグを確認して【<strong>投稿する</strong>】をクリックで完了！</li>
+                    </ol>
+                  </div>
+                  <div style={{ fontSize: 11.5, color: '#15803d' }}>
+                    💡 <strong>SEO・読者反応:</strong> noteはGoogle検索に非常に強く、「中古住宅 ガレージ」「変形地 ガレージ」で上位表示されます。アンケートの答え合わせリンクから3Dシミュレーターへダイレクトに送客されます。
+                  </div>
+                </div>
+              )}
+
+              {/* ④ X (旧Twitter)用ガイド */}
+              {activeStoryTab === 'x' && (
+                <div style={{
+                  background: '#f8fafc',
+                  padding: '12px 20px',
+                  borderTop: '1px solid #cbd5e1',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 8
+                }}>
+                  <div style={{
+                    background: '#fff',
+                    borderRadius: 8,
+                    padding: '10px 14px',
+                    border: '1px solid #94a3b8',
+                    fontSize: 12,
+                    color: '#0f172a',
+                    lineHeight: 1.65
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                      <span style={{ background: '#0f172a', color: '#fff', fontSize: 10.5, fontWeight: 800, padding: '2px 6px', borderRadius: 4 }}>
+                        X (Twitter) 貼り付け先
+                      </span>
+                      <strong style={{ color: '#0f172a', fontSize: 12.5 }}>
+                        📋 Xでの「ポスト作成 ＆ 画像・動画添付」場所と手順
+                      </strong>
+                    </div>
+                    <ol style={{ margin: '4px 0 0', paddingLeft: 20 }}>
+                      <li>【<strong>Xでポストする</strong>】ボタンを押すと、投稿作成ウィンドウが開き、すでに文章が自動入力された状態になります。</li>
+                      <li>
+                        ※ もし文章が入っていない場合は、入力枠（「いまどうしてる？」）をクリックして <kbd style={{ background: '#0f172a', color: '#fff', padding: '1px 5px', borderRadius: 3, fontSize: 11 }}>Ctrl + V</kbd> で貼り付けてください。
+                      </li>
+                      <li>
+                        入力枠の左下にある【<span style={{ background: '#e2e8f0', color: '#0f172a', padding: '1px 6px', borderRadius: 3, fontWeight: 800 }}>🖼️ 写真・動画アイコン</span>】をクリックし、保存した動画（MP4）または静止画パースを選択して添付します。
+                      </li>
+                      <li>右下の青い【<strong>ポストする</strong>】ボタンを押せば投稿完了です！</li>
+                    </ol>
+                  </div>
+                  <div style={{ fontSize: 11.5, color: '#475569' }}>
+                    💡 <strong>Xでの即効性:</strong> 画像や動画付きのポストはタイムラインで目を引きます。読者アンケートの選択肢と「正解は3Dシミュレーターでリアルタイム積算中」のURLにより、タップ誘導が極めて高くなります。
                   </div>
                 </div>
               )}
@@ -1973,25 +2434,57 @@ export default function StoryStudioPanel() {
               {kitModalTab === 'manual' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                   
-                  {/* 全体モデルハイライト */}
+                  {/* 全体モデルハイライト（ワンソース・マルチユース自動連鎖投稿構想） */}
                   <div style={{
                     background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%)',
                     borderRadius: 12,
                     padding: '18px 20px',
                     border: '1px solid #bbf7d0'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
                       <span style={{ background: '#2d6a4f', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 4 }}>
-                        方式③ ハイブリッド運用モデル
+                        ワンソース・マルチユース自動連鎖モデル
                       </span>
                       <strong style={{ fontSize: 14, color: '#166534' }}>
-                        連載ストーリーを軸とした集客・SNS拡散・3D答え合わせ送客の完全自動化
+                        1つのマスター企画から全尺（90s〜15s）と全SNS（YouTube / Instagram / note / X）へ自動連鎖展開
                       </strong>
                     </div>
-                    <p style={{ margin: 0, fontSize: 12.5, color: '#14532d', lineHeight: 1.6 }}>
-                      Story Studioで作成した物語は、<strong>Webサイト内特設ページ（/stories）での自動予約公開</strong>と<strong>公式SNS（Instagram / note / X）へのワンクリック投稿</strong>に同時展開されます。
-                      各話に読者参加型の「価格予想アンケート」を配置することで、読者を<strong>登録不要の3Dシミュレーターリアルタイム積算画面（答え合わせ）</strong>へと自然に送客し、最終的な無料パース依頼・CRMリード獲得へ繋げます。
+                    <p style={{ margin: 0, fontSize: 12.5, color: '#14532d', lineHeight: 1.65 }}>
+                      ひとつの構想・物件（マスター企画）から、ゼロから別々にコンテンツを作るのではなく、<strong>「最長の構成を軸に引き算していく」</strong>ことで圧倒的な制作効率と世界観の統一を実現します。<br />
+                      ・<strong>YouTube（30〜90秒動画 / Shorts）:</strong> Veo 3の3カットを結合した完成動画＋アンケート付き詳細概要欄<br />
+                      ・<strong>note（記事＋パース画像）:</strong> 仕様解説＋読者参加型アンケート＋3Dシミュレーター答え合わせリンク<br />
+                      ・<strong>Instagram（リール動画＋静止画カルーセル）:</strong> 動画で指を止めさせ、スワイプで図面＆アンケートへ誘導<br />
+                      ・<strong>X（テキスト＋短縮リンク＋画像/動画）:</strong> 拡散性の高い問いかけで3D積算シミュレーターへ即座に誘導
                     </p>
+                  </div>
+
+                  {/* クリエイティブ制作スタジオ体制（3部門・7大スペシャリスト） */}
+                  <div style={{ background: '#f5f3ff', borderRadius: 10, padding: 18, border: '1px solid #ddd6fe' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                      <span style={{ fontSize: 18 }}>🎬</span>
+                      <h5 style={{ margin: 0, fontSize: 14.5, fontWeight: 800, color: '#5b21b6' }}>
+                        クリエイティブ制作スタジオ体制（3部門・7大スペシャリストの連携）
+                      </h5>
+                    </div>
+                    <div style={{ fontSize: 12, color: '#4c1d95', lineHeight: 1.6, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12 }}>
+                      <div style={{ background: '#fff', padding: 10, borderRadius: 6, border: '1px solid #e9d5ff' }}>
+                        <strong style={{ color: '#6d28d9', display: 'block', marginBottom: 4 }}>① 企画・ディレクション部門</strong>
+                        ・<strong>建築プロデューサー / CD:</strong> 建築意図・自然素材・機能美の世界観を統括<br />
+                        ・<strong>映像ディレクター:</strong> 尺に合わせた見どころ絵コンテ設計<br />
+                        ・<strong>シナリオライター:</strong> 「最初の3秒のフック」＆スペックを情緒体験へ翻訳
+                      </div>
+                      <div style={{ background: '#fff', padding: 10, borderRadius: 6, border: '1px solid #e9d5ff' }}>
+                        <strong style={{ color: '#6d28d9', display: 'block', marginBottom: 4 }}>② 撮影部門</strong>
+                        ・<strong>建築シネマグラファー:</strong> 歪みのないレンズ選定、自然光と間接照明の美しさ<br />
+                        ・<strong>ドローンパイロット:</strong> 敷地全体の広がり、変形地境界、屋根形状を俯瞰撮影
+                      </div>
+                      <div style={{ background: '#fff', padding: 10, borderRadius: 6, border: '1px solid #e9d5ff' }}>
+                        <strong style={{ color: '#6d28d9', display: 'block', marginBottom: 4 }}>③ 編集・ポストプロダクション部門</strong>
+                        ・<strong>カラリスト:</strong> 木目の温もり、ガルバリウム鋼板の重厚感<br />
+                        ・<strong>モーショングラフィックス:</strong> 無音視聴対応のフォント・テロップ<br />
+                        ・<strong>サウンドデザイナー:</strong> 生活実感ある環境音（雨音・木肌の温もり。※高級路線NG）
+                      </div>
+                    </div>
                   </div>
 
                   {/* STEP 1: ストーリー作成 */}
@@ -2011,42 +2504,32 @@ export default function StoryStudioPanel() {
                       </div>
                       <div>
                         <strong style={{ color: '#0f172a' }}>② シナリオライター（自由生成）タブ:</strong>
-                        ターゲット層（例: 40代共働き）、悩み（例: 車2台と子供の自転車で庭が狭い）、ガレージによる解決、語り口のトーン（共感感動系／データ論理系／コミカル系／新築比較系）、希望話数（3〜7話）を入力して【この設定でストーリー自由生成】を実行します。
+                        ターゲット像（例: 新築予算で中古＋ガレージ層）、悩み、ガレージによる解決、住み手が手に入れる感情の変化（雨に濡れずに帰宅できる贅沢）、NGライン（高級路線NG）、尺（90s〜15s）を入力して【マスター企画＆Veo 3プロンプト一括生成】を実行します。
                       </div>
                     </div>
                   </div>
 
-                  {/* STEP 2: 作画プロンプト ＆ 動画登録 */}
+                  {/* STEP 2: 作画プロンプト ＆ 動画登録（Veo 3 3カット × 最大5アカウント = 最大15動画） */}
                   <div style={{ background: '#f8fafc', borderRadius: 10, padding: 18, border: '1px solid #e2e8f0' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
                       <div style={{ background: '#0284c7', color: '#fff', width: 26, height: 26, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800 }}>
                         2
                       </div>
                       <h5 style={{ margin: 0, fontSize: 14.5, fontWeight: 700, color: '#0f172a' }}>
-                        AI作画プロンプト（NanoBanana2 / Google AI Pro）で画像・動画を生成・反映
+                        Veo 3（3カット絵コンテ）動画 ＆ NanoBanana2静止画パースの生成・登録
                       </h5>
                     </div>
                     <div style={{ fontSize: 12.5, color: '#475569', lineHeight: 1.6, paddingLeft: 36 }}>
-                      各エピソードカードに「担当アカウント（Google AI Pro アカウント1〜5）」と英語作画プロンプトが自動割当されています。
-                      <ol style={{ margin: '6px 0 0', paddingLeft: 20 }}>
-                        <li>カード内の【コピー】ボタンで英語プロンプトをクリップボードにコピー。</li>
-                        <li>Google AI Pro（NanoBanana2）の生成画面にプロンプトを貼り付けて画像や動画を生成。</li>
-                        <li><strong>静止画パース:</strong> 【静止画枠】へペースト（<code>Ctrl + V</code>）またはファイル選択からアップロード。</li>
-                        <li><strong>完成動画:</strong> 作成した動画（MP4/WebM）を【動画枠】へドラッグ＆ドロップまたはファイル選択して登録。カード上でそのまま動画を再生プレビュー確認できます。</li>
-                      </ol>
-
-                      {/* ハイブリッド運用の黄金ルール */}
-                      <div style={{ marginTop: 10, background: '#fdf4ff', padding: '10px 14px', borderRadius: 8, border: '1px solid #f0abfc' }}>
-                        <strong style={{ color: '#86198f', fontSize: 12 }}>
-                          🌟 【エージェント直伝】Instagram動画×画像カルーセル（スワイプ）の黄金構成
-                        </strong>
-                        <ul style={{ margin: '6px 0 0', paddingLeft: 18, fontSize: 12, color: '#701a75', lineHeight: 1.5 }}>
-                          <li><strong>スライド1 (動画):</strong> 3D完成イメージ動画。タイムラインで自動再生され、読者のスクロールの手を確実にストップさせます。</li>
-                          <li><strong>スライド2 (画像):</strong> 敷地ジャストフィットの図面＆外観高画質パース画像。</li>
-                          <li><strong>スライド3 (画像):</strong> 「このガレージいくら？」価格予想アンケート。</li>
-                          <li><strong>スライド4 (誘導):</strong> 正解はプロフィール（@smile049_garage）の3Dシミュレーターリアルタイム積算画面へ！</li>
-                        </ul>
+                      各話ごとに「担当アカウント（Google AI Pro アカウント1〜5）」が割り当てられています。1アカウントあたり3つのシネマティックカット（Scene 1: 外観ドローン / Scene 2: 木造ディテール / Scene 3: 雨の日生活実感）が自動生成されます。
+                      <div style={{ background: '#eff6ff', padding: '10px 14px', borderRadius: 6, border: '1px solid #bfdbfe', margin: '8px 0', fontSize: 12, color: '#1e40af' }}>
+                        🎬 <strong>最大15動画アセットの組み合わせ連携:</strong> 5アカウントのメンバーが各3動画（計15動画）を分担生成し、それらを結合・編集することで、30秒〜90秒のハイクオリティなストーリー動画を共同で仕上げることができます。
                       </div>
+                      <ol style={{ margin: '6px 0 0', paddingLeft: 20 }}>
+                        <li>カード内の【Scene 1〜3】または【全3カット一括コピー】ボタンで英語プロンプトをコピー。</li>
+                        <li>Google AI Pro（VideoFX / NanoBanana2）の生成画面にプロンプトを貼り付けて動画・画像を生成。</li>
+                        <li><strong>静止画パース:</strong> 【静止画枠】へペースト（<code>Ctrl + V</code>）またはファイル選択からアップロード。</li>
+                        <li><strong>完成動画:</strong> 作成した動画（MP4）を【動画枠】へドラッグ＆ドロップして登録。プレビュー再生で確認できます。</li>
+                      </ol>
                     </div>
                   </div>
 
@@ -2086,40 +2569,86 @@ export default function StoryStudioPanel() {
                     </div>
                   </div>
 
-                  {/* STEP 5: SNS投稿手順 */}
-                  <div style={{ background: '#f8fafc', borderRadius: 10, padding: 18, border: '1px solid #e2e8f0' }}>
+                  {/* STEP 5: 超親切！全SNS（Instagram / YouTube / note / X）への投稿手順ガイド */}
+                  <div style={{ background: '#f8fafc', borderRadius: 10, padding: 18, border: '2px solid #0284c7' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
                       <div style={{ background: '#0284c7', color: '#fff', width: 26, height: 26, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800 }}>
                         5
                       </div>
-                      <h5 style={{ margin: 0, fontSize: 14.5, fontWeight: 700, color: '#0f172a' }}>
-                        各SNS（Instagram / note / X）へのワンクリック投稿＆管理
+                      <h5 style={{ margin: 0, fontSize: 15, fontWeight: 800, color: '#0f172a' }}>
+                        【初心者・未経験者専用】全SNS（Instagram / YouTube / note / X）投稿＆貼り付け手順完全ガイド
                       </h5>
                     </div>
-                    <div style={{ fontSize: 12.5, color: '#475569', lineHeight: 1.6, paddingLeft: 36 }}>
-                      各エピソードカードの「SNS投稿成形・ワンクリックアシスト」エリアから投稿を行います。
-                      <div style={{ marginTop: 8, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
-                        <div style={{ background: '#fff', padding: 10, borderRadius: 6, border: '1px solid #cbd5e1' }}>
-                          <strong style={{ color: '#e1306c', fontSize: 12 }}>📷 Instagram</strong>
-                          <div style={{ fontSize: 11.5, color: '#64748b', marginTop: 4 }}>
-                            【キャプションをコピー】をクリックし、公式アカウントで画像と共に投稿。ストーリーズでアンケートスタンプを配置。
+                    <div style={{ fontSize: 12.5, color: '#334155', lineHeight: 1.7, paddingLeft: 36 }}>
+                      <p style={{ margin: '0 0 12px', color: '#0369a1', fontWeight: 600 }}>
+                        ※ SNSをやったことがない方でも、以下のステップ通りに「コピー」して「貼り付け（Ctrl + V）」するだけで迷わず確実に投稿できます。
+                      </p>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                        {/* 1. Instagram */}
+                        <div style={{ background: '#fff', borderRadius: 8, padding: 14, border: '1px solid #f0abfc' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                            <span style={{ background: '#e1306c', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 4 }}>1. Instagram</span>
+                            <strong style={{ color: '#86198f', fontSize: 13 }}>リール動画 ＆ 画像カルーセル投稿</strong>
                           </div>
+                          <ol style={{ margin: 0, paddingLeft: 20, fontSize: 12, color: '#4a044e' }}>
+                            <li>カードの【<strong>Instagram投稿テキストをコピー</strong>】をクリック。</li>
+                            <li>【<strong>Instagramを開く</strong>】をクリック ➡ 画面左メニューの【<strong>＋ 作成</strong>】をクリック。</li>
+                            <li>保存した動画（MP4）や画像をドラッグ＆ドロップ（※動画と画像の両方を投稿する場合は、1枚目選択後に右下の「複数選択」アイコンから追加）。</li>
+                            <li>アスペクト比・フィルター画面で「<strong>次へ</strong>」を2回クリック。</li>
+                            <li>画面右側の【<strong>キャプションを入力...</strong>】枠をクリックし、キーボードの <kbd style={{ background: '#0f172a', color: '#fff', padding: '1px 5px', borderRadius: 3 }}>Ctrl + V</kbd> で貼り付け。</li>
+                            <li>右上の青い【<strong>シェア</strong>】ボタンを押せば完了！</li>
+                          </ol>
                         </div>
-                        <div style={{ background: '#fff', padding: 10, borderRadius: 6, border: '1px solid #cbd5e1' }}>
-                          <strong style={{ color: '#10b981', fontSize: 12 }}>📝 note</strong>
-                          <div style={{ fontSize: 11.5, color: '#64748b', marginTop: 4 }}>
-                            【記事本文(Markdown)をコピー】をクリックし、noteの投稿エディタに貼り付け。画像をヘッダーに設定して公開。
+
+                        {/* 2. YouTube */}
+                        <div style={{ background: '#fff', borderRadius: 8, padding: 14, border: '1px solid #fecaca' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                            <span style={{ background: '#ef4444', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 4 }}>2. YouTube</span>
+                            <strong style={{ color: '#b91c1c', fontSize: 13 }}>Shorts（30〜60秒）＆ 通常動画アップロード</strong>
                           </div>
+                          <ol style={{ margin: 0, paddingLeft: 20, fontSize: 12, color: '#7f1d1d' }}>
+                            <li>カードの【<strong>YouTube概要欄テキストをコピー</strong>】をクリック。</li>
+                            <li>【<strong>YouTube Studioを開く</strong>】をクリック ➡ 画面右上の【<strong>＋ 作成</strong>】➡【<strong>動画をアップロード</strong>】をクリック。</li>
+                            <li>作成した動画ファイル（MP4）を画面中央へドラッグ＆ドロップ。</li>
+                            <li>【<strong>タイトル（必須）</strong>】枠にエピソードタイトルを入力。</li>
+                            <li>その下の【<strong>説明</strong>】枠をクリックし、キーボードの <kbd style={{ background: '#0f172a', color: '#fff', padding: '1px 5px', borderRadius: 3 }}>Ctrl + V</kbd> で概要欄を貼り付け。</li>
+                            <li>【<strong>サムネイル</strong>】で静止画パースを選択。「次へ」を進んで公開設定で【<strong>公開</strong>】または【<strong>スケジュール設定（予約）</strong>】を選んで保存で完了！</li>
+                          </ol>
                         </div>
-                        <div style={{ background: '#fff', padding: 10, borderRadius: 6, border: '1px solid #cbd5e1' }}>
-                          <strong style={{ color: '#0f172a', fontSize: 12 }}>𝕏 X (旧Twitter)</strong>
-                          <div style={{ fontSize: 11.5, color: '#64748b', marginTop: 4 }}>
-                            【𝕏 でポストを作成】をクリックするとX作成画面が開き、成形テキストが自動入力されます。画像を添付してポスト。
+
+                        {/* 3. note */}
+                        <div style={{ background: '#fff', borderRadius: 8, padding: 14, border: '1px solid #bbf7d0' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                            <span style={{ background: '#10b981', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 4 }}>3. note</span>
+                            <strong style={{ color: '#166534', fontSize: 13 }}>連載記事 ＆ 見出し画像・アンケート投稿</strong>
                           </div>
+                          <ol style={{ margin: 0, paddingLeft: 20, fontSize: 12, color: '#14532d' }}>
+                            <li>カードの【<strong>note記事テキストをコピー</strong>】をクリック。</li>
+                            <li>【<strong>note新規作成を開く</strong>】をクリック。</li>
+                            <li>最上部の【<strong>記事タイトル</strong>】枠にエピソードタイトルを貼り付け。</li>
+                            <li>タイトル下の【<strong>ここに文章を入力してください</strong>】枠をクリックし、キーボードの <kbd style={{ background: '#0f172a', color: '#fff', padding: '1px 5px', borderRadius: 3 }}>Ctrl + V</kbd> で本文を貼り付け。</li>
+                            <li>タイトル上の【<strong>＋ 見出し画像を追加</strong>】から静止画パースを設定。</li>
+                            <li>右上の緑の【<strong>公開に進む</strong>】➡【<strong>投稿する</strong>】をクリックで完了！</li>
+                          </ol>
+                        </div>
+
+                        {/* 4. X (Twitter) */}
+                        <div style={{ background: '#fff', borderRadius: 8, padding: 14, border: '1px solid #cbd5e1' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                            <span style={{ background: '#0f172a', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 4 }}>4. X (旧Twitter)</span>
+                            <strong style={{ color: '#0f172a', fontSize: 13 }}>要約テキスト ＆ メディア添付ポスト</strong>
+                          </div>
+                          <ol style={{ margin: 0, paddingLeft: 20, fontSize: 12, color: '#334155' }}>
+                            <li>カードの【<strong>Xでポストする</strong>】をクリック（文章が自動入力されたウィンドウが開きます）。</li>
+                            <li>入力枠左下の写真アイコン（🖼️）をクリックして動画または画像を添付。</li>
+                            <li>右下の青い【<strong>ポストする</strong>】ボタンを押せば完了！</li>
+                          </ol>
                         </div>
                       </div>
-                      <div style={{ marginTop: 8, fontSize: 11.5, color: '#059669', fontWeight: 600 }}>
-                        ✓ 投稿が完了したら、カード上部の各SNSチェックボックスをONにすることで、管理画面上で投稿済み状態が保存・一覧把握できます。
+
+                      <div style={{ marginTop: 14, padding: 10, background: '#f0fdf4', borderRadius: 6, border: '1px solid #86efac', fontSize: 12, color: '#15803d', fontWeight: 700 }}>
+                        ✓ 投稿が完了したSNSは、各エピソードカードの「[ ] 投稿済」チェックボックスをONにしておくことで、次回作業時にもどこまで進んだか一目で分かります。
                       </div>
                     </div>
                   </div>
