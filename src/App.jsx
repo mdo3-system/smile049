@@ -8,6 +8,7 @@ import PlanAgriPage from './pages/PlanAgriPage';
 import PlanWorkshopPage from './pages/PlanWorkshopPage';
 import SimulatorPage from './pages/SimulatorPage';
 import StaffAdminPage from './pages/StaffAdminPage';
+import StoryPage from './pages/StoryPage';
 import ChatRoomModal from './components/ChatRoomModal';
 import { MessageSquare } from 'lucide-react';
 import { trackPageView, Analytics } from './utils/analytics';
@@ -20,6 +21,7 @@ const ROUTE_MAP = {
   'plan-storage': '/plan-storage',
   'plan-agri': '/plan-agri',
   'plan-workshop': '/plan-workshop',
+  'stories': '/stories',
   'admin': '/admin'
 };
 
@@ -31,6 +33,7 @@ const getRouteFromPath = (pathname) => {
   if (cleanPath === '/plan-storage') return 'plan-storage';
   if (cleanPath === '/plan-agri') return 'plan-agri';
   if (cleanPath === '/plan-workshop') return 'plan-workshop';
+  if (cleanPath === '/stories' || cleanPath === '/story') return 'stories';
   if (cleanPath === '/admin') return 'admin';
   return 'top';
 };
@@ -72,6 +75,7 @@ export default function App() {
       'plan-storage': '狭小地・変形地ストッカー倉庫｜木造自由設計【スマイチ】敷地境界ぴったり特注設計',
       'plan-agri': '農機具・トラクター大型倉庫（アグリシェッド）｜木造自由設計【スマイチ】市街化調整区域対応',
       'plan-workshop': '15m無柱大空間・スタジオ・道場・事業用倉庫｜木造自由設計【スマイチ】木造トラス構法',
+      'stories': '木造自由設計ガレージ物語（公式WEB連載コラム）｜スマイチ',
       'admin': '専任スタッフ管理ポータル｜スマイチ'
     };
 
@@ -119,6 +123,7 @@ export default function App() {
         {currentRoute === 'plan-storage' && <PlanStoragePage setCurrentRoute={handleRouteNavigation} />}
         {currentRoute === 'plan-agri' && <PlanAgriPage setCurrentRoute={handleRouteNavigation} />}
         {currentRoute === 'plan-workshop' && <PlanWorkshopPage setCurrentRoute={handleRouteNavigation} />}
+        {currentRoute === 'stories' && <StoryPage setCurrentRoute={handleRouteNavigation} />}
         {currentRoute === 'simulator' && (
           <SimulatorPage 
             setCurrentRoute={handleRouteNavigation} 

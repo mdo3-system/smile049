@@ -46,9 +46,10 @@
 // - 2026/09/25 v0.1.44: StoryStudioにX（旧Twitter）専用ポスト成形・直接ツイートボタン・X投稿完了管理を追加、secrets配備完了
 // - 2026/09/26 v0.1.45: StoryStudioにシナリオライター（自由生成）機能・プリセット切替タブ追加、見積書詳細モーダルに宛名入力欄およびA4縦印刷用スタイル最適化
 // - 2026/09/26 v0.1.46: StoryStudioのshowKitModal未定義エラー修正（クラッシュ完全解消・公式アカウント開設キット復元・X投稿初期値補完）
+// - 2026/09/26 v0.1.47: 【方式③ハイブリッド運用】連載ストーリーのWebサイト内特設ページ（/stories）新設（配信予定日連動・自動予約公開・次回予告・インタラクティブ価格アンケート＆3D答え合わせ・Topバナー配置）およびStoryStudio予約投稿連携
 
-window.APP_VERSION = '0.1.46';
-export const APP_VERSION = '0.1.46';
+window.APP_VERSION = '0.1.47';
+export const APP_VERSION = '0.1.47';
 
 
 

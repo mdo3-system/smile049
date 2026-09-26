@@ -193,7 +193,15 @@ export default function Footer({ setCurrentRoute }) {
                   <span style={{ color: 'var(--color-accent)' }}>▸</span> Plan 04: 無柱大空間・ホール【スマイチワークショップ】
                 </button>
               </li>
-              <li style={{ marginTop: 10 }}>
+              <li>
+                <button
+                  onClick={() => { setCurrentRoute('stories'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  style={{ color: '#fde047', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left' }}
+                >
+                  <span style={{ color: '#fde047' }}>📖</span> 公式WEB連載コラム【ガレージ物語】
+                </button>
+              </li>
+              <li style={{ marginTop: 6 }}>
                 <button
                   onClick={() => { setCurrentRoute('simulator'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   style={{ color: '#5eead4', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}

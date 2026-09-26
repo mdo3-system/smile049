@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { 
   Compass, ArrowRight, Check, AlertTriangle, ShieldCheck, 
   Sparkles, Layers, FileText, ChevronRight, Ruler, Wrench, Home, Car, Warehouse, Trees,
-  ZoomIn, X, Building2, HelpCircle, Calendar, Landmark, Scale, MessageSquare
+  ZoomIn, X, Building2, HelpCircle, Calendar, Landmark, Scale, MessageSquare, BookOpen
 } from 'lucide-react';
 import InteractiveHeroShowcase from '../components/InteractiveHeroShowcase';
 import { Analytics } from '../utils/analytics';
+import { getLatestPublishedStory } from '../services/storyService';
 
 export default function TopPage({ setCurrentRoute }) {
   const [previewStep, setPreviewStep] = useState(null);
+  const latestStory = getLatestPublishedStory();
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -131,6 +133,78 @@ export default function TopPage({ setCurrentRoute }) {
           <div>
             <InteractiveHeroShowcase onNavigateToSimulator={() => navigateTo('simulator')} />
           </div>
+        </div>
+      </section>
+
+      {/* =========================================================
+          公式WEB連載コラム 最新話バナー
+         ========================================================= */}
+      <section style={{ background: '#f8fafc', padding: '24px 24px 0' }}>
+        <div style={{
+          maxWidth: 1120,
+          margin: '0 auto',
+          background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+          borderRadius: 14,
+          padding: '20px 24px',
+          color: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 16,
+          boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+          border: '1px solid rgba(255, 255, 255, 0.1)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 260, flex: 1 }}>
+            <div style={{
+              width: 44,
+              height: 44,
+              borderRadius: 10,
+              background: 'rgba(64, 145, 108, 0.3)',
+              color: '#80ed99',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}>
+              <BookOpen size={22} />
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+                <span style={{ background: '#2563eb', color: '#fff', fontSize: 10.5, fontWeight: 800, padding: '1px 6px', borderRadius: 4 }}>
+                  連載コラム
+                </span>
+                <span style={{ fontSize: 11.5, color: '#94a3b8' }}>
+                  第{latestStory?.episodeNum || 1}話 公開中
+                </span>
+              </div>
+              <div style={{ fontSize: 14.5, fontWeight: 800, color: '#f8fafc', lineHeight: 1.3 }}>
+                {latestStory?.title || '木造自由設計ガレージ物語'}
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={() => navigateTo('stories')}
+            style={{
+              background: 'linear-gradient(135deg, var(--color-primary) 0%, #2d6a4f 100%)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 8,
+              padding: '10px 20px',
+              fontSize: 13.5,
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              whiteSpace: 'nowrap',
+              boxShadow: '0 2px 8px rgba(64, 145, 108, 0.3)'
+            }}
+          >
+            <span>連載ストーリーを読む</span>
+            <ChevronRight size={16} />
+          </button>
         </div>
       </section>
 

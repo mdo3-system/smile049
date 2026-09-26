@@ -12,6 +12,7 @@ export default function Header({ currentRoute, setCurrentRoute }) {
     { id: 'plan-storage', label: '狭小・変形地', planNum: '02' },
     { id: 'plan-agri', label: '農機具倉庫', planNum: '03' },
     { id: 'plan-workshop', label: '大空間・ホール', planNum: '04' },
+    { id: 'stories', label: '連載コラム', isNew: true },
   ];
 
   const handleNav = (routeId) => {

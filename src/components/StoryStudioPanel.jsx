@@ -5,8 +5,9 @@ import {
   BookOpen, HelpCircle, Upload, ShieldCheck, ArrowRight, DollarSign, Vote
 } from 'lucide-react';
 import { InstagramIcon, YoutubeIcon, NoteIcon, XIcon } from './SnsIcons';
+import { getAllStories, saveAllStories, isStoryPublished, STORY_STORAGE_KEY } from '../services/storyService';
 
-const STORAGE_KEY = 'smile049_story_studio_data_v2';
+const STORAGE_KEY = STORY_STORAGE_KEY;
 
 // プリセットテーマ（女性・家族・一般生活目線）
 const PRESET_THEMES = [
@@ -302,27 +303,15 @@ export default function StoryStudioPanel() {
   const [scTone, setScTone] = useState('emotional'); // emotional | data | humor | comparison
   const [scKeyword, setScKeyword] = useState(''); // 必ず入れたいキーワード・数字
   const [scEpisodeCount, setScEpisodeCount] = useState(3);
-  const [stories, setStories] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.error(e);
-    }
-    return generateStoriesByAi(PRESET_THEMES[0].title, PRESET_THEMES[0].protagonist, 3, PRESET_THEMES[0].theme, PRESET_THEMES[0]);
-  });
+  const [stories, setStories] = useState(() => getAllStories());
 
   const [copiedKey, setCopiedKey] = useState(null);
-  const [activeStoryTab, setActiveStoryTab] = useState('instagram'); // 'instagram' | 'note'
+  const [activeStoryTab, setActiveStoryTab] = useState('instagram'); // 'instagram' | 'note' | 'x'
 
 
-  // ローカル保存
+  // 共有ストレージ保存
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(stories));
-    } catch (e) {
-      console.error('Failed to save to localStorage:', e);
-    }
+    saveAllStories(stories);
   }, [stories]);
 
   const handleSelectPreset = (presetId) => {
@@ -589,27 +578,54 @@ export default function StoryStudioPanel() {
           </p>
         </div>
 
-        <button
-          onClick={() => setShowKitModal(true)}
-          style={{
-            background: 'rgba(255, 255, 255, 0.1)',
-            color: '#fff',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            padding: '10px 18px',
-            borderRadius: 8,
-            fontSize: 13,
-            fontWeight: 700,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            whiteSpace: 'nowrap',
-            transition: 'all 0.2s'
-          }}
-        >
-          <HelpCircle size={16} />
-          <span>アカウント開設完全キット・画像アセット</span>
-        </button>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <a
+            href="/stories"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              background: 'linear-gradient(135deg, var(--color-primary) 0%, #2d6a4f 100%)',
+              color: '#fff',
+              border: 'none',
+              padding: '10px 18px',
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              whiteSpace: 'nowrap',
+              textDecoration: 'none',
+              boxShadow: '0 4px 12px rgba(64, 145, 108, 0.35)'
+            }}
+          >
+            <BookOpen size={16} />
+            <span>🌐 サイト内連載ページ（/stories）を開く</span>
+          </a>
+
+          <button
+            onClick={() => setShowKitModal(true)}
+            style={{
+              background: 'rgba(255, 255, 255, 0.1)',
+              color: '#fff',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              padding: '10px 18px',
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              whiteSpace: 'nowrap',
+              transition: 'all 0.2s'
+            }}
+          >
+            <HelpCircle size={16} />
+            <span>アカウント開設完全キット・画像アセット</span>
+          </button>
+        </div>
       </div>
 
 
@@ -1016,8 +1032,83 @@ export default function StoryStudioPanel() {
                   </span>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 12 }}>
-                  <span style={{ color: '#64748b' }}>配信予定日: <strong>{story.scheduledDate}</strong></span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', fontSize: 12 }}>
+                  {/* 公開ステータスバッジ */}
+                  {isStoryPublished(story) ? (
+                    <span style={{
+                      background: 'rgba(16, 185, 129, 0.15)',
+                      color: '#059669',
+                      padding: '2px 8px',
+                      borderRadius: 4,
+                      fontWeight: 800,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4
+                    }}>
+                      <CheckCircle2 size={12} /> サイト公開中
+                    </span>
+                  ) : (
+                    <span style={{
+                      background: '#fef3c7',
+                      color: '#b45309',
+                      padding: '2px 8px',
+                      borderRadius: 4,
+                      fontWeight: 800,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4
+                    }}>
+                      <Calendar size={12} /> 予約公開予定
+                    </span>
+                  )}
+
+                  {/* 配信予定日 編集ピッカー */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ color: '#64748b' }}>配信日:</span>
+                    <input
+                      type="date"
+                      value={story.scheduledDate}
+                      onChange={(e) => {
+                        const updated = [...stories];
+                        updated[idx].scheduledDate = e.target.value;
+                        setStories(updated);
+                      }}
+                      style={{
+                        padding: '3px 6px',
+                        borderRadius: 4,
+                        border: '1px solid #cbd5e1',
+                        fontSize: 12,
+                        fontWeight: 700,
+                        color: '#0f172a',
+                        background: '#fff'
+                      }}
+                    />
+                  </div>
+
+                  {/* サイト公開プレビュー */}
+                  <a
+                    href={`/stories?ep=${story.episodeNum}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      background: '#fff',
+                      color: '#2563eb',
+                      border: '1px solid #bfdbfe',
+                      padding: '3px 8px',
+                      borderRadius: 4,
+                      fontSize: 11.5,
+                      fontWeight: 700,
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 3
+                    }}
+                    title="Webサイト上の公開画面を確認"
+                  >
+                    <ExternalLink size={12} />
+                    <span>サイト確認</span>
+                  </a>
+
                   <span style={{
                     background: 'rgba(59, 130, 246, 0.1)',
                     color: '#2563eb',
@@ -1328,6 +1419,28 @@ export default function StoryStudioPanel() {
                       >
                         <ExternalLink size={13} />
                         <span>Instagramを開く</span>
+                      </a>
+                      <a
+                        href="https://business.facebook.com/latest/composer"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          background: '#fff',
+                          color: '#e1306c',
+                          border: '1px solid #fbcfe8',
+                          borderRadius: 6,
+                          padding: '8px 12px',
+                          fontSize: 12.5,
+                          fontWeight: 700,
+                          textDecoration: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 4
+                        }}
+                        title="Meta Business Suiteで日時指定予約投稿"
+                      >
+                        <Calendar size={13} />
+                        <span>予約投稿（Meta Suite）</span>
                       </a>
                     </>
                   ) : activeStoryTab === 'note' ? (
