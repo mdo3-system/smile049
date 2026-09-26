@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
   BookOpen, Calendar, Clock, Lock, Sparkles, ArrowRight, ArrowLeft, 
-  CheckCircle2, Vote, Share2, HelpCircle, Eye, Box, MessageSquare, ChevronRight
+  CheckCircle2, Vote, Share2, HelpCircle, Eye, Box, MessageSquare, ChevronRight,
+  Video, Image as ImageIcon
 } from 'lucide-react';
 import { getAllStories, isStoryPublished } from '../services/storyService';
 import { Analytics } from '../utils/analytics';
@@ -12,6 +13,7 @@ export default function StoryPage({ setCurrentRoute }) {
   const [userSelectedQuizOption, setUserSelectedQuizOption] = useState(null);
   const [showAnswer, setShowAnswer] = useState(false);
   const [copiedUrl, setCopiedUrl] = useState(false);
+  const [activeMediaTab, setActiveMediaTab] = useState('auto'); // 'auto' | 'video' | 'image'
 
   // 同期イベントを監視
   useEffect(() => {
@@ -356,17 +358,88 @@ export default function StoryPage({ setCurrentRoute }) {
             /* 公開中の場合のフルコンテンツ表示 */
             <div style={{ padding: '30px 28px' }}>
               
-              {/* パース画像（ある場合） */}
-              {activeStory.imageUrl && (
-                <div style={{ marginBottom: 28, borderRadius: 10, overflow: 'hidden', border: '1px solid #e2e8f0' }}>
-                  <img
-                    src={activeStory.imageUrl}
-                    alt={activeStory.title}
-                    style={{ width: '100%', maxHeight: 460, objectFit: 'cover', display: 'block' }}
-                  />
-                  <div style={{ background: '#f8fafc', padding: '8px 14px', fontSize: 11.5, color: '#64748b', textAlign: 'center' }}>
-                    ※ 掲載パースは3DシミュレーターモデルをもとにAI高精細生成された完成予想イメージです。
-                  </div>
+              {/* メディア表示エリア（動画 ＆ 静止画パース） */}
+              {(activeStory.videoUrl || activeStory.imageUrl) && (
+                <div style={{ marginBottom: 28, borderRadius: 12, overflow: 'hidden', border: '1px solid #e2e8f0', background: '#0f172a' }}>
+                  
+                  {/* 両方ある場合の切り替えタブ */}
+                  {activeStory.videoUrl && activeStory.imageUrl && (
+                    <div style={{
+                      display: 'flex',
+                      background: '#1e293b',
+                      borderBottom: '1px solid #334155',
+                      padding: '0 16px'
+                    }}>
+                      <button
+                        onClick={() => setActiveMediaTab('video')}
+                        style={{
+                          padding: '10px 16px',
+                          fontSize: 12.5,
+                          fontWeight: 700,
+                          background: 'transparent',
+                          border: 'none',
+                          borderBottom: (activeMediaTab === 'video' || activeMediaTab === 'auto') ? '3px solid #38bdf8' : '3px solid transparent',
+                          color: (activeMediaTab === 'video' || activeMediaTab === 'auto') ? '#38bdf8' : '#94a3b8',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6
+                        }}
+                      >
+                        <Video size={14} />
+                        <span>🎥 完成動画（ウォークスルー）</span>
+                      </button>
+                      <button
+                        onClick={() => setActiveMediaTab('image')}
+                        style={{
+                          padding: '10px 16px',
+                          fontSize: 12.5,
+                          fontWeight: 700,
+                          background: 'transparent',
+                          border: 'none',
+                          borderBottom: activeMediaTab === 'image' ? '3px solid #80ed99' : '3px solid transparent',
+                          color: activeMediaTab === 'image' ? '#80ed99' : '#94a3b8',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6
+                        }}
+                      >
+                        <ImageIcon size={14} />
+                        <span>🖼️ 高精細パース静止画</span>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* 動画表示 */}
+                  {activeStory.videoUrl && (activeMediaTab === 'video' || activeMediaTab === 'auto' || !activeStory.imageUrl) ? (
+                    <div>
+                      <video
+                        src={activeStory.videoUrl}
+                        controls
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        style={{ width: '100%', maxHeight: 500, objectFit: 'contain', display: 'block', background: '#000' }}
+                      />
+                      <div style={{ background: '#1e293b', padding: '8px 14px', fontSize: 11.5, color: '#94a3b8', textAlign: 'center' }}>
+                        ※ 3DシミュレーターモデルをもとにAI生成されたドラマチック完成ウォークスルー動画です。
+                      </div>
+                    </div>
+                  ) : activeStory.imageUrl ? (
+                    /* 画像表示 */
+                    <div>
+                      <img
+                        src={activeStory.imageUrl}
+                        alt={activeStory.title}
+                        style={{ width: '100%', maxHeight: 480, objectFit: 'cover', display: 'block' }}
+                      />
+                      <div style={{ background: '#f8fafc', padding: '8px 14px', fontSize: 11.5, color: '#64748b', textAlign: 'center' }}>
+                        ※ 掲載パースは3DシミュレーターモデルをもとにAI高精細生成された完成予想イメージです。
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
               )}
 

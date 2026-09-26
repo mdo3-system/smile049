@@ -3,7 +3,7 @@ import {
   Sparkles, Copy, Check, ExternalLink, Image as ImageIcon, Download, 
   Trash2, RefreshCw, Layers, CheckCircle2, ChevronDown, ChevronRight, 
   BookOpen, HelpCircle, Upload, ShieldCheck, ArrowRight, DollarSign, Vote,
-  Calendar
+  Calendar, Video, Film, Play
 } from 'lucide-react';
 import { InstagramIcon, YoutubeIcon, NoteIcon, XIcon } from './SnsIcons';
 import { getAllStories, saveAllStories, isStoryPublished, STORY_STORAGE_KEY } from '../services/storyService';
@@ -455,6 +455,21 @@ export default function StoryStudioPanel() {
     reader.readAsDataURL(file);
   };
 
+  // 動画アップロード処理（MP4 / WebM / MOV）
+  const handleVideoFile = (file, storyIndex) => {
+    if (!file || (!file.type.startsWith('video/') && !file.name.match(/\.(mp4|webm|mov|avi)$/i))) {
+      alert('動画ファイル（MP4, WebM, MOV等）を選択してください。');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const updated = [...stories];
+      updated[storyIndex].videoUrl = e.target.result;
+      setStories(updated);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handlePasteImage = (e, storyIndex) => {
     const items = e.clipboardData?.items;
     if (!items) return;
@@ -468,18 +483,25 @@ export default function StoryStudioPanel() {
     }
   };
 
-  // Instagram用キャプション成形（価格アンケート・コメント促進付き）
+  // Instagram用キャプション成形（動画×画像ハイブリッド・カルーセル最適化）
   const formatInstagramCaption = (story) => {
-    let caption = `${story.phase}\n${story.title}\n\n${story.plot}\n\n`;
+    let caption = '';
+    if (story.videoUrl && story.imageUrl) {
+      caption += `【🎥動画×画像カルーセル投稿】\n`;
+      caption += `👉 スワイプで詳細パース＆図面をチェック！\n\n`;
+    } else if (story.videoUrl) {
+      caption += `【🎥リール動画・完成イメージ】\n\n`;
+    }
+    caption += `${story.phase}\n${story.title}\n\n${story.plot}\n\n`;
 
     if (story.quizEnabled) {
       caption += `―――――――――――――――\n`;
       caption += `💬【読者アンケート・コメントで教えてください！】\n`;
       caption += `Q. ${story.quizQuestion}\n\n`;
-      story.quizOptions.forEach((opt, idx) => {
+      story.quizOptions.forEach((opt) => {
         caption += `${opt}\n`;
       });
-      caption += `\n👉 あなたの予想や「この金額なら建てたい！」をぜひコメント欄（またはストーリーズ投票）で教えてください！\n`;
+      caption += `\n👉 あなたの予想や「この金額なら建てたい！」をコメント欄（またはストーリーズ投票）で教えてください！\n`;
       caption += `※ プロフィールの3Dシミュレーター（@smile049_garage）で実際のリアルタイム積算見積もりがその場で答え合わせできます。\n\n`;
     }
 
@@ -1300,102 +1322,241 @@ export default function StoryStudioPanel() {
                     {story.englishPrompt}
                   </div>
 
-                  {/* 画像取り込み（ペーストまたはドロップ） */}
-                  <div
-                    onPaste={(e) => handlePasteImage(e, idx)}
-                    onDragOver={(e) => e.preventDefault()}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      const file = e.dataTransfer.files?.[0];
-                      handleImageFile(file, idx);
-                    }}
-                    style={{
-                      border: '2px dashed #cbd5e1',
-                      borderRadius: 8,
-                      padding: 12,
-                      textAlign: 'center',
-                      background: story.imageUrl ? '#f8fafc' : '#f1f5f9',
-                      position: 'relative',
-                      minHeight: 120,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {story.imageUrl ? (
-                      <div style={{ width: '100%', position: 'relative' }}>
-                        <img
-                          src={story.imageUrl}
-                          alt={`第${story.episodeNum}話 イメージ`}
-                          style={{
-                            width: '100%',
-                            maxHeight: 160,
-                            objectFit: 'cover',
-                            borderRadius: 6
-                          }}
-                        />
-                        <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 8 }}>
-                          <a
-                            href={story.imageUrl}
-                            download={`smile049_story_ep${story.episodeNum}.jpg`}
-                            style={{
-                              background: '#2563eb',
-                              color: '#fff',
-                              padding: '4px 10px',
-                              borderRadius: 4,
-                              fontSize: 11.5,
-                              fontWeight: 700,
-                              textDecoration: 'none',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: 4
-                            }}
-                          >
-                            <Download size={12} />
-                            <span>画像をダウンロード</span>
-                          </a>
-                          <button
-                            onClick={() => {
-                              const updated = [...stories];
-                              updated[idx].imageUrl = null;
-                              setStories(updated);
-                            }}
-                            style={{
-                              background: '#fee2e2',
-                              color: '#dc2626',
-                              border: 'none',
-                              padding: '4px 8px',
-                              borderRadius: 4,
-                              fontSize: 11.5,
-                              cursor: 'pointer'
-                            }}
-                          >
-                            <Trash2 size={12} />
-                          </button>
-                        </div>
+                  {/* メディアスロット（動画枠 ＆ 画像枠のハイブリッド2列） */}
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+                    gap: 12
+                  }}>
+                    {/* ① 動画スロット（リール・カルーセル1枚目用） */}
+                    <div
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        const file = e.dataTransfer.files?.[0];
+                        handleVideoFile(file, idx);
+                      }}
+                      style={{
+                        border: '2px dashed #93c5fd',
+                        borderRadius: 8,
+                        padding: 10,
+                        textAlign: 'center',
+                        background: story.videoUrl ? '#f0f9ff' : '#f8fafc',
+                        position: 'relative',
+                        minHeight: 130,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <div style={{ position: 'absolute', top: 6, left: 8, display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(37, 99, 235, 0.1)', color: '#2563eb', padding: '2px 6px', borderRadius: 4, fontSize: 10.5, fontWeight: 700 }}>
+                        <Video size={12} />
+                        <span>スライド1: 動画（リール）</span>
                       </div>
-                    ) : (
-                      <label style={{ cursor: 'pointer', width: '100%', display: 'block' }}>
-                        <ImageIcon size={24} color="#94a3b8" style={{ marginBottom: 4 }} />
-                        <div style={{ fontSize: 12, fontWeight: 700, color: '#475569' }}>
-                          生成した画像をここにドラッグ＆ドロップ または Ctrl+V でペースト
+
+                      {story.videoUrl ? (
+                        <div style={{ width: '100%', marginTop: 20 }}>
+                          <video
+                            src={story.videoUrl}
+                            controls
+                            muted
+                            loop
+                            style={{
+                              width: '100%',
+                              maxHeight: 140,
+                              borderRadius: 6,
+                              background: '#000'
+                            }}
+                          />
+                          <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 6 }}>
+                            <a
+                              href={story.videoUrl}
+                              download={`smile049_story_ep${story.episodeNum}.mp4`}
+                              style={{
+                                background: '#2563eb',
+                                color: '#fff',
+                                padding: '4px 10px',
+                                borderRadius: 4,
+                                fontSize: 11,
+                                fontWeight: 700,
+                                textDecoration: 'none',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 4
+                              }}
+                            >
+                              <Download size={11} />
+                              <span>動画DL</span>
+                            </a>
+                            <button
+                              onClick={() => {
+                                const updated = [...stories];
+                                updated[idx].videoUrl = null;
+                                setStories(updated);
+                              }}
+                              style={{
+                                background: '#fee2e2',
+                                color: '#dc2626',
+                                border: 'none',
+                                padding: '4px 8px',
+                                borderRadius: 4,
+                                fontSize: 11,
+                                cursor: 'pointer'
+                              }}
+                              title="動画を削除"
+                            >
+                              <Trash2 size={11} />
+                            </button>
+                          </div>
                         </div>
-                        <div style={{ fontSize: 10.5, color: '#94a3b8', marginTop: 2 }}>
-                          またはクリックして画像ファイルを選択
+                      ) : (
+                        <label style={{ cursor: 'pointer', width: '100%', display: 'block', paddingTop: 16 }}>
+                          <Film size={22} color="#3b82f6" style={{ marginBottom: 4 }} />
+                          <div style={{ fontSize: 11.5, fontWeight: 700, color: '#1e40af' }}>
+                            🎥 作成した動画をここにドロップ
+                          </div>
+                          <div style={{ fontSize: 10, color: '#64748b', marginTop: 2 }}>
+                            またはクリックして動画（MP4/WebM）を選択
+                          </div>
+                          <input
+                            type="file"
+                            accept="video/*"
+                            onChange={(e) => handleVideoFile(e.target.files?.[0], idx)}
+                            style={{ display: 'none' }}
+                          />
+                        </label>
+                      )}
+                    </div>
+
+                    {/* ② 静止画スロット（カルーセル2枚目・パース用） */}
+                    <div
+                      onPaste={(e) => handlePasteImage(e, idx)}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        const file = e.dataTransfer.files?.[0];
+                        handleImageFile(file, idx);
+                      }}
+                      style={{
+                        border: '2px dashed #cbd5e1',
+                        borderRadius: 8,
+                        padding: 10,
+                        textAlign: 'center',
+                        background: story.imageUrl ? '#f8fafc' : '#f1f5f9',
+                        position: 'relative',
+                        minHeight: 130,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <div style={{ position: 'absolute', top: 6, left: 8, display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(71, 85, 105, 0.1)', color: '#475569', padding: '2px 6px', borderRadius: 4, fontSize: 10.5, fontWeight: 700 }}>
+                        <ImageIcon size={12} />
+                        <span>スライド2: 静止画パース</span>
+                      </div>
+
+                      {story.imageUrl ? (
+                        <div style={{ width: '100%', marginTop: 20 }}>
+                          <img
+                            src={story.imageUrl}
+                            alt={`第${story.episodeNum}話 イメージ`}
+                            style={{
+                              width: '100%',
+                              maxHeight: 140,
+                              objectFit: 'cover',
+                              borderRadius: 6
+                            }}
+                          />
+                          <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 6 }}>
+                            <a
+                              href={story.imageUrl}
+                              download={`smile049_story_ep${story.episodeNum}.jpg`}
+                              style={{
+                                background: '#475569',
+                                color: '#fff',
+                                padding: '4px 10px',
+                                borderRadius: 4,
+                                fontSize: 11,
+                                fontWeight: 700,
+                                textDecoration: 'none',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 4
+                              }}
+                            >
+                              <Download size={11} />
+                              <span>画像DL</span>
+                            </a>
+                            <button
+                              onClick={() => {
+                                const updated = [...stories];
+                                updated[idx].imageUrl = null;
+                                setStories(updated);
+                              }}
+                              style={{
+                                background: '#fee2e2',
+                                color: '#dc2626',
+                                border: 'none',
+                                padding: '4px 8px',
+                                borderRadius: 4,
+                                fontSize: 11,
+                                cursor: 'pointer'
+                              }}
+                              title="画像を削除"
+                            >
+                              <Trash2 size={11} />
+                            </button>
+                          </div>
                         </div>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => handleImageFile(e.target.files?.[0], idx)}
-                          style={{ display: 'none' }}
-                        />
-                      </label>
-                    )}
+                      ) : (
+                        <label style={{ cursor: 'pointer', width: '100%', display: 'block', paddingTop: 16 }}>
+                          <ImageIcon size={22} color="#94a3b8" style={{ marginBottom: 4 }} />
+                          <div style={{ fontSize: 11.5, fontWeight: 700, color: '#475569' }}>
+                            🖼 画像をドロップ または Ctrl+V ペースト
+                          </div>
+                          <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>
+                            またはクリックして画像ファイルを選択
+                          </div>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleImageFile(e.target.files?.[0], idx)}
+                            style={{ display: 'none' }}
+                          />
+                        </label>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
+
+              {/* Instagram用 動画×画像ハイブリッド構成ガイド（Instagramタブ選択時） */}
+              {activeStoryTab === 'instagram' && (
+                <div style={{
+                  background: 'linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%)',
+                  padding: '10px 18px',
+                  borderTop: '1px solid #f0abfc',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: 10
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ background: '#c026d3', color: '#fff', fontSize: 10.5, fontWeight: 800, padding: '2px 6px', borderRadius: 4 }}>
+                      エージェント推奨構成
+                    </span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#86198f' }}>
+                      【スライド1: 🎥動画】＋【スライド2: 🖼静止画】のカルーセル投稿
+                    </span>
+                  </div>
+                  <span style={{ fontSize: 11.5, color: '#a21caf' }}>
+                    💡 Instagram投稿時に「複数選択」で動画と画像を選んで投稿すると、動画で指を止めさせ、スワイプで図面＆アンケートへ誘導できます！
+                  </span>
+                </div>
+              )}
 
               {/* 方式A：投稿アシストバー */}
               <div style={{
@@ -1759,23 +1920,37 @@ export default function StoryStudioPanel() {
                     </div>
                   </div>
 
-                  {/* STEP 2: 作画プロンプト */}
+                  {/* STEP 2: 作画プロンプト ＆ 動画登録 */}
                   <div style={{ background: '#f8fafc', borderRadius: 10, padding: 18, border: '1px solid #e2e8f0' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
                       <div style={{ background: '#0284c7', color: '#fff', width: 26, height: 26, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800 }}>
                         2
                       </div>
                       <h5 style={{ margin: 0, fontSize: 14.5, fontWeight: 700, color: '#0f172a' }}>
-                        AI作画プロンプト（NanoBanana2 / Google AI Pro）で画像を生成・反映
+                        AI作画プロンプト（NanoBanana2 / Google AI Pro）で画像・動画を生成・反映
                       </h5>
                     </div>
                     <div style={{ fontSize: 12.5, color: '#475569', lineHeight: 1.6, paddingLeft: 36 }}>
                       各エピソードカードに「担当アカウント（Google AI Pro アカウント1〜5）」と英語作画プロンプトが自動割当されています。
                       <ol style={{ margin: '6px 0 0', paddingLeft: 20 }}>
                         <li>カード内の【コピー】ボタンで英語プロンプトをクリップボードにコピー。</li>
-                        <li>Google AI Pro（NanoBanana2）の画像生成画面にプロンプトを貼り付けて画像を生成。</li>
-                        <li>生成された画像をダウンロードするか、右クリックで「画像をコピー」して、Story Studioの各話【画像枠】へペースト（<code>Ctrl + V</code>）または【画像を選択】からアップロードします。</li>
+                        <li>Google AI Pro（NanoBanana2）の生成画面にプロンプトを貼り付けて画像や動画を生成。</li>
+                        <li><strong>静止画パース:</strong> 【静止画枠】へペースト（<code>Ctrl + V</code>）またはファイル選択からアップロード。</li>
+                        <li><strong>完成動画:</strong> 作成した動画（MP4/WebM）を【動画枠】へドラッグ＆ドロップまたはファイル選択して登録。カード上でそのまま動画を再生プレビュー確認できます。</li>
                       </ol>
+
+                      {/* ハイブリッド運用の黄金ルール */}
+                      <div style={{ marginTop: 10, background: '#fdf4ff', padding: '10px 14px', borderRadius: 8, border: '1px solid #f0abfc' }}>
+                        <strong style={{ color: '#86198f', fontSize: 12 }}>
+                          🌟 【エージェント直伝】Instagram動画×画像カルーセル（スワイプ）の黄金構成
+                        </strong>
+                        <ul style={{ margin: '6px 0 0', paddingLeft: 18, fontSize: 12, color: '#701a75', lineHeight: 1.5 }}>
+                          <li><strong>スライド1 (動画):</strong> 3D完成イメージ動画。タイムラインで自動再生され、読者のスクロールの手を確実にストップさせます。</li>
+                          <li><strong>スライド2 (画像):</strong> 敷地ジャストフィットの図面＆外観高画質パース画像。</li>
+                          <li><strong>スライド3 (画像):</strong> 「このガレージいくら？」価格予想アンケート。</li>
+                          <li><strong>スライド4 (誘導):</strong> 正解はプロフィール（@smile049_garage）の3Dシミュレーターリアルタイム積算画面へ！</li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
 
