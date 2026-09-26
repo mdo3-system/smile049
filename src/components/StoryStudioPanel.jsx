@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { 
   Sparkles, Copy, Check, ExternalLink, Image as ImageIcon, Download, 
   Trash2, RefreshCw, Layers, CheckCircle2, ChevronDown, ChevronRight, 
-  BookOpen, HelpCircle, Upload, ShieldCheck, ArrowRight, DollarSign, Vote
+  BookOpen, HelpCircle, Upload, ShieldCheck, ArrowRight, DollarSign, Vote,
+  Calendar
 } from 'lucide-react';
 import { InstagramIcon, YoutubeIcon, NoteIcon, XIcon } from './SnsIcons';
 import { getAllStories, saveAllStories, isStoryPublished, STORY_STORAGE_KEY } from '../services/storyService';
