@@ -296,6 +296,7 @@ export default function StoryStudioPanel() {
   const [customThemeDesc, setCustomThemeDesc] = useState(PRESET_THEMES[0].theme);
   const [storyMode, setStoryMode] = useState('preset'); // 'preset' | 'scenario'
   const [showKitModal, setShowKitModal] = useState(false);
+  const [kitModalTab, setKitModalTab] = useState('manual'); // 'manual' | 'snsKit'
 
   // シナリオライター専用フィールド
   const [scTarget, setScTarget] = useState(''); // 訂跢層・誦求対象
@@ -606,7 +607,36 @@ export default function StoryStudioPanel() {
           </a>
 
           <button
-            onClick={() => setShowKitModal(true)}
+            onClick={() => {
+              setKitModalTab('manual');
+              setShowKitModal(true);
+            }}
+            style={{
+              background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.25) 0%, rgba(14, 165, 233, 0.15) 100%)',
+              color: '#38bdf8',
+              border: '1px solid rgba(56, 189, 248, 0.4)',
+              padding: '10px 18px',
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              whiteSpace: 'nowrap',
+              boxShadow: '0 2px 8px rgba(56, 189, 248, 0.2)',
+              transition: 'all 0.2s'
+            }}
+          >
+            <BookOpen size={16} />
+            <span>📖 運用手順・操作マニュアル</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setKitModalTab('snsKit');
+              setShowKitModal(true);
+            }}
             style={{
               background: 'rgba(255, 255, 255, 0.1)',
               color: '#fff',
@@ -623,8 +653,8 @@ export default function StoryStudioPanel() {
               transition: 'all 0.2s'
             }}
           >
-            <HelpCircle size={16} />
-            <span>アカウント開設完全キット・画像アセット</span>
+            <ShieldCheck size={16} />
+            <span>公式SNS開設キット・画像</span>
           </button>
         </div>
       </div>
@@ -1578,7 +1608,7 @@ export default function StoryStudioPanel() {
         </div>
       </div>
 
-      {/* アカウント開設キット モーダル */}
+      {/* 運用マニュアル ＆ アカウント開設キット 統合モーダル */}
       {showKitModal && (
         <div style={{
           position: 'fixed',
@@ -1586,8 +1616,8 @@ export default function StoryStudioPanel() {
           left: 0,
           right: 0,
           bottom: 0,
-          background: 'rgba(0,0,0,0.6)',
-          backdropFilter: 'blur(4px)',
+          background: 'rgba(0,0,0,0.65)',
+          backdropFilter: 'blur(6px)',
           zIndex: 9999,
           display: 'flex',
           alignItems: 'center',
@@ -1596,160 +1626,364 @@ export default function StoryStudioPanel() {
         }}>
           <div style={{
             background: '#ffffff',
-            borderRadius: 14,
-            maxWidth: 720,
+            borderRadius: 16,
+            maxWidth: 880,
             width: '100%',
-            maxHeight: '90vh',
+            maxHeight: '92vh',
             display: 'flex',
             flexDirection: 'column',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.35)',
             overflow: 'hidden'
           }}>
+            {/* モーダルヘッダー */}
             <div style={{
-              padding: '16px 20px',
-              borderBottom: '1px solid #e2e8f0',
+              padding: '16px 24px',
+              borderBottom: '1px solid #334155',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               background: '#0f172a',
               color: '#fff'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <ShieldCheck size={18} color="#80ed99" />
-                <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700 }}>
-                  公式SNSアカウント開設完全登録キット（Instagram / note / YouTube）
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <Sparkles size={20} color="#80ed99" />
+                <h4 style={{ margin: 0, fontSize: 16, fontWeight: 800 }}>
+                  Story Studio 運用ガイド ＆ 公式SNS完全キット
                 </h4>
               </div>
               <button
                 onClick={() => setShowKitModal(false)}
-                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 18 }}
+                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 20, padding: 4 }}
               >
                 ✕
               </button>
             </div>
 
-            <div style={{ padding: 24, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
-              {/* 公式画像アセット */}
-              <div style={{ background: '#f8fafc', padding: 16, borderRadius: 8, border: '1px solid #e2e8f0' }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#1e293b', marginBottom: 10 }}>
-                  🖼 配備済み公式ブランディング画像アセット
-                </div>
-                <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
-                  <div style={{ textAlign: 'center' }}>
-                    <img src="/assets/sns/icon.jpg" alt="公式アイコン" style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', border: '2px solid #cbd5e1' }} />
-                    <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>アイコン (1:1)</div>
-                    <a href="/assets/sns/icon.jpg" download="smile049_sns_icon.jpg" style={{ fontSize: 11, color: '#2563eb', fontWeight: 600 }}>保存</a>
-                  </div>
-                  <div style={{ textAlign: 'center', flex: 1, minWidth: 200 }}>
-                    <img src="/assets/sns/banner.jpg" alt="公式バナー" style={{ width: '100%', height: 64, borderRadius: 6, objectFit: 'cover', border: '1px solid #cbd5e1' }} />
-                    <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>ヘッダー/バナー (16:9)</div>
-                    <a href="/assets/sns/banner.jpg" download="smile049_sns_banner.jpg" style={{ fontSize: 11, color: '#2563eb', fontWeight: 600 }}>保存</a>
-                  </div>
-                </div>
-              </div>
+            {/* モーダル内タブ切り替え */}
+            <div style={{
+              display: 'flex',
+              background: '#1e293b',
+              borderBottom: '1px solid #334155',
+              padding: '0 24px'
+            }}>
+              <button
+                onClick={() => setKitModalTab('manual')}
+                style={{
+                  padding: '12px 20px',
+                  fontSize: 13.5,
+                  fontWeight: 700,
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: kitModalTab === 'manual' ? '3px solid #38bdf8' : '3px solid transparent',
+                  color: kitModalTab === 'manual' ? '#38bdf8' : '#94a3b8',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  transition: 'all 0.2s'
+                }}
+              >
+                <BookOpen size={16} />
+                <span>📖 運用手順・操作マニュアル（最新フロー）</span>
+              </button>
 
-              {/* Instagram設定 */}
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 700, color: '#e1306c', marginBottom: 6 }}>
-                  <InstagramIcon size={16} color="#e1306c" />
-                  <span>Instagram 設定キット</span>
-                </div>
-                <div style={{ fontSize: 12, color: '#475569', marginBottom: 4 }}>
-                  <strong>ユーザーネーム:</strong> <code>@smile049_garage</code> | <strong>名前:</strong> <code>スマイチ | 木造自由設計ガレージ・倉庫</code>
-                </div>
-                <div style={{ position: 'relative' }}>
-                  <textarea
-                    readOnly
-                    rows={4}
-                    value={`規格サイズに土地を合わせない。敷地に合わせて自分で描く「木造自由設計ガレージ・倉庫」\n🚗 愛車・大型バイクの秘密基地\n📐 狭小地・変形地・農業倉庫\n★ 登録不要の3Dシミュレーター＆リアルタイム自動見積もり公開中\n埼玉・関東全域対応｜専任スタッフが構造計算から施工までワンストップ\n👇 3Dシミュレーターを試す\nhttps://smile049.jp/`}
-                    style={{ width: '100%', fontSize: 12, padding: '8px 10px', borderRadius: 6, border: '1px solid #cbd5e1', background: '#f8fafc', lineHeight: 1.5 }}
-                  />
-                  <button
-                    onClick={() => copyToClipboard(`規格サイズに土地を合わせない。敷地に合わせて自分で描く「木造自由設計ガレージ・倉庫」\n🚗 愛車・大型バイクの秘密基地\n📐 狭小地・変形地・農業倉庫\n★ 登録不要の3Dシミュレーター＆リアルタイム自動見積もり公開中\n埼玉・関東全域対応｜専任スタッフが構造計算から施工までワンストップ\n👇 3Dシミュレーターを試す\nhttps://smile049.jp/`, 'ig_profile')}
-                    style={{ position: 'absolute', top: 8, right: 8, padding: '3px 8px', fontSize: 11, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}
-                  >
-                    {copiedKey === 'ig_profile' ? 'コピー済' : 'コピー'}
-                  </button>
-                </div>
-              </div>
-
-              {/* note設定 */}
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 700, color: '#10b981', marginBottom: 6 }}>
-                  <NoteIcon size={16} color="#10b981" />
-                  <span>note+ 設定キット</span>
-                </div>
-                <div style={{ fontSize: 12, color: '#475569', marginBottom: 4 }}>
-                  <strong>note ID:</strong> <code>smile049</code> | <strong>クリエイター名:</strong> <code>スマイチ | 木造自由設計ガレージ物語</code>
-                </div>
-                <div style={{ position: 'relative' }}>
-                  <textarea
-                    readOnly
-                    rows={2}
-                    value={`敷地に合わせてミリ単位で創る「木造自由設計ガレージ・倉庫 スマイチ」公式note。愛車と過ごす秘密基地、狭小変形地の特注ストッカー、農機具倉庫の設計ストーリーと3Dシミュレーター活用術をお届けします。`}
-                    style={{ width: '100%', fontSize: 12, padding: '8px 10px', borderRadius: 6, border: '1px solid #cbd5e1', background: '#f8fafc', lineHeight: 1.5 }}
-                  />
-                  <button
-                    onClick={() => copyToClipboard(`敷地に合わせてミリ単位で創る「木造自由設計ガレージ・倉庫 スマイチ」公式note。愛車と過ごす秘密基地、狭小変形地の特注ストッカー、農機具倉庫の設計ストーリーと3Dシミュレーター活用術をお届けします。`, 'note_profile')}
-                    style={{ position: 'absolute', top: 8, right: 8, padding: '3px 8px', fontSize: 11, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}
-                  >
-                    {copiedKey === 'note_profile' ? 'コピー済' : 'コピー'}
-                  </button>
-                </div>
-              </div>
-
-              {/* YouTube設定 */}
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 700, color: '#ef4444', marginBottom: 6 }}>
-                  <YoutubeIcon size={16} color="#ef4444" />
-                  <span>YouTube チャンネル開設キット</span>
-                </div>
-                <div style={{ fontSize: 12, color: '#475569', marginBottom: 4 }}>
-                  <strong>チャンネル名:</strong> <code>スマイチ 木造ガレージTV</code> | <strong>ハンドル:</strong> <code>@smile049_garage</code>
-                </div>
-                <div style={{ position: 'relative' }}>
-                  <textarea
-                    readOnly
-                    rows={4}
-                    value={`規格サイズに土地を合わせるのではなく、敷地に合わせて自分で描く「木造自由設計ガレージ・倉庫 スマイチ」の公式YouTubeチャンネルです。\n\n【配信内容】\n・WEBブラウザ上で動く「無料3Dガレージシミュレーター」の実践操作解説\n・敷地寸法・台形変形地・勾配屋根のミリ単位設計ノウハウ\n・愛車（ポルシェ・GT-R・クラシックカー）や大型バイクと暮らすガレージプラン\n\n■ スマイチ公式サイト\nhttps://smile049.jp/`}
-                    style={{ width: '100%', fontSize: 12, padding: '8px 10px', borderRadius: 6, border: '1px solid #cbd5e1', background: '#f8fafc', lineHeight: 1.5 }}
-                  />
-                  <button
-                    onClick={() => copyToClipboard(`規格サイズに土地を合わせるのではなく、敷地に合わせて自分で描く「木造自由設計ガレージ・倉庫 スマイチ」の公式YouTubeチャンネルです。\n\n【配信内容】\n・WEBブラウザ上で動く「無料3Dガレージシミュレーター」の実践操作解説\n・敷地寸法・台形変形地・勾配屋根のミリ単位設計ノウハウ\n・愛車（ポルシェ・GT-R・クラシックカー）や大型バイクと暮らすガレージプラン\n\n■ スマイチ公式サイト\nhttps://smile049.jp/`, 'yt_profile')}
-                    style={{ position: 'absolute', top: 8, right: 8, padding: '3px 8px', fontSize: 11, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}
-                  >
-                    {copiedKey === 'yt_profile' ? 'コピー済' : 'コピー'}
-                  </button>
-                </div>
-              </div>
-
-              {/* X（旧Twitter）設定 */}
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 700, color: '#0f172a', marginBottom: 6 }}>
-                  <XIcon size={16} color="#0f172a" />
-                  <span>X（旧Twitter） アカウント開設キット</span>
-                </div>
-                <div style={{ fontSize: 12, color: '#475569', marginBottom: 4 }}>
-                  <strong>ユーザー名:</strong> <code>@smile049_garage</code> | <strong>名前:</strong> <code>スマイチ | 木造自由設計ガレージ・倉庫</code>
-                </div>
-                <div style={{ position: 'relative' }}>
-                  <textarea
-                    readOnly
-                    rows={4}
-                    value={`規格サイズに土地を合わせない。敷地に合わせてミリ単位で描く「木造自由設計ガレージ・倉庫 スマイチ」公式X。🚗愛車・大型バイクの秘密基地／狭小変形地ストッカー／農機具倉庫。登録不要の3Dシミュレーター＆自動見積もり公開中！埼玉・関東全域対応。専任スタッフが構造計算から施工までワンストップ。\nhttps://smile049.jp/`}
-                    style={{ width: '100%', fontSize: 12, padding: '8px 10px', borderRadius: 6, border: '1px solid #cbd5e1', background: '#f8fafc', lineHeight: 1.5 }}
-                  />
-                  <button
-                    onClick={() => copyToClipboard(`規格サイズに土地を合わせない。敷地に合わせてミリ単位で描く「木造自由設計ガレージ・倉庫 スマイチ」公式X。🚗愛車・大型バイクの秘密基地／狭小変形地ストッカー／農機具倉庫。登録不要の3Dシミュレーター＆自動見積もり公開中！埼玉・関東全域対応。専任スタッフが構造計算から施工までワンストップ。\nhttps://smile049.jp/`, 'x_profile')}
-                    style={{ position: 'absolute', top: 8, right: 8, padding: '3px 8px', fontSize: 11, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}
-                  >
-                    {copiedKey === 'x_profile' ? 'コピー済' : 'コピー'}
-                  </button>
-                </div>
-              </div>
+              <button
+                onClick={() => setKitModalTab('snsKit')}
+                style={{
+                  padding: '12px 20px',
+                  fontSize: 13.5,
+                  fontWeight: 700,
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: kitModalTab === 'snsKit' ? '3px solid #80ed99' : '3px solid transparent',
+                  color: kitModalTab === 'snsKit' ? '#80ed99' : '#94a3b8',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  transition: 'all 0.2s'
+                }}
+              >
+                <ShieldCheck size={16} />
+                <span>🛡️ 公式SNSアカウント開設キット・画像アセット</span>
+              </button>
             </div>
 
-            <div style={{ padding: '12px 20px', borderTop: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'flex-end' }}>
+            {/* モーダルコンテンツ */}
+            <div style={{ padding: '24px 28px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: 24 }}>
+              
+              {/* ── タブ1: 運用マニュアル ── */}
+              {kitModalTab === 'manual' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                  
+                  {/* 全体モデルハイライト */}
+                  <div style={{
+                    background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%)',
+                    borderRadius: 12,
+                    padding: '18px 20px',
+                    border: '1px solid #bbf7d0'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                      <span style={{ background: '#2d6a4f', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 4 }}>
+                        方式③ ハイブリッド運用モデル
+                      </span>
+                      <strong style={{ fontSize: 14, color: '#166534' }}>
+                        連載ストーリーを軸とした集客・SNS拡散・3D答え合わせ送客の完全自動化
+                      </strong>
+                    </div>
+                    <p style={{ margin: 0, fontSize: 12.5, color: '#14532d', lineHeight: 1.6 }}>
+                      Story Studioで作成した物語は、<strong>Webサイト内特設ページ（/stories）での自動予約公開</strong>と<strong>公式SNS（Instagram / note / X）へのワンクリック投稿</strong>に同時展開されます。
+                      各話に読者参加型の「価格予想アンケート」を配置することで、読者を<strong>登録不要の3Dシミュレーターリアルタイム積算画面（答え合わせ）</strong>へと自然に送客し、最終的な無料パース依頼・CRMリード獲得へ繋げます。
+                    </p>
+                  </div>
+
+                  {/* STEP 1: ストーリー作成 */}
+                  <div style={{ background: '#f8fafc', borderRadius: 10, padding: 18, border: '1px solid #e2e8f0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                      <div style={{ background: '#0284c7', color: '#fff', width: 26, height: 26, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800 }}>
+                        1
+                      </div>
+                      <h5 style={{ margin: 0, fontSize: 14.5, fontWeight: 700, color: '#0f172a' }}>
+                        ストーリーを作成する（プリセット選択 or シナリオライター自由生成）
+                      </h5>
+                    </div>
+                    <div style={{ fontSize: 12.5, color: '#475569', lineHeight: 1.6, paddingLeft: 36 }}>
+                      <div style={{ marginBottom: 8 }}>
+                        <strong style={{ color: '#0f172a' }}>① プリセット選択タブ:</strong>
+                        「中古住宅＋木造ガレージ（全7話・最重要推奨）」「子育て収納革命」「女性目線のガーデンシェッド」「狭小変形地ガレージ」の4大実戦テーマから選択し、ワンクリックで全話のプロット・アンケートを自動生成できます。
+                      </div>
+                      <div>
+                        <strong style={{ color: '#0f172a' }}>② シナリオライター（自由生成）タブ:</strong>
+                        ターゲット層（例: 40代共働き）、悩み（例: 車2台と子供の自転車で庭が狭い）、ガレージによる解決、語り口のトーン（共感感動系／データ論理系／コミカル系／新築比較系）、希望話数（3〜7話）を入力して【この設定でストーリー自由生成】を実行します。
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* STEP 2: 作画プロンプト */}
+                  <div style={{ background: '#f8fafc', borderRadius: 10, padding: 18, border: '1px solid #e2e8f0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                      <div style={{ background: '#0284c7', color: '#fff', width: 26, height: 26, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800 }}>
+                        2
+                      </div>
+                      <h5 style={{ margin: 0, fontSize: 14.5, fontWeight: 700, color: '#0f172a' }}>
+                        AI作画プロンプト（NanoBanana2 / Google AI Pro）で画像を生成・反映
+                      </h5>
+                    </div>
+                    <div style={{ fontSize: 12.5, color: '#475569', lineHeight: 1.6, paddingLeft: 36 }}>
+                      各エピソードカードに「担当アカウント（Google AI Pro アカウント1〜5）」と英語作画プロンプトが自動割当されています。
+                      <ol style={{ margin: '6px 0 0', paddingLeft: 20 }}>
+                        <li>カード内の【コピー】ボタンで英語プロンプトをクリップボードにコピー。</li>
+                        <li>Google AI Pro（NanoBanana2）の画像生成画面にプロンプトを貼り付けて画像を生成。</li>
+                        <li>生成された画像をダウンロードするか、右クリックで「画像をコピー」して、Story Studioの各話【画像枠】へペースト（<code>Ctrl + V</code>）または【画像を選択】からアップロードします。</li>
+                      </ol>
+                    </div>
+                  </div>
+
+                  {/* STEP 3: 配信予定日と特設ページ自動公開 */}
+                  <div style={{ background: '#f8fafc', borderRadius: 10, padding: 18, border: '1px solid #e2e8f0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                      <div style={{ background: '#0284c7', color: '#fff', width: 26, height: 26, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800 }}>
+                        3
+                      </div>
+                      <h5 style={{ margin: 0, fontSize: 14.5, fontWeight: 700, color: '#0f172a' }}>
+                        配信予定日の設定とサイト内特設ページ（/stories）への自動連動
+                      </h5>
+                    </div>
+                    <div style={{ fontSize: 12.5, color: '#475569', lineHeight: 1.6, paddingLeft: 36 }}>
+                      各話の「📅 配信予定日」カレンダーで公開日を設定できます。
+                      <ul style={{ margin: '6px 0 0', paddingLeft: 20 }}>
+                        <li><strong>本日以前（過去または当日）:</strong> 特設連載ページ（<code>/stories</code>）で「公開中」として即座に閲覧可能になります。</li>
+                        <li><strong>明日以降（未来の日付）:</strong> 「次回予告・○月○日公開予定」として自動カウントダウン表示され、次回のアクセスを期待させます。</li>
+                        <li>画面上部の【🌐 サイト内連載ページ（/stories）を開く】から読者目線での見え方をいつでも確認できます。</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* STEP 4: 読者アンケートと3D送客 */}
+                  <div style={{ background: '#f8fafc', borderRadius: 10, padding: 18, border: '1px solid #e2e8f0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                      <div style={{ background: '#0284c7', color: '#fff', width: 26, height: 26, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800 }}>
+                        4
+                      </div>
+                      <h5 style={{ margin: 0, fontSize: 14.5, fontWeight: 700, color: '#0f172a' }}>
+                        読者参加型アンケート（価格予想＆希望価格リサーチ）の活用
+                      </h5>
+                    </div>
+                    <div style={{ fontSize: 12.5, color: '#475569', lineHeight: 1.6, paddingLeft: 36 }}>
+                      各話には「このガレージ、いくらだと思いますか？（いくらなら欲しいですか？）」というアンケート設問と4つの選択肢が自動付与されます。
+                      Webサイト上ではインタラクティブな投票機能が動き、投票後に「💡 3Dシミュレーターでリアルタイム積算見積もりの答え合わせをする」ボタンが表示され、高い送客率を実現します。
+                    </div>
+                  </div>
+
+                  {/* STEP 5: SNS投稿手順 */}
+                  <div style={{ background: '#f8fafc', borderRadius: 10, padding: 18, border: '1px solid #e2e8f0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                      <div style={{ background: '#0284c7', color: '#fff', width: 26, height: 26, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800 }}>
+                        5
+                      </div>
+                      <h5 style={{ margin: 0, fontSize: 14.5, fontWeight: 700, color: '#0f172a' }}>
+                        各SNS（Instagram / note / X）へのワンクリック投稿＆管理
+                      </h5>
+                    </div>
+                    <div style={{ fontSize: 12.5, color: '#475569', lineHeight: 1.6, paddingLeft: 36 }}>
+                      各エピソードカードの「SNS投稿成形・ワンクリックアシスト」エリアから投稿を行います。
+                      <div style={{ marginTop: 8, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+                        <div style={{ background: '#fff', padding: 10, borderRadius: 6, border: '1px solid #cbd5e1' }}>
+                          <strong style={{ color: '#e1306c', fontSize: 12 }}>📷 Instagram</strong>
+                          <div style={{ fontSize: 11.5, color: '#64748b', marginTop: 4 }}>
+                            【キャプションをコピー】をクリックし、公式アカウントで画像と共に投稿。ストーリーズでアンケートスタンプを配置。
+                          </div>
+                        </div>
+                        <div style={{ background: '#fff', padding: 10, borderRadius: 6, border: '1px solid #cbd5e1' }}>
+                          <strong style={{ color: '#10b981', fontSize: 12 }}>📝 note</strong>
+                          <div style={{ fontSize: 11.5, color: '#64748b', marginTop: 4 }}>
+                            【記事本文(Markdown)をコピー】をクリックし、noteの投稿エディタに貼り付け。画像をヘッダーに設定して公開。
+                          </div>
+                        </div>
+                        <div style={{ background: '#fff', padding: 10, borderRadius: 6, border: '1px solid #cbd5e1' }}>
+                          <strong style={{ color: '#0f172a', fontSize: 12 }}>𝕏 X (旧Twitter)</strong>
+                          <div style={{ fontSize: 11.5, color: '#64748b', marginTop: 4 }}>
+                            【𝕏 でポストを作成】をクリックするとX作成画面が開き、成形テキストが自動入力されます。画像を添付してポスト。
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ marginTop: 8, fontSize: 11.5, color: '#059669', fontWeight: 600 }}>
+                        ✓ 投稿が完了したら、カード上部の各SNSチェックボックスをONにすることで、管理画面上で投稿済み状態が保存・一覧把握できます。
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              )}
+
+              {/* ── タブ2: SNS開設キット・画像アセット ── */}
+              {kitModalTab === 'snsKit' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                  {/* 公式画像アセット */}
+                  <div style={{ background: '#f8fafc', padding: 16, borderRadius: 8, border: '1px solid #e2e8f0' }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#1e293b', marginBottom: 10 }}>
+                      🖼 配備済み公式ブランディング画像アセット
+                    </div>
+                    <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+                      <div style={{ textAlign: 'center' }}>
+                        <img src="/assets/sns/icon.jpg" alt="公式アイコン" style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', border: '2px solid #cbd5e1' }} />
+                        <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>アイコン (1:1)</div>
+                        <a href="/assets/sns/icon.jpg" download="smile049_sns_icon.jpg" style={{ fontSize: 11, color: '#2563eb', fontWeight: 600 }}>保存</a>
+                      </div>
+                      <div style={{ textAlign: 'center', flex: 1, minWidth: 200 }}>
+                        <img src="/assets/sns/banner.jpg" alt="公式バナー" style={{ width: '100%', height: 64, borderRadius: 6, objectFit: 'cover', border: '1px solid #cbd5e1' }} />
+                        <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>ヘッダー/バナー (16:9)</div>
+                        <a href="/assets/sns/banner.jpg" download="smile049_sns_banner.jpg" style={{ fontSize: 11, color: '#2563eb', fontWeight: 600 }}>保存</a>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Instagram設定 */}
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 700, color: '#e1306c', marginBottom: 6 }}>
+                      <InstagramIcon size={16} color="#e1306c" />
+                      <span>Instagram 設定キット</span>
+                    </div>
+                    <div style={{ fontSize: 12, color: '#475569', marginBottom: 4 }}>
+                      <strong>ユーザーネーム:</strong> <code>@smile049_garage</code> | <strong>名前:</strong> <code>スマイチ | 木造自由設計ガレージ・倉庫</code>
+                    </div>
+                    <div style={{ position: 'relative' }}>
+                      <textarea
+                        readOnly
+                        rows={4}
+                        value={`規格サイズに土地を合わせない。敷地に合わせて自分で描く「木造自由設計ガレージ・倉庫」\n🚗 愛車・大型バイクの秘密基地\n📐 狭小地・変形地・農業倉庫\n★ 登録不要の3Dシミュレーター＆リアルタイム自動見積もり公開中\n埼玉・関東全域対応｜専任スタッフが構造計算から施工までワンストップ\n👇 3Dシミュレーターを試す\nhttps://smile049.jp/`}
+                        style={{ width: '100%', fontSize: 12, padding: '8px 10px', borderRadius: 6, border: '1px solid #cbd5e1', background: '#f8fafc', lineHeight: 1.5 }}
+                      />
+                      <button
+                        onClick={() => copyToClipboard(`規格サイズに土地を合わせない。敷地に合わせて自分で描く「木造自由設計ガレージ・倉庫」\n🚗 愛車・大型バイクの秘密基地\n📐 狭小地・変形地・農業倉庫\n★ 登録不要の3Dシミュレーター＆リアルタイム自動見積もり公開中\n埼玉・関東全域対応｜専任スタッフが構造計算から施工までワンストップ\n👇 3Dシミュレーターを試す\nhttps://smile049.jp/`, 'ig_profile')}
+                        style={{ position: 'absolute', top: 8, right: 8, padding: '3px 8px', fontSize: 11, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}
+                      >
+                        {copiedKey === 'ig_profile' ? 'コピー済' : 'コピー'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* note設定 */}
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 700, color: '#10b981', marginBottom: 6 }}>
+                      <NoteIcon size={16} color="#10b981" />
+                      <span>note+ 設定キット</span>
+                    </div>
+                    <div style={{ fontSize: 12, color: '#475569', marginBottom: 4 }}>
+                      <strong>note ID:</strong> <code>smile049</code> | <strong>クリエイター名:</strong> <code>スマイチ | 木造自由設計ガレージ物語</code>
+                    </div>
+                    <div style={{ position: 'relative' }}>
+                      <textarea
+                        readOnly
+                        rows={2}
+                        value={`敷地に合わせてミリ単位で創る「木造自由設計ガレージ・倉庫 スマイチ」公式note。愛車と過ごす秘密基地、狭小変形地の特注ストッカー、農機具倉庫の設計ストーリーと3Dシミュレーター活用術をお届けします。`}
+                        style={{ width: '100%', fontSize: 12, padding: '8px 10px', borderRadius: 6, border: '1px solid #cbd5e1', background: '#f8fafc', lineHeight: 1.5 }}
+                      />
+                      <button
+                        onClick={() => copyToClipboard(`敷地に合わせてミリ単位で創る「木造自由設計ガレージ・倉庫 スマイチ」公式note。愛車と過ごす秘密基地、狭小変形地の特注ストッカー、農機具倉庫の設計ストーリーと3Dシミュレーター活用術をお届けします。`, 'note_profile')}
+                        style={{ position: 'absolute', top: 8, right: 8, padding: '3px 8px', fontSize: 11, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}
+                      >
+                        {copiedKey === 'note_profile' ? 'コピー済' : 'コピー'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* YouTube設定 */}
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 700, color: '#ef4444', marginBottom: 6 }}>
+                      <YoutubeIcon size={16} color="#ef4444" />
+                      <span>YouTube チャンネル開設キット</span>
+                    </div>
+                    <div style={{ fontSize: 12, color: '#475569', marginBottom: 4 }}>
+                      <strong>チャンネル名:</strong> <code>スマイチ 木造ガレージTV</code> | <strong>ハンドル:</strong> <code>@smile049_garage</code>
+                    </div>
+                    <div style={{ position: 'relative' }}>
+                      <textarea
+                        readOnly
+                        rows={4}
+                        value={`規格サイズに土地を合わせるのではなく、敷地に合わせて自分で描く「木造自由設計ガレージ・倉庫 スマイチ」の公式YouTubeチャンネルです。\n\n【配信内容】\n・WEBブラウザ上で動く「無料3Dガレージシミュレーター」の実践操作解説\n・敷地寸法・台形変形地・勾配屋根のミリ単位設計ノウハウ\n・愛車（ポルシェ・GT-R・クラシックカー）や大型バイクと暮らすガレージプラン\n\n■ スマイチ公式サイト\nhttps://smile049.jp/`}
+                        style={{ width: '100%', fontSize: 12, padding: '8px 10px', borderRadius: 6, border: '1px solid #cbd5e1', background: '#f8fafc', lineHeight: 1.5 }}
+                      />
+                      <button
+                        onClick={() => copyToClipboard(`規格サイズに土地を合わせるのではなく、敷地に合わせて自分で描く「木造自由設計ガレージ・倉庫 スマイチ」の公式YouTubeチャンネルです。\n\n【配信内容】\n・WEBブラウザ上で動く「無料3Dガレージシミュレーター」の実践操作解説\n・敷地寸法・台形変形地・勾配屋根のミリ単位設計ノウハウ\n・愛車（ポルシェ・GT-R・クラシックカー）や大型バイクと暮らすガレージプラン\n\n■ スマイチ公式サイト\nhttps://smile049.jp/`, 'yt_profile')}
+                        style={{ position: 'absolute', top: 8, right: 8, padding: '3px 8px', fontSize: 11, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}
+                      >
+                        {copiedKey === 'yt_profile' ? 'コピー済' : 'コピー'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* X（旧Twitter）設定 */}
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 700, color: '#0f172a', marginBottom: 6 }}>
+                      <XIcon size={16} color="#0f172a" />
+                      <span>X（旧Twitter） アカウント開設キット</span>
+                    </div>
+                    <div style={{ fontSize: 12, color: '#475569', marginBottom: 4 }}>
+                      <strong>ユーザー名:</strong> <code>@smile049_garage</code> | <strong>名前:</strong> <code>スマイチ | 木造自由設計ガレージ・倉庫</code>
+                    </div>
+                    <div style={{ position: 'relative' }}>
+                      <textarea
+                        readOnly
+                        rows={4}
+                        value={`規格サイズに土地を合わせない。敷地に合わせてミリ単位で描く「木造自由設計ガレージ・倉庫 スマイチ」公式X。🚗愛車・大型バイクの秘密基地／狭小変形地ストッカー／農機具倉庫。登録不要の3Dシミュレーター＆自動見積もり公開中！埼玉・関東全域対応。専任スタッフが構造計算から施工までワンストップ。\nhttps://smile049.jp/`}
+                        style={{ width: '100%', fontSize: 12, padding: '8px 10px', borderRadius: 6, border: '1px solid #cbd5e1', background: '#f8fafc', lineHeight: 1.5 }}
+                      />
+                      <button
+                        onClick={() => copyToClipboard(`規格サイズに土地を合わせない。敷地に合わせてミリ単位で描く「木造自由設計ガレージ・倉庫 スマイチ」公式X。🚗愛車・大型バイクの秘密基地／狭小変形地ストッカー／農機具倉庫。登録不要の3Dシミュレーター＆自動見積もり公開中！埼玉・関東全域対応。専任スタッフが構造計算から施工までワンストップ。\nhttps://smile049.jp/`, 'x_profile')}
+                        style={{ position: 'absolute', top: 8, right: 8, padding: '3px 8px', fontSize: 11, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}
+                      >
+                        {copiedKey === 'x_profile' ? 'コピー済' : 'コピー'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            </div>
+
+            {/* モーダルフッター */}
+            <div style={{ padding: '12px 24px', borderTop: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'flex-end' }}>
               <button
                 onClick={() => setShowKitModal(false)}
                 style={{
@@ -1757,7 +1991,7 @@ export default function StoryStudioPanel() {
                   color: '#fff',
                   border: 'none',
                   borderRadius: 6,
-                  padding: '8px 18px',
+                  padding: '8px 20px',
                   fontSize: 13,
                   fontWeight: 600,
                   cursor: 'pointer'

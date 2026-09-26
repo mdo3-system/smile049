@@ -48,9 +48,10 @@
 // - 2026/09/26 v0.1.46: StoryStudioのshowKitModal未定義エラー修正（クラッシュ完全解消・公式アカウント開設キット復元・X投稿初期値補完）
 // - 2026/09/26 v0.1.47: 【方式③ハイブリッド運用】連載ストーリーのWebサイト内特設ページ（/stories）新設（配信予定日連動・自動予約公開・次回予告・インタラクティブ価格アンケート＆3D答え合わせ・Topバナー配置）およびStoryStudio予約投稿連携
 // - 2026/09/26 v0.1.48: StoryStudioのCalendarアイコン未インポートによる描画クラッシュ（ReferenceError）を修正
+// - 2026/09/26 v0.1.49: StoryStudioに公式運用手順・操作マニュアル（方式③ハイブリッドモデル・シナリオライター・NanoBanana2作画・予約公開連動・アンケート送客・SNS投稿フロー）を完全配備
 
-window.APP_VERSION = '0.1.48';
-export const APP_VERSION = '0.1.48';
+window.APP_VERSION = '0.1.49';
+export const APP_VERSION = '0.1.49';
 
 
 
