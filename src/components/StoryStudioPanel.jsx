@@ -1664,7 +1664,7 @@ export default function StoryStudioPanel() {
                         <span>Instagramを開く</span>
                       </a>
                       <a
-                        href="https://business.facebook.com/latest/composer"
+                        href="https://business.facebook.com/latest/composer?locale=ja_JP"
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{
@@ -1680,10 +1680,10 @@ export default function StoryStudioPanel() {
                           alignItems: 'center',
                           gap: 4
                         }}
-                        title="Meta Business Suiteで日時指定予約投稿"
+                        title="Meta Business Suite（日本語）で日時指定予約投稿"
                       >
                         <Calendar size={13} />
-                        <span>予約投稿（Meta Suite）</span>
+                        <span>予約投稿（Meta Suite・日本語）</span>
                       </a>
                     </>
                   ) : activeStoryTab === 'note' ? (
@@ -1815,6 +1815,51 @@ export default function StoryStudioPanel() {
                   </label>
                 </div>
               </div>
+
+              {/* Instagram用 テキスト貼り付け先（ペースト場所）の完全手順ガイド */}
+              {activeStoryTab === 'instagram' && (
+                <div style={{
+                  background: '#fdf4ff',
+                  padding: '12px 20px',
+                  borderTop: '1px solid #f0abfc',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 8
+                }}>
+                  <div style={{
+                    background: '#fff',
+                    borderRadius: 8,
+                    padding: '10px 14px',
+                    border: '1px solid #e879f9',
+                    fontSize: 12,
+                    color: '#4a044e',
+                    lineHeight: 1.65
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                      <span style={{ background: '#c026d3', color: '#fff', fontSize: 10.5, fontWeight: 800, padding: '2px 6px', borderRadius: 4 }}>
+                        貼り付け先ガイド
+                      </span>
+                      <strong style={{ color: '#86198f', fontSize: 12.5 }}>
+                        📋 Instagramを開いた後の「テキスト貼り付け（ペースト）」場所と手順
+                      </strong>
+                    </div>
+                    <ol style={{ margin: '4px 0 0', paddingLeft: 20 }}>
+                      <li>【<strong>Instagramを開く</strong>】ボタンを押してInstagramを開く ➡ 左メニューの【<strong>＋ 作成</strong>】をクリック。</li>
+                      <li>ダウンロードした動画や画像をドラッグ＆ドロップ（※動画と画像の両方を投稿する場合は、選択後に右下の「複数選択」アイコンから追加）。</li>
+                      <li>アスペクト比・フィルター画面で「<strong>次へ</strong>」を2回クリック。</li>
+                      <li>
+                        画面右側に表示される【<span style={{ background: '#fbcfe8', color: '#86198f', padding: '1px 6px', borderRadius: 3, fontWeight: 800 }}>キャプションを入力...</span>】という大きな入力枠をクリックし、<br />
+                        先ほどコピーした本文を貼り付け（キーボードの <kbd style={{ background: '#0f172a', color: '#fff', padding: '1px 5px', borderRadius: 3, fontSize: 11 }}>Ctrl + V</kbd> または右クリック貼り付け）します。
+                      </li>
+                      <li>右上の青い【<strong>シェア</strong>】ボタンを押せば投稿完了です！</li>
+                    </ol>
+                  </div>
+
+                  <div style={{ fontSize: 11.5, color: '#701a75' }}>
+                    ⏰ <strong>予約投稿について:</strong> 上の【予約投稿（Meta Suite・日本語）】リンクから日時指定予約を行うか、またはスマホInstagramアプリの投稿最終画面最下部【詳細設定】➡【この投稿を日時指定】をONにするとアプリ単体で簡単に予約投稿が可能です。
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
