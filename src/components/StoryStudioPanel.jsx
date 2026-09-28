@@ -3,10 +3,18 @@ import {
   Sparkles, Copy, Check, ExternalLink, Image as ImageIcon, Download, 
   Trash2, RefreshCw, Layers, CheckCircle2, ChevronDown, ChevronRight, 
   BookOpen, HelpCircle, Upload, ShieldCheck, ArrowRight, DollarSign, Vote,
-  Calendar, Video, Film, Play
+  Calendar, Video, Film, Play, FolderOpen, Link as LinkIcon, Key, HardDrive, Share2,
+  Search, Zap, Tag, FileText
 } from 'lucide-react';
 import { InstagramIcon, YoutubeIcon, NoteIcon, XIcon } from './SnsIcons';
-import { getAllStories, saveAllStories, isStoryPublished, generateVeoPrompt, generateVeo3CutPrompts, STORY_STORAGE_KEY } from '../services/storyService';
+import { 
+  getAllStories, saveAllStories, isStoryPublished, generateVeoPrompt, 
+  generateVeo3CutPrompts, STORY_STORAGE_KEY, GOOGLE_MASTER_INFO,
+  extractGoogleDriveFileId, isGoogleDriveUrl, getGoogleDrivePreviewUrl, getGoogleDriveDownloadUrl,
+  generateAssetFileName, getAutoDetectedAssetInfo, generateGoogleAppsScriptForFolders, getGoogleDriveSearchUrl,
+  formatXPost, calculateXPostLength
+} from '../services/storyService';
+import { APP_VERSION } from '../version.js';
 
 const STORAGE_KEY = STORY_STORAGE_KEY;
 
@@ -264,7 +272,7 @@ const generateStoriesByAi = (themeTitle, protagonist, storyCount, themeDesc, pre
     const englishPrompt = phaseData.englishPrompt ||
       `8k architectural lifestyle photography, beautiful modern wooden custom garage, dark galvalume steel exterior, Japanese suburban setting, warm natural lighting, photorealistic.`;
 
-    generated.push({
+    const storyObj = {
       id: `story_${Date.now()}_${i}`,
       episodeNum: i,
       phase,
@@ -282,7 +290,9 @@ const generateStoriesByAi = (themeTitle, protagonist, storyCount, themeDesc, pre
       isPostedNote: false,
       isPostedX: false,
       scheduledDate: new Date(Date.now() + (i - 1) * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-    });
+    };
+    storyObj.xPost = formatXPost(storyObj);
+    generated.push(storyObj);
   }
 
   return generated;
@@ -316,10 +326,34 @@ export default function StoryStudioPanel() {
   const [promptType, setPromptType] = useState('veo'); // 'veo' | 'nano'
   const [selectedVeoCut, setSelectedVeoCut] = useState('scene1'); // 'scene1' | 'scene2' | 'scene3' | 'all'
 
+  // Google Drive（049smile02@gmail.com）集約管理ステート
+  const [showDriveInfoModal, setShowDriveInfoModal] = useState(false);
+  const [showFolderBuildModal, setShowFolderBuildModal] = useState(false);
+  const [driveLinkInputs, setDriveLinkInputs] = useState({});
+  const [activeLinkInputKey, setActiveLinkInputKey] = useState(null);
+
   // 共有ストレージ保存
   useEffect(() => {
     saveAllStories(stories);
   }, [stories]);
+
+  // Google Drive共有リンク・URLの登録ハンドラー
+  const handleRegisterDriveLink = (storyIndex, mediaType) => {
+    const key = `${storyIndex}_${mediaType}`;
+    const rawUrl = (driveLinkInputs[key] || '').trim();
+    if (!rawUrl) return;
+
+    const updated = [...stories];
+    if (mediaType === 'video') {
+      updated[storyIndex].videoUrl = rawUrl;
+    } else {
+      updated[storyIndex].imageUrl = rawUrl;
+    }
+    setStories(updated);
+    setActiveLinkInputKey(null);
+    setDriveLinkInputs(prev => ({ ...prev, [key]: '' }));
+  };
+
 
   const handleSelectPreset = (presetId) => {
     setSelectedPreset(presetId);
@@ -412,7 +446,7 @@ export default function StoryStudioPanel() {
     // STORY_ARCSをバイパスして直接生成
     const newStories = scenarioPhases.map((ph, idx) => {
       const cuts = generateVeo3CutPrompts(ph.englishPrompt, `${themeTitle} ${ph.subTitle}`, idx + 1);
-      return {
+      const storyObj = {
         id: `story_${Date.now()}_${idx + 1}`,
         episodeNum: idx + 1,
         phase: ph.phase,
@@ -437,6 +471,8 @@ export default function StoryStudioPanel() {
         isPostedX: false,
         scheduledDate: new Date(Date.now() + idx * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
       };
+      storyObj.xPost = formatXPost(storyObj);
+      return storyObj;
     });
     setStories(newStories);
   }; // end handleScenarioGenerate
@@ -581,21 +617,6 @@ export default function StoryStudioPanel() {
     return md;
   };
 
-  // X（旧Twitter）用ポスト成形（アンケート・短縮URL・ハッシュタグ）
-  const formatXPost = (story) => {
-    let text = `【木造自由設計ガレージ連載 第${story.episodeNum}話】\n`;
-    text += `${story.title}\n\n`;
-    if (story.quizEnabled) {
-      text += `💬 Q. ${story.quizQuestion}\n`;
-      story.quizOptions.slice(0, 4).forEach((opt) => {
-        text += `・${opt}\n`;
-      });
-      text += `\n正解は3Dシミュレーターでリアルタイム積算中👇\n`;
-    }
-    text += `https://smile049.jp/simulator\n\n`;
-    text += `#スマイチ #木造ガレージ #ガレージハウス #秘密基地`;
-    return text;
-  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -723,6 +744,127 @@ export default function StoryStudioPanel() {
         </div>
       </div>
 
+      {/* ── 📁 Google Drive 素材共有センター（049smile02@gmail.com）集約管理バナー ── */}
+      <div style={{
+        background: 'linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%)',
+        border: '1.5px solid #bfdbfe',
+        borderRadius: 10,
+        padding: '12px 18px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: 12,
+        boxShadow: '0 2px 6px rgba(37, 99, 235, 0.06)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{
+            width: 38,
+            height: 38,
+            borderRadius: 8,
+            background: '#2563eb',
+            color: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 6px rgba(37, 99, 235, 0.3)',
+            flexShrink: 0
+          }}>
+            <HardDrive size={20} />
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 13.5, fontWeight: 800, color: '#1e40af' }}>
+                📁 動画・画像マスター共有ストレージ（Google Drive 集約管理）
+              </span>
+              <span style={{
+                background: '#dbeafe',
+                color: '#1d4ed8',
+                padding: '2px 8px',
+                borderRadius: 12,
+                fontSize: 11,
+                fontWeight: 700
+              }}>
+                049smile02@gmail.com
+              </span>
+            </div>
+            <div style={{ fontSize: 11.5, color: '#475569', marginTop: 2 }}>
+              各スタッフが作成した動画（Veo 3等）・AIパース画像はすべてこのドライブに保存・集約してください。どのPCからでも容量無制限で流用できます。
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <a
+            href={GOOGLE_MASTER_INFO.accountChooserUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              background: '#2563eb',
+              color: '#fff',
+              border: 'none',
+              padding: '8px 14px',
+              borderRadius: 6,
+              fontSize: 12,
+              fontWeight: 700,
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              boxShadow: '0 2px 4px rgba(37, 99, 235, 0.25)',
+              cursor: 'pointer'
+            }}
+          >
+            <FolderOpen size={14} />
+            <span>Google Drive を開く</span>
+            <ExternalLink size={12} />
+          </a>
+
+          <button
+            type="button"
+            onClick={() => setShowFolderBuildModal(true)}
+            style={{
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              color: '#fff',
+              border: 'none',
+              padding: '8px 14px',
+              borderRadius: 6,
+              fontSize: 12,
+              fontWeight: 800,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              boxShadow: '0 2px 4px rgba(16, 185, 129, 0.25)',
+              cursor: 'pointer'
+            }}
+            title="Google Drive内に各話・各カットの階層フォルダを一瞬で自動生成します"
+          >
+            <Zap size={14} />
+            <span>⚡ フォルダ自動構築ツール</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowDriveInfoModal(true)}
+            style={{
+              background: '#fff',
+              color: '#1e40af',
+              border: '1px solid #bfdbfe',
+              padding: '7px 12px',
+              borderRadius: 6,
+              fontSize: 12,
+              fontWeight: 700,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              cursor: 'pointer'
+            }}
+          >
+            <Key size={13} />
+            <span>ログイン情報・集約手順</span>
+          </button>
+        </div>
+      </div>
 
       {/* ── モード切り替えタブ ── */}
       <div style={{ display: 'flex', gap: 0, borderRadius: 10, overflow: 'hidden', border: '1.5px solid #e2e8f0' }}>
@@ -1379,107 +1521,209 @@ export default function StoryStudioPanel() {
 
               {/* カードメインコンテンツ */}
               <div style={{ padding: 20, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24 }}>
-                {/* 左列：ストーリー本文 ＆ 価格アンケート */}
+                {/* 左列：ストーリー本文 または X専用ポスト本文 */}
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: '#64748b', marginBottom: 6 }}>
-                    ストーリー本文（SEO配慮・木造自由設計の強みを網羅）
-                  </div>
-                  <div style={{
-                    background: '#f8fafc',
-                    padding: '12px 14px',
-                    borderRadius: 8,
-                    fontSize: 13.5,
-                    lineHeight: 1.8,
-                    color: '#1e293b',
-                    whiteSpace: 'pre-wrap',
-                    border: '1px solid #e2e8f0',
-                    maxHeight: 180,
-                    overflowY: 'auto'
-                  }}>
-                    {story.plot}
-                  </div>
-
-                  {/* 読者参加型 価格アンケート・希望価格リサーチ枠 */}
-                  <div style={{
-                    marginTop: 16,
-                    background: 'rgba(234, 179, 8, 0.06)',
-                    borderRadius: 8,
-                    border: '1px solid rgba(234, 179, 8, 0.3)',
-                    padding: '12px 14px'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, fontWeight: 700, color: '#b45309' }}>
-                        <Vote size={15} />
-                        <span>読者参加型 価格アンケート・希望価格リサーチ</span>
-                      </div>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11.5, cursor: 'pointer', color: '#78350f' }}>
-                        <input
-                          type="checkbox"
-                          checked={story.quizEnabled}
-                          onChange={(e) => {
+                  {activeStoryTab === 'x' ? (
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <XIcon size={14} color="#0f172a" />
+                          <span>X (Twitter) ポスト本文（全角140文字厳守・リアルタイム積算CTA）</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
                             const updated = [...stories];
-                            updated[idx].quizEnabled = e.target.checked;
+                            updated[idx].xPost = formatXPost(story);
                             setStories(updated);
                           }}
-                        />
-                        <span>記事・投稿に含める</span>
-                      </label>
-                    </div>
-
-                    {story.quizEnabled && (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                        <input
-                          type="text"
-                          value={story.quizQuestion}
-                          onChange={(e) => {
-                            const updated = [...stories];
-                            updated[idx].quizQuestion = e.target.value;
-                            setStories(updated);
-                          }}
-                          placeholder="質問文"
                           style={{
-                            width: '100%',
-                            padding: '6px 10px',
-                            fontSize: 12,
-                            borderRadius: 4,
+                            background: '#f8fafc',
                             border: '1px solid #cbd5e1',
-                            background: '#fff'
+                            borderRadius: 4,
+                            padding: '3px 8px',
+                            fontSize: 11,
+                            fontWeight: 600,
+                            color: '#475569',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 4
                           }}
-                        />
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 6 }}>
-                          {story.quizOptions.map((opt, optIdx) => (
+                          title="140文字仕様で自動再最適化して初期化"
+                        >
+                          <RefreshCw size={11} />
+                          <span>140文字に再最適化</span>
+                        </button>
+                      </div>
+
+                      {/* Xポスト入力エリア */}
+                      <textarea
+                        value={story.xPost || formatXPost(story)}
+                        onChange={(e) => {
+                          const updated = [...stories];
+                          updated[idx].xPost = e.target.value;
+                          setStories(updated);
+                        }}
+                        rows={7}
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          borderRadius: 8,
+                          fontSize: 13,
+                          lineHeight: 1.6,
+                          color: '#0f172a',
+                          border: calculateXPostLength(story.xPost || formatXPost(story)) > 140 ? '2px solid #ef4444' : '1px solid #cbd5e1',
+                          background: '#fff',
+                          resize: 'vertical',
+                          fontFamily: 'inherit',
+                          boxSizing: 'border-box'
+                        }}
+                        placeholder="Xポスト本文を入力..."
+                      />
+
+                      {/* 文字数カウンター ＆ 判定インジケーター */}
+                      {(() => {
+                        const currentText = story.xPost || formatXPost(story);
+                        const len = calculateXPostLength(currentText);
+                        const isOver = len > 140;
+                        const remain = 140 - len;
+                        return (
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginTop: 6,
+                            padding: '6px 12px',
+                            borderRadius: 6,
+                            background: isOver ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+                            border: isOver ? '1px solid #fca5a5' : '1px solid #a7f3d0',
+                            fontSize: 12
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              {isOver ? (
+                                <span style={{ color: '#dc2626', fontWeight: 800 }}>⚠️ 140文字を超過しています（Xに投稿できません）</span>
+                              ) : (
+                                <span style={{ color: '#059669', fontWeight: 700 }}>✅ 140文字以内（Xにそのままポスト可能）</span>
+                              )}
+                            </div>
+                            <div style={{ fontWeight: 800, color: isOver ? '#dc2626' : '#059669', fontSize: 13 }}>
+                              <span>{len}</span> / 140文字
+                              <span style={{ fontSize: 11, fontWeight: 600, marginLeft: 6, color: isOver ? '#b91c1c' : '#047857' }}>
+                                ({isOver ? `超過 +${len - 140}` : `残り ${remain}`})
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })()}
+
+                      <div style={{ marginTop: 8, fontSize: 11, color: '#64748b', lineHeight: 1.5 }}>
+                        💡 <strong>X文字数仕様:</strong> URL（https://smile049.jp/simulator）はX公式仕様により一律23半角文字（全角11.5文字）として正確に加重計算されます。
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: '#64748b', marginBottom: 6 }}>
+                        ストーリー本文（SEO配慮・木造自由設計の強みを網羅）
+                      </div>
+                      <div style={{
+                        background: '#f8fafc',
+                        padding: '12px 14px',
+                        borderRadius: 8,
+                        fontSize: 13.5,
+                        lineHeight: 1.8,
+                        color: '#1e293b',
+                        whiteSpace: 'pre-wrap',
+                        border: '1px solid #e2e8f0',
+                        maxHeight: 180,
+                        overflowY: 'auto'
+                      }}>
+                        {story.plot}
+                      </div>
+
+                      {/* 読者参加型 価格アンケート・希望価格リサーチ枠 */}
+                      <div style={{
+                        marginTop: 16,
+                        background: 'rgba(234, 179, 8, 0.06)',
+                        borderRadius: 8,
+                        border: '1px solid rgba(234, 179, 8, 0.3)',
+                        padding: '12px 14px'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, fontWeight: 700, color: '#b45309' }}>
+                            <Vote size={15} />
+                            <span>読者参加型 価格アンケート・希望価格リサーチ</span>
+                          </div>
+                          <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11.5, cursor: 'pointer', color: '#78350f' }}>
                             <input
-                              key={optIdx}
-                              type="text"
-                              value={opt}
+                              type="checkbox"
+                              checked={story.quizEnabled}
                               onChange={(e) => {
                                 const updated = [...stories];
-                                updated[idx].quizOptions[optIdx] = e.target.value;
+                                updated[idx].quizEnabled = e.target.checked;
                                 setStories(updated);
                               }}
+                            />
+                            <span>記事・投稿に含める</span>
+                          </label>
+                        </div>
+
+                        {story.quizEnabled && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            <input
+                              type="text"
+                              value={story.quizQuestion}
+                              onChange={(e) => {
+                                const updated = [...stories];
+                                updated[idx].quizQuestion = e.target.value;
+                                setStories(updated);
+                              }}
+                              placeholder="質問文"
                               style={{
-                                padding: '4px 8px',
-                                fontSize: 11.5,
+                                width: '100%',
+                                padding: '6px 10px',
+                                fontSize: 12,
                                 borderRadius: 4,
                                 border: '1px solid #cbd5e1',
                                 background: '#fff'
                               }}
                             />
-                          ))}
-                        </div>
-                        <div style={{ fontSize: 11, color: '#78350f', display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
-                          <span>💡 答え合わせ目安:</span>
-                          <strong>{story.quizAnswerHint}</strong>
-                          <span style={{ color: '#92400e' }}>（3Dシミュレーター導線で即座に答え合わせ）</span>
-                        </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 6 }}>
+                              {story.quizOptions.map((opt, optIdx) => (
+                                <input
+                                  key={optIdx}
+                                  type="text"
+                                  value={opt}
+                                  onChange={(e) => {
+                                    const updated = [...stories];
+                                    updated[idx].quizOptions[optIdx] = e.target.value;
+                                    setStories(updated);
+                                  }}
+                                  style={{
+                                    padding: '4px 8px',
+                                    fontSize: 11.5,
+                                    borderRadius: 4,
+                                    border: '1px solid #cbd5e1',
+                                    background: '#fff'
+                                  }}
+                                />
+                              ))}
+                            </div>
+                            <div style={{ fontSize: 11, color: '#78350f', display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
+                              <span>💡 答え合わせ目安:</span>
+                              <strong>{story.quizAnswerHint}</strong>
+                              <span style={{ color: '#92400e' }}>（3Dシミュレーター導線で即座に答え合わせ）</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
 
-                  {/* ハッシュタグプレビュー */}
-                  <div style={{ marginTop: 10, fontSize: 11, color: '#64748b', lineHeight: 1.5 }}>
-                    <strong>付与タグ:</strong> {story.hashtags}
-                  </div>
+                      {/* ハッシュタグプレビュー */}
+                      <div style={{ marginTop: 10, fontSize: 11, color: '#64748b', lineHeight: 1.5 }}>
+                        <strong>付与タグ:</strong> {story.hashtags}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* 右列：AIプロンプト（Veo 3 動画 3カット絵コンテ ＆ NanoBanana2 静止画） ＆ メディアスロット */}
@@ -1638,212 +1882,624 @@ export default function StoryStudioPanel() {
                     </div>
                   )}
 
-                  {/* メディアスロット（動画枠 ＆ 画像枠のハイブリッド2列） */}
+                  {/* メディアスロット（動画枠 ＆ 画像枠のハイブリッド2列 + Google Drive共有連携） */}
                   <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
                     gap: 12
                   }}>
                     {/* ① 動画スロット（リール・カルーセル1枚目用） */}
-                    <div
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        const file = e.dataTransfer.files?.[0];
-                        handleVideoFile(file, idx);
-                      }}
-                      style={{
-                        border: '2px dashed #93c5fd',
-                        borderRadius: 8,
-                        padding: 10,
-                        textAlign: 'center',
-                        background: story.videoUrl ? '#f0f9ff' : '#f8fafc',
-                        position: 'relative',
-                        minHeight: 130,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}
-                    >
-                      <div style={{ position: 'absolute', top: 6, left: 8, display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(37, 99, 235, 0.1)', color: '#2563eb', padding: '2px 6px', borderRadius: 4, fontSize: 10.5, fontWeight: 700 }}>
-                        <Video size={12} />
-                        <span>スライド1: 動画（リール）</span>
-                      </div>
+                    {(() => {
+                      const videoFileName = generateAssetFileName(story, 'video', promptType === 'veo' ? selectedVeoCut : 'master');
+                      const videoAutoInfo = getAutoDetectedAssetInfo(story, 'video', promptType === 'veo' ? selectedVeoCut : 'master');
+                      const videoCopyKey = `fname_video_${story.id}_${selectedVeoCut}`;
 
-                      {story.videoUrl ? (
-                        <div style={{ width: '100%', marginTop: 20 }}>
-                          <video
-                            src={story.videoUrl}
-                            controls
-                            muted
-                            loop
-                            style={{
-                              width: '100%',
-                              maxHeight: 140,
-                              borderRadius: 6,
-                              background: '#000'
-                            }}
-                          />
-                          <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 6 }}>
-                            <a
-                              href={story.videoUrl}
-                              download={`smile049_story_ep${story.episodeNum}.mp4`}
-                              style={{
-                                background: '#2563eb',
-                                color: '#fff',
-                                padding: '4px 10px',
+                      return (
+                        <div
+                          onDragOver={(e) => e.preventDefault()}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            const file = e.dataTransfer.files?.[0];
+                            handleVideoFile(file, idx);
+                          }}
+                          style={{
+                            border: isGoogleDriveUrl(story.videoUrl) ? '2px solid #3b82f6' : '2px dashed #93c5fd',
+                            borderRadius: 8,
+                            padding: 10,
+                            textAlign: 'center',
+                            background: story.videoUrl ? '#f0f9ff' : '#f8fafc',
+                            position: 'relative',
+                            minHeight: 155,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                        >
+                          {/* スロットヘッダー（アセット自動判定タグ ＆ Drive検索） */}
+                          <div style={{
+                            position: 'absolute',
+                            top: 6,
+                            left: 8,
+                            right: 8,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            flexWrap: 'wrap',
+                            gap: 4
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 3, background: 'rgba(37, 99, 235, 0.1)', color: '#2563eb', padding: '2px 6px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>
+                                <Video size={11} />
+                                <span>動画スロット</span>
+                              </div>
+                              <span style={{
+                                background: videoAutoInfo.bg,
+                                color: videoAutoInfo.color,
+                                padding: '1px 6px',
                                 borderRadius: 4,
-                                fontSize: 11,
-                                fontWeight: 700,
+                                fontSize: 9.5,
+                                fontWeight: 800,
+                                border: `1px solid ${videoAutoInfo.color}33`,
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 2
+                              }} title="ストーリーと選択中カットから自動判定">
+                                <Tag size={9} />
+                                <span>{videoAutoInfo.label}</span>
+                              </span>
+                              {isGoogleDriveUrl(story.videoUrl) && (
+                                <span style={{ background: '#2563eb', color: '#fff', padding: '1px 5px', borderRadius: 3, fontSize: 9 }}>
+                                  ☁️ Drive共有
+                                </span>
+                              )}
+                            </div>
+
+                            <a
+                              href={getGoogleDriveSearchUrl(`第${story.episodeNum}話`)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{
+                                fontSize: 10,
+                                color: '#64748b',
                                 textDecoration: 'none',
                                 display: 'inline-flex',
                                 alignItems: 'center',
-                                gap: 4
+                                gap: 2,
+                                background: '#f1f5f9',
+                                padding: '1px 5px',
+                                borderRadius: 3
                               }}
+                              title="Google Drive内でこの話の動画・画像を検索"
                             >
-                              <Download size={11} />
-                              <span>動画DL</span>
+                              <Search size={10} />
+                              <span>Drive検索</span>
                             </a>
-                            <button
-                              onClick={() => {
-                                const updated = [...stories];
-                                updated[idx].videoUrl = null;
-                                setStories(updated);
-                              }}
-                              style={{
-                                background: '#fee2e2',
-                                color: '#dc2626',
-                                border: 'none',
-                                padding: '4px 8px',
-                                borderRadius: 4,
-                                fontSize: 11,
-                                cursor: 'pointer'
-                              }}
-                              title="動画を削除"
-                            >
-                              <Trash2 size={11} />
-                            </button>
                           </div>
+
+                          {story.videoUrl ? (
+                            <div style={{ width: '100%', marginTop: 24 }}>
+                              {isGoogleDriveUrl(story.videoUrl) ? (
+                                <iframe
+                                  src={getGoogleDrivePreviewUrl(story.videoUrl)}
+                                  style={{
+                                    width: '100%',
+                                    height: 140,
+                                    borderRadius: 6,
+                                    border: '1px solid #bfdbfe',
+                                    background: '#000'
+                                  }}
+                                  allow="autoplay"
+                                  title={`第${story.episodeNum}話 Google Drive動画`}
+                                />
+                              ) : (
+                                <video
+                                  src={story.videoUrl}
+                                  controls
+                                  muted
+                                  loop
+                                  style={{
+                                    width: '100%',
+                                    maxHeight: 140,
+                                    borderRadius: 6,
+                                    background: '#000'
+                                  }}
+                                />
+                              )}
+
+                              <div style={{ display: 'flex', gap: 5, justifyContent: 'center', marginTop: 8, flexWrap: 'wrap' }}>
+                                {isGoogleDriveUrl(story.videoUrl) && (
+                                  <a
+                                    href={story.videoUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{
+                                      background: '#eff6ff',
+                                      color: '#1d4ed8',
+                                      border: '1px solid #bfdbfe',
+                                      padding: '4px 7px',
+                                      borderRadius: 4,
+                                      fontSize: 10.5,
+                                      fontWeight: 700,
+                                      textDecoration: 'none',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: 3
+                                    }}
+                                  >
+                                    <FolderOpen size={11} />
+                                    <span>Drive</span>
+                                    <ExternalLink size={9} />
+                                  </a>
+                                )}
+                                <a
+                                  href={isGoogleDriveUrl(story.videoUrl) ? getGoogleDriveDownloadUrl(story.videoUrl) : story.videoUrl}
+                                  download={videoFileName}
+                                  target={isGoogleDriveUrl(story.videoUrl) ? '_blank' : undefined}
+                                  rel="noopener noreferrer"
+                                  style={{
+                                    background: '#2563eb',
+                                    color: '#fff',
+                                    padding: '4px 9px',
+                                    borderRadius: 4,
+                                    fontSize: 10.5,
+                                    fontWeight: 700,
+                                    textDecoration: 'none',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 3
+                                  }}
+                                  title={`ダウンロード名: ${videoFileName}`}
+                                >
+                                  <Download size={11} />
+                                  <span>DL</span>
+                                </a>
+                                <button
+                                  type="button"
+                                  onClick={() => copyToClipboard(videoFileName, videoCopyKey)}
+                                  style={{
+                                    background: copiedKey === videoCopyKey ? '#10b981' : '#f8fafc',
+                                    color: copiedKey === videoCopyKey ? '#fff' : '#475569',
+                                    border: '1px solid #cbd5e1',
+                                    padding: '4px 7px',
+                                    borderRadius: 4,
+                                    fontSize: 10.5,
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 3
+                                  }}
+                                  title={`推奨ファイル名: ${videoFileName}`}
+                                >
+                                  {copiedKey === videoCopyKey ? <Check size={11} /> : <Copy size={11} />}
+                                  <span>{copiedKey === videoCopyKey ? '名コピー済' : 'ファイル名'}</span>
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    const updated = [...stories];
+                                    updated[idx].videoUrl = null;
+                                    setStories(updated);
+                                  }}
+                                  style={{
+                                    background: '#fee2e2',
+                                    color: '#dc2626',
+                                    border: 'none',
+                                    padding: '4px 7px',
+                                    borderRadius: 4,
+                                    fontSize: 10.5,
+                                    cursor: 'pointer'
+                                  }}
+                                  title="動画を解除"
+                                >
+                                  <Trash2 size={11} />
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div style={{ width: '100%', paddingTop: 20 }}>
+                              <label style={{ cursor: 'pointer', width: '100%', display: 'block' }}>
+                                <Film size={22} color="#3b82f6" style={{ marginBottom: 4 }} />
+                                <div style={{ fontSize: 11.5, fontWeight: 700, color: '#1e40af' }}>
+                                  🎥 動画をドロップ または クリック選択
+                                </div>
+                                <div style={{ fontSize: 9.5, color: '#64748b', marginTop: 2 }}>
+                                  推奨名: <code style={{ color: '#2563eb' }}>{videoFileName}</code>
+                                </div>
+                                <input
+                                  type="file"
+                                  accept="video/*"
+                                  onChange={(e) => handleVideoFile(e.target.files?.[0], idx)}
+                                  style={{ display: 'none' }}
+                                />
+                              </label>
+
+                              {/* ファイル名コピー ＆ Drive登録フォーム */}
+                              <div style={{ marginTop: 8, borderTop: '1px dashed #cbd5e1', paddingTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                  <button
+                                    type="button"
+                                    onClick={() => copyToClipboard(videoFileName, videoCopyKey)}
+                                    style={{
+                                      background: copiedKey === videoCopyKey ? '#10b981' : '#f1f5f9',
+                                      color: copiedKey === videoCopyKey ? '#fff' : '#475569',
+                                      border: '1px solid #cbd5e1',
+                                      padding: '2px 8px',
+                                      borderRadius: 4,
+                                      fontSize: 10,
+                                      fontWeight: 600,
+                                      cursor: 'pointer',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: 3
+                                    }}
+                                  >
+                                    {copiedKey === videoCopyKey ? <Check size={10} /> : <Copy size={10} />}
+                                    <span>{copiedKey === videoCopyKey ? '推奨名コピー済' : '📋 推奨ファイル名をコピー'}</span>
+                                  </button>
+                                </div>
+
+                                {activeLinkInputKey === `${idx}_video` ? (
+                                  <div style={{ display: 'flex', gap: 4, width: '100%' }}>
+                                    <input
+                                      type="text"
+                                      placeholder="Google Driveの共有リンク (https://drive.google.com/file/d/...)"
+                                      value={driveLinkInputs[`${idx}_video`] || ''}
+                                      onChange={(e) => setDriveLinkInputs({ ...driveLinkInputs, [`${idx}_video`]: e.target.value })}
+                                      style={{ flex: 1, fontSize: 10.5, padding: '3px 6px', borderRadius: 4, border: '1px solid #93c5fd' }}
+                                      autoFocus
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => handleRegisterDriveLink(idx, 'video')}
+                                      style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 4, padding: '3px 7px', fontSize: 10.5, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                                    >
+                                      登録
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => setActiveLinkInputKey(null)}
+                                      style={{ background: '#f1f5f9', color: '#64748b', border: 'none', borderRadius: 4, padding: '3px 5px', fontSize: 10.5, cursor: 'pointer' }}
+                                    >
+                                      ✕
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() => setActiveLinkInputKey(`${idx}_video`)}
+                                    style={{
+                                      background: '#eff6ff',
+                                      color: '#1d4ed8',
+                                      border: '1px solid #bfdbfe',
+                                      borderRadius: 4,
+                                      padding: '3px 8px',
+                                      fontSize: 10,
+                                      fontWeight: 700,
+                                      cursor: 'pointer',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      gap: 4
+                                    }}
+                                  >
+                                    <LinkIcon size={10} />
+                                    <span>🔗 Google Drive共有リンクで登録</span>
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      ) : (
-                        <label style={{ cursor: 'pointer', width: '100%', display: 'block', paddingTop: 16 }}>
-                          <Film size={22} color="#3b82f6" style={{ marginBottom: 4 }} />
-                          <div style={{ fontSize: 11.5, fontWeight: 700, color: '#1e40af' }}>
-                            🎥 作成した動画をここにドロップ
-                          </div>
-                          <div style={{ fontSize: 10, color: '#64748b', marginTop: 2 }}>
-                            またはクリックして動画（MP4/WebM）を選択
-                          </div>
-                          <input
-                            type="file"
-                            accept="video/*"
-                            onChange={(e) => handleVideoFile(e.target.files?.[0], idx)}
-                            style={{ display: 'none' }}
-                          />
-                        </label>
-                      )}
-                    </div>
+                      );
+                    })()}
 
                     {/* ② 静止画スロット（カルーセル2枚目・パース用） */}
-                    <div
-                      onPaste={(e) => handlePasteImage(e, idx)}
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        const file = e.dataTransfer.files?.[0];
-                        handleImageFile(file, idx);
-                      }}
-                      style={{
-                        border: '2px dashed #cbd5e1',
-                        borderRadius: 8,
-                        padding: 10,
-                        textAlign: 'center',
-                        background: story.imageUrl ? '#f8fafc' : '#f1f5f9',
-                        position: 'relative',
-                        minHeight: 130,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}
-                    >
-                      <div style={{ position: 'absolute', top: 6, left: 8, display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(71, 85, 105, 0.1)', color: '#475569', padding: '2px 6px', borderRadius: 4, fontSize: 10.5, fontWeight: 700 }}>
-                        <ImageIcon size={12} />
-                        <span>スライド2: 静止画パース</span>
-                      </div>
+                    {(() => {
+                      const imageFileName = generateAssetFileName(story, 'image');
+                      const imageAutoInfo = getAutoDetectedAssetInfo(story, 'image');
+                      const imageCopyKey = `fname_image_${story.id}`;
 
-                      {story.imageUrl ? (
-                        <div style={{ width: '100%', marginTop: 20 }}>
-                          <img
-                            src={story.imageUrl}
-                            alt={`第${story.episodeNum}話 イメージ`}
-                            style={{
-                              width: '100%',
-                              maxHeight: 140,
-                              objectFit: 'cover',
-                              borderRadius: 6
-                            }}
-                          />
-                          <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 6 }}>
-                            <a
-                              href={story.imageUrl}
-                              download={`smile049_story_ep${story.episodeNum}.jpg`}
-                              style={{
-                                background: '#475569',
-                                color: '#fff',
-                                padding: '4px 10px',
+                      return (
+                        <div
+                          onPaste={(e) => handlePasteImage(e, idx)}
+                          onDragOver={(e) => e.preventDefault()}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            const file = e.dataTransfer.files?.[0];
+                            handleImageFile(file, idx);
+                          }}
+                          style={{
+                            border: isGoogleDriveUrl(story.imageUrl) ? '2px solid #059669' : '2px dashed #cbd5e1',
+                            borderRadius: 8,
+                            padding: 10,
+                            textAlign: 'center',
+                            background: story.imageUrl ? '#f8fafc' : '#f1f5f9',
+                            position: 'relative',
+                            minHeight: 155,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                        >
+                          {/* スロットヘッダー（自動判定タグ ＆ Drive検索） */}
+                          <div style={{
+                            position: 'absolute',
+                            top: 6,
+                            left: 8,
+                            right: 8,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            flexWrap: 'wrap',
+                            gap: 4
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 3, background: 'rgba(71, 85, 105, 0.1)', color: '#475569', padding: '2px 6px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>
+                                <ImageIcon size={11} />
+                                <span>静止画枠</span>
+                              </div>
+                              <span style={{
+                                background: imageAutoInfo.bg,
+                                color: imageAutoInfo.color,
+                                padding: '1px 6px',
                                 borderRadius: 4,
-                                fontSize: 11,
-                                fontWeight: 700,
+                                fontSize: 9.5,
+                                fontWeight: 800,
+                                border: `1px solid ${imageAutoInfo.color}33`,
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 2
+                              }}>
+                                <Tag size={9} />
+                                <span>{imageAutoInfo.label}</span>
+                              </span>
+                              {isGoogleDriveUrl(story.imageUrl) && (
+                                <span style={{ background: '#059669', color: '#fff', padding: '1px 5px', borderRadius: 3, fontSize: 9 }}>
+                                  ☁️ Drive共有
+                                </span>
+                              )}
+                            </div>
+
+                            <a
+                              href={getGoogleDriveSearchUrl(`第${story.episodeNum}話`)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{
+                                fontSize: 10,
+                                color: '#64748b',
                                 textDecoration: 'none',
                                 display: 'inline-flex',
                                 alignItems: 'center',
-                                gap: 4
+                                gap: 2,
+                                background: '#f8fafc',
+                                padding: '1px 5px',
+                                borderRadius: 3
                               }}
+                              title="Google Drive内でこの話の素材を検索"
                             >
-                              <Download size={11} />
-                              <span>画像DL</span>
+                              <Search size={10} />
+                              <span>Drive検索</span>
                             </a>
-                            <button
-                              onClick={() => {
-                                const updated = [...stories];
-                                updated[idx].imageUrl = null;
-                                setStories(updated);
-                              }}
-                              style={{
-                                background: '#fee2e2',
-                                color: '#dc2626',
-                                border: 'none',
-                                padding: '4px 8px',
-                                borderRadius: 4,
-                                fontSize: 11,
-                                cursor: 'pointer'
-                              }}
-                              title="画像を削除"
-                            >
-                              <Trash2 size={11} />
-                            </button>
                           </div>
+
+                          {story.imageUrl ? (
+                            <div style={{ width: '100%', marginTop: 24 }}>
+                              {isGoogleDriveUrl(story.imageUrl) ? (
+                                <img
+                                  src={`https://drive.google.com/thumbnail?id=${extractGoogleDriveFileId(story.imageUrl)}&sz=w800`}
+                                  alt={`第${story.episodeNum}話 イメージ`}
+                                  onError={(e) => {
+                                    e.target.style.display = 'none';
+                                  }}
+                                  style={{
+                                    width: '100%',
+                                    maxHeight: 140,
+                                    objectFit: 'cover',
+                                    borderRadius: 6,
+                                    border: '1px solid #a7f3d0'
+                                  }}
+                                />
+                              ) : (
+                                <img
+                                  src={story.imageUrl}
+                                  alt={`第${story.episodeNum}話 イメージ`}
+                                  style={{
+                                    width: '100%',
+                                    maxHeight: 140,
+                                    objectFit: 'cover',
+                                    borderRadius: 6
+                                  }}
+                                />
+                              )}
+
+                              <div style={{ display: 'flex', gap: 5, justifyContent: 'center', marginTop: 8, flexWrap: 'wrap' }}>
+                                {isGoogleDriveUrl(story.imageUrl) && (
+                                  <a
+                                    href={story.imageUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{
+                                      background: '#f0fdf4',
+                                      color: '#047857',
+                                      border: '1px solid #a7f3d0',
+                                      padding: '4px 7px',
+                                      borderRadius: 4,
+                                      fontSize: 10.5,
+                                      fontWeight: 700,
+                                      textDecoration: 'none',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: 3
+                                    }}
+                                  >
+                                    <FolderOpen size={11} />
+                                    <span>Drive</span>
+                                    <ExternalLink size={9} />
+                                  </a>
+                                )}
+                                <a
+                                  href={isGoogleDriveUrl(story.imageUrl) ? getGoogleDriveDownloadUrl(story.imageUrl) : story.imageUrl}
+                                  download={imageFileName}
+                                  target={isGoogleDriveUrl(story.imageUrl) ? '_blank' : undefined}
+                                  rel="noopener noreferrer"
+                                  style={{
+                                    background: '#475569',
+                                    color: '#fff',
+                                    padding: '4px 9px',
+                                    borderRadius: 4,
+                                    fontSize: 10.5,
+                                    fontWeight: 700,
+                                    textDecoration: 'none',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 3
+                                  }}
+                                  title={`ダウンロード名: ${imageFileName}`}
+                                >
+                                  <Download size={11} />
+                                  <span>DL</span>
+                                </a>
+                                <button
+                                  type="button"
+                                  onClick={() => copyToClipboard(imageFileName, imageCopyKey)}
+                                  style={{
+                                    background: copiedKey === imageCopyKey ? '#10b981' : '#f8fafc',
+                                    color: copiedKey === imageCopyKey ? '#fff' : '#475569',
+                                    border: '1px solid #cbd5e1',
+                                    padding: '4px 7px',
+                                    borderRadius: 4,
+                                    fontSize: 10.5,
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 3
+                                  }}
+                                  title={`推奨ファイル名: ${imageFileName}`}
+                                >
+                                  {copiedKey === imageCopyKey ? <Check size={11} /> : <Copy size={11} />}
+                                  <span>{copiedKey === imageCopyKey ? '名コピー済' : 'ファイル名'}</span>
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    const updated = [...stories];
+                                    updated[idx].imageUrl = null;
+                                    setStories(updated);
+                                  }}
+                                  style={{
+                                    background: '#fee2e2',
+                                    color: '#dc2626',
+                                    border: 'none',
+                                    padding: '4px 7px',
+                                    borderRadius: 4,
+                                    fontSize: 10.5,
+                                    cursor: 'pointer'
+                                  }}
+                                  title="画像を解除"
+                                >
+                                  <Trash2 size={11} />
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div style={{ width: '100%', paddingTop: 20 }}>
+                              <label style={{ cursor: 'pointer', width: '100%', display: 'block' }}>
+                                <ImageIcon size={22} color="#94a3b8" style={{ marginBottom: 4 }} />
+                                <div style={{ fontSize: 11.5, fontWeight: 700, color: '#475569' }}>
+                                  🖼 画像をドロップ または Ctrl+V
+                                </div>
+                                <div style={{ fontSize: 9.5, color: '#64748b', marginTop: 2 }}>
+                                  推奨名: <code style={{ color: '#059669' }}>{imageFileName}</code>
+                                </div>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => handleImageFile(e.target.files?.[0], idx)}
+                                  style={{ display: 'none' }}
+                                />
+                              </label>
+
+                              {/* ファイル名コピー ＆ Drive登録フォーム */}
+                              <div style={{ marginTop: 8, borderTop: '1px dashed #cbd5e1', paddingTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                  <button
+                                    type="button"
+                                    onClick={() => copyToClipboard(imageFileName, imageCopyKey)}
+                                    style={{
+                                      background: copiedKey === imageCopyKey ? '#10b981' : '#f1f5f9',
+                                      color: copiedKey === imageCopyKey ? '#fff' : '#475569',
+                                      border: '1px solid #cbd5e1',
+                                      padding: '2px 8px',
+                                      borderRadius: 4,
+                                      fontSize: 10,
+                                      fontWeight: 600,
+                                      cursor: 'pointer',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: 3
+                                    }}
+                                  >
+                                    {copiedKey === imageCopyKey ? <Check size={10} /> : <Copy size={10} />}
+                                    <span>{copiedKey === imageCopyKey ? '推奨名コピー済' : '📋 推奨ファイル名をコピー'}</span>
+                                  </button>
+                                </div>
+
+                                {activeLinkInputKey === `${idx}_image` ? (
+                                  <div style={{ display: 'flex', gap: 4, width: '100%' }}>
+                                    <input
+                                      type="text"
+                                      placeholder="Google Driveの共有リンク (https://drive.google.com/file/d/...)"
+                                      value={driveLinkInputs[`${idx}_image`] || ''}
+                                      onChange={(e) => setDriveLinkInputs({ ...driveLinkInputs, [`${idx}_image`]: e.target.value })}
+                                      style={{ flex: 1, fontSize: 10.5, padding: '3px 6px', borderRadius: 4, border: '1px solid #a7f3d0' }}
+                                      autoFocus
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => handleRegisterDriveLink(idx, 'image')}
+                                      style={{ background: '#059669', color: '#fff', border: 'none', borderRadius: 4, padding: '3px 7px', fontSize: 10.5, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                                    >
+                                      登録
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => setActiveLinkInputKey(null)}
+                                      style={{ background: '#f1f5f9', color: '#64748b', border: 'none', borderRadius: 4, padding: '3px 5px', fontSize: 10.5, cursor: 'pointer' }}
+                                    >
+                                      ✕
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() => setActiveLinkInputKey(`${idx}_image`)}
+                                    style={{
+                                      background: '#f0fdf4',
+                                      color: '#047857',
+                                      border: '1px solid #a7f3d0',
+                                      borderRadius: 4,
+                                      padding: '3px 8px',
+                                      fontSize: 10,
+                                      fontWeight: 700,
+                                      cursor: 'pointer',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      gap: 4
+                                    }}
+                                  >
+                                    <LinkIcon size={10} />
+                                    <span>🔗 Google Drive共有リンクで登録</span>
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      ) : (
-                        <label style={{ cursor: 'pointer', width: '100%', display: 'block', paddingTop: 16 }}>
-                          <ImageIcon size={22} color="#94a3b8" style={{ marginBottom: 4 }} />
-                          <div style={{ fontSize: 11.5, fontWeight: 700, color: '#475569' }}>
-                            🖼 画像をドロップ または Ctrl+V ペースト
-                          </div>
-                          <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>
-                            またはクリックして画像ファイルを選択
-                          </div>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleImageFile(e.target.files?.[0], idx)}
-                            style={{ display: 'none' }}
-                          />
-                        </label>
-                      )}
-                    </div>
+                      );
+                    })()}
                   </div>
                 </div>
               </div>
@@ -2040,7 +2696,7 @@ export default function StoryStudioPanel() {
                   ) : (
                     <>
                       <button
-                        onClick={() => copyToClipboard(formatXPost(story), `x_${story.id}`)}
+                        onClick={() => copyToClipboard(story.xPost || formatXPost(story), `x_${story.id}`)}
                         style={{
                           background: copiedKey === `x_${story.id}` ? '#10b981' : '#0f172a',
                           color: '#fff',
@@ -2056,10 +2712,10 @@ export default function StoryStudioPanel() {
                         }}
                       >
                         {copiedKey === `x_${story.id}` ? <Check size={14} /> : <Copy size={14} />}
-                        <span>{copiedKey === `x_${story.id}` ? 'Xポストをコピー済' : 'X (Twitter) ポストをコピー'}</span>
+                        <span>{copiedKey === `x_${story.id}` ? 'Xポストをコピー済' : 'X (Twitter) ポスト（140文字仕様）をコピー'}</span>
                       </button>
                       <a
-                        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(formatXPost(story))}`}
+                        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(story.xPost || formatXPost(story))}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{
@@ -2317,7 +2973,7 @@ export default function StoryStudioPanel() {
                     </ol>
                   </div>
                   <div style={{ fontSize: 11.5, color: '#475569' }}>
-                    💡 <strong>Xでの即効性:</strong> 画像や動画付きのポストはタイムラインで目を引きます。読者アンケートの選択肢と「正解は3Dシミュレーターでリアルタイム積算中」のURLにより、タップ誘導が極めて高くなります。
+                    💡 <strong>Xでの即効性 ＆ 140文字最適化:</strong> 全角140文字（半角280文字・URL23文字換算）以内で完全自動最適化成形されています。画面上で直接推敲・文字数確認も可能で、文字数エラーなくワンクリックでポストできます。画像や動画付きのポストはタイムラインで目を引き、3Dシミュレーターへのタップ誘導が極めて高くなります。
                   </div>
                 </div>
               )}
@@ -2363,11 +3019,22 @@ export default function StoryStudioPanel() {
               background: '#0f172a',
               color: '#fff'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                 <Sparkles size={20} color="#80ed99" />
                 <h4 style={{ margin: 0, fontSize: 16, fontWeight: 800 }}>
                   Story Studio 運用ガイド ＆ 公式SNS完全キット
                 </h4>
+                <span style={{
+                  fontSize: 11,
+                  background: 'rgba(56, 189, 248, 0.15)',
+                  color: '#38bdf8',
+                  padding: '2px 8px',
+                  borderRadius: 4,
+                  fontWeight: 700,
+                  border: '1px solid rgba(56, 189, 248, 0.4)'
+                }}>
+                  v{APP_VERSION} 公式最新版
+                </span>
               </div>
               <button
                 onClick={() => setShowKitModal(false)}
@@ -2402,7 +3069,7 @@ export default function StoryStudioPanel() {
                 }}
               >
                 <BookOpen size={16} />
-                <span>📖 運用手順・操作マニュアル（最新フロー）</span>
+                <span>📖 運用手順・操作マニュアル（最新フロー v{APP_VERSION}）</span>
               </button>
 
               <button
@@ -2509,26 +3176,88 @@ export default function StoryStudioPanel() {
                     </div>
                   </div>
 
-                  {/* STEP 2: 作画プロンプト ＆ 動画登録（Veo 3 3カット × 最大5アカウント = 最大15動画） */}
+                    {/* STEP 2: 作画プロンプト ＆ 動画登録 ＆ Google Drive集約管理・自動フォルダ構築 */}
                   <div style={{ background: '#f8fafc', borderRadius: 10, padding: 18, border: '1px solid #e2e8f0' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
                       <div style={{ background: '#0284c7', color: '#fff', width: 26, height: 26, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800 }}>
                         2
                       </div>
                       <h5 style={{ margin: 0, fontSize: 14.5, fontWeight: 700, color: '#0f172a' }}>
-                        Veo 3（3カット絵コンテ）動画 ＆ NanoBanana2静止画パースの生成・登録
+                        Veo 3 動画 ＆ 静止画パース生成 ＆ Google Drive集約・フォルダ自動構築
                       </h5>
                     </div>
                     <div style={{ fontSize: 12.5, color: '#475569', lineHeight: 1.6, paddingLeft: 36 }}>
                       各話ごとに「担当アカウント（Google AI Pro アカウント1〜5）」が割り当てられています。1アカウントあたり3つのシネマティックカット（Scene 1: 外観ドローン / Scene 2: 木造ディテール / Scene 3: 雨の日生活実感）が自動生成されます。
+                      
                       <div style={{ background: '#eff6ff', padding: '10px 14px', borderRadius: 6, border: '1px solid #bfdbfe', margin: '8px 0', fontSize: 12, color: '#1e40af' }}>
                         🎬 <strong>最大15動画アセットの組み合わせ連携:</strong> 5アカウントのメンバーが各3動画（計15動画）を分担生成し、それらを結合・編集することで、30秒〜90秒のハイクオリティなストーリー動画を共同で仕上げることができます。
                       </div>
+
+                      {/* ① フォルダ階層全自動構築ツール（GAS）の解説 */}
+                      <div style={{ background: '#ecfdf5', padding: '14px 16px', borderRadius: 8, border: '1.5px solid #10b981', margin: '12px 0', fontSize: 12, color: '#065f46' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                          <span style={{ fontSize: 15 }}>⚡</span>
+                          <strong style={{ fontSize: 13, color: '#047857' }}>
+                            Google Drive フォルダ階層の全自動構築（手作業作成は一切不要！）
+                          </strong>
+                        </div>
+                        <div style={{ lineHeight: 1.7 }}>
+                          Google Drive内でフォルダを1つずつ手作業で作る必要はありません。<br />
+                          1. 画面上部Google Driveバナーの【<strong style={{ color: '#059669' }}>⚡ フォルダ自動構築ツール</strong>】をクリック。<br />
+                          2. 【<strong>📋 自動構築スクリプトをコピー</strong>】を押し、【<strong>🚀 Google Apps Script を開く</strong>】をクリック。<br />
+                          3. 開いたエディタ画面にコードを貼り付け（<code>Ctrl + V</code>）て、画面上部の【<strong>▷ 実行</strong>】を押すだけ！<br />
+                          <div style={{ background: '#fff', padding: '8px 12px', borderRadius: 6, border: '1px solid #a7f3d0', margin: '6px 0', fontSize: 11.5, color: '#047857' }}>
+                            💡 <strong>【初回のみの確認画面が出た場合】:</strong><br />
+                            「アクセスを承認」をクリック ➡ Googleアカウント（<code>049smile02@gmail.com</code>）を選択 ➡「詳細を表示」をクリック ➡「無題のプロジェクト（安全ではないページ）に移動」をクリック ➡「許可」を押せば実行されます。
+                          </div>
+                          <span style={{ fontSize: 12, color: '#047857', fontWeight: 800 }}>
+                            ➡ たった10秒で、Google Driveのマイドライブ直下に「第1話〜第7話」「Scene 1〜3」「完成動画」「静止画」の全階層フォルダが完全自動生成されます。
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* ② アセット自動判定 ＆ ファイル名統一 */}
+                      <div style={{ background: '#fffbeb', padding: '14px 16px', borderRadius: 8, border: '1.5px solid #f59e0b', margin: '12px 0', fontSize: 12, color: '#92400e' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                          <span style={{ fontSize: 15 }}>🏷️</span>
+                          <strong style={{ fontSize: 13, color: '#b45309' }}>
+                            「何の動画か」を自動判定 ＆ 推奨ファイル名ワンクリックコピー
+                          </strong>
+                        </div>
+                        <div style={{ lineHeight: 1.7 }}>
+                          ・<strong>自動判定タグ:</strong> 各話スロットの上部に「🏷️ 第1話 Scene 1: 外観ドローン全景」等のバッジが常時表示され、何の素材枠かが一目でわかります。<br />
+                          ・<strong>推奨ファイル名コピー:</strong> スロット内の【<strong>📋 推奨ファイル名をコピー</strong>】を押すと、<code>smile049_ep01_scene1_外観ドローン全景.mp4</code> などの整理済みファイル名がコピーされます。Veo 3書き出し時やファイル名変更時にそのまま貼り付けてください。<br />
+                          ・<strong>動画・画像DL時の自動反映:</strong> 画面上の【動画DL】【画像DL】ボタンを押した際も、この統一ファイル名が自動でセットされてPCに保存されます。<br />
+                          ・<strong>Drive内ピンポイント検索:</strong> スロット右上の【<strong>🔍 Drive検索</strong>】を押すと、Google Drive内でその話数（例: 第1話）の素材だけが瞬時に絞り込み表示されます。
+                        </div>
+                      </div>
+
+                      {/* ③ Google Drive集約管理の重要解説 ＆ リンク取得方法 */}
+                      <div style={{ background: '#f0fdf4', padding: '14px 16px', borderRadius: 8, border: '1.5px solid #86efac', margin: '12px 0', fontSize: 12, color: '#166534' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                          <span style={{ fontSize: 15 }}>📁</span>
+                          <strong style={{ fontSize: 13, color: '#15803d' }}>
+                            動画・画像の保存先：Google Drive集約管理（社内全PC・全スタッフで無制限共有）
+                          </strong>
+                        </div>
+                        <div style={{ lineHeight: 1.7 }}>
+                          ・<strong>サーバー容量の保護:</strong> 動画（数十MB〜数百MB）をWebサーバーに直接置くと容量が圧迫されます。またブラウザ一時記憶では別PCと共有できません。<br />
+                          ・<strong>全社集約の仕組み:</strong> 作成した動画や画像は、マスターアカウント（<code>049smile02@gmail.com</code>）のGoogle Driveに保存してください。<br />
+                          ・<strong>Google Drive共有リンクの取得と登録手順（初心者向け）:</strong><br />
+                          <div style={{ background: '#fff', padding: '8px 12px', borderRadius: 6, border: '1px solid #bbf7d0', margin: '6px 0', fontSize: 11.5, color: '#14532d' }}>
+                            1. Google Drive内の該当ファイルの上で「右クリック」 ➡【<strong>共有</strong>】➡【<strong>リンクをコピー</strong>】をクリック。<br />
+                            （※「一般的なアクセス」が「リンクを知っている全員（閲覧者）」になっていることを確認してください）<br />
+                            2. Story Studioの各話スロットの【<strong>🔗 Google Drive共有リンクで登録</strong>】欄に貼り付け（<code>Ctrl + V</code>）。<br />
+                            ➡ これだけで、<strong>社内の全PCで動画がストリーミング再生され、誰でもダウンロード・流用</strong>できるようになります！
+                          </div>
+                        </div>
+                      </div>
+
                       <ol style={{ margin: '6px 0 0', paddingLeft: 20 }}>
                         <li>カード内の【Scene 1〜3】または【全3カット一括コピー】ボタンで英語プロンプトをコピー。</li>
                         <li>Google AI Pro（VideoFX / NanoBanana2）の生成画面にプロンプトを貼り付けて動画・画像を生成。</li>
-                        <li><strong>静止画パース:</strong> 【静止画枠】へペースト（<code>Ctrl + V</code>）またはファイル選択からアップロード。</li>
-                        <li><strong>完成動画:</strong> 作成した動画（MP4）を【動画枠】へドラッグ＆ドロップして登録。プレビュー再生で確認できます。</li>
+                        <li>生成した動画・画像を【📋 推奨ファイル名をコピー】でリネームし、Google Drive（<code>049smile02@gmail.com</code>）の該当フォルダにアップロード。</li>
+                        <li>ファイルの「リンクをコピー」して、Story Studioの【🔗 Google Drive共有リンクで登録】に貼り付け（または直接ファイルをドロップ）。</li>
                       </ol>
                     </div>
                   </div>
@@ -2637,10 +3366,11 @@ export default function StoryStudioPanel() {
                         <div style={{ background: '#fff', borderRadius: 8, padding: 14, border: '1px solid #cbd5e1' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
                             <span style={{ background: '#0f172a', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 4 }}>4. X (旧Twitter)</span>
-                            <strong style={{ color: '#0f172a', fontSize: 13 }}>要約テキスト ＆ メディア添付ポスト</strong>
+                            <strong style={{ color: '#0f172a', fontSize: 13 }}>要約テキスト ＆ メディア添付ポスト（140文字厳守仕様）</strong>
                           </div>
                           <ol style={{ margin: 0, paddingLeft: 20, fontSize: 12, color: '#334155' }}>
-                            <li>カードの【<strong>Xでポストする</strong>】をクリック（文章が自動入力されたウィンドウが開きます）。</li>
+                            <li>カードの【<strong>X (Twitter)用表示</strong>】タブで、リアルタイム文字数カウンターを確認しながら直接推敲可能（全角140文字・半角280文字・URL23文字換算）。</li>
+                            <li>【<strong>Xでポストする</strong>】をクリック（140文字以内の文章が自動入力された投稿ウィンドウが開きます）。</li>
                             <li>入力枠左下の写真アイコン（🖼️）をクリックして動画または画像を添付。</li>
                             <li>右下の青い【<strong>ポストする</strong>】ボタンを押せば完了！</li>
                           </ol>
@@ -2803,6 +3533,407 @@ export default function StoryStudioPanel() {
           </div>
         </div>
       )}
+
+      {/* ── 📁 Google Drive（049smile02@gmail.com）素材集約管理モーダル ── */}
+      {showDriveInfoModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(15, 23, 42, 0.65)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: 20
+        }}>
+          <div style={{
+            background: '#fff',
+            borderRadius: 12,
+            maxWidth: 680,
+            width: '100%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2)',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            {/* モーダルヘッダー */}
+            <div style={{
+              padding: '16px 22px',
+              borderBottom: '1px solid #e2e8f0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              background: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)',
+              color: '#fff',
+              borderRadius: '12px 12px 0 0'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <HardDrive size={22} />
+                <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>
+                  Google Drive 動画・画像マスター集約管理マニュアル
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowDriveInfoModal(false)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: 28,
+                  height: 28,
+                  cursor: 'pointer',
+                  fontSize: 14,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* モーダル本文 */}
+            <div style={{ padding: '22px', fontSize: 13, color: '#334155', lineHeight: 1.7 }}>
+              {/* 現状の保存先と集約の理由 */}
+              <div style={{ background: '#fef3c7', borderLeft: '4px solid #f59e0b', padding: '12px 14px', borderRadius: 4, marginBottom: 18 }}>
+                <strong style={{ color: '#92400e', display: 'block', marginBottom: 4, fontSize: 13.5 }}>
+                  💡 現在の保存先と Google Drive 集約の重要性
+                </strong>
+                <p style={{ margin: 0, fontSize: 12, color: '#78350f' }}>
+                  これまでは、作成した動画や画像は<strong>「お使いのパソコンのブラウザ内（一時記憶）」</strong>に保存されていました。そのため、<strong>「別のPCから見られない」「動画ファイルが重いとブラウザの容量上限（約5〜10MB）でエラーになる」</strong>という課題がありました。<br />
+                  すべての動画・画像を <strong>Google Drive（049smile02@gmail.com）</strong> に保存・集約することで、<strong>サーバーやPCの容量を消費せず、社内のどのPC・どの担当者でも動画や画像を自由にプレビュー・流用・ダウンロード</strong>できるようになります！
+                </p>
+              </div>
+
+              {/* Google アカウント情報 */}
+              <div style={{ background: '#f8fafc', border: '1.5px solid #e2e8f0', borderRadius: 8, padding: 14, marginBottom: 18 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <Key size={16} color="#2563eb" />
+                  <span>Google Drive マスターアカウント情報</span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 10 }}>
+                  <div style={{ background: '#fff', padding: '10px 12px', borderRadius: 6, border: '1px solid #cbd5e1' }}>
+                    <div style={{ fontSize: 11, color: '#64748b' }}>ログインメールアドレス</div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
+                      <code style={{ fontSize: 13, fontWeight: 700, color: '#1e40af' }}>{GOOGLE_MASTER_INFO.email}</code>
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard(GOOGLE_MASTER_INFO.email, 'g_email')}
+                        style={{ padding: '3px 8px', fontSize: 11, background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', borderRadius: 4, cursor: 'pointer' }}
+                      >
+                        {copiedKey === 'g_email' ? 'コピー済' : 'コピー'}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div style={{ background: '#fff', padding: '10px 12px', borderRadius: 6, border: '1px solid #cbd5e1' }}>
+                    <div style={{ fontSize: 11, color: '#64748b' }}>ログインパスワード</div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
+                      <code style={{ fontSize: 13, fontWeight: 700, color: '#0f172a' }}>{GOOGLE_MASTER_INFO.password}</code>
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard(GOOGLE_MASTER_INFO.password, 'g_pass')}
+                        style={{ padding: '3px 8px', fontSize: 11, background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', borderRadius: 4, cursor: 'pointer' }}
+                      >
+                        {copiedKey === 'g_pass' ? 'コピー済' : 'コピー'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ marginTop: 12, textAlign: 'center' }}>
+                  <a
+                    href={GOOGLE_MASTER_INFO.accountChooserUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      background: '#2563eb',
+                      color: '#fff',
+                      padding: '8px 20px',
+                      borderRadius: 6,
+                      fontSize: 12.5,
+                      fontWeight: 700,
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6
+                    }}
+                  >
+                    <FolderOpen size={15} />
+                    <span>このアカウントで Google Drive を開く</span>
+                    <ExternalLink size={13} />
+                  </a>
+                </div>
+              </div>
+
+              {/* 3ステップ運用手順 */}
+              <div style={{ marginBottom: 16 }}>
+                <strong style={{ fontSize: 13.5, color: '#0f172a', display: 'block', marginBottom: 10 }}>
+                  📋 誰でもできる！動画・画像の保存＆登録 3ステップ
+                </strong>
+                <ol style={{ margin: 0, paddingLeft: 20, fontSize: 12.5, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <li>
+                    <strong>ステップ1: Google Driveにファイルを保存</strong><br />
+                    上記ボタンからGoogle Driveを開き、Veo 3等で作成した動画や画像をドラッグ＆ドロップでアップロードします。
+                  </li>
+                  <li>
+                    <strong>ステップ2: 共有リンクをコピー</strong><br />
+                    アップロードしたファイルを右クリック ➡ <strong>「共有」</strong> ➡ <strong>「リンクをコピー」</strong> をクリックします。<br />
+                    <span style={{ fontSize: 11, color: '#64748b' }}>※ 一般的なアクセスが「リンクを知っている全員」になっていることをご確認ください。</span>
+                  </li>
+                  <li>
+                    <strong>ステップ3: Story Studioのスロットに登録</strong><br />
+                    各話の動画スロットにある <strong>「🔗 Google Drive共有リンクで登録」</strong> をクリックし、コピーしたリンクを貼り付けて「登録」を押します。<br />
+                    <span style={{ fontSize: 11, color: '#059669', fontWeight: 600 }}>
+                      ➡ これだけで、社内のどのPCでも動画がプレビュー再生でき、ダウンロードしてSNSへ投稿できます！
+                    </span>
+                  </li>
+                </ol>
+              </div>
+
+              {/* 推奨フォルダ構成 */}
+              <div style={{ background: '#f1f5f9', padding: '12px 14px', borderRadius: 6, border: '1px solid #cbd5e1' }}>
+                <strong style={{ color: '#334155', display: 'block', marginBottom: 4, fontSize: 12 }}>
+                  📁 Google Drive内の推奨フォルダ構成（整理用）
+                </strong>
+                <pre style={{ margin: 0, fontSize: 11.5, fontFamily: 'monospace', color: '#475569', lineHeight: 1.5 }}>
+{`📁 スマイチ_SNS共有素材（049smile02）
+  ├── 📁 01_動画アセット（Veo3カット・完成動画）
+  │    ├── ep1_外観ドローン_scene1.mp4
+  │    ├── ep1_木造シャッター_scene2.mp4
+  │    └── ep1_生活実感_scene3.mp4
+  └── 📁 02_パース静止画（高画質AIパース）
+       ├── ep1_パース1.png
+       └── ep1_パース2.png`}
+                </pre>
+              </div>
+            </div>
+
+            {/* モーダルフッター */}
+            <div style={{ padding: '12px 22px', borderTop: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'flex-end', borderRadius: '0 0 12px 12px' }}>
+              <button
+                type="button"
+                onClick={() => setShowDriveInfoModal(false)}
+                style={{
+                  background: '#0f172a',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 6,
+                  padding: '8px 20px',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                理解しました（閉じる）
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── ⚡ Google Drive フォルダ階層全自動構築モーダル ── */}
+      {showFolderBuildModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(15, 23, 42, 0.65)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: 20
+        }}>
+          <div style={{
+            background: '#fff',
+            borderRadius: 12,
+            maxWidth: 720,
+            width: '100%',
+            maxHeight: '92vh',
+            overflowY: 'auto',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2)',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            {/* モーダルヘッダー */}
+            <div style={{
+              padding: '16px 22px',
+              borderBottom: '1px solid #e2e8f0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+              color: '#fff',
+              borderRadius: '12px 12px 0 0'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <Zap size={22} />
+                <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>
+                  ⚡ Google Drive フォルダ階層 全自動構築ツール
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowFolderBuildModal(false)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: 28,
+                  height: 28,
+                  cursor: 'pointer',
+                  fontSize: 14,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* モーダル本文 */}
+            <div style={{ padding: '22px', fontSize: 13, color: '#334155', lineHeight: 1.7 }}>
+              {/* ガイダンスバナー */}
+              <div style={{ background: '#ecfdf5', borderLeft: '4px solid #10b981', padding: '12px 14px', borderRadius: 4, marginBottom: 18 }}>
+                <strong style={{ color: '#065f46', display: 'block', marginBottom: 4, fontSize: 13.5 }}>
+                  🎯 現在のストーリー（全{stories.length}話）に完全一致したフォルダ構造を一瞬で自動生成！
+                </strong>
+                <p style={{ margin: 0, fontSize: 12, color: '#047857' }}>
+                  手作業でフォルダを何十個も作る必要はありません。下記の<strong>Google Apps Script（自動作成コード）</strong>を実行するだけで、Google Drive（<code>049smile02@gmail.com</code>）の直下に、各話・各カット（Scene 1〜3・完成動画・静止画）の専用フォルダが一瞬で自動生成されます。
+                </p>
+              </div>
+
+              {/* 3ステップ簡単操作ガイド */}
+              <div style={{ background: '#f8fafc', border: '1.5px solid #e2e8f0', borderRadius: 8, padding: 14, marginBottom: 18 }}>
+                <strong style={{ fontSize: 13.5, color: '#0f172a', display: 'block', marginBottom: 10 }}>
+                  🚀 実行手順（たった3ステップ・約10秒で完了）
+                </strong>
+                <ol style={{ margin: 0, paddingLeft: 20, fontSize: 12.5, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <li>
+                    下の <strong>［📋 自動構築スクリプトをコピー］</strong> ボタンをクリックします。
+                  </li>
+                  <li>
+                    <strong>［🚀 Google Apps Script を開く］</strong> ボタンをクリックして開きます。<br />
+                    <span style={{ fontSize: 11, color: '#64748b' }}>※ ログイン画面が出た場合は <code>049smile02@gmail.com</code> でログインしてください。</span>
+                  </li>
+                  <li>
+                    エディタ画面にコードを貼り付け（<code>Ctrl + V</code>）し、画面上部の <strong>［▷ 実行］</strong> ボタンを押すだけ！<br />
+                    <span style={{ fontSize: 11, color: '#059669', fontWeight: 600 }}>
+                      ➡ 初回のみ「アクセスを承認」が表示されます。「詳細」➡「移動」をクリックして許可すると、マイドライブに全フォルダが一瞬で完成します！
+                    </span>
+                  </li>
+                </ol>
+
+                <div style={{ display: 'flex', gap: 10, marginTop: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard(generateGoogleAppsScriptForFolders(stories), 'gas_script')}
+                    style={{
+                      background: copiedKey === 'gas_script' ? '#10b981' : '#059669',
+                      color: '#fff',
+                      border: 'none',
+                      padding: '8px 18px',
+                      borderRadius: 6,
+                      fontSize: 12.5,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      boxShadow: '0 2px 6px rgba(5, 150, 105, 0.3)'
+                    }}
+                  >
+                    {copiedKey === 'gas_script' ? <Check size={14} /> : <Copy size={14} />}
+                    <span>{copiedKey === 'gas_script' ? 'スクリプトをコピー完了！' : '📋 自動構築スクリプトをコピー'}</span>
+                  </button>
+
+                  <a
+                    href="https://script.google.com/home/start"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      background: '#fff',
+                      color: '#059669',
+                      border: '1.5px solid #059669',
+                      padding: '7px 16px',
+                      borderRadius: 6,
+                      fontSize: 12.5,
+                      fontWeight: 700,
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6
+                    }}
+                  >
+                    <ExternalLink size={14} />
+                    <span>🚀 Google Apps Script を開く</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* 自動構築されるフォルダツリー構造のプレビュー */}
+              <div style={{ background: '#f1f5f9', padding: '12px 14px', borderRadius: 6, border: '1px solid #cbd5e1' }}>
+                <strong style={{ color: '#334155', display: 'block', marginBottom: 6, fontSize: 12 }}>
+                  🌲 自動生成されるフォルダツリー階層（プレビュー）
+                </strong>
+                <pre style={{
+                  margin: 0,
+                  fontSize: 11.5,
+                  fontFamily: 'monospace',
+                  color: '#1e293b',
+                  lineHeight: 1.6,
+                  maxHeight: 180,
+                  overflowY: 'auto',
+                  background: '#fff',
+                  padding: 10,
+                  borderRadius: 4,
+                  border: '1px solid #e2e8f0'
+                }}>
+{`📁 スマイチ_SNS共有素材（smile049）
+  ├── 📁 00_共通_ロゴ・Canva・サムネイル素材
+  ├── 📁 00_共通_BGM・環境音・効果音
+` + stories.map(s => {
+  const ep = String(s.episodeNum || 1).padStart(2, '0');
+  const safeTitle = (s.title || `第${s.episodeNum}話`).replace(/[\/\\:*?"<>|]/g, '_').slice(0, 24);
+  return `  ├── 📁 第${s.episodeNum}話_${safeTitle}
+  │    ├── 📁 01_Veo3_Scene1_外観ドローン全景
+  │    ├── 📁 02_Veo3_Scene2_木造シャッター
+  │    ├── 📁 03_Veo3_Scene3_雨の日生活実感
+  │    ├── 📁 04_完成マスター動画（30s-90s）
+  │    └── 📁 05_AIパース静止画`;
+}).join('\n')}
+                </pre>
+              </div>
+            </div>
+
+            {/* モーダルフッター */}
+            <div style={{ padding: '12px 22px', borderTop: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'flex-end', borderRadius: '0 0 12px 12px' }}>
+              <button
+                type="button"
+                onClick={() => setShowFolderBuildModal(false)}
+                style={{
+                  background: '#0f172a',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 6,
+                  padding: '8px 20px',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                閉じる
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

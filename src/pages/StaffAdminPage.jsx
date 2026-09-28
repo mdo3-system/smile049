@@ -9,6 +9,7 @@ import DocumentSlotPanel from '../components/DocumentSlotPanel';
 import StoryStudioPanel from '../components/StoryStudioPanel';
 import { Lock, KeyRound } from 'lucide-react';
 import { getChatRooms, sendMessageToRoom, updateRoomStatus } from '../services/chatService';
+import { APP_VERSION } from '../version.js';
 
 const STAFF_PASSCODE = 'smile049';
 
@@ -320,6 +321,9 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
             </h2>
             <span style={{ fontSize: 11, background: '#1e293b', color: '#38bdf8', padding: '2px 8px', borderRadius: 4 }}>
               Xserver 連携運用モード
+            </span>
+            <span style={{ fontSize: 11, background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '2px 8px', borderRadius: 4, fontWeight: 700, border: '1px solid rgba(56, 189, 248, 0.3)' }}>
+              v{APP_VERSION}
             </span>
           </div>
         </div>

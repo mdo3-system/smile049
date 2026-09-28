@@ -238,6 +238,103 @@ export const generateVeo3CutPrompts = (englishPrompt, title = '', episodeNum = 1
 };
 
 /**
+ * X（旧Twitter）仕様の文字数カウント関数
+ * - 全角文字（日本語、漢字、ひらがな、カタカナ、全角記号、絵文字など）: 1文字 = 1カウント (上限140)
+ * - 半角英数、半角記号、半角スペース、改行: 1文字 = 0.5カウント (上限140、半角換算280)
+ * - URL (http:// または https://): 長さに関わらず一律 23半角文字 = 11.5文字分カウント (X公式 t.co 仕様)
+ */
+export const calculateXPostLength = (text) => {
+  if (!text) return 0;
+  const urlRegex = /https?:\/\/[^\s]+/g;
+  const urlMatches = text.match(urlRegex) || [];
+  let remainingText = text.replace(urlRegex, '');
+  
+  let halfWidthCount = urlMatches.length * 23;
+  for (let i = 0; i < remainingText.length; i++) {
+    const code = remainingText.charCodeAt(i);
+    if ((code >= 0x0000 && code <= 0x007f) || (code >= 0xff61 && code <= 0xff9f)) {
+      halfWidthCount += 1;
+    } else {
+      halfWidthCount += 2;
+    }
+  }
+  return Math.ceil(halfWidthCount / 2);
+};
+
+/**
+ * X（旧Twitter）用ポスト成形（140文字厳守・尺引き算アプローチ）
+ * 全角140文字（加重280）以内にフック、要約、アンケート、3D答え合わせリンク、ハッシュタグを確実に収めます。
+ */
+export const formatXPost = (story) => {
+  if (!story) return '';
+  const epNum = story.episodeNum || 1;
+  const header = `【木造ガレージ連載 第${epNum}話】\n`;
+  
+  // サブタイトルや冗長修飾をスマートに整理
+  let cleanTitle = (story.title || '')
+    .replace(/^中古住宅＋木造ガレージで新築以上の暮らしを\s*〜?/, '')
+    .replace(/^[〜～]\s*/, '')
+    .replace(/\s*[〜～]$/, '')
+    .replace(/[〜～].*?[〜～]/g, '')
+    .replace(/【.*?】/g, '')
+    .replace(/《.*?》/g, '')
+    .trim();
+  if (!cleanTitle) cleanTitle = (story.title || '').slice(0, 28);
+  if (cleanTitle.length > 28) {
+    cleanTitle = cleanTitle.slice(0, 26) + '…';
+  }
+
+  // クイズ/アンケート問いかけ（1行・要約）
+  let quizLine = '';
+  if (story.quizEnabled && story.quizQuestion) {
+    let cleanQ = story.quizQuestion;
+    if (cleanQ.includes('新築4,500万円と中古3,000万円') || cleanQ.includes('どのくらい変わると思いますか')) {
+      cleanQ = '新築vs中古＋ガレージ、総額いくら変わる？';
+    } else if (cleanQ.includes('変形地や旗竿地') || cleanQ.includes('どのくらい自由が利く')) {
+      cleanQ = '変形地・旗竿地、木造なら既製品とどう違う？';
+    } else if (cleanQ.includes('いくらの予算なら今すぐ建ててみたい')) {
+      cleanQ = 'あなたの理想のガレージ、いくらなら建てたい？';
+    } else if (cleanQ.includes('台形地') || cleanQ.includes('スペースを有効活用')) {
+      cleanQ = '台形の敷地、木造ならどのくらい広く使える？';
+    } else if (cleanQ.includes('駐車場代') || cleanQ.includes('何年でモト')) {
+      cleanQ = '月3万の駐車場代、ガレージは何年で元が取れる？';
+    } else if (cleanQ.includes('浮いた予算') || cleanQ.includes('次に何をしたい')) {
+      cleanQ = '浮いた予算があったらガレージの次に何したい？';
+    } else if (cleanQ.includes('3Dで試してみませんか')) {
+      cleanQ = 'あなたの敷地ならいくら？3Dで試してみませんか？';
+    } else if (cleanQ.includes('総額いくらだと思いますか') || cleanQ.includes('いくらなら買いたい')) {
+      cleanQ = 'この木造ガレージ建築、総額いくらだと思う？';
+    } else {
+      cleanQ = cleanQ.trim();
+      if (cleanQ.length > 28) {
+        cleanQ = cleanQ.slice(0, 26) + '…？';
+      }
+    }
+    quizLine = `💬 Q. ${cleanQ}\n`;
+  }
+
+  const ctaLine = `正解は3Dシミュレーターで即時積算中👇\n`;
+  const url = `https://smile049.jp/simulator\n`;
+  const tags = `#スマイチ #木造ガレージ`;
+
+  let body = `${header}${cleanTitle}\n${quizLine ? quizLine + '\n' : '\n'}${ctaLine}${url}${tags}`;
+
+  // 万が一140文字を超過している場合の自動短縮・調整
+  if (calculateXPostLength(body) > 140 && quizLine) {
+    quizLine = `💬 Q. いくらだと思う？\n`;
+    body = `${header}${cleanTitle}\n${quizLine}\n${ctaLine}${url}${tags}`;
+  }
+
+  // それでも超える場合はタイトルを切り詰め
+  while (calculateXPostLength(body) > 140 && cleanTitle.length > 8) {
+    cleanTitle = cleanTitle.slice(0, -2) + '…';
+    body = `${header}${cleanTitle}\n\n${ctaLine}${url}${tags}`;
+  }
+
+  return body;
+};
+
+/**
  * 全ストーリーを取得（ローカルストレージ優先、なければデフォルト）
  */
 export const getAllStories = () => {
@@ -254,6 +351,7 @@ export const getAllStories = () => {
             veoPromptScene1: cuts.scene1,
             veoPromptScene2: cuts.scene2,
             veoPromptScene3: cuts.scene3,
+            xPost: s.xPost || formatXPost(s),
             isPostedYouTube: typeof s.isPostedYouTube === 'boolean' ? s.isPostedYouTube : false
           };
         });
@@ -270,6 +368,7 @@ export const getAllStories = () => {
       veoPromptScene1: cuts.scene1,
       veoPromptScene2: cuts.scene2,
       veoPromptScene3: cuts.scene3,
+      xPost: s.xPost || formatXPost(s),
       isPostedYouTube: typeof s.isPostedYouTube === 'boolean' ? s.isPostedYouTube : false
     };
   });
@@ -326,3 +425,191 @@ export const getNextUpcomingStory = () => {
   const upcoming = all.filter(s => !isStoryPublished(s));
   return upcoming[0] || null;
 };
+
+/**
+ * Google Master（049smile02@gmail.com）共有管理情報
+ */
+export const GOOGLE_MASTER_INFO = {
+  email: '049smile02@gmail.com',
+  password: '@Smile2656',
+  accountChooserUrl: 'https://accounts.google.com/AccountChooser?Email=049smile02@gmail.com&continue=https://drive.google.com/drive/my-drive',
+  driveDirectUrl: 'https://drive.google.com/drive/my-drive'
+};
+
+/**
+ * Google DriveのファイルIDを抽出
+ * - https://drive.google.com/file/d/FILE_ID/view...
+ * - https://drive.google.com/open?id=FILE_ID
+ * - https://drive.google.com/uc?id=FILE_ID
+ */
+export const extractGoogleDriveFileId = (url) => {
+  if (!url || typeof url !== 'string') return null;
+  const matchPath = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (matchPath && matchPath[1]) return matchPath[1];
+  const matchParam = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (matchParam && matchParam[1]) return matchParam[1];
+  return null;
+};
+
+/**
+ * Google Drive URLかどうか判定
+ */
+export const isGoogleDriveUrl = (url) => {
+  return !!extractGoogleDriveFileId(url);
+};
+
+/**
+ * Google Driveの埋め込みプレビュー用URLを生成
+ */
+export const getGoogleDrivePreviewUrl = (url) => {
+  const fileId = extractGoogleDriveFileId(url);
+  if (!fileId) return null;
+  return `https://drive.google.com/file/d/${fileId}/preview`;
+};
+
+/**
+ * Google Driveの直接ダウンロードURLを生成
+ */
+export const getGoogleDriveDownloadUrl = (url) => {
+  const fileId = extractGoogleDriveFileId(url);
+  if (!fileId) return null;
+  return `https://drive.google.com/uc?export=download&id=${fileId}`;
+};
+
+/**
+ * Google Drive 内の検索URLを生成
+ */
+export const getGoogleDriveSearchUrl = (keyword) => {
+  const query = keyword ? `"${keyword}"` : 'smile049';
+  return `https://drive.google.com/drive/search?q=${encodeURIComponent(query)}`;
+};
+
+/**
+ * ストーリー情報から「何の動画・画像か」が直感的にわかるファイル名を自動生成
+ */
+export const generateAssetFileName = (story, assetType = 'video', cut = 'scene1') => {
+  if (!story) return 'smile049_asset';
+  const ep = String(story.episodeNum || 1).padStart(2, '0');
+  
+  if (assetType === 'video') {
+    const cutMap = {
+      scene1: 'scene1_外観ドローン全景',
+      scene2: 'scene2_木造シャッター',
+      scene3: 'scene3_雨の日生活実感',
+      master: 'master_完成結合動画',
+      all: 'cut_master'
+    };
+    const cutLabel = cutMap[cut] || cutMap.scene1;
+    return `smile049_ep${ep}_${cutLabel}.mp4`;
+  } else {
+    return `smile049_ep${ep}_AIパース静止画.jpg`;
+  }
+};
+
+/**
+ * 自動判定アセット情報（バッジ表示用ラベル）
+ */
+export const getAutoDetectedAssetInfo = (story, assetType = 'video', cut = 'scene1') => {
+  const ep = story?.episodeNum || 1;
+  if (assetType === 'video') {
+    const cutMap = {
+      scene1: { label: `第${ep}話 Scene 1: 外観ドローン全景`, color: '#2563eb', bg: '#eff6ff' },
+      scene2: { label: `第${ep}話 Scene 2: シャッター・木造現し`, color: '#7c3aed', bg: '#faf5ff' },
+      scene3: { label: `第${ep}話 Scene 3: 雨の日入庫・生活実感`, color: '#059669', bg: '#f0fdf4' },
+      all: { label: `第${ep}話 全3カット結合マスター`, color: '#d97706', bg: '#fffbeb' },
+      master: { label: `第${ep}話 完成マスター動画`, color: '#ea580c', bg: '#fff7ed' }
+    };
+    return cutMap[cut] || cutMap.scene1;
+  } else {
+    return { label: `第${ep}話 AIパース高精細静止画`, color: '#0d9488', bg: '#f0fdfa' };
+  }
+};
+
+/**
+ * Google Apps Script（GAS）用 フォルダ構造全自動構築コードを動的に生成
+ * Google Drive（049smile02@gmail.com）で実行すると、各話・各カットのフォルダが一瞬で自動生成される
+ */
+export const generateGoogleAppsScriptForFolders = (stories, rootFolderName = 'スマイチ_SNS共有素材（smile049）') => {
+  const list = stories && stories.length > 0 ? stories : getAllStories();
+  const folderData = list.map(s => {
+    const ep = String(s.episodeNum || 1).padStart(2, '0');
+    const safeTitle = (s.title || `第${s.episodeNum}話`).replace(/[\/\\:*?"<>|]/g, '_').slice(0, 30);
+    return {
+      folderName: `第${s.episodeNum}話_${safeTitle}`,
+      epNum: ep,
+      subFolders: [
+        `01_Veo3_Scene1_外観ドローン全景`,
+        `02_Veo3_Scene2_木造シャッター`,
+        `03_Veo3_Scene3_雨の日生活実感`,
+        `04_完成マスター動画（30s-90s）`,
+        `05_AIパース静止画`
+      ]
+    };
+  });
+
+  return `/**
+ * 【スマイチ公式】Google Drive フォルダ階層全自動構築スクリプト
+ * 実行アカウント: 049smile02@gmail.com
+ * 
+ * 使い方:
+ * 1. Google Drive (drive.google.com) を開きます。
+ * 2. 左上「新規」➡「その他」➡「Google Apps Script」をクリック（または script.google.com を開く）
+ * 3. このコードをそのまま貼り付けて、上部の「実行」ボタンを押します。
+ * 4. 初回のみ「権限を確認」が出るので、許可（詳細 ➡ 移動）すると、マイドライブに全フォルダが自動作成されます！
+ */
+function createSmile049FolderStructure() {
+  var rootName = "${rootFolderName}";
+  var rootFolder;
+  
+  // 既存の同名フォルダを検索、無ければ新規作成
+  var folders = DriveApp.getFoldersByName(rootName);
+  if (folders.hasNext()) {
+    rootFolder = folders.next();
+    Logger.log("既存のルートフォルダを使用します: " + rootName);
+  } else {
+    rootFolder = DriveApp.createFolder(rootName);
+    Logger.log("新規ルートフォルダを作成しました: " + rootName);
+  }
+
+  // 共通アセットフォルダ
+  var commonFolders = ["00_共通_ロゴ・Canva・サムネイル素材", "00_共通_BGM・環境音・効果音"];
+  for (var c = 0; c < commonFolders.length; c++) {
+    var cName = commonFolders[c];
+    if (!rootFolder.getFoldersByName(cName).hasNext()) {
+      rootFolder.createFolder(cName);
+    }
+  }
+
+  // ストーリー各話の階層データ
+  var episodes = ${JSON.stringify(folderData, null, 2)};
+
+  for (var i = 0; i < episodes.length; i++) {
+    var ep = episodes[i];
+    var epFolder;
+    var epFolders = rootFolder.getFoldersByName(ep.folderName);
+    if (epFolders.hasNext()) {
+      epFolder = epFolders.next();
+    } else {
+      epFolder = rootFolder.createFolder(ep.folderName);
+      Logger.log("話数フォルダ作成: " + ep.folderName);
+    }
+
+    // 各話のサブフォルダ（Scene 1〜3、完成動画、静止画）
+    for (var j = 0; j < ep.subFolders.length; j++) {
+      var subName = ep.subFolders[j];
+      if (!epFolder.getFoldersByName(subName).hasNext()) {
+        epFolder.createFolder(subName);
+        Logger.log("  └ サブフォルダ作成: " + subName);
+      }
+    }
+  }
+
+  Logger.log("=========================================");
+  Logger.log("全フォルダの自動構築が完了しました！");
+  Logger.log("Google Driveを開いてご確認ください。");
+  Logger.log("=========================================");
+}
+`;
+};
+
+
