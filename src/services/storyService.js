@@ -206,9 +206,9 @@ export const DEFAULT_STORIES = [
 export const buildVeoDialogueBlock = (text, characterDescription = 'The character') => {
   const cleanText = (text || '').replace(/[「」"']/g, '').trim();
   if (!cleanText) {
-    return 'Audio: Natural realistic environmental ambient sound, no English speech, quiet suburban atmosphere.';
+    return 'Audio: Natural realistic Japanese suburban ambient environmental sound, gentle breeze, quiet peaceful atmosphere, strictly no speech, no English narration.';
   }
-  return `Audio: Japanese spoken dialogue with authentic native Japanese accent, realistic clear acoustics, no English speech. ${characterDescription} speaks fluent Japanese with precise natural lip-sync: 「${cleanText}」.`;
+  return `Audio: Authentic Japanese spoken dialogue with clear native Japanese accent and natural acoustics. ${characterDescription} speaks in Japanese with precise natural lip-sync: 「${cleanText}」. Strictly NO English speech, NO English translation.`;
 };
 
 /**
@@ -222,7 +222,7 @@ export const generateVeoPrompt = (englishPrompt, title = '', episodeNum = 1, opt
 /**
  * Veo 3（Google AI Pro / VideoFX）用 3カット連動・絵コンテプロンプト生成
  * 1アカウントあたり3つの異なるシネマティックカット（外観全景 / 開口木造ディテール / 生活実感雨の日）を生成
- * 役者セリフの英語化（Context Leakage）を防止するため、発話言語明示・独立オーディオセクション・二重補強タグを採用
+ * 役者セリフの英語化（Context Leakage）を防止するため、冒頭言語Prefix・独立オーディオセクション・二重補強タグを採用
  */
 export const generateVeo3CutPrompts = (englishPrompt, title = '', episodeNum = 1, options = {}) => {
   // optionsが文字列の場合は直接dialogueとして解釈
@@ -257,10 +257,14 @@ export const generateVeo3CutPrompts = (englishPrompt, title = '', episodeNum = 1
     'Cinematic 4k 24fps majestic low-angle wide tilt-up camera movement showing zero-eave roofline and timber structure fitting perfectly on lot',
     'Cinematic 4k 24fps slow orbiting panoramic crane shot around modern wooden garage at dusk twilight'
   ];
-  const scene1Audio = (dialogueScene === 'scene1' && includeDialogue && finalDialogue)
+  const hasScene1Dialogue = (dialogueScene === 'scene1' && includeDialogue && finalDialogue);
+  const scene1Prefix = hasScene1Dialogue
+    ? '[Spoken Audio: Japanese native dialogue ONLY. Absolutely NO English speech. The character speaks in Japanese with natural lip-sync.]'
+    : '[Audio Track: Environmental ambient sound only. Absolutely NO English voice, NO speech, NO narration.]';
+  const scene1Audio = hasScene1Dialogue
     ? buildVeoDialogueBlock(finalDialogue, 'The narrator or character in Japanese neighborhood')
-    : 'Audio: Gentle suburban wind, distant tranquil neighborhood ambiance, no speech, no English voice.';
-  const scene1 = `${scene1Motions[(episodeNum - 1) % scene1Motions.length]}, ${clean}, crisp architectural symmetry, realistic natural lighting. ${scene1Audio} Photorealistic 4k video.`;
+    : 'Audio: Gentle suburban wind, distant tranquil neighborhood ambiance, quiet atmosphere, strictly no speech, no English voices.';
+  const scene1 = `${scene1Prefix} ${scene1Motions[(episodeNum - 1) % scene1Motions.length]}, ${clean}, crisp architectural symmetry, realistic natural lighting. ${scene1Audio} Photorealistic 4k video.`;
 
   // カット2: シャッター開閉・木造現し構造（建築シネマグラファー＆カラリスト視点）
   const scene2Actions = [
@@ -268,10 +272,14 @@ export const generateVeo3CutPrompts = (englishPrompt, title = '', episodeNum = 1
     'Cinematic 4k 24fps slow-motion tracking shot inside garage, warm wood grain textures, tool wall neatly organized, gentle golden light spilling across polished concrete floor',
     'Cinematic 4k 24fps panning shot across ceiling wooden timber trusses and dark metallic walls, modern high-end architectural finish'
   ];
-  const scene2Audio = (dialogueScene === 'scene2' && includeDialogue && finalDialogue)
+  const hasScene2Dialogue = (dialogueScene === 'scene2' && includeDialogue && finalDialogue);
+  const scene2Prefix = hasScene2Dialogue
+    ? '[Spoken Audio: Japanese native dialogue ONLY. Absolutely NO English speech. The character speaks in Japanese with natural lip-sync.]'
+    : '[Audio Track: Environmental ambient sound only. Absolutely NO English voice, NO speech, NO narration.]';
+  const scene2Audio = hasScene2Dialogue
     ? buildVeoDialogueBlock(finalDialogue, 'The craftsperson or homeowner')
-    : 'Audio: Sound of motorized roller shutter smoothly rolling open, mechanical hum and resonant natural timber acoustic, no speech.';
-  const scene2 = `${scene2Actions[(episodeNum - 1) % scene2Actions.length]}, authentic Japanese timber craftsmanship, realistic physics. ${scene2Audio} 4k 24fps video.`;
+    : 'Audio: Sound of motorized roller shutter smoothly rolling open, mechanical hum and resonant natural timber acoustic, strictly no speech, no English voice.';
+  const scene2 = `${scene2Prefix} ${scene2Actions[(episodeNum - 1) % scene2Actions.length]}, authentic Japanese timber craftsmanship, realistic physics. ${scene2Audio} 4k 24fps video.`;
 
   // カット3: 雨の日入庫・生活実感の豊かさ（映像ディレクター＆サウンドデザイナー視点）
   // 役者が登場するメインシーンのため、デフォルトで日本語台詞二重補強ブロックを挿入
@@ -280,10 +288,14 @@ export const generateVeo3CutPrompts = (englishPrompt, title = '', episodeNum = 1
     'Cinematic 4k 24fps heartwarming dusk lifestyle shot, Japanese couple admiring their organized garage space with steaming mugs of coffee, tranquil suburban rain outside',
     'Cinematic 4k 24fps uplifting morning shot, golden sunrise breaking through morning mist, electric shutter rolling open, family preparing bicycles and car for weekend outing'
   ];
-  const scene3Audio = (dialogueScene === 'scene3' && includeDialogue && finalDialogue)
+  const hasScene3Dialogue = (dialogueScene === 'scene3' && includeDialogue && finalDialogue);
+  const scene3Prefix = hasScene3Dialogue
+    ? '[Spoken Audio: Japanese native dialogue ONLY. Absolutely NO English speech. The character speaks in Japanese with natural lip-sync.]'
+    : '[Audio Track: Environmental ambient sound only. Absolutely NO English voice, NO speech, NO narration.]';
+  const scene3Audio = hasScene3Dialogue
     ? buildVeoDialogueBlock(finalDialogue, 'The Japanese family member looks happy and')
-    : 'Audio: Cozy soft rain sound on galvalume eaves, car door softly clicking shut, tranquil suburban life, no English speech.';
-  const scene3 = `${scene3Lifestyles[(episodeNum - 1) % scene3Lifestyles.length]}, cozy heartfelt atmosphere, no luxury exaggeration, honest Japanese suburban lifestyle. ${scene3Audio} Photorealistic 4k 24fps video.`;
+    : 'Audio: Cozy soft rain sound on galvalume eaves, car door softly clicking shut, tranquil suburban life, strictly no speech, no English voices.';
+  const scene3 = `${scene3Prefix} ${scene3Lifestyles[(episodeNum - 1) % scene3Lifestyles.length]}, cozy heartfelt atmosphere, no luxury exaggeration, honest Japanese suburban lifestyle. ${scene3Audio} Photorealistic 4k 24fps video.`;
 
   return { scene1, scene2, scene3, dialogue: finalDialogue };
 };

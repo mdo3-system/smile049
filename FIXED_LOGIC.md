@@ -130,12 +130,12 @@
     1. **言語コンテキストの引きずられ（Context Leakage）**: 指示文全体が英語だと、モデルが英語圏シチュエーションや英語音声を前提と認識し、日本語テキストを英訳して発話してしまう。
     2. **音声合成・リップシンクの解釈ブレ**: 日本語テキストが英語プロンプト内に埋没していると、トークナイザーや音声合成モジュールが英語の発音やスクリプトを優先して割り当てる。
     3. **日本語指定の制約不足**: 単に `"こんにちは"` と台詞のみを置くと、「日本語で話す」制約ではなく「メッセージの意図」と解釈されて `"Hello"` 等に置き換わる。
-  - **確実な日本語発話のための3大プロンプト設計原則**:
-    1. **話す言語の明示**: プロンプト冒頭または台詞直前で `The character speaks fluent Japanese.` または `Audio: Japanese spoken dialogue with native accent.` を必ず宣言する。
-    2. **台詞の分離と独立フォーマット**: 映像指示と台詞を混同させず、独立ブロックとして記述する（例: `The character looks at the camera and speaks in Japanese: 「〜」`）。
-    3. **日本語スクリプトの二重補強（独立オーディオセクション）**: 英語の映像・カメラワーク指示の後に、独立したオーディオ指定（`Audio: Japanese dialogue with native Japanese accent. The character speaks fluent Japanese and says: 「セリフ」.`）をセクションとして切り出す。
-  - **非台詞シーンの英語混入防止**:
-    - Scene 1（外観全景）やScene 2（建具）など台詞のないシーンでも、意図しない英語ナレーションや英語音声の発生を防ぐため、`Audio: Natural realistic environmental ambient sound, no English speech.` を明記する。
+  - **確実な日本語発話のための4大プロンプト設計原則（v0.1.59確定）**:
+    1. **プロンプト最先頭へのPrefixディレクティブ強制**: プロンプトの最先頭に `[Spoken Audio: Japanese native dialogue ONLY. Absolutely NO English speech. The character speaks in Japanese with natural lip-sync.]` を配置し、冒頭でコンテキストを日本語音声に完全ロック。
+    2. **台詞の分離と独立フォーマット**: 映像指示と台詞を混同させず、独立ブロックとして記述する。
+    3. **日本語スクリプトの二重補強（独立オーディオセクション）**: プロンプト末尾に独立したオーディオ指定（`Audio: Authentic Japanese spoken dialogue with clear native Japanese accent and natural acoustics. [人物] speaks in Japanese with precise natural lip-sync: 「セリフ」. Strictly NO English speech, NO English translation.`）を付与。
+    4. **非台詞シーン（Scene 1, Scene 2）の英語混入防止**:
+       - 冒頭Prefixに `[Audio Track: Environmental ambient sound only. Absolutely NO English voice, NO speech, NO narration.]` を配置し、末尾にも `strictly no speech, no English voices.` を明記して勝手な英語ナレーションや会話の発生を完全に遮断。
 - **4大SNS初心者向け貼り付け先ガイド**:
   - **Instagram**: 右側の「キャプションを入力...」枠にCtrl+Vで貼り付け。複数選択で動画＋静止画カルーセル。
   - **YouTube**: YouTube Studio「動画をアップロード」➡「タイトル」枠に話数タイトル、「説明」枠にCtrl+Vで概要欄を貼り付け。サムネイル設定。
