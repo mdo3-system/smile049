@@ -16,6 +16,7 @@ export const DEFAULT_STORIES = [
     plot: `山本恵子（42歳・共働き）は、週末のたびに住宅展示場を訪れていた。営業担当者に「土地込み4,500万円が標準ですよ」と言われるたびに、胸の奥で何かが引っかかる。「本当にこれしか選択肢はないのだろうか？」帰り道、スマホで「中古住宅 ガレージ 埼玉」と検索したその瞬間、木造自由設計ガレージ【スマイチ】のブラウザ3Dシミュレーターに出会った。`,
     assignedAccount: 'Google AI Pro アカウント 1',
     englishPrompt: '8k cinematic photograph, warm suburban Japanese family neighborhood at dusk, young Japanese family of four walking together, beautiful modern dark charcoal wooden garage attached to a renovated mid-century Japanese house, warm garden lights, hopeful atmosphere, photorealistic.',
+    dialogue: '土地込み4,500万円は厳しいよね…あ、この3Dシミュレーター、自分で設計できるんだ',
     imageUrl: null,
     hashtags: '#スマイチ #中古住宅ガレージ #中古住宅リノベ #ガレージのある暮らし #木造ガレージ #自由設計 #変形地ガレージ #ガルバリウム外壁 #3Dシミュレーター #smile049',
     quizEnabled: true,
@@ -42,6 +43,7 @@ export const DEFAULT_STORIES = [
     plot: `恵子はスマイチのシミュレーターで「幅5m×奥行き6m、台形地対応」のガレージを試作してみた。概算248万円。「この金額でガレージが建つなら、中古住宅でも全然アリじゃない？」物件探しの基準が変わった。不動産サイトで変形地や旗竿地の安い物件を見る目が、全く変わった。「ガレージが建てられるかどうか」で土地を選べばいい。`,
     assignedAccount: 'Google AI Pro アカウント 2',
     englishPrompt: '8k illustration style, split screen comparison, left side shows expensive new-build Japanese house, right side shows used Japanese house with beautiful custom wooden garage addition, family car parked inside, price difference highlighted, clean modern infographic style, photorealistic rendering.',
+    dialogue: 'この金額でガレージが建つなら、中古住宅でも全然アリじゃない？',
     imageUrl: null,
     hashtags: '#スマイチ #中古住宅ガレージ #土地探し #変形地 #木造ガレージ #自由設計 #smile049',
     quizEnabled: true,
@@ -68,6 +70,7 @@ export const DEFAULT_STORIES = [
     plot: `夜、ダイニングテーブルに向かい合って座った夫婦。スマイチのシミュレーターを開き、希望のガレージを3D設計する。概算建築費が画面に目安300万円と表示された。「中古住宅3,800万円＋リノベ300万円＋ガレージ300万円＋諸費用…合計でおよそ4,400万円。さっきまで考えていた新築4,500万円とほぼ同じ想定の中で、ガレージが入っている」。夜更けに笑い合った夫婦のその夜が、大きな決断の出発点になった。`,
     assignedAccount: 'Google AI Pro アカウント 3',
     englishPrompt: '8k intimate lifestyle photography, Japanese couple sitting at dining table at night, laptop screen showing 3D garage simulator with real-time price calculator, warm kitchen lighting, family planning atmosphere, notebooks and house listing papers on table, hopeful and decisive mood, photorealistic.',
+    dialogue: '新築と同じ予算で、憧れの木造ガレージまで手に入るんだね',
     imageUrl: null,
     hashtags: '#スマイチ #予算計画 #マイホーム計画 #中古住宅 #木造ガレージ #見積もり #smile049',
     quizEnabled: true,
@@ -94,6 +97,7 @@ export const DEFAULT_STORIES = [
     plot: `購入した中古住宅の敷地は、南側が台形に斜めになっていた。不動産会社の担当者に「既製品の物置やガレージは入りませんよ」と言われていた部分だ。しかしスマイチの専任スタッフが現地測量を行い、既存外壁のラインに合わせ、その台形の角まで余すことなく使い切る木造ガレージを設計。数センチ単位の精度で、まるでそこに最初からあったかのように建物は収まった。`,
     assignedAccount: 'Google AI Pro アカウント 4',
     englishPrompt: '8k architectural photography, top-down aerial view of Japanese suburban house plot showing a perfectly fitted custom wooden garage built to match the irregular trapezoidal shape of the land, dark galvalume cladding, zero-eave design, fitting seamlessly between property boundaries, crisp sunlight, photorealistic.',
+    dialogue: '見て、この変形した敷地の形に、数センチ単位でぴったり収まったよ',
     imageUrl: null,
     hashtags: '#スマイチ #変形地設計 #台形地 #ガルバリウム #ミリ単位 #専任スタッフ #smile049',
     quizEnabled: true,
@@ -120,6 +124,7 @@ export const DEFAULT_STORIES = [
     plot: `完成から3ヶ月。恵子の家計簿に「駐車場代 ¥0」と書かれた月が初めて訪れた。それまで月3万円、年間36万円を払い続けていた駐車場代が消えた。ガレージの建設費250万円を単純計算すると、約7年で元が取れる。しかし実際のメリットはそれだけではなかった。雨の日に車に乗り込む手間がなくなり、荷物の積み下ろしが楽になり、休日の家族の動き方そのものが変わっていた。`,
     assignedAccount: 'Google AI Pro アカウント 5',
     englishPrompt: '8k warm lifestyle photography, happy Japanese mother loading groceries from car directly into wooden garage attached to house on a rainy day, covered walkway, family dog sitting nearby, suburban garden background, sense of everyday comfort and convenience, photorealistic.',
+    dialogue: '雨の日でも濡れずに荷物が運べるなんて、本当に便利で助かるね',
     imageUrl: null,
     hashtags: '#スマイチ #駐車場代節約 #家計改善 #7年で回収 #生活の質向上 #smile049',
     quizEnabled: true,
@@ -146,6 +151,7 @@ export const DEFAULT_STORIES = [
     plot: `新築同期の友人宅を訪ねた恵子は、ふと感じた。お互いに4,000万円台の住宅ローンだと思っていたのに、自分の家にはガレージがあり、庭にはウッドデッキがあり、将来のリノベーション資金も手元に残っている。「中古住宅を選んで、ガレージを建てて、残った1,750万円で人生を豊かにする。これが令和の賢い家の作り方だったんだ」と、恵子は静かに確信した。`,
     assignedAccount: 'Google AI Pro アカウント 1',
     englishPrompt: '8k cinematic lifestyle photography, happy Japanese family evening scene outside their renovated house with custom wooden garage, string lights in garden, children playing, parents with coffee cups, warm golden hour light, sense of contentment and good life choices, photorealistic.',
+    dialogue: '新築じゃなくて大正解だったね。ガレージも庭も楽しめて、暮らしが豊かになったよ',
     imageUrl: null,
     hashtags: '#スマイチ #賢い選択 #中古リノベ #ウッドデッキ #豊かな人生 #smile049',
     quizEnabled: true,
@@ -172,6 +178,7 @@ export const DEFAULT_STORIES = [
     plot: `休日の朝、電動シャッターをゆっくり開けると、整然と並んだ家族の自転車と、愛車の濡れていないボディが迎えてくれる。恵子は振り返る——新築の展示場を回り続けた日々、シミュレーターで夜中に試算した夜、専任スタッフと敷地を測った日。「敷地の形に、数センチ単位で合わせてもらったガレージ。新築ではこうはいかなかった」。令和の豊かな暮らしは、中古住宅から始まった。`,
     assignedAccount: 'Google AI Pro アカウント 2',
     englishPrompt: '8k cinematic wide shot, sunrise morning scene of a beautiful renovated Japanese house with custom-built dark wooden garage, garage door slowly opening, silhouette of a family car inside, golden morning light, dew on the garden grass, peaceful suburban street, sense of a life well-chosen, photorealistic masterpiece.',
+    dialogue: '敷地の形に合わせて自分で描いたガレージ。これを選んで本当に良かった',
     imageUrl: null,
     hashtags: '#スマイチ #木造ガレージ #ガレージライフ #自由設計 #愛車のある暮らし #smile049',
     quizEnabled: true,
@@ -193,22 +200,56 @@ export const DEFAULT_STORIES = [
 ];
 
 /**
+ * Veo 3 日本語台詞発話二重補強ブロックを生成
+ * 英語プロンプトのコンテキストリークを防ぎ、指定した日本語テキストをネイティブ発音・正確なリップシンクで発話させます
+ */
+export const buildVeoDialogueBlock = (text, characterDescription = 'The character') => {
+  const cleanText = (text || '').replace(/[「」"']/g, '').trim();
+  if (!cleanText) {
+    return 'Audio: Natural realistic environmental ambient sound, no English speech, quiet suburban atmosphere.';
+  }
+  return `Audio: Japanese spoken dialogue with authentic native Japanese accent, realistic clear acoustics, no English speech. ${characterDescription} speaks fluent Japanese with precise natural lip-sync: 「${cleanText}」.`;
+};
+
+/**
  * Veo 3（Google AI Pro / VideoFX）用シネマティック4K動画生成プロンプト（単一・メインカット）
  */
-export const generateVeoPrompt = (englishPrompt, title = '', episodeNum = 1) => {
-  const cuts = generateVeo3CutPrompts(englishPrompt, title, episodeNum);
-  return cuts.scene1;
+export const generateVeoPrompt = (englishPrompt, title = '', episodeNum = 1, options = {}) => {
+  const cuts = generateVeo3CutPrompts(englishPrompt, title, episodeNum, options);
+  return cuts.scene3 || cuts.scene1;
 };
 
 /**
  * Veo 3（Google AI Pro / VideoFX）用 3カット連動・絵コンテプロンプト生成
  * 1アカウントあたり3つの異なるシネマティックカット（外観全景 / 開口木造ディテール / 生活実感雨の日）を生成
+ * 役者セリフの英語化（Context Leakage）を防止するため、発話言語明示・独立オーディオセクション・二重補強タグを採用
  */
-export const generateVeo3CutPrompts = (englishPrompt, title = '', episodeNum = 1) => {
+export const generateVeo3CutPrompts = (englishPrompt, title = '', episodeNum = 1, options = {}) => {
+  // optionsが文字列の場合は直接dialogueとして解釈
+  const dialogueText = typeof options === 'string'
+    ? options
+    : (options?.dialogue !== undefined ? options.dialogue : null);
+  const includeDialogue = options?.includeDialogue !== false; // デフォルトtrue
+  const dialogueScene = options?.dialogueScene || 'scene3'; // デフォルトは役者の生活実感シーン（Scene 3）
+
   let clean = (englishPrompt || '')
     .replace(/^8k (cinematic photograph|illustration style|intimate lifestyle photography|architectural photography|warm lifestyle photography|cinematic wide shot),?\s*/i, '')
     .replace(/photorealistic( rendering| masterpiece)?\.?/gi, '')
     .trim();
+
+  // デフォルト台詞の解決（指定がなければエピソード番号に応じたデフォルトセリフ）
+  const defaultDialogues = [
+    '土地込み4,500万円は厳しいよね…あ、この3Dシミュレーター、自分で設計できるんだ',
+    'この金額でガレージが建つなら、中古住宅でも全然アリじゃない？',
+    '新築と同じ予算で、憧れの木造ガレージまで手に入るんだね',
+    '見て、この変形した敷地の形に、数センチ単位でぴったり収まったよ',
+    '雨の日でも濡れずに荷物が運べるなんて、本当に便利で助かるね',
+    '新築じゃなくて大正解だったね。ガレージも庭も楽しめて、暮らしが豊かになったよ',
+    '敷地の形に合わせて自分で描いたガレージ。これを選んで本当に良かった'
+  ];
+  const finalDialogue = dialogueText !== null
+    ? dialogueText
+    : defaultDialogues[(episodeNum - 1) % defaultDialogues.length];
 
   // カット1: 外観・ドローン全景（建築カメラマン＆ドローンパイロット視点）
   const scene1Motions = [
@@ -216,7 +257,10 @@ export const generateVeo3CutPrompts = (englishPrompt, title = '', episodeNum = 1
     'Cinematic 4k 24fps majestic low-angle wide tilt-up camera movement showing zero-eave roofline and timber structure fitting perfectly on lot',
     'Cinematic 4k 24fps slow orbiting panoramic crane shot around modern wooden garage at dusk twilight'
   ];
-  const scene1 = `${scene1Motions[(episodeNum - 1) % scene1Motions.length]}, ${clean}, crisp architectural symmetry, realistic natural lighting, photorealistic 4k video.`;
+  const scene1Audio = (dialogueScene === 'scene1' && includeDialogue && finalDialogue)
+    ? buildVeoDialogueBlock(finalDialogue, 'The narrator or character in Japanese neighborhood')
+    : 'Audio: Gentle suburban wind, distant tranquil neighborhood ambiance, no speech, no English voice.';
+  const scene1 = `${scene1Motions[(episodeNum - 1) % scene1Motions.length]}, ${clean}, crisp architectural symmetry, realistic natural lighting. ${scene1Audio} Photorealistic 4k video.`;
 
   // カット2: シャッター開閉・木造現し構造（建築シネマグラファー＆カラリスト視点）
   const scene2Actions = [
@@ -224,17 +268,24 @@ export const generateVeo3CutPrompts = (englishPrompt, title = '', episodeNum = 1
     'Cinematic 4k 24fps slow-motion tracking shot inside garage, warm wood grain textures, tool wall neatly organized, gentle golden light spilling across polished concrete floor',
     'Cinematic 4k 24fps panning shot across ceiling wooden timber trusses and dark metallic walls, modern high-end architectural finish'
   ];
-  const scene2 = `${scene2Actions[(episodeNum - 1) % scene2Actions.length]}, authentic Japanese timber craftsmanship, realistic physics, 4k 24fps video.`;
+  const scene2Audio = (dialogueScene === 'scene2' && includeDialogue && finalDialogue)
+    ? buildVeoDialogueBlock(finalDialogue, 'The craftsperson or homeowner')
+    : 'Audio: Sound of motorized roller shutter smoothly rolling open, mechanical hum and resonant natural timber acoustic, no speech.';
+  const scene2 = `${scene2Actions[(episodeNum - 1) % scene2Actions.length]}, authentic Japanese timber craftsmanship, realistic physics. ${scene2Audio} 4k 24fps video.`;
 
   // カット3: 雨の日入庫・生活実感の豊かさ（映像ディレクター＆サウンドデザイナー視点）
+  // 役者が登場するメインシーンのため、デフォルトで日本語台詞二重補強ブロックを挿入
   const scene3Lifestyles = [
     'Cinematic 4k 24fps slow dolly tracking shot on rainy evening, raindrops softly trickling off galvalume eaves, family car smoothly parking inside dry warm garage, family stepping out without getting wet, warm smiling faces',
     'Cinematic 4k 24fps heartwarming dusk lifestyle shot, Japanese couple admiring their organized garage space with steaming mugs of coffee, tranquil suburban rain outside',
     'Cinematic 4k 24fps uplifting morning shot, golden sunrise breaking through morning mist, electric shutter rolling open, family preparing bicycles and car for weekend outing'
   ];
-  const scene3 = `${scene3Lifestyles[(episodeNum - 1) % scene3Lifestyles.length]}, cozy heartfelt atmosphere, no luxury exaggeration, honest Japanese suburban lifestyle, photorealistic 4k.`;
+  const scene3Audio = (dialogueScene === 'scene3' && includeDialogue && finalDialogue)
+    ? buildVeoDialogueBlock(finalDialogue, 'The Japanese family member looks happy and')
+    : 'Audio: Cozy soft rain sound on galvalume eaves, car door softly clicking shut, tranquil suburban life, no English speech.';
+  const scene3 = `${scene3Lifestyles[(episodeNum - 1) % scene3Lifestyles.length]}, cozy heartfelt atmosphere, no luxury exaggeration, honest Japanese suburban lifestyle. ${scene3Audio} Photorealistic 4k 24fps video.`;
 
-  return { scene1, scene2, scene3 };
+  return { scene1, scene2, scene3, dialogue: finalDialogue };
 };
 
 /**
@@ -338,16 +389,29 @@ export const formatXPost = (story) => {
  * 全ストーリーを取得（ローカルストレージ優先、なければデフォルト）
  */
 export const getAllStories = () => {
+  const defaultDialogues = [
+    '土地込み4,500万円は厳しいよね…あ、この3Dシミュレーター、自分で設計できるんだ',
+    'この金額でガレージが建つなら、中古住宅でも全然アリじゃない？',
+    '新築と同じ予算で、憧れの木造ガレージまで手に入るんだね',
+    '見て、この変形した敷地の形に、数センチ単位でぴったり収まったよ',
+    '雨の日でも濡れずに荷物が運べるなんて、本当に便利で助かるね',
+    '新築じゃなくて大正解だったね。ガレージも庭も楽しめて、暮らしが豊かになったよ',
+    '敷地の形に合わせて自分で描いたガレージ。これを選んで本当に良かった'
+  ];
+
   try {
     const saved = localStorage.getItem(STORY_STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
         return parsed.map((s, idx) => {
-          const cuts = generateVeo3CutPrompts(s.englishPrompt, s.title, s.episodeNum || idx + 1);
+          const epNum = s.episodeNum || idx + 1;
+          const epDialogue = s.dialogue !== undefined ? s.dialogue : (defaultDialogues[(epNum - 1) % defaultDialogues.length] || '');
+          const cuts = generateVeo3CutPrompts(s.englishPrompt, s.title, epNum, { dialogue: epDialogue });
           return {
             ...s,
-            veoPrompt: s.veoPrompt || cuts.scene1,
+            dialogue: epDialogue,
+            veoPrompt: s.veoPrompt || cuts.scene3 || cuts.scene1,
             veoPromptScene1: cuts.scene1,
             veoPromptScene2: cuts.scene2,
             veoPromptScene3: cuts.scene3,
@@ -361,10 +425,13 @@ export const getAllStories = () => {
     console.error('Failed to load stories from localStorage:', e);
   }
   return DEFAULT_STORIES.map((s, idx) => {
-    const cuts = generateVeo3CutPrompts(s.englishPrompt, s.title, s.episodeNum || idx + 1);
+    const epNum = s.episodeNum || idx + 1;
+    const epDialogue = s.dialogue || defaultDialogues[(epNum - 1) % defaultDialogues.length] || '';
+    const cuts = generateVeo3CutPrompts(s.englishPrompt, s.title, epNum, { dialogue: epDialogue });
     return {
       ...s,
-      veoPrompt: s.veoPrompt || cuts.scene1,
+      dialogue: epDialogue,
+      veoPrompt: s.veoPrompt || cuts.scene3 || cuts.scene1,
       veoPromptScene1: cuts.scene1,
       veoPromptScene2: cuts.scene2,
       veoPromptScene3: cuts.scene3,

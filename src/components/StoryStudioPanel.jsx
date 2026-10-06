@@ -4,12 +4,12 @@ import {
   Trash2, RefreshCw, Layers, CheckCircle2, ChevronDown, ChevronRight, 
   BookOpen, HelpCircle, Upload, ShieldCheck, ArrowRight, DollarSign, Vote,
   Calendar, Video, Film, Play, FolderOpen, Link as LinkIcon, Key, HardDrive, Share2,
-  Search, Zap, Tag, FileText
+  Search, Zap, Tag, FileText, MessageSquare, Mic, Volume2, Info
 } from 'lucide-react';
 import { InstagramIcon, YoutubeIcon, NoteIcon, XIcon } from './SnsIcons';
 import { 
   getAllStories, saveAllStories, isStoryPublished, generateVeoPrompt, 
-  generateVeo3CutPrompts, STORY_STORAGE_KEY, GOOGLE_MASTER_INFO,
+  generateVeo3CutPrompts, buildVeoDialogueBlock, STORY_STORAGE_KEY, GOOGLE_MASTER_INFO,
   extractGoogleDriveFileId, isGoogleDriveUrl, getGoogleDrivePreviewUrl, getGoogleDriveDownloadUrl,
   generateAssetFileName, getAutoDetectedAssetInfo, generateGoogleAppsScriptForFolders, getGoogleDriveSearchUrl,
   formatXPost, calculateXPostLength
@@ -272,6 +272,16 @@ const generateStoriesByAi = (themeTitle, protagonist, storyCount, themeDesc, pre
     const englishPrompt = phaseData.englishPrompt ||
       `8k architectural lifestyle photography, beautiful modern wooden custom garage, dark galvalume steel exterior, Japanese suburban setting, warm natural lighting, photorealistic.`;
 
+    const defaultDialogueList = [
+      '土地や既製品のサイズに合わせるんじゃなくて、自分で敷地に合わせられるんだ',
+      '画面の中でミリ単位で形になっていく…これなら理想通りに作れそう',
+      '専任スタッフが構造計算から確認申請まで全部やってくれるから本当に心強いね',
+      '木の香りがして結露もしない。木造ガレージにして本当に大正解だったよ',
+      '作って本当に良かった。毎日の暮らしがこんなに快適で楽しくなるなんて'
+    ];
+    const dialogue = phaseData.dialogue || defaultDialogueList[(i - 1) % defaultDialogueList.length];
+    const cuts = generateVeo3CutPrompts(englishPrompt, epTitle, i, { dialogue });
+
     const storyObj = {
       id: `story_${Date.now()}_${i}`,
       episodeNum: i,
@@ -280,6 +290,11 @@ const generateStoriesByAi = (themeTitle, protagonist, storyCount, themeDesc, pre
       plot,
       assignedAccount: `Google AI Pro アカウント ${(i % 5) || 5}`,
       englishPrompt,
+      dialogue,
+      veoPrompt: cuts.scene3 || cuts.scene1,
+      veoPromptScene1: cuts.scene1,
+      veoPromptScene2: cuts.scene2,
+      veoPromptScene3: cuts.scene3,
       imageUrl: null,
       hashtags,
       quizEnabled: true,
@@ -325,6 +340,7 @@ export default function StoryStudioPanel() {
   const [activeStoryTab, setActiveStoryTab] = useState('instagram'); // 'instagram' | 'youtube' | 'note' | 'x'
   const [promptType, setPromptType] = useState('veo'); // 'veo' | 'nano'
   const [selectedVeoCut, setSelectedVeoCut] = useState('scene1'); // 'scene1' | 'scene2' | 'scene3' | 'all'
+  const [showDialogueTips, setShowDialogueTips] = useState(false); // Veo 3 日本語台詞英語化防止Tips表示トグル
 
   // Google Drive（049smile02@gmail.com）集約管理ステート
   const [showDriveInfoModal, setShowDriveInfoModal] = useState(false);
@@ -415,7 +431,16 @@ export default function StoryStudioPanel() {
         englishPrompt = `8k architectural photography, custom wooden garage or storage building under construction in Japan, professional timber frame, dark galvalume cladding panels being fitted, craftsmen at work, clear blue sky, sense of progress and precision construction, photorealistic.`;
       }
 
-      return { phase, subTitle, plot: () => plot, englishPrompt };
+      let sceneDialogue = '';
+      if (i === 1) {
+        sceneDialogue = `「${scProblem.slice(0, 18)}で悩んでたけど、自分で設計できるなら試してみよう」`;
+      } else if (i === scEpisodeCount) {
+        sceneDialogue = `「作って本当に良かった！${scResolution.slice(0, 16)}で暮らしが変わったよ」`;
+      } else {
+        sceneDialogue = `「敷地の形に合わせて数センチ単位で設計できるなんて、本当に助かるね」`;
+      }
+
+      return { phase, subTitle, plot: () => plot, englishPrompt, dialogue: sceneDialogue };
     });
 
     // ハッシュタグをトーン別に調整
@@ -445,7 +470,7 @@ export default function StoryStudioPanel() {
 
     // STORY_ARCSをバイパスして直接生成
     const newStories = scenarioPhases.map((ph, idx) => {
-      const cuts = generateVeo3CutPrompts(ph.englishPrompt, `${themeTitle} ${ph.subTitle}`, idx + 1);
+      const cuts = generateVeo3CutPrompts(ph.englishPrompt, `${themeTitle} ${ph.subTitle}`, idx + 1, { dialogue: ph.dialogue });
       const storyObj = {
         id: `story_${Date.now()}_${idx + 1}`,
         episodeNum: idx + 1,
@@ -454,7 +479,8 @@ export default function StoryStudioPanel() {
         plot: ph.plot(protagonist),
         assignedAccount: `Google AI Pro アカウント ${((idx + 1) % 5) || 5}`,
         englishPrompt: ph.englishPrompt,
-        veoPrompt: cuts.scene1,
+        dialogue: ph.dialogue,
+        veoPrompt: cuts.scene3 || cuts.scene1,
         veoPromptScene1: cuts.scene1,
         veoPromptScene2: cuts.scene2,
         veoPromptScene3: cuts.scene3,
@@ -486,6 +512,22 @@ export default function StoryStudioPanel() {
     setStories(newStories);
   };
 
+
+  // 役者セリフ（日本語台詞）変更時の即時再計算・保存
+  const handleUpdateDialogue = (storyIndex, newDialogue) => {
+    const updated = [...stories];
+    const story = updated[storyIndex];
+    const cuts = generateVeo3CutPrompts(story.englishPrompt, story.title, story.episodeNum, { dialogue: newDialogue });
+    updated[storyIndex] = {
+      ...story,
+      dialogue: newDialogue,
+      veoPrompt: cuts.scene3 || cuts.scene1,
+      veoPromptScene1: cuts.scene1,
+      veoPromptScene2: cuts.scene2,
+      veoPromptScene3: cuts.scene3
+    };
+    setStories(updated);
+  };
 
   const copyToClipboard = (text, key) => {
     navigator.clipboard.writeText(text);
@@ -1773,7 +1815,7 @@ export default function StoryStudioPanel() {
 
                     {/* コピーボタン */}
                     {(() => {
-                      const cuts = generateVeo3CutPrompts(story.englishPrompt, story.title, story.episodeNum);
+                      const cuts = generateVeo3CutPrompts(story.englishPrompt, story.title, story.episodeNum, { dialogue: story.dialogue });
                       const targetText = promptType === 'nano'
                         ? story.englishPrompt
                         : selectedVeoCut === 'scene1'
@@ -1816,37 +1858,175 @@ export default function StoryStudioPanel() {
                     })()}
                   </div>
 
-                  {/* Veo 3 選択時の絵コンテ 3カット切り替えセレクター */}
+                  {/* Veo 3 選択時の役者セリフ（日本語発話・英語化防止）入力エリア ＆ 絵コンテ 3カット切り替えセレクター */}
                   {promptType === 'veo' && (
-                    <div style={{ display: 'flex', gap: 4, marginBottom: 6, flexWrap: 'wrap' }}>
-                      {[
-                        { key: 'scene1', label: 'Scene 1: 外観・ドローン全景', role: '建築カメラマン/ドローン' },
-                        { key: 'scene2', label: 'Scene 2: シャッター・木造現し', role: 'シネマグラファー/カラリスト' },
-                        { key: 'scene3', label: 'Scene 3: 雨の日入庫・生活実感', role: 'ディレクター/選曲' },
-                        { key: 'all', label: '📋 全3カット一括', role: '結合マスター' }
-                      ].map(tab => (
-                        <button
-                          key={tab.key}
-                          type="button"
-                          onClick={() => setSelectedVeoCut(tab.key)}
-                          style={{
-                            padding: '3px 8px',
-                            borderRadius: 4,
-                            fontSize: 10.5,
-                            fontWeight: 700,
-                            border: 'none',
-                            cursor: 'pointer',
-                            background: selectedVeoCut === tab.key ? '#2563eb' : '#e0e7ff',
-                            color: selectedVeoCut === tab.key ? '#fff' : '#3730a3',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 4
-                          }}
-                          title={tab.role}
-                        >
-                          <span>{tab.label}</span>
-                        </button>
-                      ))}
+                    <div style={{ marginBottom: 8 }}>
+                      {/* 🗣️ 役者セリフ（日本語台詞）編集ブロック */}
+                      <div style={{
+                        background: '#f8fafc',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: 6,
+                        padding: '8px 10px',
+                        marginBottom: 6
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4, flexWrap: 'wrap', gap: 4 }}>
+                          <label style={{ fontSize: 11, fontWeight: 700, color: '#1e293b', display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <Mic size={12} color="#2563eb" />
+                            <span>🗣️ 役者セリフ（日本語発話・英語化防止）:</span>
+                          </label>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span style={{
+                              fontSize: 10,
+                              padding: '1px 6px',
+                              borderRadius: 4,
+                              background: story.dialogue ? '#dcfce7' : '#f1f5f9',
+                              color: story.dialogue ? '#15803d' : '#64748b',
+                              fontWeight: 700
+                            }}>
+                              {story.dialogue ? '🇯🇵 日本語二重補強中（英語化防止）' : '🔇 環境音のみ（英語混入防止）'}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setShowDialogueTips(!showDialogueTips)}
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: '#2563eb',
+                                fontSize: 10.5,
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 2,
+                                textDecoration: 'underline'
+                              }}
+                            >
+                              <Info size={11} />
+                              <span>{showDialogueTips ? 'Tipsを閉じる' : '英語化防止の3原則'}</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                          <input
+                            type="text"
+                            value={story.dialogue || ''}
+                            onChange={(e) => handleUpdateDialogue(idx, e.target.value)}
+                            placeholder="例: 雨の日でも濡れずに荷物が運べるなんて、本当に便利で助かるね"
+                            style={{
+                              flex: 1,
+                              padding: '5px 8px',
+                              fontSize: 11.5,
+                              borderRadius: 4,
+                              border: '1px solid #cbd5e1',
+                              background: '#fff',
+                              color: '#0f172a'
+                            }}
+                          />
+                          {story.dialogue ? (
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateDialogue(idx, '')}
+                              title="セリフなし（環境音・BGMのみ）に変更"
+                              style={{
+                                padding: '4px 8px',
+                                fontSize: 10.5,
+                                background: '#f1f5f9',
+                                border: '1px solid #cbd5e1',
+                                borderRadius: 4,
+                                color: '#64748b',
+                                cursor: 'pointer',
+                                whiteSpace: 'nowrap'
+                              }}
+                            >
+                              セリフ消去
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const defaultList = [
+                                  '土地込み4,500万円は厳しいよね…あ、この3Dシミュレーター、自分で設計できるんだ',
+                                  'この金額でガレージが建つなら、中古住宅でも全然アリじゃない？',
+                                  '新築と同じ予算で、憧れの木造ガレージまで手に入るんだね',
+                                  '見て、この変形した敷地の形に、数センチ単位でぴったり収まったよ',
+                                  '雨の日でも濡れずに荷物が運べるなんて、本当に便利で助かるね',
+                                  '新築じゃなくて大正解だったね。ガレージも庭も楽しめて、暮らしが豊かになったよ',
+                                  '敷地の形に合わせて自分で描いたガレージ。これを選んで本当に良かった'
+                                ];
+                                handleUpdateDialogue(idx, defaultList[(story.episodeNum - 1) % defaultList.length]);
+                              }}
+                              title="標準セリフを復元"
+                              style={{
+                                padding: '4px 8px',
+                                fontSize: 10.5,
+                                background: '#eff6ff',
+                                border: '1px solid #bfdbfe',
+                                borderRadius: 4,
+                                color: '#2563eb',
+                                cursor: 'pointer',
+                                whiteSpace: 'nowrap'
+                              }}
+                            >
+                              セリフ復元
+                            </button>
+                          )}
+                        </div>
+
+                        {/* 英語化防止Tipsアコーディオン */}
+                        {showDialogueTips && (
+                          <div style={{
+                            marginTop: 6,
+                            padding: '8px 10px',
+                            background: '#eff6ff',
+                            border: '1px solid #bfdbfe',
+                            borderRadius: 6,
+                            fontSize: 11,
+                            color: '#1e3a8a',
+                            lineHeight: 1.5
+                          }}>
+                            <div style={{ fontWeight: 700, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <span>💡 なぜVeo 3でセリフが英語化するのか？（Context Leakageと解決策）</span>
+                            </div>
+                            <ul style={{ margin: 0, paddingLeft: 16 }}>
+                              <li><strong>英語コンテキストの引きずられ</strong>: 指示文全体が英語だと、モデルが英語音声出力を基本前提として日本語台詞を勝手に翻訳してしまいます。</li>
+                              <li><strong>日本語発話の二重補強</strong>: 本システムでは <code>Audio: Japanese spoken dialogue with authentic native Japanese accent... The character speaks fluent Japanese: 「〜」</code> を独立セクションとして自動付与し、英語への自動翻訳や発話ブレを完全防止しています。</li>
+                              <li><strong>非セリフシーンの英語混入防止</strong>: セリフがないシーン（外観・建具など）でも <code>no English speech</code> を明示し、勝手な英語音声の生成を防ぎます。</li>
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* カット切り替えタブ */}
+                      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                        {[
+                          { key: 'scene1', label: 'Scene 1: 外観・ドローン全景', role: '建築カメラマン/ドローン' },
+                          { key: 'scene2', label: 'Scene 2: シャッター・木造現し', role: 'シネマグラファー/カラリスト' },
+                          { key: 'scene3', label: 'Scene 3: 雨の日入庫・生活実感（セリフ）', role: 'ディレクター/役者セリフ' },
+                          { key: 'all', label: '📋 全3カット一括', role: '結合マスター' }
+                        ].map(tab => (
+                          <button
+                            key={tab.key}
+                            type="button"
+                            onClick={() => setSelectedVeoCut(tab.key)}
+                            style={{
+                              padding: '3px 8px',
+                              borderRadius: 4,
+                              fontSize: 10.5,
+                              fontWeight: 700,
+                              border: 'none',
+                              cursor: 'pointer',
+                              background: selectedVeoCut === tab.key ? '#2563eb' : '#e0e7ff',
+                              color: selectedVeoCut === tab.key ? '#fff' : '#3730a3',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 4
+                            }}
+                            title={tab.role}
+                          >
+                            <span>{tab.label}</span>
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   )}
 
@@ -1861,15 +2041,15 @@ export default function StoryStudioPanel() {
                     lineHeight: 1.6,
                     fontFamily: 'monospace',
                     marginBottom: 8,
-                    maxHeight: 85,
+                    maxHeight: 95,
                     overflowY: 'auto'
                   }}>
                     {(() => {
                       if (promptType === 'nano') return story.englishPrompt;
-                      const cuts = generateVeo3CutPrompts(story.englishPrompt, story.title, story.episodeNum);
+                      const cuts = generateVeo3CutPrompts(story.englishPrompt, story.title, story.episodeNum, { dialogue: story.dialogue });
                       if (selectedVeoCut === 'scene1') return `[Scene 1 / 建築全景] ${story.veoPromptScene1 || cuts.scene1}`;
                       if (selectedVeoCut === 'scene2') return `[Scene 2 / 木造美] ${story.veoPromptScene2 || cuts.scene2}`;
-                      if (selectedVeoCut === 'scene3') return `[Scene 3 / 生活実感] ${story.veoPromptScene3 || cuts.scene3}`;
+                      if (selectedVeoCut === 'scene3') return `[Scene 3 / 生活実感・セリフ] ${story.veoPromptScene3 || cuts.scene3}`;
                       return `[Scene 1]\n${story.veoPromptScene1 || cuts.scene1}\n\n[Scene 2]\n${story.veoPromptScene2 || cuts.scene2}\n\n[Scene 3]\n${story.veoPromptScene3 || cuts.scene3}`;
                     })()}
                   </div>
@@ -1878,7 +2058,7 @@ export default function StoryStudioPanel() {
                   {promptType === 'veo' && (
                     <div style={{ fontSize: 10.5, color: '#3b82f6', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 4 }}>
                       <span>🎬</span>
-                      <span>1アカウントで3カット生成し、最大5アカウントで最大15シーンの動画を組み合わせて30〜90秒のマスター動画に仕上げます</span>
+                      <span>1アカウントで3カット生成（Scene 3は日本語台詞二重補強済）。最大5アカウントで15カットを組み合わせて30〜90秒のマスター動画に仕上げます</span>
                     </div>
                   )}
 
@@ -3191,6 +3371,23 @@ export default function StoryStudioPanel() {
                       
                       <div style={{ background: '#eff6ff', padding: '10px 14px', borderRadius: 6, border: '1px solid #bfdbfe', margin: '8px 0', fontSize: 12, color: '#1e40af' }}>
                         🎬 <strong>最大15動画アセットの組み合わせ連携:</strong> 5アカウントのメンバーが各3動画（計15動画）を分担生成し、それらを結合・編集することで、30秒〜90秒のハイクオリティなストーリー動画を共同で仕上げることができます。
+                      </div>
+
+                      {/* 🗣️ Veo 3 日本語台詞発話・英語化防止運用仕様 */}
+                      <div style={{ background: '#f5f3ff', padding: '14px 16px', borderRadius: 8, border: '1.5px solid #8b5cf6', margin: '12px 0', fontSize: 12, color: '#5b21b6' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                          <span style={{ fontSize: 15 }}>🗣️</span>
+                          <strong style={{ fontSize: 13, color: '#6d28d9' }}>
+                            Veo 3 役者セリフを確実に日本語で喋らせる運用仕様（英語化防止）
+                          </strong>
+                        </div>
+                        <div style={{ lineHeight: 1.7 }}>
+                          Veo 3で英語プロンプトを用いて動画を生成する際、プロンプトのコンテキストに引きずられてセリフが英語（"Hello"等）になってしまう現象を防ぐため、以下の確定仕様がシステムに組み込まれています：<br />
+                          1. <strong>言語明示・独立セクション化:</strong> プロンプト末尾に <code>Audio: Japanese spoken dialogue with authentic native Japanese accent...</code> を独立セクションとして配置。<br />
+                          2. <strong>台詞の二重補強:</strong> <code>The character speaks fluent Japanese with precise natural lip-sync: 「〜」</code> により、英語への自動翻訳や発話ブレを完全防止。<br />
+                          3. <strong>画面上で日本語セリフを自由編集:</strong> 各話カードの【🗣️ 役者セリフ】入力欄で台詞を編集するだけで、プロンプト内にリアルタイムで反映され、ワンクリックでコピーできます。<br />
+                          4. <strong>非セリフシーンの英語混入防止:</strong> 外観や建具などセリフのないシーンでも <code>no English speech</code> を明示し、勝手な英語音声の生成を防ぎます。
+                        </div>
                       </div>
 
                       {/* ① フォルダ階層全自動構築ツール（GAS）の解説 */}

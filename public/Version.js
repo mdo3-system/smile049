@@ -57,9 +57,10 @@
 // - 2026/09/26 v0.1.55: Google Drive フォルダ階層全自動構築ツール（GAS動的生成・ワンクリックコピー）、アセット自動判定タグ（話数・カット種別）、推奨ファイル名自動生成＆コピー、Drive内検索直通リンク配備
 // - 2026/09/26 v0.1.56: 公式マニュアル最新化（Google Driveフォルダ自動構築GASの初回承認手順、共有リンク取得3ステップ、アセット自動判定・統一命名運用ガイド完全反映）、管理画面・マニュアルモーダルへのバージョンバッジ配備
 // - 2026/09/28 v0.1.57: X（旧Twitter）140文字厳格制限＆リアルタイム文字数カウンター（X加重判定・全角140文字/半角280文字/URL23文字換算）、尺引き算自動最適化ロジック（formatXPost刷新）、X専用ポスト編集エリア配備完了
+// - 2026/10/04 v0.1.58: Veo 3日本語台詞発話・英語化防止強化（Context Leakage防止構文、独立オーディオセクションAudio: Japanese dialogue...、The character speaks fluent Japanese: 「〜」二重補強タグ、StoryStudio各話セリフ入力・編集・復元UI、英語化防止Tipsアコーディオン、FIXED_LOGIC.md確定仕様追記）
 
-window.APP_VERSION = '0.1.57';
-export const APP_VERSION = '0.1.57';
+window.APP_VERSION = '0.1.58';
+export const APP_VERSION = '0.1.58';
 
 
 

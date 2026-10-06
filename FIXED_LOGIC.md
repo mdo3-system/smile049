@@ -125,6 +125,17 @@
 - **Veo 3（3カット絵コンテ）× 最大5アカウント連携**:
   - 1話あたり3カット（Scene 1: 外観ドローン全景 / Scene 2: シャッター木造ディテール / Scene 3: 雨の日入庫・生活実感）。
   - 最大5アカウント × 3カット = 最大15動画アセットを組み合わせて30〜90秒のマスター動画に仕上げる。
+- **Veo 3 日本語台詞発話・英語化防止確定仕様（Prompt Engineering for Japanese Dialogue）**:
+  - **英語化する主な原因**:
+    1. **言語コンテキストの引きずられ（Context Leakage）**: 指示文全体が英語だと、モデルが英語圏シチュエーションや英語音声を前提と認識し、日本語テキストを英訳して発話してしまう。
+    2. **音声合成・リップシンクの解釈ブレ**: 日本語テキストが英語プロンプト内に埋没していると、トークナイザーや音声合成モジュールが英語の発音やスクリプトを優先して割り当てる。
+    3. **日本語指定の制約不足**: 単に `"こんにちは"` と台詞のみを置くと、「日本語で話す」制約ではなく「メッセージの意図」と解釈されて `"Hello"` 等に置き換わる。
+  - **確実な日本語発話のための3大プロンプト設計原則**:
+    1. **話す言語の明示**: プロンプト冒頭または台詞直前で `The character speaks fluent Japanese.` または `Audio: Japanese spoken dialogue with native accent.` を必ず宣言する。
+    2. **台詞の分離と独立フォーマット**: 映像指示と台詞を混同させず、独立ブロックとして記述する（例: `The character looks at the camera and speaks in Japanese: 「〜」`）。
+    3. **日本語スクリプトの二重補強（独立オーディオセクション）**: 英語の映像・カメラワーク指示の後に、独立したオーディオ指定（`Audio: Japanese dialogue with native Japanese accent. The character speaks fluent Japanese and says: 「セリフ」.`）をセクションとして切り出す。
+  - **非台詞シーンの英語混入防止**:
+    - Scene 1（外観全景）やScene 2（建具）など台詞のないシーンでも、意図しない英語ナレーションや英語音声の発生を防ぐため、`Audio: Natural realistic environmental ambient sound, no English speech.` を明記する。
 - **4大SNS初心者向け貼り付け先ガイド**:
   - **Instagram**: 右側の「キャプションを入力...」枠にCtrl+Vで貼り付け。複数選択で動画＋静止画カルーセル。
   - **YouTube**: YouTube Studio「動画をアップロード」➡「タイトル」枠に話数タイトル、「説明」枠にCtrl+Vで概要欄を貼り付け。サムネイル設定。
