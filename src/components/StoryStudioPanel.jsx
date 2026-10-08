@@ -280,7 +280,7 @@ const generateStoriesByAi = (themeTitle, protagonist, storyCount, themeDesc, pre
       '作って本当に良かった。毎日の暮らしがこんなに快適で楽しくなるなんて'
     ];
     const dialogue = phaseData.dialogue || defaultDialogueList[(i - 1) % defaultDialogueList.length];
-    const cuts = generateVeo3CutPrompts(englishPrompt, epTitle, i, { dialogue });
+    const cuts = generateVeo3CutPrompts(englishPrompt, epTitle, i, { dialogue, protagonist: protagonist || presetData?.protagonist });
 
     const storyObj = {
       id: `story_${Date.now()}_${i}`,
@@ -470,7 +470,7 @@ export default function StoryStudioPanel() {
 
     // STORY_ARCSをバイパスして直接生成
     const newStories = scenarioPhases.map((ph, idx) => {
-      const cuts = generateVeo3CutPrompts(ph.englishPrompt, `${themeTitle} ${ph.subTitle}`, idx + 1, { dialogue: ph.dialogue });
+      const cuts = generateVeo3CutPrompts(ph.englishPrompt, `${themeTitle} ${ph.subTitle}`, idx + 1, { dialogue: ph.dialogue, protagonist });
       const storyObj = {
         id: `story_${Date.now()}_${idx + 1}`,
         episodeNum: idx + 1,
@@ -517,7 +517,7 @@ export default function StoryStudioPanel() {
   const handleUpdateDialogue = (storyIndex, newDialogue) => {
     const updated = [...stories];
     const story = updated[storyIndex];
-    const cuts = generateVeo3CutPrompts(story.englishPrompt, story.title, story.episodeNum, { dialogue: newDialogue });
+    const cuts = generateVeo3CutPrompts(story.englishPrompt, story.title, story.episodeNum, { dialogue: newDialogue, protagonist: story.protagonist || customProtagonist });
     updated[storyIndex] = {
       ...story,
       dialogue: newDialogue,
@@ -1815,7 +1815,7 @@ export default function StoryStudioPanel() {
 
                     {/* コピーボタン */}
                     {(() => {
-                      const cuts = generateVeo3CutPrompts(story.englishPrompt, story.title, story.episodeNum, { dialogue: story.dialogue });
+                      const cuts = generateVeo3CutPrompts(story.englishPrompt, story.title, story.episodeNum, { dialogue: story.dialogue, protagonist: story.protagonist || customProtagonist });
                       const targetText = promptType === 'nano'
                         ? story.englishPrompt
                         : selectedVeoCut === 'scene1'
@@ -1824,7 +1824,7 @@ export default function StoryStudioPanel() {
                         ? (story.veoPromptScene2 || cuts.scene2)
                         : selectedVeoCut === 'scene3'
                         ? (story.veoPromptScene3 || cuts.scene3)
-                        : `[Cut 1: Drone Wide Shot]\n${story.veoPromptScene1 || cuts.scene1}\n\n[Cut 2: Timber & Shutter Detail]\n${story.veoPromptScene2 || cuts.scene2}\n\n[Cut 3: Rainy Day Lifestyle]\n${story.veoPromptScene3 || cuts.scene3}`;
+                        : `【Scene 1: 外観・ドローン全景】\n${story.veoPromptScene1 || cuts.scene1}\n\n【Scene 2: シャッター・木造現し構造】\n${story.veoPromptScene2 || cuts.scene2}\n\n【Scene 3: 雨の日入庫・生活実感（セリフ）】\n${story.veoPromptScene3 || cuts.scene3}`;
 
                       const copyKeyId = `prompt_${story.id}_${promptType}_${selectedVeoCut}`;
 
@@ -1850,7 +1850,7 @@ export default function StoryStudioPanel() {
                             {copiedKey === copyKeyId 
                               ? 'コピー完了' 
                               : (promptType === 'veo' 
-                                  ? (selectedVeoCut === 'all' ? '全3カット一括コピー' : `${selectedVeoCut.toUpperCase()}をコピー`)
+                                  ? (selectedVeoCut === 'all' ? '全3カット一括コピー（100%日本語）' : `${selectedVeoCut.toUpperCase()}をコピー（100%日本語）`)
                                   : '作画プロンプトをコピー')}
                           </span>
                         </button>
@@ -1858,7 +1858,7 @@ export default function StoryStudioPanel() {
                     })()}
                   </div>
 
-                  {/* Veo 3 選択時の役者セリフ（日本語発話・英語化防止）入力エリア ＆ 絵コンテ 3カット切り替えセレクター */}
+                  {/* Veo 3 選択時の役者セリフ（日本語発話・年代厳格指定）入力エリア ＆ 絵コンテ 3カット切り替えセレクター */}
                   {promptType === 'veo' && (
                     <div style={{ marginBottom: 8 }}>
                       {/* 🗣️ 役者セリフ（日本語台詞）編集ブロック */}
@@ -1872,7 +1872,7 @@ export default function StoryStudioPanel() {
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4, flexWrap: 'wrap', gap: 4 }}>
                           <label style={{ fontSize: 11, fontWeight: 700, color: '#1e293b', display: 'flex', alignItems: 'center', gap: 4 }}>
                             <Mic size={12} color="#2563eb" />
-                            <span>🗣️ 役者セリフ（日本語発話・英語化防止）:</span>
+                            <span>🗣️ 役者セリフ（100%日本語発話＆年代固定）:</span>
                           </label>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                             <span style={{
@@ -1883,7 +1883,7 @@ export default function StoryStudioPanel() {
                               color: story.dialogue ? '#15803d' : '#64748b',
                               fontWeight: 700
                             }}>
-                              {story.dialogue ? '🇯🇵 日本語二重補強中（英語化防止）' : '🔇 環境音のみ（英語混入防止）'}
+                              {story.dialogue ? '🇯🇵 100%日本語・年代厳密指定' : '🔇 環境音のみ（英語音声遮断）'}
                             </span>
                             <button
                               type="button"
@@ -1901,7 +1901,7 @@ export default function StoryStudioPanel() {
                               }}
                             >
                               <Info size={11} />
-                              <span>{showDialogueTips ? 'Tipsを閉じる' : '英語化防止の3原則'}</span>
+                              <span>{showDialogueTips ? '閉じる' : '100%日本語・年代固定の仕組み'}</span>
                             </button>
                           </div>
                         </div>
@@ -1972,7 +1972,7 @@ export default function StoryStudioPanel() {
                           )}
                         </div>
 
-                        {/* 英語化防止Tipsアコーディオン */}
+                        {/* 100%日本語・年代固定Tipsアコーディオン */}
                         {showDialogueTips && (
                           <div style={{
                             marginTop: 6,
@@ -1985,12 +1985,12 @@ export default function StoryStudioPanel() {
                             lineHeight: 1.5
                           }}>
                             <div style={{ fontWeight: 700, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
-                              <span>💡 なぜVeo 3でセリフが英語化するのか？（Context Leakageと解決策）</span>
+                              <span>💡 100%日本語プロンプト＆年代ブレ防止仕様</span>
                             </div>
                             <ul style={{ margin: 0, paddingLeft: 16 }}>
-                              <li><strong>英語コンテキストの引きずられ</strong>: 指示文全体が英語だと、モデルが英語音声出力を基本前提として日本語台詞を勝手に翻訳してしまいます。</li>
-                              <li><strong>日本語発話の二重補強</strong>: 本システムでは <code>Audio: Japanese spoken dialogue with authentic native Japanese accent... The character speaks fluent Japanese: 「〜」</code> を独立セクションとして自動付与し、英語への自動翻訳や発話ブレを完全防止しています。</li>
-                              <li><strong>非セリフシーンの英語混入防止</strong>: セリフがないシーン（外観・建具など）でも <code>no English speech</code> を明示し、勝手な英語音声の生成を防ぎます。</li>
+                              <li><strong>100%日本語指示</strong>: 英語プロンプトによる音声やシチュエーションの誤認識（Context Leakage）を完全に排除し、映像指示・カメラワーク・音声を100%日本語で生成します。</li>
+                              <li><strong>年代固定（50代夫婦の若返り防止）</strong>: 50代設定の場合、「50代の落ち着いた日本人夫婦（50代相応の大人の佇まい、自然な笑いジワ、白髪交じりのナチュラルな髪型、若作りではない実年齢50代の自然な風貌）」を自動付加し、30代などに若返ってしまう現象を厳格に防止します。</li>
+                              <li><strong>音声トラックの分離</strong>: セリフ付きシーンでは「日本語ネイティブ発音・正確なリップシンク」を指定し、非セリフシーンでは「環境音のみ・英語音声なし」を明示しています。</li>
                             </ul>
                           </div>
                         )}
@@ -2030,7 +2030,7 @@ export default function StoryStudioPanel() {
                     </div>
                   )}
 
-                  {/* 英語プロンプト枠 */}
+                  {/* 100%日本語プロンプト枠 */}
                   <div style={{
                     background: promptType === 'veo' ? '#0b1329' : '#0f172a',
                     color: promptType === 'veo' ? '#93c5fd' : '#94a3b8',
@@ -2041,16 +2041,16 @@ export default function StoryStudioPanel() {
                     lineHeight: 1.6,
                     fontFamily: 'monospace',
                     marginBottom: 8,
-                    maxHeight: 95,
+                    maxHeight: 110,
                     overflowY: 'auto'
                   }}>
                     {(() => {
                       if (promptType === 'nano') return story.englishPrompt;
-                      const cuts = generateVeo3CutPrompts(story.englishPrompt, story.title, story.episodeNum, { dialogue: story.dialogue });
-                      if (selectedVeoCut === 'scene1') return `[Scene 1 / 建築全景] ${story.veoPromptScene1 || cuts.scene1}`;
-                      if (selectedVeoCut === 'scene2') return `[Scene 2 / 木造美] ${story.veoPromptScene2 || cuts.scene2}`;
-                      if (selectedVeoCut === 'scene3') return `[Scene 3 / 生活実感・セリフ] ${story.veoPromptScene3 || cuts.scene3}`;
-                      return `[Scene 1]\n${story.veoPromptScene1 || cuts.scene1}\n\n[Scene 2]\n${story.veoPromptScene2 || cuts.scene2}\n\n[Scene 3]\n${story.veoPromptScene3 || cuts.scene3}`;
+                      const cuts = generateVeo3CutPrompts(story.englishPrompt, story.title, story.episodeNum, { dialogue: story.dialogue, protagonist: story.protagonist || customProtagonist });
+                      if (selectedVeoCut === 'scene1') return `【Scene 1 / 建築全景】${story.veoPromptScene1 || cuts.scene1}`;
+                      if (selectedVeoCut === 'scene2') return `【Scene 2 / 木造美】${story.veoPromptScene2 || cuts.scene2}`;
+                      if (selectedVeoCut === 'scene3') return `【Scene 3 / 生活実感・セリフ】${story.veoPromptScene3 || cuts.scene3}`;
+                      return `【Scene 1】\n${story.veoPromptScene1 || cuts.scene1}\n\n【Scene 2】\n${story.veoPromptScene2 || cuts.scene2}\n\n【Scene 3】\n${story.veoPromptScene3 || cuts.scene3}`;
                     })()}
                   </div>
 
@@ -2058,7 +2058,7 @@ export default function StoryStudioPanel() {
                   {promptType === 'veo' && (
                     <div style={{ fontSize: 10.5, color: '#3b82f6', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 4 }}>
                       <span>🎬</span>
-                      <span>1アカウントで3カット生成（Scene 3は日本語台詞二重補強済）。最大5アカウントで15カットを組み合わせて30〜90秒のマスター動画に仕上げます</span>
+                      <span>Google Gemini / Veo 3 にこのまま日本語で入力できます。1話あたり3カット（Scene 3は年代固定＆日本語台詞指定済）を生成します</span>
                     </div>
                   )}
 

@@ -200,19 +200,63 @@ export const DEFAULT_STORIES = [
 ];
 
 /**
- * Veo 3 日本語台詞発話二重補強ブロックを生成
- * 英語プロンプトのコンテキストリークを防ぎ、指定した日本語テキストをネイティブ発音・正確なリップシンクで発話させます
+ * 登場人物・ターゲットから年代・ペルソナ属性を抽出し、AIによる若返り（30代化）を防ぐ詳細指定を生成
+ * 例: 50代夫婦が30代に見えてしまう現象を防止し、自然な50代相応の佇まいを厳密に指示
  */
-export const buildVeoDialogueBlock = (text, characterDescription = 'The character') => {
-  const cleanText = (text || '').replace(/[「」"']/g, '').trim();
-  if (!cleanText) {
-    return 'Audio: Natural realistic Japanese suburban ambient environmental sound, gentle breeze, quiet peaceful atmosphere, strictly no speech, no English narration.';
+export const buildCharacterAgeDetail = (protagonistOrText = '') => {
+  const text = protagonistOrText || '';
+  
+  if (/50代|5[0-9]歳|五十代/i.test(text)) {
+    return {
+      ageLabel: '50代',
+      description: '50代の落ち着いた日本人夫婦（50代相応の落ち着いた大人の佇まい、自然な目元の笑いジワ、上品で控えめな普段着、白髪交じりのナチュラルな髪型、30代のような若作りではない実年齢50代の自然で品のある風貌）'
+    };
   }
-  return `Audio: Authentic Japanese spoken dialogue with clear native Japanese accent and natural acoustics. ${characterDescription} speaks in Japanese with precise natural lip-sync: 「${cleanText}」. Strictly NO English speech, NO English translation.`;
+  if (/60代|6[0-9]歳|六十代|シニア|定年/i.test(text)) {
+    return {
+      ageLabel: '60代',
+      description: '60代の穏やかな日本人シニア夫婦（人生経験を感じさせる優しい目元と温かな笑顔、自然なグレイヘア、落ち着いた上質な普段着、等身大の60代シニアの佇まい）'
+    };
+  }
+  if (/40代|4[0-9]歳|四十代/i.test(text)) {
+    return {
+      ageLabel: '40代',
+      description: '40代の日本人夫婦（落ち着いた共働き世代の佇まい、大人の自然な笑顔、清潔感のある上品なカジュアルウェア、等身大の40代の落ち着き）'
+    };
+  }
+  if (/30代|3[0-9]歳|三十代|子育て/i.test(text)) {
+    return {
+      ageLabel: '30代',
+      description: '30代の日本人子育て世代・夫婦（等身大の30代の明るい表情、動きやすく清潔感のある普段着、自然な日常の笑顔）'
+    };
+  }
+  // 指定テキストがある場合はそれを尊重しつつ等身大ディテールを付与
+  if (text.trim()) {
+    return {
+      ageLabel: text.slice(0, 15),
+      description: `${text}（過度な若作りやモデル調の演出を排した、自然で親しみやすい等身大の日本人の落ち着いた風貌・普段着）`
+    };
+  }
+  return {
+    ageLabel: '等身大の家族',
+    description: '落ち着いた佇まいの日本人家族（過度な若作りやモデル調の誇張を排した、自然で親しみやすい等身大の日本の一般家庭の風貌）'
+  };
 };
 
 /**
- * Veo 3（Google AI Pro / VideoFX）用シネマティック4K動画生成プロンプト（単一・メインカット）
+ * Veo 3 日本語台詞発話・音声トラック指定ブロックを生成
+ * 100%日本語のみで構成し、英語音声の混入や英語翻訳を完全に遮断します
+ */
+export const buildVeoDialogueBlock = (text, characterDescription = '登場人物') => {
+  const cleanText = (text || '').replace(/[「」"']/g, '').trim();
+  if (!cleanText) {
+    return '【音声トラック】環境音（日本の住宅街の静かな風の音、遠くの穏やかな生活環境音）のみ。人の声・ナレーション・英語音声は一切含めない。';
+  }
+  return `【発話音声・日本語セリフ】自然な日本語ネイティブの発音と正確な口の動き（リップシンク）で、${characterDescription}が「${cleanText}」と日本語で話す。英語音声・英語ナレーション・翻訳音声は一切なし。`;
+};
+
+/**
+ * Veo 3（Google AI Pro / VideoFX）用 100%日本語動画生成プロンプト（単一・メインカット）
  */
 export const generateVeoPrompt = (englishPrompt, title = '', episodeNum = 1, options = {}) => {
   const cuts = generateVeo3CutPrompts(englishPrompt, title, episodeNum, options);
@@ -220,9 +264,9 @@ export const generateVeoPrompt = (englishPrompt, title = '', episodeNum = 1, opt
 };
 
 /**
- * Veo 3（Google AI Pro / VideoFX）用 3カット連動・絵コンテプロンプト生成
- * 1アカウントあたり3つの異なるシネマティックカット（外観全景 / 開口木造ディテール / 生活実感雨の日）を生成
- * 役者セリフの英語化（Context Leakage）を防止するため、冒頭言語Prefix・独立オーディオセクション・二重補強タグを採用
+ * Veo 3（Google AI Pro / VideoFX）用 100%日本語 3カット連動・絵コンテプロンプト生成
+ * 英語の指示を一切排除し、100%日本語のみで精密に指示
+ * 年代ブレ防止（50代夫婦が30代にならない厳格な外見・年齢指定）を完全実装
  */
 export const generateVeo3CutPrompts = (englishPrompt, title = '', episodeNum = 1, options = {}) => {
   // optionsが文字列の場合は直接dialogueとして解釈
@@ -231,11 +275,10 @@ export const generateVeo3CutPrompts = (englishPrompt, title = '', episodeNum = 1
     : (options?.dialogue !== undefined ? options.dialogue : null);
   const includeDialogue = options?.includeDialogue !== false; // デフォルトtrue
   const dialogueScene = options?.dialogueScene || 'scene3'; // デフォルトは役者の生活実感シーン（Scene 3）
+  const protagonist = options?.protagonist || options?.target || '';
 
-  let clean = (englishPrompt || '')
-    .replace(/^8k (cinematic photograph|illustration style|intimate lifestyle photography|architectural photography|warm lifestyle photography|cinematic wide shot),?\s*/i, '')
-    .replace(/photorealistic( rendering| masterpiece)?\.?/gi, '')
-    .trim();
+  // 年代・ペルソナの厳格な外見ディテールを取得
+  const characterInfo = buildCharacterAgeDetail(protagonist || title || englishPrompt);
 
   // デフォルト台詞の解決（指定がなければエピソード番号に応じたデフォルトセリフ）
   const defaultDialogues = [
@@ -253,51 +296,42 @@ export const generateVeo3CutPrompts = (englishPrompt, title = '', episodeNum = 1
 
   // カット1: 外観・ドローン全景（建築カメラマン＆ドローンパイロット視点）
   const scene1Motions = [
-    'Cinematic 4k 24fps smooth drone push-in tracking shot over Japanese suburban neighborhood, revealing dark charcoal galvalume custom wooden garage attached to renovated house',
-    'Cinematic 4k 24fps majestic low-angle wide tilt-up camera movement showing zero-eave roofline and timber structure fitting perfectly on lot',
-    'Cinematic 4k 24fps slow orbiting panoramic crane shot around modern wooden garage at dusk twilight'
+    '日本の閑静な住宅街の上空から、ドローンが滑らかに前進しながら下降するドローンプッシュイン撮影。リノベーションされた日本家屋に隣接する、ダークチャコール色のガルバリウム鋼板仕上げ・軒出ゼロの美しい木造オーダーメイドガレージの全景が映し出される。敷地境界にミリ単位でジャストフィットした建築美、夕暮れの温かな自然光と落ち着いた影のコントラスト。歪みのない精密な建築構図。',
+    '青空を背景に、建物の足元から見上げるローアングル・ワイドティルトアップ撮影。ダークガルバリウム外壁とシャープな軒出ゼロの屋根ライン、木造躯体の精密な重厚感が際立つ。',
+    '夕暮れ時のマジックアワー、温かな庭の照明が灯る中、木造ガレージの周囲を滑らかに旋回するクレーンパノラマ撮影。日本の落ち着いた住宅街の風景に美しく溶け込む佇まい。'
   ];
   const hasScene1Dialogue = (dialogueScene === 'scene1' && includeDialogue && finalDialogue);
-  const scene1Prefix = hasScene1Dialogue
-    ? '[Spoken Audio: Japanese native dialogue ONLY. Absolutely NO English speech. The character speaks in Japanese with natural lip-sync.]'
-    : '[Audio Track: Environmental ambient sound only. Absolutely NO English voice, NO speech, NO narration.]';
   const scene1Audio = hasScene1Dialogue
-    ? buildVeoDialogueBlock(finalDialogue, 'The narrator or character in Japanese neighborhood')
-    : 'Audio: Gentle suburban wind, distant tranquil neighborhood ambiance, quiet atmosphere, strictly no speech, no English voices.';
-  const scene1 = `${scene1Prefix} ${scene1Motions[(episodeNum - 1) % scene1Motions.length]}, ${clean}, crisp architectural symmetry, realistic natural lighting. ${scene1Audio} Photorealistic 4k video.`;
+    ? buildVeoDialogueBlock(finalDialogue, characterInfo.description)
+    : '【音声トラック】環境音（日本の住宅街の静かな風の音、心地よい街の環境音）のみ。人の声・ナレーション・英語音声は一切含めない。';
+  const scene1 = `4K高画質 24fps シネマティック実写映像。${scene1Motions[(episodeNum - 1) % scene1Motions.length]} 実写映画クオリティ。${scene1Audio}`;
 
   // カット2: シャッター開閉・木造現し構造（建築シネマグラファー＆カラリスト視点）
   const scene2Actions = [
-    'Cinematic 4k 24fps eye-level dolly shot moving into garage interior, electric motorized roller shutter smoothly rising, warm LED strip lights illuminating exposed wooden rafters and OSB plywood workbench',
-    'Cinematic 4k 24fps slow-motion tracking shot inside garage, warm wood grain textures, tool wall neatly organized, gentle golden light spilling across polished concrete floor',
-    'Cinematic 4k 24fps panning shot across ceiling wooden timber trusses and dark metallic walls, modern high-end architectural finish'
+    'ガレージ正面からのアイレベル・ドリー前進撮影。電動シャッターが静かに滑らかに巻き上がると、内部の温かみのある木造小屋組み梁（木造現し構造）とOSB合板の壁面、整然と並んだ棚やワークスペースが温白色のLED照明に照らし出される。磨かれた土間コンクリート床に反射する柔らかな光。日本の木造大工技術の高い質感とリアルな物理挙動。',
+    'ガレージ内部のスローモーショントラッキング撮影。無垢の木目テクスチャ、美しく整理されたツールラック、土間コンクリートに差し込む優しい夕暮れの光。木造建築ならではの温もりと機能美。',
+    '天井の木造トラス梁からダークメタリックの外壁へとゆっくりと移動するパン撮影。モダンで洗練された現代木造建築のディテールと素材感。'
   ];
   const hasScene2Dialogue = (dialogueScene === 'scene2' && includeDialogue && finalDialogue);
-  const scene2Prefix = hasScene2Dialogue
-    ? '[Spoken Audio: Japanese native dialogue ONLY. Absolutely NO English speech. The character speaks in Japanese with natural lip-sync.]'
-    : '[Audio Track: Environmental ambient sound only. Absolutely NO English voice, NO speech, NO narration.]';
   const scene2Audio = hasScene2Dialogue
-    ? buildVeoDialogueBlock(finalDialogue, 'The craftsperson or homeowner')
-    : 'Audio: Sound of motorized roller shutter smoothly rolling open, mechanical hum and resonant natural timber acoustic, strictly no speech, no English voice.';
-  const scene2 = `${scene2Prefix} ${scene2Actions[(episodeNum - 1) % scene2Actions.length]}, authentic Japanese timber craftsmanship, realistic physics. ${scene2Audio} 4k 24fps video.`;
+    ? buildVeoDialogueBlock(finalDialogue, characterInfo.description)
+    : '【音声トラック】電動シャッターが静かに巻き上がる心地よい機械音と、木造空間の自然な反響音のみ。人の声・ナレーション・英語音声は一切含めない。';
+  const scene2 = `4K高画質 24fps シネマティック実写映像。${scene2Actions[(episodeNum - 1) % scene2Actions.length]} 実写映画クオリティ。${scene2Audio}`;
 
   // カット3: 雨の日入庫・生活実感の豊かさ（映像ディレクター＆サウンドデザイナー視点）
-  // 役者が登場するメインシーンのため、デフォルトで日本語台詞二重補強ブロックを挿入
+  // 役者が登場するメインシーン：年代指定（50代夫婦等）を厳格に反映
   const scene3Lifestyles = [
-    'Cinematic 4k 24fps slow dolly tracking shot on rainy evening, raindrops softly trickling off galvalume eaves, family car smoothly parking inside dry warm garage, family stepping out without getting wet, warm smiling faces',
-    'Cinematic 4k 24fps heartwarming dusk lifestyle shot, Japanese couple admiring their organized garage space with steaming mugs of coffee, tranquil suburban rain outside',
-    'Cinematic 4k 24fps uplifting morning shot, golden sunrise breaking through morning mist, electric shutter rolling open, family preparing bicycles and car for weekend outing'
+    `雨の降る夕暮れ時、雨粒がガルバリウム鋼板の屋根を静かに伝い落ちる中、乗用車が雨に濡れない乾いた木造ガレージ内部へ滑らかに駐車するスロードリー撮影。車から降り立つ${characterInfo.description}。雨に濡れずに荷物を運び込める安心感と、温かな大人の笑顔。高級感の過度な誇張を排した、等身大の日本の豊かな暮らしの実感。`,
+    `夕暮れ時のガレージ内で、温かいコーヒーマグを手に自分たちだけの整った空間を穏やかに眺め合う${characterInfo.description}。外では静かな雨が降り、ガレージの中は温かい照明と木の香りに包まれている。心温まる大人の日常のひとコマ。`,
+    `清々しい朝の光が差し込む中、電動シャッターを開け、休日のドライブやお出かけの準備をする${characterInfo.description}。自分たちの敷地に合わせたガレージがある暮らしの満足感と笑顔。`
   ];
   const hasScene3Dialogue = (dialogueScene === 'scene3' && includeDialogue && finalDialogue);
-  const scene3Prefix = hasScene3Dialogue
-    ? '[Spoken Audio: Japanese native dialogue ONLY. Absolutely NO English speech. The character speaks in Japanese with natural lip-sync.]'
-    : '[Audio Track: Environmental ambient sound only. Absolutely NO English voice, NO speech, NO narration.]';
   const scene3Audio = hasScene3Dialogue
-    ? buildVeoDialogueBlock(finalDialogue, 'The Japanese family member looks happy and')
-    : 'Audio: Cozy soft rain sound on galvalume eaves, car door softly clicking shut, tranquil suburban life, strictly no speech, no English voices.';
-  const scene3 = `${scene3Prefix} ${scene3Lifestyles[(episodeNum - 1) % scene3Lifestyles.length]}, cozy heartfelt atmosphere, no luxury exaggeration, honest Japanese suburban lifestyle. ${scene3Audio} Photorealistic 4k 24fps video.`;
+    ? buildVeoDialogueBlock(finalDialogue, characterInfo.description)
+    : '【音声トラック】ガルバリウム屋根に当たる静かな雨音、車のドアが静かに閉まる音。人の声・ナレーション・英語音声は一切含めない。';
+  const scene3 = `4K高画質 24fps シネマティック実写映像。${scene3Lifestyles[(episodeNum - 1) % scene3Lifestyles.length]} 実写映画クオリティ。${scene3Audio}`;
 
-  return { scene1, scene2, scene3, dialogue: finalDialogue };
+  return { scene1, scene2, scene3, dialogue: finalDialogue, characterInfo };
 };
 
 /**
@@ -419,11 +453,12 @@ export const getAllStories = () => {
         return parsed.map((s, idx) => {
           const epNum = s.episodeNum || idx + 1;
           const epDialogue = s.dialogue !== undefined ? s.dialogue : (defaultDialogues[(epNum - 1) % defaultDialogues.length] || '');
-          const cuts = generateVeo3CutPrompts(s.englishPrompt, s.title, epNum, { dialogue: epDialogue });
+          const protagonist = s.protagonist || s.target || '';
+          const cuts = generateVeo3CutPrompts(s.englishPrompt, s.title, epNum, { dialogue: epDialogue, protagonist });
           return {
             ...s,
             dialogue: epDialogue,
-            veoPrompt: s.veoPrompt || cuts.scene3 || cuts.scene1,
+            veoPrompt: cuts.scene3 || cuts.scene1,
             veoPromptScene1: cuts.scene1,
             veoPromptScene2: cuts.scene2,
             veoPromptScene3: cuts.scene3,
@@ -439,11 +474,12 @@ export const getAllStories = () => {
   return DEFAULT_STORIES.map((s, idx) => {
     const epNum = s.episodeNum || idx + 1;
     const epDialogue = s.dialogue || defaultDialogues[(epNum - 1) % defaultDialogues.length] || '';
-    const cuts = generateVeo3CutPrompts(s.englishPrompt, s.title, epNum, { dialogue: epDialogue });
+    const protagonist = s.protagonist || s.target || '';
+    const cuts = generateVeo3CutPrompts(s.englishPrompt, s.title, epNum, { dialogue: epDialogue, protagonist });
     return {
       ...s,
       dialogue: epDialogue,
-      veoPrompt: s.veoPrompt || cuts.scene3 || cuts.scene1,
+      veoPrompt: cuts.scene3 || cuts.scene1,
       veoPromptScene1: cuts.scene1,
       veoPromptScene2: cuts.scene2,
       veoPromptScene3: cuts.scene3,
