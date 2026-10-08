@@ -1017,14 +1017,14 @@ export default function StoryStudioPanel() {
             marginBottom: 20
           }}>
             <label style={{ display: 'block', fontSize: 12.5, fontWeight: 800, color: '#5b21b6', marginBottom: 8 }}>
-              ⏱️ ワンソース・マルチユース展開（マスター企画から引き算する尺の選択）
+              ⏱️ ワンソース・マルチユース展開（Gemini 1カット約8〜10秒固定に基づく尺・カット数設計）
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 8 }}>
               {[
-                { sec: 90, label: '90秒（施工事例・YouTube長尺）', desc: '深い理解・世界観型' },
-                { sec: 60, label: '60秒（WEBメインビュー）', desc: 'ブランド・共感型ショート' },
-                { sec: 30, label: '30秒（Shorts / リール王道）', desc: '興味・3D動線型（推奨）' },
-                { sec: 15, label: '15秒（ストーリーズ / 広告）', desc: '認知・衝立型' }
+                { sec: 30, label: '30秒（1話・全3カット / 約24〜30s）', desc: 'Shorts / リール王道（推奨）' },
+                { sec: 60, label: '60秒（2話分・全6カット / 約48〜60s）', desc: 'WEBメイン・ブランド共感型' },
+                { sec: 90, label: '90秒（3話分・全9カット / 約72〜90s）', desc: 'YouTube長尺・施工事例' },
+                { sec: 15, label: '10〜15秒（単独1カット / 約8〜10s）', desc: 'ストーリーズ・バンパー広告' }
               ].map(d => (
                 <button
                   key={d.sec}
@@ -1972,7 +1972,7 @@ export default function StoryStudioPanel() {
                           )}
                         </div>
 
-                        {/* 100%日本語・年代固定Tipsアコーディオン */}
+                        {/* 100%日本語・年代固定・8〜10秒尺最適化Tipsアコーディオン */}
                         {showDialogueTips && (
                           <div style={{
                             marginTop: 6,
@@ -1985,12 +1985,12 @@ export default function StoryStudioPanel() {
                             lineHeight: 1.5
                           }}>
                             <div style={{ fontWeight: 700, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
-                              <span>💡 100%日本語プロンプト＆年代ブレ防止仕様</span>
+                              <span>💡 100%日本語プロンプト＆年代固定＆Gemini（8〜10秒固定）仕様</span>
                             </div>
                             <ul style={{ margin: 0, paddingLeft: 16 }}>
-                              <li><strong>100%日本語指示</strong>: 英語プロンプトによる音声やシチュエーションの誤認識（Context Leakage）を完全に排除し、映像指示・カメラワーク・音声を100%日本語で生成します。</li>
-                              <li><strong>年代固定（50代夫婦の若返り防止）</strong>: 50代設定の場合、「50代の落ち着いた日本人夫婦（50代相応の大人の佇まい、自然な笑いジワ、白髪交じりのナチュラルな髪型、若作りではない実年齢50代の自然な風貌）」を自動付加し、30代などに若返ってしまう現象を厳格に防止します。</li>
-                              <li><strong>音声トラックの分離</strong>: セリフ付きシーンでは「日本語ネイティブ発音・正確なリップシンク」を指定し、非セリフシーンでは「環境音のみ・英語音声なし」を明示しています。</li>
+                              <li><strong>Gemini 1生成＝約8〜10秒固定</strong>: GeminiチャットUIのVeo呼び出しは内部パラメータ固定（約8〜10秒/生成）のため、プロンプト内で「前半0〜4秒（アプローチ） ➔ 後半5〜9秒（見どころ・セリフ発話・余韻）」の2段階タイムライン演出を組み込み、間延びや破綻を防ぎます。</li>
+                              <li><strong>3カット結合で約30秒の王道ショート</strong>: 各話の3カット（Scene 1: 全景 ＋ Scene 2: 木造 ＋ Scene 3: セリフ）をそのまま結合するだけで、YouTube Shorts / Instagram Reelsに最適な約24〜30秒動画が完成します。</li>
+                              <li><strong>100%日本語指示＆年代固定</strong>: 英語プロンプトを完全廃止し、50代設定時は「50代の落ち着いた日本人夫婦（50代相応の大人の佇まい、自然な笑いジワ、白髪交じりのナチュラルな髪型、若作りではない実年齢50代の自然な風貌）」を自動付加して若返りを防止します。</li>
                             </ul>
                           </div>
                         )}
