@@ -195,6 +195,14 @@ export default function Footer({ setCurrentRoute }) {
               </li>
               <li>
                 <button
+                  onClick={() => { setCurrentRoute('case-01'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  style={{ color: '#38bdf8', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left' }}
+                >
+                  <span style={{ color: '#38bdf8' }}>★</span> 【実例】第1号棟 境界15cm・既存舗装活用
+                </button>
+              </li>
+              <li>
+                <button
                   onClick={() => { setCurrentRoute('stories'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   style={{ color: '#fde047', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left' }}
                 >
@@ -215,7 +223,7 @@ export default function Footer({ setCurrentRoute }) {
           {/* 対応エリア・運営情報 */}
           <div>
             <h4 style={{ fontSize: 15, color: '#fff', marginBottom: 16, borderBottom: '1px solid #334155', paddingBottom: 8 }}>
-              対応エリア ＆ 施工体制
+              対応エリア ＆ 施工体制・許認可
             </h4>
             <div style={{ fontSize: 13, color: '#cbd5e1', lineHeight: 1.8, display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
@@ -237,7 +245,7 @@ export default function Footer({ setCurrentRoute }) {
                 <span>高耐震金物工法・自社専任スタッフによる構造計算実施</span>
               </div>
 
-              {/* 運営事業者情報 */}
+              {/* 運営事業者情報・建設業許可 */}
               <div style={{
                 marginTop: 14,
                 paddingTop: 14,
@@ -246,8 +254,12 @@ export default function Footer({ setCurrentRoute }) {
                 color: '#94a3b8',
                 lineHeight: 1.7
               }}>
-                <div style={{ color: '#f1f5f9', fontWeight: 700 }}>運営事業者：株式会社 住ま居る</div>
+                <div style={{ color: '#f1f5f9', fontWeight: 700, fontSize: 13.5 }}>運営事業者：株式会社 住ま居る</div>
                 <div>所在地：〒350-2224 埼玉県鶴ヶ島市町屋176番地5</div>
+                <div style={{ color: '#cbd5e1', marginTop: 2 }}>
+                  建設業許可：埼玉県知事 許可（般）第60650号<br />
+                  宅地建物取引業者免許：埼玉県知事 (2) 第22198号
+                </div>
                 <div style={{ marginTop: 4, color: '#38bdf8', fontSize: 11.5 }}>
                   ※設計データやパース画像を迅速・正確に共有するため、お問合せ・ご相談は専用オンライン相談チャット（24時間受付）にて承っております。
                 </div>

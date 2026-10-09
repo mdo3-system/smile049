@@ -8,6 +8,7 @@ export default function Header({ currentRoute, setCurrentRoute }) {
 
   const navItems = [
     { id: 'top', label: 'トップ', icon: Home },
+    { id: 'case-01', label: '施工実例 (第1号)', isHighlight: true },
     { id: 'plan-hobby', label: '愛車・ホビー', planNum: '01' },
     { id: 'plan-storage', label: '狭小・変形地', planNum: '02' },
     { id: 'plan-agri', label: '農機具倉庫', planNum: '03' },

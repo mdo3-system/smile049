@@ -137,74 +137,145 @@ export default function TopPage({ setCurrentRoute }) {
       </section>
 
       {/* =========================================================
-          公式WEB連載コラム 最新話バナー
+          公式WEB連載コラム ＆ 施工実例 第1号棟 バナー
          ========================================================= */}
       <section style={{ background: '#f8fafc', padding: '24px 24px 0' }}>
         <div style={{
           maxWidth: 1120,
           margin: '0 auto',
-          background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
-          borderRadius: 14,
-          padding: '20px 24px',
-          color: '#fff',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: 16,
-          boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
-          border: '1px solid rgba(255, 255, 255, 0.1)'
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+          gap: 16
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 260, flex: 1 }}>
-            <div style={{
-              width: 44,
-              height: 44,
-              borderRadius: 10,
-              background: 'rgba(64, 145, 108, 0.3)',
-              color: '#80ed99',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0
-            }}>
-              <BookOpen size={22} />
-            </div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-                <span style={{ background: '#2563eb', color: '#fff', fontSize: 10.5, fontWeight: 800, padding: '1px 6px', borderRadius: 4 }}>
-                  連載コラム
-                </span>
-                <span style={{ fontSize: 11.5, color: '#94a3b8' }}>
-                  第{latestStory?.episodeNum || 1}話 公開中
-                </span>
+          {/* ① 施工実例 第1号棟バナー */}
+          <div style={{
+            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            borderRadius: 14,
+            padding: '18px 22px',
+            color: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 14,
+            boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+            border: '1px solid rgba(56, 189, 248, 0.3)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 200, flex: 1 }}>
+              <div style={{
+                width: 44,
+                height: 44,
+                borderRadius: 10,
+                background: 'rgba(56, 189, 248, 0.2)',
+                color: '#38bdf8',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0
+              }}>
+                <Building2 size={22} />
               </div>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: '#f8fafc', lineHeight: 1.3 }}>
-                {latestStory?.title || '木造自由設計ガレージ物語'}
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+                  <span style={{ background: '#0284c7', color: '#fff', fontSize: 10.5, fontWeight: 800, padding: '1px 6px', borderRadius: 4 }}>
+                    施工実例
+                  </span>
+                  <span style={{ fontSize: 11, color: '#38bdf8', fontWeight: 700 }}>
+                    第1号棟 完工レポート
+                  </span>
+                </div>
+                <div style={{ fontSize: 13.5, fontWeight: 800, color: '#f8fafc', lineHeight: 1.3 }}>
+                  敷地境界15cm × 既存アスファルト活用
+                </div>
               </div>
             </div>
+
+            <button
+              onClick={() => navigateTo('case-01')}
+              style={{
+                background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 8,
+                padding: '9px 16px',
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                whiteSpace: 'nowrap',
+                boxShadow: '0 2px 8px rgba(2, 132, 199, 0.4)'
+              }}
+            >
+              <span>現場写真を見る</span>
+              <ChevronRight size={15} />
+            </button>
           </div>
 
-          <button
-            onClick={() => navigateTo('stories')}
-            style={{
-              background: 'linear-gradient(135deg, var(--color-primary) 0%, #2d6a4f 100%)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 8,
-              padding: '10px 20px',
-              fontSize: 13.5,
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              whiteSpace: 'nowrap',
-              boxShadow: '0 2px 8px rgba(64, 145, 108, 0.3)'
-            }}
-          >
-            <span>連載ストーリーを読む</span>
-            <ChevronRight size={16} />
-          </button>
+          {/* ② 連載コラムバナー */}
+          <div style={{
+            background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+            borderRadius: 14,
+            padding: '18px 22px',
+            color: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 14,
+            boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.1)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 200, flex: 1 }}>
+              <div style={{
+                width: 44,
+                height: 44,
+                borderRadius: 10,
+                background: 'rgba(64, 145, 108, 0.3)',
+                color: '#80ed99',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0
+              }}>
+                <BookOpen size={22} />
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+                  <span style={{ background: '#2563eb', color: '#fff', fontSize: 10.5, fontWeight: 800, padding: '1px 6px', borderRadius: 4 }}>
+                    連載コラム
+                  </span>
+                  <span style={{ fontSize: 11, color: '#94a3b8' }}>
+                    第{latestStory?.episodeNum || 1}話 公開中
+                  </span>
+                </div>
+                <div style={{ fontSize: 13.5, fontWeight: 800, color: '#f8fafc', lineHeight: 1.3 }}>
+                  {latestStory?.title || '木造自由設計ガレージ物語'}
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => navigateTo('stories')}
+              style={{
+                background: 'linear-gradient(135deg, var(--color-primary) 0%, #2d6a4f 100%)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 8,
+                padding: '9px 16px',
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                whiteSpace: 'nowrap',
+                boxShadow: '0 2px 8px rgba(64, 145, 108, 0.3)'
+              }}
+            >
+              <span>読む</span>
+              <ChevronRight size={15} />
+            </button>
+          </div>
         </div>
       </section>
 
@@ -725,6 +796,123 @@ export default function TopPage({ setCurrentRoute }) {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================
+          【実例で証明】現場写真で見るスマイチの施工力（第1号棟）
+         ========================================================= */}
+      <section style={{
+        background: 'linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%)',
+        padding: '80px 24px',
+        borderTop: '1px solid var(--border-light)',
+        borderBottom: '1px solid var(--border-light)'
+      }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+          <div className="section-header">
+            <span className="section-tag" style={{ background: '#0284c7', color: '#ffffff' }}>
+              リアルな施工実績
+            </span>
+            <h2 className="section-title">
+              【実例】敷地境界15cm × 既存アスファルト活用<br />
+              規格品で断られた厳しい敷地に、3ヶ月で完工。
+            </h2>
+            <p className="section-desc">
+              「大手メーカーでは手配がバラバラで断念した」「既存のアスファルトを壊さずに安く建てたい」――。<br />
+              実際の現場で撮影された120枚超の写真とともに、スマイチの確かな施工力を公開しています。
+            </p>
+          </div>
+
+          <div style={{
+            background: '#ffffff',
+            borderRadius: 16,
+            padding: '32px',
+            boxShadow: '0 10px 25px -5px rgba(0,0,0,0.06)',
+            border: '1px solid #cbd5e1',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: 28,
+            alignItems: 'center',
+            marginBottom: 30
+          }}>
+            {/* 左側：完成写真＋施工中ミニギャラリー */}
+            <div>
+              <div style={{
+                position: 'relative',
+                borderRadius: 10,
+                overflow: 'hidden',
+                height: 230,
+                marginBottom: 12,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+              }}>
+                <img 
+                  src="/assets/construction/01/IMG_1840.JPG" 
+                  alt="スマイチ第1号棟 完成全景" 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+                <div style={{
+                  position: 'absolute',
+                  bottom: 10,
+                  left: 10,
+                  background: 'rgba(15, 23, 42, 0.85)',
+                  color: '#fff',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  padding: '4px 10px',
+                  borderRadius: 6
+                }}>
+                  第1号棟 完成写真（事業用特注ガレージ）
+                </div>
+              </div>
+
+              {/* ミニ写真3枚 */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+                <div style={{ height: 70, borderRadius: 6, overflow: 'hidden' }}>
+                  <img src="/assets/construction/01/IMG_1623.jpeg" alt="基礎工事" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+                <div style={{ height: 70, borderRadius: 6, overflow: 'hidden' }}>
+                  <img src="/assets/construction/01/IMG_1676.jpeg" alt="木造建て方" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+                <div style={{ height: 70, borderRadius: 6, overflow: 'hidden' }}>
+                  <img src="/assets/construction/01/IMG_1794.jpeg" alt="内部棚造作" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+              </div>
+            </div>
+
+            {/* 右側：解説＆メリット */}
+            <div>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#0284c7', fontWeight: 800, fontSize: 13, marginBottom: 8 }}>
+                <ShieldCheck size={18} />
+                <span>施主様のご要望を100%実現した木造ワンストップ</span>
+              </div>
+              <h3 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', marginBottom: 14, lineHeight: 1.4 }}>
+                既存アスファルトと車止めをそのまま活かし、余分な解体費用ゼロで完工。
+              </h3>
+              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: 10, fontSize: 14, color: '#334155' }}>
+                <li style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                  <Check size={18} color="#16a34a" style={{ flexShrink: 0, marginTop: 2 }} />
+                  <span><strong>隣地境界から実質15cm：</strong> 駐車スペース2台分を無駄なくミリ単位活用</span>
+                </li>
+                <li style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                  <Check size={18} color="#16a34a" style={{ flexShrink: 0, marginTop: 2 }} />
+                  <span><strong>完全ワンストップ：</strong> 確認申請・基礎・建て方・電気まで窓口ひとつで3ヶ月完工</span>
+                </li>
+                <li style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                  <Check size={18} color="#16a34a" style={{ flexShrink: 0, marginTop: 2 }} />
+                  <span><strong>工事中の棚追加も自在：</strong> 木造軸組だから使い勝手に応じた棚をその場で造作</span>
+                </li>
+              </ul>
+
+              <button
+                onClick={() => navigateTo('case-01')}
+                className="btn-accent"
+                style={{ fontSize: 14.5, padding: '12px 24px', display: 'inline-flex', alignItems: 'center', gap: 8 }}
+              >
+                <span>全工程の現場写真・詳細レポートを見る</span>
+                <ChevronRight size={16} />
+              </button>
+            </div>
           </div>
         </div>
       </section>
