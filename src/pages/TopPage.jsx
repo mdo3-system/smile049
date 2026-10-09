@@ -884,23 +884,23 @@ export default function TopPage({ setCurrentRoute }) {
             <div>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#0284c7', fontWeight: 800, fontSize: 13, marginBottom: 8 }}>
                 <ShieldCheck size={18} />
-                <span>大手規格品が断る条件も木造自由設計ならすべて余裕で実現</span>
+                <span>市街化区域（法22条）も、市街化調整区域も、どちらも正規ワンストップ対応</span>
               </div>
               <h3 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', marginBottom: 14, lineHeight: 1.4 }}>
-                市街化調整区域、境界15cm、特殊寸法——どんな厳しい敷地・法令条件も自社一括対応。
+                鶴ヶ島市（法22条・境界15cm）も、調整区域（適合証明・特注寸法）も自社で検査合格。
               </h3>
               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: 10, fontSize: 14, color: '#334155' }}>
                 <li style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                   <Check size={18} color="#16a34a" style={{ flexShrink: 0, marginTop: 2 }} />
-                  <span><strong>市街化調整区域の許可＆検査済証取得：</strong> 埼玉県への適合証明・確認申請・完了検査まで一級建築士が完全代行</span>
+                  <span><strong>【実例】市街化調整区域：</strong> 埼玉県への適合証明・確認申請・完了検査まで一級建築士が完全代行（W2.73×D6.37m特注）</span>
                 </li>
                 <li style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                   <Check size={18} color="#16a34a" style={{ flexShrink: 0, marginTop: 2 }} />
-                  <span><strong>間口・奥行きミリ単位の特注寸法：</strong> 農機具スペースや勝手口直結ドアなど、生活動線に合わせた自由設計</span>
+                  <span><strong>【実例】鶴ヶ島市・市街化区域（法22条）：</strong> 防火指定をクリアし、隣地境界15cm・既存アスファルト活用でコスト半減</span>
                 </li>
                 <li style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                   <Check size={18} color="#16a34a" style={{ flexShrink: 0, marginTop: 2 }} />
-                  <span><strong>境界15cm・既存舗装活用：</strong> 余分な解体費用をカットし、敷地をミリ単位で限界活用</span>
+                  <span><strong>大手規格品で断られた案件も余裕で解決：</strong> 基礎・大工・電気・行政手続きまで窓口ひとつで完工</span>
                 </li>
               </ul>
 
