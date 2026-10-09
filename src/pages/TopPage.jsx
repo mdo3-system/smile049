@@ -180,17 +180,17 @@ export default function TopPage({ setCurrentRoute }) {
                     施工実例
                   </span>
                   <span style={{ fontSize: 11, color: '#38bdf8', fontWeight: 700 }}>
-                    第1号棟 完工レポート
+                    市街化調整区域・境界15cm・特注寸法
                   </span>
                 </div>
                 <div style={{ fontSize: 13.5, fontWeight: 800, color: '#f8fafc', lineHeight: 1.3 }}>
-                  敷地境界15cm × 既存アスファルト活用
+                  大手規格品が断る難条件も木造自由設計なら余裕で実現
                 </div>
               </div>
             </div>
 
             <button
-              onClick={() => navigateTo('case-01')}
+              onClick={() => navigateTo('case-studies')}
               style={{
                 background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
                 color: '#fff',
@@ -207,7 +207,7 @@ export default function TopPage({ setCurrentRoute }) {
                 boxShadow: '0 2px 8px rgba(2, 132, 199, 0.4)'
               }}
             >
-              <span>現場写真を見る</span>
+              <span>現場施工実例を見る</span>
               <ChevronRight size={15} />
             </button>
           </div>
@@ -847,8 +847,8 @@ export default function TopPage({ setCurrentRoute }) {
                 boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
               }}>
                 <img 
-                  src="/assets/construction/01/IMG_1840.JPG" 
-                  alt="スマイチ第1号棟 完成全景" 
+                  src="/assets/construction/02/IMG_2514.jpeg" 
+                  alt="スマイチ木造自由設計ガレージ 完成全景" 
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
                 <div style={{
@@ -862,20 +862,20 @@ export default function TopPage({ setCurrentRoute }) {
                   padding: '4px 10px',
                   borderRadius: 6
                 }}>
-                  第1号棟 完成写真（事業用特注ガレージ）
+                  実例：市街化調整区域・特注寸法 (W2.73×D6.37) ガレージ
                 </div>
               </div>
 
               {/* ミニ写真3枚 */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
                 <div style={{ height: 70, borderRadius: 6, overflow: 'hidden' }}>
-                  <img src="/assets/construction/01/IMG_1623.jpeg" alt="基礎工事" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src="/assets/construction/02/IMG_2339.jpeg" alt="基礎配筋" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <div style={{ height: 70, borderRadius: 6, overflow: 'hidden' }}>
-                  <img src="/assets/construction/01/IMG_1676.jpeg" alt="木造建て方" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src="/assets/construction/02/IMG_2427.JPG" alt="木造建て方" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <div style={{ height: 70, borderRadius: 6, overflow: 'hidden' }}>
-                  <img src="/assets/construction/01/IMG_1794.jpeg" alt="内部棚造作" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src="/assets/construction/01/IMG_1840.JPG" alt="境界15cm実例" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
               </div>
             </div>
@@ -884,32 +884,32 @@ export default function TopPage({ setCurrentRoute }) {
             <div>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#0284c7', fontWeight: 800, fontSize: 13, marginBottom: 8 }}>
                 <ShieldCheck size={18} />
-                <span>施主様のご要望を100%実現した木造ワンストップ</span>
+                <span>大手規格品が断る条件も木造自由設計ならすべて余裕で実現</span>
               </div>
               <h3 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', marginBottom: 14, lineHeight: 1.4 }}>
-                既存アスファルトと車止めをそのまま活かし、余分な解体費用ゼロで完工。
+                市街化調整区域、境界15cm、特殊寸法——どんな厳しい敷地・法令条件も自社一括対応。
               </h3>
               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: 10, fontSize: 14, color: '#334155' }}>
                 <li style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                   <Check size={18} color="#16a34a" style={{ flexShrink: 0, marginTop: 2 }} />
-                  <span><strong>隣地境界から実質15cm：</strong> 駐車スペース2台分を無駄なくミリ単位活用</span>
+                  <span><strong>市街化調整区域の許可＆検査済証取得：</strong> 埼玉県への適合証明・確認申請・完了検査まで一級建築士が完全代行</span>
                 </li>
                 <li style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                   <Check size={18} color="#16a34a" style={{ flexShrink: 0, marginTop: 2 }} />
-                  <span><strong>完全ワンストップ：</strong> 確認申請・基礎・建て方・電気まで窓口ひとつで3ヶ月完工</span>
+                  <span><strong>間口・奥行きミリ単位の特注寸法：</strong> 農機具スペースや勝手口直結ドアなど、生活動線に合わせた自由設計</span>
                 </li>
                 <li style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                   <Check size={18} color="#16a34a" style={{ flexShrink: 0, marginTop: 2 }} />
-                  <span><strong>工事中の棚追加も自在：</strong> 木造軸組だから使い勝手に応じた棚をその場で造作</span>
+                  <span><strong>境界15cm・既存舗装活用：</strong> 余分な解体費用をカットし、敷地をミリ単位で限界活用</span>
                 </li>
               </ul>
 
               <button
-                onClick={() => navigateTo('case-01')}
+                onClick={() => navigateTo('case-studies')}
                 className="btn-accent"
                 style={{ fontSize: 14.5, padding: '12px 24px', display: 'inline-flex', alignItems: 'center', gap: 8 }}
               >
-                <span>全工程の現場写真・詳細レポートを見る</span>
+                <span>現場施工実例（全工程写真レポート）を見る</span>
                 <ChevronRight size={16} />
               </button>
             </div>

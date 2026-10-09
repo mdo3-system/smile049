@@ -195,10 +195,10 @@ export default function Footer({ setCurrentRoute }) {
               </li>
               <li>
                 <button
-                  onClick={() => { setCurrentRoute('case-01'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  onClick={() => { setCurrentRoute('case-studies'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   style={{ color: '#38bdf8', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left' }}
                 >
-                  <span style={{ color: '#38bdf8' }}>★</span> 【実例】第1号棟 境界15cm・既存舗装活用
+                  <span style={{ color: '#38bdf8' }}>★</span> 【施工実例】市街化調整区域・境界15cm・特注寸法
                 </button>
               </li>
               <li>
