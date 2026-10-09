@@ -471,3 +471,13 @@ export function generateAutoColumn(themeTitle, category = 'お悩み解決・ノ
   };
   return saveColumn(newCol);
 }
+
+/**
+ * コラムを削除（カスタム追加分）またはアーカイブ
+ */
+export function deleteColumn(id) {
+  const custom = getCustomColumns().filter(c => c.id !== id);
+  localStorage.setItem(CUSTOM_COLUMNS_KEY, JSON.stringify(custom));
+  return true;
+}
+
