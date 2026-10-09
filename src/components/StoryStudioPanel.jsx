@@ -4,7 +4,7 @@ import {
   Trash2, RefreshCw, Layers, CheckCircle2, ChevronDown, ChevronRight, 
   BookOpen, HelpCircle, Upload, ShieldCheck, ArrowRight, DollarSign, Vote,
   Calendar, Video, Film, Play, FolderOpen, Link as LinkIcon, Key, HardDrive, Share2,
-  Search, Zap, Tag, FileText, MessageSquare, Mic, Volume2, Info
+  Search, Zap, Tag, FileText, MessageSquare, Mic, Volume2, Info, Lightbulb, Plus, Eye
 } from 'lucide-react';
 import { InstagramIcon, YoutubeIcon, NoteIcon, XIcon } from './SnsIcons';
 import { 
@@ -14,6 +14,9 @@ import {
   generateAssetFileName, getAutoDetectedAssetInfo, generateGoogleAppsScriptForFolders, getGoogleDriveSearchUrl,
   formatXPost, calculateXPostLength
 } from '../services/storyService';
+import { 
+  getAllColumns, saveColumn, generateAutoColumn, deleteColumn 
+} from '../services/columnService';
 import { APP_VERSION } from '../version.js';
 
 const STORAGE_KEY = STORY_STORAGE_KEY;
@@ -315,6 +318,11 @@ const generateStoriesByAi = (themeTitle, protagonist, storyCount, themeDesc, pre
 
 
 export default function StoryStudioPanel() {
+  const [studioMainTab, setStudioMainTab] = useState('columns'); // 'columns' | 'stories'
+  const [columnsList, setColumnsList] = useState(() => getAllColumns());
+  const [newColumnTheme, setNewColumnTheme] = useState('');
+  const [selectedColumnForEdit, setSelectedColumnForEdit] = useState(null);
+
   const [selectedPreset, setSelectedPreset] = useState(PRESET_THEMES[0].id);
   const [customTitle, setCustomTitle] = useState(PRESET_THEMES[0].title);
   const [customProtagonist, setCustomProtagonist] = useState(PRESET_THEMES[0].protagonist);
@@ -322,6 +330,30 @@ export default function StoryStudioPanel() {
   const [storyMode, setStoryMode] = useState('preset'); // 'preset' | 'scenario'
   const [showKitModal, setShowKitModal] = useState(false);
   const [kitModalTab, setKitModalTab] = useState('manual'); // 'manual' | 'snsKit'
+
+  // コラム自動生成ハンドラー
+  const handleAutoGenerateColumn = () => {
+    if (!newColumnTheme.trim()) {
+      alert('生成したいコラムのテーマ（例: ガレージの固定資産税、市街化調整区域の申請など）を入力してください。');
+      return;
+    }
+    const updated = generateAutoColumn(newColumnTheme.trim());
+    setColumnsList(updated);
+    setNewColumnTheme('');
+    alert(`「${newColumnTheme}」のSEOコラムを自動生成し、サイトに即時公開しました！`);
+  };
+
+  // コラム削除ハンドラー
+  const handleDeleteColumn = (id, title) => {
+    if (!window.confirm(`コラム「${title}」を削除しますか？`)) return;
+    const updated = columnsList.filter(c => c.id !== id);
+    setColumnsList(updated);
+    try {
+      localStorage.setItem('smile049_seo_columns_v1', JSON.stringify(updated));
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   // シナリオライター専用フィールド（クリエイティブスタジオ3部門体制 ＆ 5大要素連動）
   const [scTarget, setScTarget] = useState('新築予算で中古購入＋リノベ＋木造ガレージで暮らしの豊かさを優先する層'); // ターゲット像・ペルソナ
@@ -785,6 +817,295 @@ export default function StoryStudioPanel() {
           </button>
         </div>
       </div>
+
+      {/* ── 🌟 2大スタジオ機能切替タブバー ── */}
+      <div style={{
+        display: 'flex',
+        gap: 12,
+        background: '#0f172a',
+        padding: '10px 14px',
+        borderRadius: 12,
+        border: '1px solid rgba(255, 255, 255, 0.15)',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+      }}>
+        <button
+          type="button"
+          onClick={() => setStudioMainTab('columns')}
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 10,
+            padding: '12px 20px',
+            borderRadius: 8,
+            fontSize: 14.5,
+            fontWeight: 800,
+            cursor: 'pointer',
+            border: 'none',
+            background: studioMainTab === 'columns' ? 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)' : 'rgba(255, 255, 255, 0.05)',
+            color: studioMainTab === 'columns' ? '#ffffff' : '#94a3b8',
+            boxShadow: studioMainTab === 'columns' ? '0 4px 12px rgba(2, 132, 199, 0.4)' : 'none',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          <Lightbulb size={18} />
+          <span>📚 お悩み解決SEOコラム 自動量産スタジオ ({columnsList.length}記事配備中)</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setStudioMainTab('stories')}
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 10,
+            padding: '12px 20px',
+            borderRadius: 8,
+            fontSize: 14.5,
+            fontWeight: 800,
+            cursor: 'pointer',
+            border: 'none',
+            background: studioMainTab === 'stories' ? 'linear-gradient(135deg, var(--color-primary) 0%, #2d6a4f 100%)' : 'rgba(255, 255, 255, 0.05)',
+            color: studioMainTab === 'stories' ? '#ffffff' : '#94a3b8',
+            boxShadow: studioMainTab === 'stories' ? '0 4px 12px rgba(64, 145, 108, 0.4)' : 'none',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          <Film size={18} />
+          <span>🎬 ストーリー・Veo 3動画制作スタジオ ({stories.length}話構成)</span>
+        </button>
+      </div>
+
+      {/* ── 📚 【タブ 1】SEOコラム自動量産スタジオ ── */}
+      {studioMainTab === 'columns' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          
+          {/* AIコラム即時自動生成バー */}
+          <div style={{
+            background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+            border: '1.5px solid #cbd5e1',
+            borderRadius: 14,
+            padding: '24px 26px',
+            boxShadow: '0 4px 14px rgba(0,0,0,0.04)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#0284c7', fontWeight: 800, fontSize: 16, marginBottom: 8 }}>
+              <Zap size={20} />
+              <span>⚡ スタッフ負担ゼロ！テーマ名から3,000文字級のSEOコラムを一瞬で自動生成</span>
+            </div>
+            <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 16px', lineHeight: 1.6 }}>
+              Googleで検索されやすいお悩みキーワード（市街化調整区域、変形地、結露、税金、農機具など）を入力し、「AIで自動生成して即時公開」ボタンを押すだけで、見出し構成・解説・Q&A・3DシミュレーターCTAが揃った本格的なSEO記事がサイト上に公開されます。
+            </p>
+
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 14 }}>
+              <input
+                type="text"
+                placeholder="コラムのテーマ（例: 川越市の市街化調整区域ガレージ建築、木造ガレージの固定資産税と減価償却 など）"
+                value={newColumnTheme}
+                onChange={(e) => setNewColumnTheme(e.target.value)}
+                style={{
+                  flex: 1,
+                  minWidth: 280,
+                  padding: '12px 16px',
+                  borderRadius: 8,
+                  border: '1.5px solid #94a3b8',
+                  fontSize: 14,
+                  outline: 'none',
+                  background: '#ffffff'
+                }}
+              />
+              <button
+                type="button"
+                onClick={handleAutoGenerateColumn}
+                style={{
+                  background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: 8,
+                  fontSize: 14,
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  boxShadow: '0 4px 10px rgba(2, 132, 199, 0.3)'
+                }}
+              >
+                <Sparkles size={16} />
+                <span>AIでコラム自動生成 ＆ 即時公開</span>
+              </button>
+            </div>
+
+            {/* サジェストクイックボタン */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 12 }}>
+              <span style={{ color: '#64748b', fontWeight: 700 }}>おすすめテーマ:</span>
+              {[
+                '市街化調整区域の農地転用とガレージ建築',
+                '変形地・三角地に建てる木造ガレージ',
+                '木造ガレージの固定資産税シミュレーション',
+                '農機具・トラクター倉庫の補助金活用'
+              ].map((sug, sIdx) => (
+                <button
+                  key={sIdx}
+                  type="button"
+                  onClick={() => setNewColumnTheme(sug)}
+                  style={{
+                    padding: '4px 10px',
+                    borderRadius: 14,
+                    background: '#e0f2fe',
+                    color: '#0369a1',
+                    border: '1px solid #bae6fd',
+                    fontSize: 11.5,
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  ＋ {sug}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 公開中コラム一覧グリッド */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 20 }}>
+            {columnsList.map((col, cIdx) => (
+              <div
+                key={col.id}
+                style={{
+                  background: '#ffffff',
+                  borderRadius: 12,
+                  border: '1px solid #e2e8f0',
+                  padding: '20px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between'
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                    <span style={{ background: '#e0f2fe', color: '#0369a1', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 4 }}>
+                      {col.badge || col.category}
+                    </span>
+                    <span style={{ fontSize: 11.5, color: '#16a34a', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <CheckCircle2 size={13} /> サイト公開中
+                    </span>
+                  </div>
+
+                  <h4 style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', lineHeight: 1.4, marginBottom: 8 }}>
+                    {col.title}
+                  </h4>
+
+                  <p style={{ fontSize: 12.5, color: '#64748b', lineHeight: 1.6, margin: '0 0 14px' }}>
+                    {col.description.length > 70 ? col.description.substring(0, 70) + '...' : col.description}
+                  </p>
+                </div>
+
+                <div>
+                  {/* 4大SNSテキスト ワンクリックコピーバー */}
+                  <div style={{ background: '#f8fafc', borderRadius: 8, padding: '10px 12px', border: '1px solid #e2e8f0', marginBottom: 12 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#475569', marginBottom: 6 }}>
+                      📋 SNSワンクリック拡散用テキストコピー:
+                    </div>
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard(col.snsText?.x || col.title, `col_x_${col.id}`)}
+                        style={{
+                          padding: '4px 10px',
+                          borderRadius: 6,
+                          background: copiedKey === `col_x_${col.id}` ? '#16a34a' : '#0f172a',
+                          color: '#fff',
+                          border: 'none',
+                          fontSize: 11,
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4
+                        }}
+                      >
+                        <XIcon size={11} />
+                        <span>{copiedKey === `col_x_${col.id}` ? 'コピー済' : 'X (140字)'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard(col.snsText?.note || col.description, `col_note_${col.id}`)}
+                        style={{
+                          padding: '4px 10px',
+                          borderRadius: 6,
+                          background: copiedKey === `col_note_${col.id}` ? '#16a34a' : '#22c55e',
+                          color: '#fff',
+                          border: 'none',
+                          fontSize: 11,
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4
+                        }}
+                      >
+                        <NoteIcon size={11} />
+                        <span>{copiedKey === `col_note_${col.id}` ? 'コピー済' : 'note'}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* リンク ＆ 削除 */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 10, borderTop: '1px solid #f1f5f9' }}>
+                    <a
+                      href={`/stories?col=${col.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        color: '#0284c7',
+                        fontSize: 12.5,
+                        fontWeight: 700,
+                        textDecoration: 'none',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 4
+                      }}
+                    >
+                      <Eye size={14} />
+                      <span>サイトで記事を見る</span>
+                      <ExternalLink size={12} />
+                    </a>
+
+                    {columnsList.length > 5 && (
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteColumn(col.id, col.title)}
+                        style={{
+                          color: '#ef4444',
+                          background: 'transparent',
+                          border: 'none',
+                          fontSize: 11.5,
+                          cursor: 'pointer',
+                          padding: '2px 6px'
+                        }}
+                        title="コラムを削除"
+                      >
+                        削除
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+              </div>
+            ))}
+          </div>
+
+        </div>
+      )}
+
+      {/* ── 🎬 【タブ 2】ストーリー・Veo 3動画制作スタジオ（既存UI） ── */}
+      {studioMainTab === 'stories' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
       {/* ── 📁 Google Drive 素材共有センター（049smile02@gmail.com）集約管理バナー ── */}
       <div style={{
@@ -4131,6 +4452,11 @@ export default function StoryStudioPanel() {
         </div>
       )}
 
+      {/* storiesタブの閉じタグ */}
+      </div>
+      )}
+
     </div>
   );
 }
+
