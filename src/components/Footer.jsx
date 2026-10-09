@@ -257,7 +257,7 @@ export default function Footer({ setCurrentRoute }) {
                 <div style={{ color: '#f1f5f9', fontWeight: 700, fontSize: 13.5 }}>運営事業者：株式会社 住ま居る</div>
                 <div>所在地：〒350-2224 埼玉県鶴ヶ島市町屋176番地5</div>
                 <div style={{ color: '#cbd5e1', marginTop: 2 }}>
-                  設計事務所：すまいる設計 埼玉県知事 第（5）10278号<br />
+                  建築士事務所登録：埼玉県知事 第（5）10278号<br />
                   建設業許可：埼玉県知事 許可（般）第60650号<br />
                   宅地建物取引業者免許：埼玉県知事 (2) 第22198号
                 </div>
