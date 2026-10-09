@@ -19,4 +19,4 @@ vite.config.js.timestamp-*
 .env.local
 secrets/
 *.local.json
-
+backup_raw_photos/
