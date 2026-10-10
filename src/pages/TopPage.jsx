@@ -351,7 +351,7 @@ export default function TopPage({ setCurrentRoute }) {
                     【再進の家】鳩山ニュータウン
                   </h4>
                   <p style={{ fontSize: 12.5, color: '#cbd5e1', lineHeight: 1.6, marginBottom: 14 }}>
-                    HEAT20 G2断熱・フルリノベ2,380万円。生活熱と陽光で冬暖かく、光熱費ほぼ0円。50〜60代のご夫婦に贈る終の住処。
+                    HEAT20 G2断熱・フルリノベ2,180万円。生活熱と陽光で冬暖かく、光熱費ほぼ0円。50〜60代のご夫婦に贈る終の住処。
                   </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 10, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>

@@ -121,7 +121,7 @@ export default function SaishinLpPage({ onNavigate }) {
 
           <p className="text-base sm:text-xl text-stone-200 max-w-3xl mx-auto mb-8 font-normal leading-relaxed drop-shadow">
             鳩山ニュータウン。一級建築士が躯体からフルスケルトン再生。<br className="hidden sm:inline" />
-            新築3,000万円超と同等以上のHEAT20 G2超高断熱を、<span className="font-bold text-amber-300 underline underline-offset-4">2,380万円（税込）</span>で。
+            新築3,000万円超と同等以上のHEAT20 G2超高断熱を、<span className="font-bold text-amber-300 underline underline-offset-4">2,180万円（税込）</span>で。
           </p>
 
           {/* 3大キラーフックバッジ */}
@@ -287,8 +287,8 @@ export default function SaishinLpPage({ onNavigate }) {
                 老後の固定費（光熱費・税金）が極小化。
               </h3>
               <p className="text-stone-600 text-sm sm:text-base leading-relaxed mb-6">
-                一般的な高断熱新築住宅（3,200万円超）に対し、本物件は<span className="font-bold text-stone-900">2,380万円（税込）</span>。
-                初期費用で浮いた約800〜1,000万円は、老後のゆとり資金やご夫婦での旅行へ。
+                一般的な高断熱新築住宅（3,200万円超）に対し、本物件は<span className="font-bold text-stone-900">2,180万円（税込）</span>。
+                初期費用で浮いた約1,000万円は、老後のゆとり資金やご夫婦での旅行へ。
               </p>
 
               <div className="space-y-3 bg-stone-50 p-5 rounded-2xl border border-stone-200 text-xs sm:text-sm mb-6">
@@ -333,19 +333,19 @@ export default function SaishinLpPage({ onNavigate }) {
                 <div>
                   <div className="flex justify-between text-xs mb-1">
                     <span className="text-amber-400 font-bold">再進の家（鳩山ニュータウン）</span>
-                    <span className="font-bold text-amber-400">約 2,580 万円（30年）</span>
+                    <span className="font-bold text-amber-400">約 2,380 万円（30年）</span>
                   </div>
                   <div className="w-full h-4 bg-stone-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full" style={{ width: '61%' }}></div>
+                    <div className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full" style={{ width: '56%' }}></div>
                   </div>
-                  <div className="text-[11px] text-amber-300 font-medium mt-1">本体2,380万 ＋ 固定資産税激減 ＋ 光熱費ほぼ0円</div>
+                  <div className="text-[11px] text-amber-300 font-medium mt-1">本体2,180万 ＋ 固定資産税激減 ＋ 光熱費ほぼ0円</div>
                 </div>
               </div>
 
               <div className="mt-8 pt-6 border-t border-stone-800 text-center">
                 <span className="text-xs text-stone-400">30年間で生み出される「ゆとり資金」</span>
                 <div className="text-2xl sm:text-3xl font-black text-amber-400 mt-1">
-                  約 1,620 万円の差額効果
+                  約 1,820 万円の差額効果
                 </div>
               </div>
             </div>
@@ -630,7 +630,7 @@ export default function SaishinLpPage({ onNavigate }) {
             <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200 bg-amber-50/40">
               <span className="p-4 bg-amber-100/60 font-bold text-amber-900 md:border-r border-stone-200">価格</span>
               <span className="p-4 md:col-span-3 text-amber-900 font-extrabold text-lg sm:text-xl flex items-baseline gap-2">
-                2,380 万円 <span className="text-xs font-normal text-stone-600">（税込 / 土地・建物総額）</span>
+                2,180 万円 <span className="text-xs font-normal text-stone-600">（税込 / 土地・建物総額）</span>
               </span>
             </div>
 

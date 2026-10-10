@@ -3,11 +3,12 @@ import * as THREE from 'three';
 import { Compass, RotateCw, ZoomIn, ZoomOut, Check, ChevronRight } from 'lucide-react';
 
 const SPOTS = [
-  { id: 'living', name: 'LDK（吹き抜け＆採光）', url: '/assets/saishin/360/living.jpg', desc: '陽光あふれる大空間。エアコン1台で家中快適。' },
-  { id: 'dining', name: 'ダイニング＆キッチン', url: '/assets/saishin/360/dining.jpg', desc: 'スムーズな家事動線と落ち着きのある木目調。' },
-  { id: 'room1', name: '主寝室（趣味・書斎）', url: '/assets/saishin/360/room1.jpg', desc: '静けさを確保したプライベート空間。' },
-  { id: 'room2', name: 'セカンド寝室', url: '/assets/saishin/360/room2.jpg', desc: 'つかず離れずの距離感。引き戸で気配を共有。' },
-  { id: 'entrance', name: '玄関・ホール', url: '/assets/saishin/360/entrance.jpg', desc: 'ゆとりあるアプローチと明るい土間。' },
+  { id: 'living', name: 'LDK（吹き抜け＆採光）', url: '/assets/saishin/360/living.jpg', desc: '陽光あふれる大空間。杉板木天井と高窓採光。エアコン1台で家中快適。', initialLon: 190 },
+  { id: 'dining', name: 'システムキッチン', url: '/assets/saishin/360/dining.jpg', desc: 'タカラスタンダード高品位ホーローキッチン・IH。リビングと緑を見渡す清潔な家事空間。', initialLon: 160 },
+  { id: 'room1', name: '2F 主寝室（眺望・書斎）', url: '/assets/saishin/360/room1.jpg', desc: '大きな樹脂窓から高台の街並みと青空が広がる、心地よい日差しのプライベート空間。', initialLon: 80 },
+  { id: 'room2', name: '1F セカンド寝室', url: '/assets/saishin/360/room2.jpg', desc: '木天井とスリット高窓を備えた落ち着きの空間。つかず離れずの心地よい距離感。', initialLon: 170 },
+  { id: 'entrance', name: '玄関・ホール', url: '/assets/saishin/360/entrance.jpg', desc: '明るい玄関土間と下駄箱、木製建具が迎えるゆとりあるアプローチ。', initialLon: 250 },
+  { id: 'bath', name: '洗面脱衣・ユニットバス', url: '/assets/saishin/360/bath.jpg', desc: 'タカラスタンダード高品位ホーローバス＆洗面化粧台。配管も全面更新済。', initialLon: 240 },
 ];
 
 export default function VirtualTour360() {
@@ -24,7 +25,7 @@ export default function VirtualTour360() {
   const textureLoaderRef = useRef(new THREE.TextureLoader());
 
   const stateRef = useRef({
-    lon: 0,
+    lon: SPOTS[0].initialLon || 0,
     lat: 0,
     phi: 0,
     theta: 0,
@@ -144,6 +145,10 @@ export default function VirtualTour360() {
 
   const switchSpot = (spot) => {
     setCurrentSpot(spot);
+    if (stateRef.current) {
+      stateRef.current.lon = spot.initialLon !== undefined ? spot.initialLon : 0;
+      stateRef.current.lat = 0;
+    }
     loadTexture(spot.url);
   };
 

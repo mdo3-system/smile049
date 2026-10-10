@@ -227,7 +227,7 @@ export default function Footer({ setCurrentRoute }) {
                   onClick={() => { setCurrentRoute('saishin'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   style={{ color: '#fbbf24', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left' }}
                 >
-                  <span style={{ color: '#fbbf24' }}>🏡</span> 【再進の家】鳩山 2,380万円・HEAT20 G2（360°内覧）
+                  <span style={{ color: '#fbbf24' }}>🏡</span> 【再進の家】鳩山 2,180万円・HEAT20 G2（360°内覧）
                 </button>
               </li>
               <li>

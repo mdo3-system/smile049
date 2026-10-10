@@ -85,7 +85,7 @@ export default function EieRealEstatePage({ onNavigate }) {
                   HEAT20 G2基準超高断熱・太陽光自家消費・躯体配管全面更新。新築の約2/3の価格で叶える理想の再生住宅。
                 </p>
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl font-black text-amber-400">2,380 万円<span className="text-xs text-stone-400 font-normal">（税込）</span></span>
+                  <span className="text-2xl font-black text-amber-400">2,180 万円<span className="text-xs text-stone-400 font-normal">（税込）</span></span>
                   <button
                     onClick={() => onNavigate && onNavigate('saishin')}
                     className="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-stone-950 transition flex items-center gap-1.5 shadow-lg"
