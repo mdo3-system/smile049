@@ -20,3 +20,4 @@ vite.config.js.timestamp-*
 secrets/
 *.local.json
 backup_raw_photos/
+saishin_materials/
