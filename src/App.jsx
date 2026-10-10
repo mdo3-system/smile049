@@ -11,6 +11,8 @@ import SimulatorPage from './pages/SimulatorPage';
 import StaffAdminPage from './pages/StaffAdminPage';
 import StoryPage from './pages/StoryPage';
 import SaishinLpPage from './pages/SaishinLpPage';
+import SaishinTechPage from './pages/SaishinTechPage';
+import SaishinSpecPage from './pages/SaishinSpecPage';
 import EieRealEstatePage from './pages/EieRealEstatePage';
 import ReRenovationPage from './pages/ReRenovationPage';
 import ChatRoomModal from './components/ChatRoomModal';
@@ -28,6 +30,8 @@ const ROUTE_MAP = {
   'case-studies': '/cases',
   'stories': '/stories',
   'saishin': '/saishin',
+  'saishin-tech': '/saishin/technology',
+  'saishin-spec': '/saishin/spec',
   'eie': '/eie',
   're': '/re',
   'admin': '/admin'
@@ -43,6 +47,8 @@ const getRouteFromPath = (pathname) => {
   if (cleanPath === '/plan-workshop') return 'plan-workshop';
   if (cleanPath === '/cases' || cleanPath === '/case-studies' || cleanPath === '/works' || cleanPath === '/case-01' || cleanPath === '/case-02' || cleanPath === '/casestudy01' || cleanPath === '/cases/01' || cleanPath === '/cases/02') return 'case-studies';
   if (cleanPath === '/stories' || cleanPath === '/story' || cleanPath === '/column') return 'stories';
+  if (cleanPath === '/saishin/technology' || cleanPath === '/saishin/tech' || cleanPath === '/saishin/structure') return 'saishin-tech';
+  if (cleanPath === '/saishin/spec' || cleanPath === '/saishin/specification' || cleanPath === '/saishin/environment') return 'saishin-spec';
   if (cleanPath === '/saishin' || cleanPath === '/lp/saishin' || cleanPath === '/saishin-no-ie') return 'saishin';
   if (cleanPath === '/eie' || cleanPath === '/realestate' || cleanPath === '/fudosan') return 'eie';
   if (cleanPath === '/re' || cleanPath === '/renovation' || cleanPath === '/reform') return 're';
@@ -90,6 +96,8 @@ export default function App() {
       'case-studies': '【施工実例】市街化調整区域・境界15cm・特注寸法 木造自由設計ガレージ｜スマイチ',
       'stories': '木造自由設計ガレージ物語（公式WEB連載コラム）｜スマイチ',
       'saishin': '【公式LP】再進の家｜鳩山ニュータウン 2,180万円・ほぼ光熱費0円・HEAT20 G2高性能再生住宅',
+      'saishin-tech': '【技術レポート】再進の家｜建築士と大工による躯体・スケルトン再生と構造計算エビデンス',
+      'saishin-spec': '【物件スペック】再進の家｜HEAT20 G2温熱データ・周辺環境と生活網・物件詳細概要',
       'eie': 'スマイチ不動産 (EIE)｜中古戸建×リノベ・土地探し×ガレージ・自社預かり土地5区画',
       're': 'スマイチ リフォーム (RE)｜新築以上の性能を3/4価格で実現するフルスケルトン高断熱再生',
       'admin': '専任スタッフ管理ポータル｜スマイチ'
@@ -119,7 +127,7 @@ export default function App() {
     setCurrentRoute(route);
   };
 
-  const isLp = currentRoute === 'saishin' || currentRoute === 'eie' || currentRoute === 're';
+  const isLp = currentRoute === 'saishin' || currentRoute === 'saishin-tech' || currentRoute === 'saishin-spec' || currentRoute === 'eie' || currentRoute === 're';
 
   return (
     <div className="app-root" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -144,6 +152,8 @@ export default function App() {
         {currentRoute === 'case-studies' && <CaseStudiesPage setCurrentRoute={handleRouteNavigation} />}
         {currentRoute === 'stories' && <StoryPage setCurrentRoute={handleRouteNavigation} />}
         {currentRoute === 'saishin' && <SaishinLpPage onNavigate={handleRouteNavigation} />}
+        {currentRoute === 'saishin-tech' && <SaishinTechPage onNavigate={handleRouteNavigation} />}
+        {currentRoute === 'saishin-spec' && <SaishinSpecPage onNavigate={handleRouteNavigation} />}
         {currentRoute === 'eie' && <EieRealEstatePage onNavigate={handleRouteNavigation} />}
         {currentRoute === 're' && <ReRenovationPage onNavigate={handleRouteNavigation} />}
         {currentRoute === 'simulator' && (
