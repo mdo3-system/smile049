@@ -44,8 +44,8 @@ export default function CaseStudiesPage({ setCurrentRoute, initialCase = 'case-u
         { label: '用途', val: '自家用車ガレージ ＋ 奥側農業用物置・機具保管' },
         { label: '都市計画', val: '市街化調整区域（埼玉県への適合証明取得）' },
         { label: '行政検査', val: '確認申請 ＆ 埼玉県建築主事による完了検査合格（検査済証受領）' },
-        { label: '構造・仕様', val: '木造軸組＋高耐震金物、ブラックガルバリウム鋼板、手動ワイドシャッター' },
-        { label: '特注ポイント', val: '母屋勝手口への最短動線サイドドア、奥側農機具スペース確保のロング奥行き' }
+        { label: '構造・仕様', val: '木造軸組＋耐震金物、ホワイト角波ガルバリウム鋼板、手動ワイドシャッター' },
+        { label: '特注ポイント', val: '母屋勝手口への最短動線サイドドア、奥側農機具スペース＆特注固定木製棚' }
       ],
       points: [
         { label: '市街化調整区域も正規合格', text: '埼玉県への適合証明申請から完了検査まで自社専任スタッフが一貫代行。正規の検査済証を取得。' },
@@ -57,61 +57,64 @@ export default function CaseStudiesPage({ setCurrentRoute, initialCase = 'case-u
           id: 'b-step1',
           category: 'survey',
           stepNum: '01',
-          title: '現況調査・地縄・行政事前協議',
-          desc: '市街化調整区域における適合証明協議と、母屋勝手口に合わせたミリ単位の地縄・配置確認。',
+          title: '現況調査・根切り掘削・丁張り出し',
+          desc: '市街化調整区域における適合証明協議完了後、母屋勝手口との位置関係に合わせて間口2.73m×奥行6.37mをミリ単位で根切り掘削。',
           photos: [
-            { src: '/assets/construction/02/IMG_2310.jpeg', title: '施工前現況確認', caption: '母屋との位置関係と敷地の確認' },
-            { src: '/assets/construction/02/IMG_2311.jpeg', title: '地縄・境界確認', caption: '間口2.73m×奥行6.37mの正確な位置出し' }
+            { src: '/assets/construction/02/IMG_2310.jpeg', title: '着工前現況・根切り掘削', caption: '母屋勝手口との離隔・通りを確認し基礎根切り掘削' },
+            { src: '/assets/construction/02/IMG_2311.jpeg', title: '掘削溝底・丁張り確認', caption: '砕石地業に向け、掘削深さとレベル（水平）を精密に確認' }
           ]
         },
         {
           id: 'b-step2',
           category: 'foundation',
           stepNum: '02',
-          title: '基礎工事（配筋・型枠・コンクリート打設）',
-          desc: '車両や重量のある農機具の荷重に耐える強固な配筋と、高精度なアンカーボルト配置。',
+          title: '基礎工事（配筋検査・型枠・土間コンクリート金鏝押さえ）',
+          desc: '愛車および重量のある農機具の長期荷重を支える強固な基礎。配筋検査合格後、高強度土間コンクリートを金鏝で平滑に仕上げ。',
           photos: [
-            { src: '/assets/construction/02/IMG_2339.jpeg', title: '鉄筋配筋組み', caption: '構造計算に基づくD10/D13鉄筋結束' },
-            { src: '/assets/construction/02/IMG_2341.JPG', title: '型枠建込み', caption: '立ち上がり幅とかぶり厚を厳密に確保' },
-            { src: '/assets/construction/02/IMG_2343.JPG', title: 'コンクリート打設', caption: 'ジャンカのない密実な打設' },
-            { src: '/assets/construction/02/IMG_2344.JPG', title: '基礎脱型完了', caption: '十分な養生期間を経て型枠解体' }
+            { src: '/assets/construction/02/IMG_2341.JPG', title: '耐圧盤 配筋ピッチ検査', caption: 'D13/D10鉄筋を規定ピッチ（300mm）通りに正確に結束検測' },
+            { src: '/assets/construction/02/IMG_2343.JPG', title: '立ち上がり配筋・かぶり厚検査', caption: 'スペーサーブロックで設計通りのかぶり厚を厳密に確保' },
+            { src: '/assets/construction/02/IMG_2339.jpeg', title: '外周型枠・アンカー設置', caption: '土台と基礎を強固に締結するアンカーボルトを高精度にセット' },
+            { src: '/assets/construction/02/IMG_2430.jpeg', title: '基礎完了・土間金鏝仕上げ', caption: '車両乗り入れに耐える高強度土間コンクリートを金鏝で平滑に仕上げ' }
           ]
         },
         {
           id: 'b-step3',
           category: 'framing',
           stepNum: '03',
-          title: '木造建て方・特注小屋組み',
-          desc: '奥行6.37mのロングスパンを堅牢に支える木造軸組と、勝手口ドア開口部の高精度な造作。',
+          title: '木造建て方・高耐震金物工法・小屋組み',
+          desc: '間口2.73m×奥行き6.37mのロングスパンを堅牢に支える木造軸組構造。自社大工による高精度プレカット施工と適材適所の耐震金物。',
           photos: [
-            { src: '/assets/construction/02/IMG_2423.JPG', title: '柱建て・梁架け', caption: '高精度プレカット材による迅速な組み上げ' },
-            { src: '/assets/construction/02/IMG_2425.JPG', title: '耐震金物施工', caption: 'ホールダウン金物・筋交いプレートで補強' },
-            { src: '/assets/construction/02/IMG_2427.JPG', title: '建て方骨組み完成', caption: '間口2.73m×奥行6.37mのフレーム' }
+            { src: '/assets/construction/02/IMG_2433.jpeg', title: '土台敷き・柱建て開始', caption: '防腐防蟻処理されたヒノキ土台に105角主要柱を直立' },
+            { src: '/assets/construction/02/IMG_2443.jpeg', title: '建て方骨組み・開口部構築', caption: 'シャッター上部に耐力壁合板と仮筋交いを配置し狂いのない骨組みを構築' },
+            { src: '/assets/construction/02/IMG_2436.jpeg', title: '梁・柱 羽子板ボルト接合', caption: '梁の引き抜けを防止する耐震金物（羽子板ボルト）で頑強に緊結' },
+            { src: '/assets/construction/02/IMG_2466.jpeg', title: '土台アンカー座金締め', caption: '基礎アンカーボルトを規定トルクで確実に締結' },
+            { src: '/assets/construction/02/IMG_2458.jpeg', title: '筋交いプレート耐震補強', caption: '地震・強風の水平荷重に抵抗する耐震金物・耐力壁を施工' }
           ]
         },
         {
           id: 'b-step4',
           category: 'exterior',
           stepNum: '04',
-          title: '耐力面材・透湿防水・外壁ガルバリウム',
-          desc: '通気層工法で内部結露を防止。勝手口直結ドアとブラックガルバでシャープに仕上げ。',
+          title: '透湿防水シート・通気胴縁・外壁ホワイトガルバ・勝手口直結ドア',
+          desc: '壁体内の湿気を逃がし雨水を防ぐ通気工法。母屋勝手口直結の片引き戸サッシを設置し、清潔感のあるホワイトガルバリウム鋼板を施工。',
           photos: [
-            { src: '/assets/construction/02/IMG_2430.jpeg', title: '構造用合板耐力壁', caption: '耐震性を高める面材工法' },
-            { src: '/assets/construction/02/IMG_2433.jpeg', title: '透湿防水シート', caption: '雨水を遮断し湿気を逃がす二重防水' },
-            { src: '/assets/construction/02/IMG_2436.jpeg', title: 'ガルバリウム外壁施工', caption: '高耐久・メンテナンスフリーの外壁' }
+            { src: '/assets/construction/02/IMG_2514.jpeg', title: '透湿防水シート全面施工', caption: '雨水を遮断し湿気を逃がす高機能透湿防水シートを施工' },
+            { src: '/assets/construction/02/IMG_2535.jpeg', title: '勝手口直結サッシ・通気胴縁', caption: '母屋勝手口の真向かいに片引き戸を設置し外壁通気胴縁を施工' },
+            { src: '/assets/construction/02/IMG_2536.jpeg', title: 'ホワイトガルバリウム外壁張り', caption: '清潔感と高耐久・低メンテナンスを両立する角波ガルバリウム鋼板' }
           ]
         },
         {
           id: 'b-step5',
-          category: 'inspection',
+          category: 'completion',
           stepNum: '05',
-          title: 'シャッター取付・埼玉県完了検査合格・完成',
-          desc: '埼玉県の建築主事による現地完了検査に合格し「検査済証」を取得。安心のお引渡し。',
+          title: '完工・ワイドシャッター・内部特注固定棚・完了検査合格',
+          desc: '埼玉県の完了検査に無事合格し「検査済証」受領。雨に濡れない勝手口動線、たっぷり収納できる奥側特注棚、手動ワイドシャッターが完成。',
           photos: [
-            { src: '/assets/construction/02/IMG_2466.jpeg', title: '勝手口直結ドア動線', caption: '母屋勝手口と雨に濡れず直結' },
-            { src: '/assets/construction/02/IMG_2470.jpeg', title: '奥側農機具スペース', caption: '車＋農機具がたっぷり入る奥行き' },
-            { src: '/assets/construction/02/IMG_2514.jpeg', title: '完成外観', caption: 'ブラックガルバとワイドシャッター' },
-            { src: '/assets/construction/02/IMG_2534.jpeg', title: 'お引渡し完了', caption: '施主様のご要望をすべて実現' }
+            { src: '/assets/construction/02/IMG_2560.jpg', title: '完成外観（ワイドシャッター閉）', caption: '清潔感のあるホワイトガルバリウム外壁と母屋の佇まいに美しく調和' },
+            { src: '/assets/construction/02/IMG_2556.jpg', title: '完成正面（シャッター全開）', caption: '間口いっぱいの手動ワイドシャッターと段差のない金鏝仕上げ土間コン' },
+            { src: '/assets/construction/02/IMG_2558.jpg', title: '母屋勝手口との直結動線', caption: '側面片引き戸を出ると目の前が母屋勝手口。雨の日でも濡れずに行き来可能' },
+            { src: '/assets/construction/02/IMG_2559.jpg', title: '内部完成（奥側 特注造作固定棚）', caption: '奥スペースに農機具・備品を整理できる特注固定棚と引き違い窓を完備' },
+            { src: '/assets/construction/02/IMG_2557.jpg', title: 'サイド全景（片流れ屋根・奥行6.37m）', caption: '敷地にミリ単位で収まった奥行き6.37mの美しいロングプロポーション' }
           ]
         }
       ]

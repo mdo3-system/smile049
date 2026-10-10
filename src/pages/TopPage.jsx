@@ -847,7 +847,7 @@ export default function TopPage({ setCurrentRoute }) {
                 boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
               }}>
                 <img 
-                  src="/assets/construction/02/IMG_2514.jpeg" 
+                  src="/assets/construction/02/IMG_2560.jpg" 
                   alt="スマイチ木造自由設計ガレージ 完成全景" 
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
@@ -869,10 +869,10 @@ export default function TopPage({ setCurrentRoute }) {
               {/* ミニ写真3枚 */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
                 <div style={{ height: 70, borderRadius: 6, overflow: 'hidden' }}>
-                  <img src="/assets/construction/02/IMG_2339.jpeg" alt="基礎配筋" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src="/assets/construction/02/IMG_2339.jpeg" alt="基礎型枠" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <div style={{ height: 70, borderRadius: 6, overflow: 'hidden' }}>
-                  <img src="/assets/construction/02/IMG_2427.JPG" alt="木造建て方" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src="/assets/construction/02/IMG_2556.jpg" alt="シャッター開口" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <div style={{ height: 70, borderRadius: 6, overflow: 'hidden' }}>
                   <img src="/assets/construction/01/IMG_1840.JPG" alt="境界15cm実例" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
