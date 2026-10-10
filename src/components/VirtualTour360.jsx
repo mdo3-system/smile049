@@ -40,8 +40,8 @@ export default function VirtualTour360() {
     const container = containerRef.current;
     if (!container) return;
 
-    const width = container.clientWidth;
-    const height = container.clientHeight;
+    const width = container.clientWidth || window.innerWidth || 800;
+    const height = container.clientHeight || 520;
 
     // Scene
     const scene = new THREE.Scene();
@@ -65,6 +65,9 @@ export default function VirtualTour360() {
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(width, height);
+    renderer.domElement.style.width = '100%';
+    renderer.domElement.style.height = '100%';
+    renderer.domElement.style.display = 'block';
     container.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
@@ -97,8 +100,8 @@ export default function VirtualTour360() {
     // Resize Handler
     const handleResize = () => {
       if (!container || !camera || !renderer) return;
-      const w = container.clientWidth;
-      const h = container.clientHeight;
+      const w = container.clientWidth || 800;
+      const h = container.clientHeight || 520;
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
@@ -189,7 +192,8 @@ export default function VirtualTour360() {
       {/* 360 Viewer Canvas Container */}
       <div
         ref={containerRef}
-        className="w-full h-[420px] md:h-[560px] cursor-grab active:cursor-grabbing relative select-none"
+        style={{ width: '100%', height: '520px', minHeight: '400px', position: 'relative' }}
+        className="w-full cursor-grab active:cursor-grabbing select-none"
         onMouseDown={handlePointerDown}
         onMouseMove={handlePointerMove}
         onMouseUp={handlePointerUp}

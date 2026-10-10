@@ -121,7 +121,7 @@ export default function SaishinLpPage({ onNavigate }) {
 
           <p className="text-base sm:text-xl text-stone-200 max-w-3xl mx-auto mb-8 font-normal leading-relaxed drop-shadow">
             鳩山ニュータウン。一級建築士が躯体からフルスケルトン再生。<br className="hidden sm:inline" />
-            新築3,000万円超と同等以上のHEAT20 G2超高断熱を、<span className="font-bold text-amber-300 underline underline-offset-4">2,100万円</span>で。
+            新築3,000万円超と同等以上のHEAT20 G2超高断熱を、<span className="font-bold text-amber-300 underline underline-offset-4">2,380万円（税込）</span>で。
           </p>
 
           {/* 3大キラーフックバッジ */}
@@ -287,8 +287,8 @@ export default function SaishinLpPage({ onNavigate }) {
                 老後の固定費（光熱費・税金）が極小化。
               </h3>
               <p className="text-stone-600 text-sm sm:text-base leading-relaxed mb-6">
-                一般的な高断熱新築住宅（3,200万円超）に対し、本物件は<span className="font-bold text-stone-900">2,100万円（税込）</span>。
-                初期費用で浮いた約1,000万円は、老後のゆとり資金やご夫婦での旅行へ。
+                一般的な高断熱新築住宅（3,200万円超）に対し、本物件は<span className="font-bold text-stone-900">2,380万円（税込）</span>。
+                初期費用で浮いた約800〜1,000万円は、老後のゆとり資金やご夫婦での旅行へ。
               </p>
 
               <div className="space-y-3 bg-stone-50 p-5 rounded-2xl border border-stone-200 text-xs sm:text-sm mb-6">
@@ -296,7 +296,7 @@ export default function SaishinLpPage({ onNavigate }) {
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold text-stone-900">太陽光自家消費で「光熱費ほぼ0円」：</span>
-                    <span className="text-stone-600">HEAT20 G2基準＋大容量太陽光で、毎月の電気代不安を解消。</span>
+                    <span className="text-stone-600">HEAT20 G2基準＋大容量7.1kWh太陽光＆ヒートポンプエコキュートで、電気代不安を解消。</span>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
@@ -333,19 +333,19 @@ export default function SaishinLpPage({ onNavigate }) {
                 <div>
                   <div className="flex justify-between text-xs mb-1">
                     <span className="text-amber-400 font-bold">再進の家（鳩山ニュータウン）</span>
-                    <span className="font-bold text-amber-400">約 2,300 万円（30年）</span>
+                    <span className="font-bold text-amber-400">約 2,580 万円（30年）</span>
                   </div>
                   <div className="w-full h-4 bg-stone-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full" style={{ width: '55%' }}></div>
+                    <div className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full" style={{ width: '61%' }}></div>
                   </div>
-                  <div className="text-[11px] text-amber-300 font-medium mt-1">本体2,100万 ＋ 固定資産税激減 ＋ 光熱費ほぼ0円</div>
+                  <div className="text-[11px] text-amber-300 font-medium mt-1">本体2,380万 ＋ 固定資産税激減 ＋ 光熱費ほぼ0円</div>
                 </div>
               </div>
 
               <div className="mt-8 pt-6 border-t border-stone-800 text-center">
                 <span className="text-xs text-stone-400">30年間で生み出される「ゆとり資金」</span>
                 <div className="text-2xl sm:text-3xl font-black text-amber-400 mt-1">
-                  約 1,900 万円の差額効果
+                  約 1,620 万円の差額効果
                 </div>
               </div>
             </div>
@@ -357,42 +357,42 @@ export default function SaishinLpPage({ onNavigate }) {
               <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-2xl overflow-hidden shadow-md border border-stone-200">
                   <img
-                    src="/assets/saishin/construction/step_06.jpg"
-                    alt="木造スケルトン解体と梁の現し"
+                    src="/assets/saishin/features/feat_01_skeleton.jpg"
+                    alt="内部全解体・スケルトン現しと耐震金物補強"
                     className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                   />
                   <div className="p-2.5 bg-white text-[11px] font-bold text-stone-800 text-center">
-                    内部全撤去・スケルトン現し
+                    内部全解体・柱梁と金物補強
                   </div>
                 </div>
                 <div className="rounded-2xl overflow-hidden shadow-md border border-stone-200">
                   <img
-                    src="/assets/saishin/construction/step_07.jpg"
+                    src="/assets/saishin/features/feat_02_ginjiro.jpg"
                     alt="銀次郎 遮熱通気スペーサー施工"
                     className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                   />
                   <div className="p-2.5 bg-white text-[11px] font-bold text-stone-800 text-center">
-                    銀次郎 遮熱通気スペーサー
+                    屋根 銀次郎 遮熱通気スペーサー
                   </div>
                 </div>
                 <div className="rounded-2xl overflow-hidden shadow-md border border-stone-200">
                   <img
-                    src="/assets/saishin/sales/sales_06.jpg"
-                    alt="高断熱サッシと明るい室内"
+                    src="/assets/saishin/features/feat_03_window.jpg"
+                    alt="樹脂窓トリプルガラスサッシ（APW430相当）と高窓採光"
                     className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                   />
                   <div className="p-2.5 bg-white text-[11px] font-bold text-stone-800 text-center">
-                    新品高断熱サッシ・窓枠
+                    樹脂窓トリプルガラス＆高窓採光
                   </div>
                 </div>
                 <div className="rounded-2xl overflow-hidden shadow-md border border-stone-200">
                   <img
-                    src="/assets/saishin/sales/sales_05.jpg"
-                    alt="新品洗面化粧台・水回り"
+                    src="/assets/saishin/features/feat_04_plumbing.jpg"
+                    alt="水回り全新調（タカラ・LIXIL・TOTO）＆配管更新"
                     className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                   />
                   <div className="p-2.5 bg-white text-[11px] font-bold text-stone-800 text-center">
-                    配管全更新・新品設備導入
+                    水回り全新調（ユニットバス等）＆配管更新
                   </div>
                 </div>
               </div>
@@ -559,28 +559,47 @@ export default function SaishinLpPage({ onNavigate }) {
       {/* =========================================================================
           7. 不動産事業との連携：自宅売却・住み替えワンストップ相談
       ========================================================================= */}
-      <section className="py-20 bg-amber-900 text-white">
+      <section 
+        className="py-20 text-white" 
+        style={{ 
+          background: 'linear-gradient(135deg, #1c1917 0%, #292524 50%, #1c1917 100%)', 
+          borderTop: '1px solid #44403c',
+          borderBottom: '1px solid #44403c'
+        }}
+      >
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 text-amber-300 text-xs font-bold mb-4 border border-white/20">
+          <div 
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-4 shadow-sm"
+            style={{ 
+              background: 'rgba(217, 119, 6, 0.25)', 
+              border: '1px solid #d97706', 
+              color: '#fef3c7' 
+            }}
+          >
             <HeartHandshake className="w-4 h-4 text-amber-400" />
-            <span>宅地建物取引業者免許保有・ワンストップ対応</span>
+            <span>宅地建物取引業者免許保有・住み替えワンストップ対応</span>
           </div>
 
-          <h2 className="text-2xl sm:text-4xl font-black mb-4">
+          <h2 className="text-2xl sm:text-4xl font-black mb-4 tracking-tight" style={{ color: '#ffffff' }}>
             「今の家をどう売却するか」も、<br />
             当社が一括してお引き受けします。
           </h2>
 
-          <p className="text-stone-200 text-xs sm:text-base leading-relaxed max-w-2xl mx-auto mb-8">
-            住み替えで最も不安なのは、「今住んでいる家がいくらで売れるか、残債や手続きはどうなるか」です。<br />
-            当社は不動産事業も直営しているため、現在のお住まいの査定・売却・処分から、本物件への住み替え資金計画までワンストップでサポートいたします。
+          <p className="text-sm sm:text-base leading-relaxed max-w-2xl mx-auto mb-8" style={{ color: '#e7e5e4' }}>
+            住み替えで最もご不安なのは、「今住んでいる家がいくらで売れるか、残債や手続きはどうなるか」です。<br />
+            当社は建設業・設計事務所だけでなく<strong className="text-amber-300">不動産事業（宅建免許保有）も直営</strong>しているため、現在のお住まいの査定・買取・仲介売却から、本物件への住み替え資金計画まで全プロセスをワンストップで伴走いたします。
           </p>
 
           <button
             onClick={() => setModalType('tour')}
-            className="px-8 py-4 rounded-xl text-sm font-bold bg-white text-stone-900 hover:bg-stone-100 shadow-xl transition"
+            className="px-8 py-4 rounded-xl text-sm font-extrabold transition shadow-2xl"
+            style={{ 
+              background: '#ffffff', 
+              color: '#1c1917',
+              boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.4)' 
+            }}
           >
-            ご自宅の売却・住み替えを相談する
+            ご自宅の売却・住み替えを相談する（秘密厳守・無料）
           </button>
         </div>
       </section>
@@ -588,47 +607,106 @@ export default function SaishinLpPage({ onNavigate }) {
       {/* =========================================================================
           8. 物件概要
       ========================================================================= */}
-      <section className="py-20 bg-white border-b border-stone-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 text-center mb-10">
-            物件概要
-          </h2>
+      <section className="py-20 bg-stone-50 border-b border-stone-200">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-10">
+            <span className="text-xs font-bold text-amber-700 tracking-widest uppercase bg-amber-100 px-3 py-1 rounded-full">
+              PROPERTY OUTLINE
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 mt-2">
+              物件概要
+            </h2>
+            <p className="text-stone-500 text-xs sm:text-sm mt-1">
+              安心の売主直売・仲介手数料不要。詳細な図面や検査書類もすべて現地でご確認いただけます。
+            </p>
+          </div>
 
-          <div className="bg-stone-50 rounded-2xl border border-stone-200 overflow-hidden text-xs sm:text-sm">
-            <div className="grid grid-cols-3 p-4 border-b border-stone-200">
-              <span className="font-bold text-stone-700">物件名称</span>
-              <span className="col-span-2 text-stone-900 font-semibold">再進の家（鳩山ニュータウン）</span>
+          <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden text-xs sm:text-sm">
+            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
+              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">物件名称</span>
+              <span className="p-4 md:col-span-3 text-stone-900 font-bold">再進の家（鳩山ニュータウン高性能再生住宅）</span>
             </div>
-            <div className="grid grid-cols-3 p-4 border-b border-stone-200 bg-white">
-              <span className="font-bold text-stone-700">販売価格</span>
-              <span className="col-span-2 text-stone-900 font-bold text-amber-700 text-base">
-                2,100 万円（税込）
+
+            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200 bg-amber-50/40">
+              <span className="p-4 bg-amber-100/60 font-bold text-amber-900 md:border-r border-stone-200">価格</span>
+              <span className="p-4 md:col-span-3 text-amber-900 font-extrabold text-lg sm:text-xl flex items-baseline gap-2">
+                2,380 万円 <span className="text-xs font-normal text-stone-600">（税込 / 土地・建物総額）</span>
               </span>
             </div>
-            <div className="grid grid-cols-3 p-4 border-b border-stone-200">
-              <span className="font-bold text-stone-700">所在地</span>
-              <span className="col-span-2 text-stone-900">埼玉県比企郡鳩山町（鳩山ニュータウン内）</span>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
+              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">所在地</span>
+              <div className="p-4 md:col-span-3 text-stone-900 space-y-1">
+                <div>埼玉県比企郡鳩山町鳩ｹ丘2丁目867番400</div>
+                <div className="text-stone-600 text-xs">（住居表示）埼玉県比企郡鳩山町鳩ｹ丘2-9-8</div>
+              </div>
             </div>
-            <div className="grid grid-cols-3 p-4 border-b border-stone-200 bg-white">
-              <span className="font-bold text-stone-700">建物構造</span>
-              <span className="col-span-2 text-stone-900">木造スレート葺2階建（フルスケルトン再生）</span>
-            </div>
-            <div className="grid grid-cols-3 p-4 border-b border-stone-200">
-              <span className="font-bold text-stone-700">温熱・省エネ性能</span>
-              <span className="col-span-2 text-stone-900">
-                HEAT20 G2基準超高断熱 / 大容量太陽光発電自家消費システム / オール電化
+
+            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
+              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">交通</span>
+              <span className="p-4 md:col-span-3 text-stone-900">
+                東武東上線「高坂」駅 バス11分、サブセンターバス停より徒歩3分
               </span>
             </div>
-            <div className="grid grid-cols-3 p-4 border-b border-stone-200 bg-white">
-              <span className="font-bold text-stone-700">主要改修部位</span>
-              <span className="col-span-2 text-stone-900">
-                構造躯体補強・配管全更新・電気配線全更新・外壁屋根遮熱塗装・新品サッシ・新品設備
-              </span>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
+              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">土地</span>
+              <div className="p-4 md:col-span-3 text-stone-900">
+                正味面積：239.93㎡（約72.57坪） / 私道他なし
+              </div>
             </div>
-            <div className="grid grid-cols-3 p-4">
-              <span className="font-bold text-stone-700">取引態様</span>
-              <span className="col-span-2 text-stone-900 font-bold text-emerald-700">
-                売主（※仲介手数料 約75万円が不要です）
+
+            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
+              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">建物</span>
+              <div className="p-4 md:col-span-3 text-stone-900 space-y-1">
+                <div>1階：77.01㎡、2階：28.89㎡（延床面積：105.90㎡ / 約32.03坪）</div>
+                <div className="text-stone-600 text-xs">木造鋼板葺き / 昭和51年6月30日 築（フルスケルトン性能向上リノベーション済）</div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
+              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">法令上の制限</span>
+              <div className="p-4 md:col-span-3 text-stone-900 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                <div><span className="font-semibold text-stone-700">土地権利：</span>所有権</div>
+                <div><span className="font-semibold text-stone-700">地目：</span>宅地</div>
+                <div><span className="font-semibold text-stone-700">都市計画：</span>市街化区域</div>
+                <div><span className="font-semibold text-stone-700">用途地域：</span>第1種低層住居専用地域</div>
+                <div className="sm:col-span-2"><span className="font-semibold text-stone-700">建ぺい率 / 容積率：</span>50（60）％ / 80％</div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
+              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">備考・道路</span>
+              <div className="p-4 md:col-span-3 text-stone-900 space-y-1">
+                <div><span className="font-semibold text-stone-700">設備：</span>公営水道・東京電力・本下水</div>
+                <div><span className="font-semibold text-stone-700">接道（角地）：</span>南西9.9m公道に約15m接道、南東5.8m公道に約12m接道</div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
+              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">温熱・性能仕様</span>
+              <div className="p-4 md:col-span-3 text-stone-900 space-y-1">
+                <div className="font-semibold text-stone-800">HEAT20 G2.5水準超高断熱（冬期無暖房でも朝15℃を下回らない家）</div>
+                <div className="text-stone-600 text-xs">
+                  YKK APW430高性能トリプルガラス樹脂窓 / 屋根・壁付加断熱 / ホウ酸防腐防蟻処理 / フルスケルトン耐震補強・金物緊結
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
+              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">創エネ・主要設備</span>
+              <div className="p-4 md:col-span-3 text-stone-900 space-y-1">
+                <div>太陽光発電 7.1kWh（自家消費システム）＋高効率エコキュート（ほぼ光熱費実質ゼロ設計）</div>
+                <div className="text-stone-600 text-xs">
+                  タカラスタンダード高品位ホーローシステムキッチン・ホーローユニットバス / LIXIL洗面化粧台 / TOTOウォシュレット
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 bg-emerald-50/50">
+              <span className="p-4 bg-emerald-100/60 font-bold text-emerald-900 md:border-r border-stone-200">取引態様</span>
+              <span className="p-4 md:col-span-3 text-emerald-900 font-bold">
+                売主（※仲介手数料 約85万円が不要です）
               </span>
             </div>
           </div>
@@ -695,7 +773,7 @@ export default function SaishinLpPage({ onNavigate }) {
           </div>
           <p className="text-stone-500 max-w-xl mx-auto leading-relaxed">
             〒350-2224 埼玉県鶴ヶ島市町屋176番地5<br />
-            建設業許可：埼玉県知事(般-4)第66822号 / 宅地建物取引業：埼玉県知事(2)第23725号<br />
+            建設業許可：埼玉県知事(般-8)第66822号 / 宅地建物取引業：埼玉県知事(3)第23725号<br />
             建築士事務所登録：埼玉県知事 第(5)10278号
           </p>
           <div className="text-stone-600 text-[11px] pt-4 border-t border-stone-900">

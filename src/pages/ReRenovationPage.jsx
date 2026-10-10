@@ -184,7 +184,7 @@ export default function ReRenovationPage({ onNavigate }) {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-3">
           <div className="font-bold text-stone-200">株式会社 住ま居る リフォーム事業部 (RE)</div>
           <p className="text-stone-500">
-            埼玉県鶴ヶ島市町屋176番地5 / 建設業許可：埼玉県知事(般-4)第66822号 / 建築士事務所登録：埼玉県知事 第(5)10278号
+            埼玉県鶴ヶ島市町屋176番地5 / 建設業許可：埼玉県知事(般-8)第66822号 / 建築士事務所登録：埼玉県知事 第(5)10278号
           </p>
           <div className="text-stone-600">© 2026 SMILE Co., Ltd.</div>
         </div>

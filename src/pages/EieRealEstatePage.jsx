@@ -85,7 +85,7 @@ export default function EieRealEstatePage({ onNavigate }) {
                   HEAT20 G2基準超高断熱・太陽光自家消費・躯体配管全面更新。新築の約2/3の価格で叶える理想の再生住宅。
                 </p>
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl font-black text-amber-400">2,100 万円<span className="text-xs text-stone-400 font-normal">（税込）</span></span>
+                  <span className="text-2xl font-black text-amber-400">2,380 万円<span className="text-xs text-stone-400 font-normal">（税込）</span></span>
                   <button
                     onClick={() => onNavigate && onNavigate('saishin')}
                     className="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-stone-950 transition flex items-center gap-1.5 shadow-lg"
@@ -161,7 +161,7 @@ export default function EieRealEstatePage({ onNavigate }) {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-3">
           <div className="font-bold text-stone-200">株式会社 住ま居る 不動産事業部 (EIE)</div>
           <p className="text-stone-500">
-            埼玉県鶴ヶ島市町屋176番地5 / 宅地建物取引業：埼玉県知事(2)第23725号
+            埼玉県鶴ヶ島市町屋176番地5 / 宅地建物取引業：埼玉県知事(3)第23725号
           </p>
           <div className="text-stone-600">© 2026 SMILE Co., Ltd.</div>
         </div>
