@@ -276,6 +276,187 @@ export default function TopPage({ setCurrentRoute }) {
               <ChevronRight size={15} />
             </button>
           </div>
+
+          {/* ③ 【特設・新展開】スマイチ 住宅再生・不動産・リフォーム 3大プロジェクト */}
+          <div style={{
+            marginTop: 28,
+            padding: '24px 22px',
+            background: 'linear-gradient(135deg, #09131d 0%, #162436 100%)',
+            borderRadius: 16,
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+            boxShadow: '0 12px 36px rgba(0,0,0,0.2)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
+              <div>
+                <span style={{
+                  display: 'inline-block',
+                  padding: '3px 10px',
+                  borderRadius: 4,
+                  background: 'rgba(217, 119, 6, 0.25)',
+                  color: '#fbbf24',
+                  fontSize: 11,
+                  fontWeight: 800,
+                  letterSpacing: '0.05em',
+                  marginBottom: 6
+                }}>
+                  PROJECT SHOWCASE 2026
+                </span>
+                <h3 style={{ fontSize: 'clamp(17px, 2.4vw, 21px)', fontWeight: 800, color: '#fff', margin: 0 }}>
+                  木造自由設計ガレージから広がる、住まいと土地のワンストップ提案
+                </h3>
+              </div>
+              <span style={{ fontSize: 12, color: '#94a3b8' }}>
+                ※建築士・宅建士専任チームによる自社直接対応
+              </span>
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))',
+              gap: 16
+            }}>
+              {/* カード1: 再進の家 */}
+              <div
+                onClick={() => navigateTo('saishin')}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: 12,
+                  padding: '20px 18px',
+                  border: '1px solid rgba(217, 119, 6, 0.35)',
+                  cursor: 'pointer',
+                  transition: 'all 0.25s ease',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                    <span style={{ background: '#b45309', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 4 }}>
+                      現地モデルハウス販売中
+                    </span>
+                    <span style={{ fontSize: 11, color: '#fbbf24', fontWeight: 700 }}>
+                      24hバーチャル内覧公開中
+                    </span>
+                  </div>
+                  <h4 style={{ fontSize: 16, fontWeight: 800, color: '#fff', marginBottom: 6 }}>
+                    【再進の家】鳩山ニュータウン
+                  </h4>
+                  <p style={{ fontSize: 12.5, color: '#cbd5e1', lineHeight: 1.6, marginBottom: 14 }}>
+                    HEAT20 G2断熱・フルリノベ2,100万円。生活熱と陽光で冬暖かく、光熱費ほぼ0円。50〜60代のご夫婦に贈る終の住処。
+                  </p>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 10, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                  <span style={{ fontSize: 12, color: '#fbbf24', fontWeight: 700 }}>
+                    360°内覧ツアーを見る
+                  </span>
+                  <ChevronRight size={16} color="#fbbf24" />
+                </div>
+              </div>
+
+              {/* カード2: スマイチ不動産 */}
+              <div
+                onClick={() => navigateTo('eie')}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: 12,
+                  padding: '20px 18px',
+                  border: '1px solid rgba(5, 150, 105, 0.35)',
+                  cursor: 'pointer',
+                  transition: 'all 0.25s ease',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                    <span style={{ background: '#059669', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 4 }}>
+                      土地探し × ガレージ
+                    </span>
+                    <span style={{ fontSize: 11, color: '#34d399', fontWeight: 700 }}>
+                      自社預かり5区画
+                    </span>
+                  </div>
+                  <h4 style={{ fontSize: 16, fontWeight: 800, color: '#fff', marginBottom: 6 }}>
+                    スマイチ不動産 (EIE)
+                  </h4>
+                  <p style={{ fontSize: 12.5, color: '#cbd5e1', lineHeight: 1.6, marginBottom: 14 }}>
+                    「ガレージを建てられる広い土地がない」を解決。鳩山・坂戸・東松山の自社預かり売り地や中古戸建探しを直営サポート。
+                  </p>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 10, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                  <span style={{ fontSize: 12, color: '#34d399', fontWeight: 700 }}>
+                    土地情報・相談を見る
+                  </span>
+                  <ChevronRight size={16} color="#34d399" />
+                </div>
+              </div>
+
+              {/* カード3: スマイチリフォーム */}
+              <div
+                onClick={() => navigateTo('re')}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: 12,
+                  padding: '20px 18px',
+                  border: '1px solid rgba(37, 99, 235, 0.35)',
+                  cursor: 'pointer',
+                  transition: 'all 0.25s ease',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                    <span style={{ background: '#2563eb', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 4 }}>
+                      断熱・耐震・スケルトン
+                    </span>
+                    <span style={{ fontSize: 11, color: '#60a5fa', fontWeight: 700 }}>
+                      施工工程写真公開
+                    </span>
+                  </div>
+                  <h4 style={{ fontSize: 16, fontWeight: 800, color: '#fff', marginBottom: 6 }}>
+                    スマイチリフォーム (RE)
+                  </h4>
+                  <p style={{ fontSize: 12.5, color: '#cbd5e1', lineHeight: 1.6, marginBottom: 14 }}>
+                    寒くて暗い築古戸建を、新築以上の高断熱・高耐震へ。遮熱通気銀次郎と樹脂窓サッシによる劇的性能向上リノベーション。
+                  </p>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 10, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                  <span style={{ fontSize: 12, color: '#60a5fa', fontWeight: 700 }}>
+                    施工例・性能診断を見る
+                  </span>
+                  <ChevronRight size={16} color="#60a5fa" />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

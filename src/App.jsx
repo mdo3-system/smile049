@@ -10,6 +10,9 @@ import CaseStudiesPage from './pages/CaseStudiesPage';
 import SimulatorPage from './pages/SimulatorPage';
 import StaffAdminPage from './pages/StaffAdminPage';
 import StoryPage from './pages/StoryPage';
+import SaishinLpPage from './pages/SaishinLpPage';
+import EieRealEstatePage from './pages/EieRealEstatePage';
+import ReRenovationPage from './pages/ReRenovationPage';
 import ChatRoomModal from './components/ChatRoomModal';
 import { MessageSquare } from 'lucide-react';
 import { trackPageView, Analytics } from './utils/analytics';
@@ -24,6 +27,9 @@ const ROUTE_MAP = {
   'plan-workshop': '/plan-workshop',
   'case-studies': '/cases',
   'stories': '/stories',
+  'saishin': '/saishin',
+  'eie': '/eie',
+  're': '/re',
   'admin': '/admin'
 };
 
@@ -37,6 +43,9 @@ const getRouteFromPath = (pathname) => {
   if (cleanPath === '/plan-workshop') return 'plan-workshop';
   if (cleanPath === '/cases' || cleanPath === '/case-studies' || cleanPath === '/works' || cleanPath === '/case-01' || cleanPath === '/case-02' || cleanPath === '/casestudy01' || cleanPath === '/cases/01' || cleanPath === '/cases/02') return 'case-studies';
   if (cleanPath === '/stories' || cleanPath === '/story' || cleanPath === '/column') return 'stories';
+  if (cleanPath === '/saishin' || cleanPath === '/lp/saishin' || cleanPath === '/saishin-no-ie') return 'saishin';
+  if (cleanPath === '/eie' || cleanPath === '/realestate' || cleanPath === '/fudosan') return 'eie';
+  if (cleanPath === '/re' || cleanPath === '/renovation' || cleanPath === '/reform') return 're';
   if (cleanPath === '/admin') return 'admin';
   return 'top';
 };
@@ -80,6 +89,9 @@ export default function App() {
       'plan-workshop': '15m無柱大空間・スタジオ・道場・事業用倉庫｜木造自由設計【スマイチ】木造トラス構法',
       'case-studies': '【施工実例】市街化調整区域・境界15cm・特注寸法 木造自由設計ガレージ｜スマイチ',
       'stories': '木造自由設計ガレージ物語（公式WEB連載コラム）｜スマイチ',
+      'saishin': '【公式LP】再進の家｜鳩山ニュータウン 2,100万円・ほぼ光熱費0円・HEAT20 G2高性能再生住宅',
+      'eie': 'スマイチ不動産 (EIE)｜中古戸建×リノベ・土地探し×ガレージ・自社預かり土地5区画',
+      're': 'スマイチ リフォーム (RE)｜新築以上の性能を3/4価格で実現するフルスケルトン高断熱再生',
       'admin': '専任スタッフ管理ポータル｜スマイチ'
     };
 
@@ -107,6 +119,8 @@ export default function App() {
     setCurrentRoute(route);
   };
 
+  const isLp = currentRoute === 'saishin' || currentRoute === 'eie' || currentRoute === 're';
+
   return (
     <div className="app-root" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* 共通チャットモーダル */}
@@ -115,8 +129,8 @@ export default function App() {
         onClose={() => setIsChatModalOpen(false)} 
       />
 
-      {/* 共通ヘッダー（シミュレーター画面時は3Dモデルを最大表示するため専用極薄バーにする） */}
-      {currentRoute !== 'simulator' && (
+      {/* 共通ヘッダー（シミュレーター画面およびLP特設画面時は非表示） */}
+      {currentRoute !== 'simulator' && !isLp && (
         <Header currentRoute={currentRoute} setCurrentRoute={handleRouteNavigation} onOpenChat={() => setIsChatModalOpen(true)} />
       )}
 
@@ -129,6 +143,9 @@ export default function App() {
         {currentRoute === 'plan-workshop' && <PlanWorkshopPage setCurrentRoute={handleRouteNavigation} />}
         {currentRoute === 'case-studies' && <CaseStudiesPage setCurrentRoute={handleRouteNavigation} />}
         {currentRoute === 'stories' && <StoryPage setCurrentRoute={handleRouteNavigation} />}
+        {currentRoute === 'saishin' && <SaishinLpPage onNavigate={handleRouteNavigation} />}
+        {currentRoute === 'eie' && <EieRealEstatePage onNavigate={handleRouteNavigation} />}
+        {currentRoute === 're' && <ReRenovationPage onNavigate={handleRouteNavigation} />}
         {currentRoute === 'simulator' && (
           <SimulatorPage 
             setCurrentRoute={handleRouteNavigation} 
@@ -146,13 +163,13 @@ export default function App() {
         )}
       </main>
 
-      {/* シミュレーター画面および管理画面以外で共通フッターを表示 */}
-      {currentRoute !== 'simulator' && currentRoute !== 'admin' && (
+      {/* シミュレーター画面、管理画面、LP画面以外で共通フッターを表示 */}
+      {currentRoute !== 'simulator' && currentRoute !== 'admin' && !isLp && (
         <Footer setCurrentRoute={handleRouteNavigation} />
       )}
 
-      {/* 画面右下固定の「💬 無料相談チャット」フローティングボタン（シミュレーター・管理画面以外） */}
-      {currentRoute !== 'simulator' && currentRoute !== 'admin' && (
+      {/* 画面右下固定の「💬 無料相談チャット」フローティングボタン */}
+      {currentRoute !== 'simulator' && currentRoute !== 'admin' && !isLp && (
         <button
           onClick={() => {
             Analytics.trackChatOpen('floating_button');
