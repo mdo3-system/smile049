@@ -7,7 +7,8 @@ import {
 } from 'lucide-react';
 import DocumentSlotPanel from '../components/DocumentSlotPanel';
 import StoryStudioPanel from '../components/StoryStudioPanel';
-import { Lock, KeyRound } from 'lucide-react';
+import SaishinAdsPortalPanel from '../components/SaishinAdsPortalPanel';
+import { Lock, KeyRound, Target } from 'lucide-react';
 import { getChatRooms, sendMessageToRoom, updateRoomStatus } from '../services/chatService';
 import { APP_VERSION } from '../version.js';
 
@@ -404,7 +405,28 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
             }}
           >
             <Sparkles size={16} />
-            <span>ガレージ連載・Story Studio (Instagram / note / NanoBanana2)</span>
+            <span>ガレージ連載・Story Studio (Instagram / note)</span>
+          </button>
+
+          <button
+            onClick={() => setMainAdminTab('saishinAds')}
+            style={{
+              padding: '12px 18px',
+              fontSize: 13.5,
+              fontWeight: 700,
+              background: 'transparent',
+              border: 'none',
+              borderBottom: mainAdminTab === 'saishinAds' ? '3px solid #f59e0b' : '3px solid transparent',
+              color: mainAdminTab === 'saishinAds' ? '#f59e0b' : '#94a3b8',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <Target size={16} />
+            <span>再進の家 広告・SNSポータル (Facebook / Instagram / Threads)</span>
           </button>
         </div>
       </div>
@@ -826,7 +848,7 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
       </div>
       )}
 
-      {/* タブ2: ガレージ連載・Story Studio (Instagram / note / NanoBanana2) */}
+      {/* タブ2: ガレージ連載・Story Studio (Instagram / note) */}
       {mainAdminTab === 'storyStudio' && (
         <div style={{
           flex: 1,
@@ -836,6 +858,17 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
           padding: '24px 20px'
         }}>
           <StoryStudioPanel />
+        </div>
+      )}
+
+      {/* タブ3: 再進の家 広告・SNSマーケティングポータル */}
+      {mainAdminTab === 'saishinAds' && (
+        <div style={{
+          flex: 1,
+          width: '100%',
+          margin: '0 auto'
+        }}>
+          <SaishinAdsPortalPanel />
         </div>
       )}
 

@@ -13,6 +13,7 @@ import StoryPage from './pages/StoryPage';
 import SaishinLpPage from './pages/SaishinLpPage';
 import SaishinTechPage from './pages/SaishinTechPage';
 import SaishinSpecPage from './pages/SaishinSpecPage';
+import SaishinAdsPortalPanel from './components/SaishinAdsPortalPanel';
 import EieRealEstatePage from './pages/EieRealEstatePage';
 import ReRenovationPage from './pages/ReRenovationPage';
 import ChatRoomModal from './components/ChatRoomModal';
@@ -32,6 +33,7 @@ const ROUTE_MAP = {
   'saishin': '/saishin',
   'saishin-tech': '/saishin/technology',
   'saishin-spec': '/saishin/spec',
+  'saishin-ads': '/saishin/ads',
   'eie': '/eie',
   're': '/re',
   'admin': '/admin'
@@ -49,6 +51,7 @@ const getRouteFromPath = (pathname) => {
   if (cleanPath === '/stories' || cleanPath === '/story' || cleanPath === '/column') return 'stories';
   if (cleanPath === '/saishin/technology' || cleanPath === '/saishin/tech' || cleanPath === '/saishin/structure') return 'saishin-tech';
   if (cleanPath === '/saishin/spec' || cleanPath === '/saishin/specification' || cleanPath === '/saishin/environment') return 'saishin-spec';
+  if (cleanPath === '/saishin/ads' || cleanPath === '/admin/saishin-ads' || cleanPath === '/saishin-ads') return 'saishin-ads';
   if (cleanPath === '/saishin' || cleanPath === '/lp/saishin' || cleanPath === '/saishin-no-ie') return 'saishin';
   if (cleanPath === '/eie' || cleanPath === '/realestate' || cleanPath === '/fudosan') return 'eie';
   if (cleanPath === '/re' || cleanPath === '/renovation' || cleanPath === '/reform') return 're';
@@ -98,6 +101,7 @@ export default function App() {
       'saishin': '【公式LP】再進の家｜鳩山ニュータウン 2,180万円・ほぼ光熱費0円・HEAT20 G2高性能再生住宅',
       'saishin-tech': '【技術レポート】再進の家｜建築士と大工による躯体・スケルトン再生と構造計算エビデンス',
       'saishin-spec': '【物件スペック】再進の家｜HEAT20 G2温熱データ・周辺環境と生活網・物件詳細概要',
+      'saishin-ads': '【広告ポータル】再進の家｜Facebook/Instagram/Threads 広告・SNSマーケティング',
       'eie': 'スマイチ不動産 (EIE)｜中古戸建×リノベ・土地探し×ガレージ・自社預かり土地5区画',
       're': 'スマイチ リフォーム (RE)｜新築以上の性能を3/4価格で実現するフルスケルトン高断熱再生',
       'admin': '専任スタッフ管理ポータル｜スマイチ'
@@ -127,7 +131,7 @@ export default function App() {
     setCurrentRoute(route);
   };
 
-  const isLp = currentRoute === 'saishin' || currentRoute === 'saishin-tech' || currentRoute === 'saishin-spec' || currentRoute === 'eie' || currentRoute === 're';
+  const isLp = currentRoute === 'saishin' || currentRoute === 'saishin-tech' || currentRoute === 'saishin-spec' || currentRoute === 'saishin-ads' || currentRoute === 'eie' || currentRoute === 're';
 
   return (
     <div className="app-root" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -154,6 +158,7 @@ export default function App() {
         {currentRoute === 'saishin' && <SaishinLpPage onNavigate={handleRouteNavigation} />}
         {currentRoute === 'saishin-tech' && <SaishinTechPage onNavigate={handleRouteNavigation} />}
         {currentRoute === 'saishin-spec' && <SaishinSpecPage onNavigate={handleRouteNavigation} />}
+        {currentRoute === 'saishin-ads' && <SaishinAdsPortalPanel />}
         {currentRoute === 'eie' && <EieRealEstatePage onNavigate={handleRouteNavigation} />}
         {currentRoute === 're' && <ReRenovationPage onNavigate={handleRouteNavigation} />}
         {currentRoute === 'simulator' && (
