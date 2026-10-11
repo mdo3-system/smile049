@@ -63,7 +63,7 @@ export default function StoryPage({ setCurrentRoute }) {
   const activeColumn = selectedColumnSlug ? getColumnBySlug(selectedColumnSlug) : null;
 
   // カテゴリ一覧
-  const categories = ['all', '市街化調整区域・法規', '変形地・狭小地活用', '構造・性能比較', '農業・大型倉庫', '愛車・バイク', '建築法規・申請', '税金・建築費', '施工実例レポート'];
+  const categories = ['all', '競合・構造比較', '違法建築是正・行政協議', '市街化調整区域・青地転用', '価格・費用・資金計画', '市街化調整区域・法規', '変形地・狭小地活用', '構造・性能比較', '農業・大型倉庫', '愛車・バイク', '建築法規・申請', '税金・建築費', '施工実例レポート'];
 
   const filteredColumns = columns.filter(col => {
     const matchesCat = selectedCategory === 'all' || col.category === selectedCategory;

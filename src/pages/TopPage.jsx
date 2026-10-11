@@ -1563,6 +1563,59 @@ export default function TopPage({ setCurrentRoute }) {
                 </p>
               </div>
             </div>
+
+            {/* Q5: カクイチ・他社で断られた難条件や行政指導、施工エリア */}
+            <div style={{
+              background: '#ffffff',
+              borderRadius: 'var(--radius-lg)',
+              border: '1px solid #fed7aa',
+              padding: '28px 32px',
+              boxShadow: '0 4px 14px rgba(234, 88, 12, 0.06)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+                <div style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  background: '#ffedd5',
+                  color: '#ea580c',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 800,
+                  fontSize: 16
+                }}>
+                  Q5
+                </div>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', margin: 0 }}>
+                  カクイチなどの大手鉄骨規格メーカーや他社に断られた難条件でも相談できますか？
+                </h3>
+              </div>
+              <div style={{ paddingLeft: 48 }}>
+                <p style={{ fontSize: 14.5, color: '#475569', lineHeight: 1.8, margin: '0 0 12px 0' }}>
+                  <strong>はい、まさに「他社で規格が合わない・断られた」難条件こそ、スマイチが最も強みを発揮する領域です。</strong><br />
+                  カクイチ等の鉄骨規格品で「敷地に余白・デッドスペースができる」「冬の結露で困る」というお客様の受け皿として、ミリ単位の自由設計で土地ジャストフィットを実現します。
+                </p>
+                <div style={{
+                  background: '#fff7ed',
+                  border: '1px solid #fdba74',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '14px 18px',
+                  marginBottom: 12,
+                  fontSize: 13.5,
+                  color: '#9a3412',
+                  lineHeight: 1.7
+                }}>
+                  <strong>【専任建築士による実際の難案件クリア実績】</strong><br />
+                  ・<strong>埼玉県北本市（違法建築是正救済）</strong>：10坪のセルフビルド無確認建築に対し、行政との協議を経て<strong>建物を丸ごとジャッキアップして適法基礎を打設・合法化</strong>。<br />
+                  ・<strong>青農地からの店舗建築</strong>：市街化調整区域の難関「農振農用地（青地）」から除外・転用を勝ち取り、20坪日用品販売店舗を建築。<br />
+                  ・<strong>敷地境界15cm・既存舗装活用</strong>：隣地境界ギリギリへの軒ゼロ配置と、既存アスファルトを活かした解体費ゼロの特殊布基礎工法。
+                </div>
+                <p style={{ fontSize: 13.5, color: '#64748b', lineHeight: 1.7, margin: 0 }}>
+                  <strong>【対応エリア】</strong>：埼玉県内全域（鶴ヶ島・川越・坂戸・東松山・鳩山・比企郡・さいたま等）はもちろん、<strong>群馬県、栃木県、茨城県、東京都多摩エリアなど、アクセス可能な関東近郊全域に対応</strong>しています。個人・小規模事業主様のボリュームゾーン（5坪〜15坪、概算250万〜500万円）から大空間倉庫まで幅広くご相談いただけます。
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Q&Aセクション内 CTA */}
