@@ -54,7 +54,7 @@ const getRouteFromPath = (pathname) => {
   if (cleanPath === '/plan-agri') return 'plan-agri';
   if (cleanPath === '/plan-workshop') return 'plan-workshop';
   if (cleanPath === '/cases' || cleanPath === '/case-studies' || cleanPath === '/works' || cleanPath === '/case-01' || cleanPath === '/case-02' || cleanPath === '/casestudy01' || cleanPath === '/cases/01' || cleanPath === '/cases/02') return 'case-studies';
-  if (cleanPath === '/stories' || cleanPath === '/story' || cleanPath === '/column') return 'stories';
+  if (cleanPath === '/stories' || cleanPath === '/story' || cleanPath === '/column' || cleanPath.startsWith('/column/') || cleanPath.startsWith('/stories/')) return 'stories';
   if (cleanPath === '/saishin/technology' || cleanPath === '/saishin/tech' || cleanPath === '/saishin/structure') return 'saishin-tech';
   if (cleanPath === '/saishin/spec' || cleanPath === '/saishin/specification' || cleanPath === '/saishin/environment') return 'saishin-spec';
   if (cleanPath === '/saishin/ads' || cleanPath === '/admin/saishin-ads' || cleanPath === '/saishin-ads') return 'saishin-ads';

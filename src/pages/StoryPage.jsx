@@ -36,8 +36,19 @@ export default function StoryPage({ setCurrentRoute }) {
     return () => window.removeEventListener('smile049_stories_updated', handleUpdate);
   }, []);
 
-  // URLパラメータのチェック（?tab=stories or ?col=xxx or ?ep=xxx）
+  // URLパス（/column/:slug）およびクエリパラメータ（?tab=stories or ?col=xxx or ?ep=xxx）のチェック
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const pathname = window.location.pathname.replace(/\/+$/, '');
+      if (pathname.startsWith('/column/')) {
+        const slug = pathname.replace(/^\/column\//, '');
+        if (slug) {
+          setSelectedColumnSlug(slug);
+          setMainTab('columns');
+        }
+      }
+    }
+
     const params = new URLSearchParams(window.location.search);
     const tabParam = params.get('tab');
     if (tabParam === 'stories' || tabParam === 'story') {
