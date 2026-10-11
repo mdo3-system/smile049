@@ -162,60 +162,67 @@ export default function Footer({ setCurrentRoute }) {
             </h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10, fontSize: 14 }}>
               <li>
-                <button
-                  onClick={() => { setCurrentRoute('plan-hobby'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  style={{ color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left' }}
+                <a
+                  href="/plan-hobby"
+                  onClick={(e) => { e.preventDefault(); setCurrentRoute('plan-hobby'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  style={{ color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left', textDecoration: 'none' }}
                 >
                   <span style={{ color: 'var(--color-accent)' }}>▸</span> Plan 01: 大人の秘密基地【愛車・ホビー】
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() => { setCurrentRoute('plan-storage'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  style={{ color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left' }}
+                <a
+                  href="/plan-storage"
+                  onClick={(e) => { e.preventDefault(); setCurrentRoute('plan-storage'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  style={{ color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left', textDecoration: 'none' }}
                 >
                   <span style={{ color: 'var(--color-accent)' }}>▸</span> Plan 02: 隙間・変形地活用【特注ストッカー】
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() => { setCurrentRoute('plan-agri'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  style={{ color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left' }}
+                <a
+                  href="/plan-agri"
+                  onClick={(e) => { e.preventDefault(); setCurrentRoute('plan-agri'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  style={{ color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left', textDecoration: 'none' }}
                 >
                   <span style={{ color: 'var(--color-accent)' }}>▸</span> Plan 03: 農機具・大型倉庫【アグリシェッド】
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() => { setCurrentRoute('plan-workshop'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  style={{ color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left' }}
+                <a
+                  href="/plan-workshop"
+                  onClick={(e) => { e.preventDefault(); setCurrentRoute('plan-workshop'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  style={{ color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left', textDecoration: 'none' }}
                 >
                   <span style={{ color: 'var(--color-accent)' }}>▸</span> Plan 04: 無柱大空間・ホール【スマイチワークショップ】
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() => { setCurrentRoute('case-studies'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  style={{ color: '#38bdf8', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left' }}
+                <a
+                  href="/cases"
+                  onClick={(e) => { e.preventDefault(); setCurrentRoute('case-studies'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  style={{ color: '#38bdf8', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left', textDecoration: 'none' }}
                 >
                   <span style={{ color: '#38bdf8' }}>★</span> 【施工実例】市街化調整区域・境界15cm・特注寸法
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() => { setCurrentRoute('stories'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  style={{ color: '#fde047', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left' }}
+                <a
+                  href="/stories"
+                  onClick={(e) => { e.preventDefault(); setCurrentRoute('stories'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  style={{ color: '#fde047', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left', textDecoration: 'none' }}
                 >
                   <span style={{ color: '#fde047' }}>📖</span> 公式WEB連載コラム【ガレージ物語】
-                </button>
+                </a>
               </li>
               <li style={{ marginTop: 6 }}>
-                <button
-                  onClick={() => { setCurrentRoute('simulator'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  style={{ color: '#5eead4', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}
+                <a
+                  href="/simulator"
+                  onClick={(e) => { e.preventDefault(); setCurrentRoute('simulator'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  style={{ color: '#5eead4', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}
                 >
                   <span style={{ color: '#5eead4' }}>★</span> 無料3Dシミュレーター＋自動見積もり
-                </button>
+                </a>
               </li>
               <li style={{ marginTop: 12, paddingTop: 10, borderTop: '1px dashed #334155' }}>
                 <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 700, letterSpacing: '0.05em' }}>
@@ -223,28 +230,31 @@ export default function Footer({ setCurrentRoute }) {
                 </span>
               </li>
               <li>
-                <button
-                  onClick={() => { setCurrentRoute('saishin'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  style={{ color: '#fbbf24', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left' }}
+                <a
+                  href="/saishin"
+                  onClick={(e) => { e.preventDefault(); setCurrentRoute('saishin'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  style={{ color: '#fbbf24', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left', textDecoration: 'none' }}
                 >
                   <span style={{ color: '#fbbf24' }}>🏡</span> 【再進の家】鳩山 2,180万円・HEAT20 G2（360°内覧）
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() => { setCurrentRoute('eie'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  style={{ color: '#34d399', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left' }}
+                <a
+                  href="/eie"
+                  onClick={(e) => { e.preventDefault(); setCurrentRoute('eie'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  style={{ color: '#34d399', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left', textDecoration: 'none' }}
                 >
                   <span style={{ color: '#34d399' }}>📍</span> スマイチ不動産（EIE）土地探し×ガレージ（売り地5区画）
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() => { setCurrentRoute('re'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  style={{ color: '#60a5fa', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left' }}
+                <a
+                  href="/re"
+                  onClick={(e) => { e.preventDefault(); setCurrentRoute('re'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  style={{ color: '#60a5fa', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left', textDecoration: 'none' }}
                 >
                   <span style={{ color: '#60a5fa' }}>🔨</span> スマイチリフォーム（RE）断熱・耐震フルスケルトン再生
-                </button>
+                </a>
               </li>
             </ul>
           </div>

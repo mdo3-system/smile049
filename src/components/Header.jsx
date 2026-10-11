@@ -7,13 +7,13 @@ export default function Header({ currentRoute, setCurrentRoute }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { id: 'top', label: 'トップ', icon: Home },
-    { id: 'case-studies', label: '施工実例', isHighlight: true },
-    { id: 'plan-hobby', label: '愛車・ホビー', planNum: '01' },
-    { id: 'plan-storage', label: '狭小・変形地', planNum: '02' },
-    { id: 'plan-agri', label: '農機具倉庫', planNum: '03' },
-    { id: 'plan-workshop', label: '大空間・ホール', planNum: '04' },
-    { id: 'stories', label: 'お悩み解決コラム', isNew: true },
+    { id: 'top', label: 'トップ', icon: Home, href: '/' },
+    { id: 'case-studies', label: '施工実例', isHighlight: true, href: '/cases' },
+    { id: 'plan-hobby', label: '愛車・ホビー', planNum: '01', href: '/plan-hobby' },
+    { id: 'plan-storage', label: '狭小・変形地', planNum: '02', href: '/plan-storage' },
+    { id: 'plan-agri', label: '農機具倉庫', planNum: '03', href: '/plan-agri' },
+    { id: 'plan-workshop', label: '大空間・ホール', planNum: '04', href: '/plan-workshop' },
+    { id: 'stories', label: 'お悩み解決コラム', isNew: true, href: '/stories' },
   ];
 
   const handleNav = (routeId) => {
@@ -42,15 +42,22 @@ export default function Header({ currentRoute, setCurrentRoute }) {
         gap: 12
       }}>
         {/* ブランドロゴ */}
-        <div 
-          onClick={() => handleNav('top')}
+        <a 
+          href="/"
+          onClick={(e) => {
+            e.preventDefault();
+            handleNav('top');
+          }}
           style={{
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             gap: 10,
-            flexShrink: 0
+            flexShrink: 0,
+            textDecoration: 'none',
+            color: 'inherit'
           }}
+          title="スマイチ ガレージ - トップページ"
         >
           <div style={{
             width: 38,
@@ -99,7 +106,7 @@ export default function Header({ currentRoute, setCurrentRoute }) {
               スマイチ ガレージ
             </div>
           </div>
-        </div>
+        </a>
 
         {/* デスクトップナビ（P01〜P04） */}
         <nav style={{
@@ -110,9 +117,13 @@ export default function Header({ currentRoute, setCurrentRoute }) {
           {navItems.map((item) => {
             const isActive = currentRoute === item.id;
             return (
-              <button
+              <a
                 key={item.id}
-                onClick={() => handleNav(item.id)}
+                href={item.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNav(item.id);
+                }}
                 style={{
                   padding: '7px 11px',
                   borderRadius: 'var(--radius-full)',
@@ -124,7 +135,8 @@ export default function Header({ currentRoute, setCurrentRoute }) {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 5,
-                  whiteSpace: 'nowrap'
+                  whiteSpace: 'nowrap',
+                  textDecoration: 'none'
                 }}
               >
                 {item.planNum && (
@@ -140,15 +152,19 @@ export default function Header({ currentRoute, setCurrentRoute }) {
                   </span>
                 )}
                 {item.label}
-              </button>
+              </a>
             );
           })}
         </nav>
 
         {/* 右側CTA（主役の3Dシミュレーターボタンを最優先強調） */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-          <button
-            onClick={() => handleNav('simulator')}
+          <a
+            href="/simulator"
+            onClick={(e) => {
+              e.preventDefault();
+              handleNav('simulator');
+            }}
             className="btn-accent"
             style={{
               padding: '9px 20px',
@@ -157,12 +173,14 @@ export default function Header({ currentRoute, setCurrentRoute }) {
               boxShadow: '0 4px 14px rgba(224, 122, 95, 0.38)',
               display: 'flex',
               alignItems: 'center',
-              gap: 7
+              gap: 7,
+              textDecoration: 'none',
+              color: '#fff'
             }}
           >
             <Compass size={17} />
             <span>3Dシミュレーター（無料）</span>
-          </button>
+          </a>
 
           {/* モバイルハンバーガー */}
           <button
@@ -194,9 +212,13 @@ export default function Header({ currentRoute, setCurrentRoute }) {
           boxShadow: 'var(--shadow-md)'
         }}>
           {navItems.map((item) => (
-            <button
+            <a
               key={item.id}
-              onClick={() => handleNav(item.id)}
+              href={item.href}
+              onClick={(e) => {
+                e.preventDefault();
+                handleNav(item.id);
+              }}
               style={{
                 textAlign: 'left',
                 padding: '12px 14px',
@@ -207,21 +229,26 @@ export default function Header({ currentRoute, setCurrentRoute }) {
                 background: currentRoute === item.id ? 'var(--color-primary-soft)' : 'transparent',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
+                textDecoration: 'none'
               }}
             >
               <span>{item.label}</span>
               <ArrowRight size={16} opacity={0.5} />
-            </button>
+            </a>
           ))}
-          <button
-            onClick={() => handleNav('simulator')}
+          <a
+            href="/simulator"
+            onClick={(e) => {
+              e.preventDefault();
+              handleNav('simulator');
+            }}
             className="btn-accent"
-            style={{ marginTop: 10, width: '100%', justifyContent: 'center' }}
+            style={{ marginTop: 10, width: '100%', justifyContent: 'center', textDecoration: 'none', color: '#fff' }}
           >
             <Compass size={18} />
             <span>無料3Dシミュレーターを起動</span>
-          </button>
+          </a>
         </div>
       )}
 

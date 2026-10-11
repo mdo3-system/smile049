@@ -107,12 +107,50 @@ export default function App() {
       'admin': '専任スタッフ管理ポータル｜スマイチ'
     };
 
+    const descriptionMap = {
+      'top': 'あと少し大きく、あと少し小さく。規格サイズに土地を合わせるのではなく、敷地に合わせて自分で描く木造自由設計ガレージ・倉庫【スマイチ】。登録不要の3Dシミュレーターで概算金額・パースを即時自動見積もり。関東・埼玉県全域対応、変形地・狭小地・市街化調整区域もワンストップ対応。',
+      'simulator': '会員登録不要・無料。敷地寸法・変形地に合わせて1mm単位で自分で間口・奥行き・高さを自由に変更でき、概算建築費用をリアルタイム自動見積もりできるスマイチ3Dシミュレーター。',
+      'plan-hobby': '愛車・大型バイク・工具・書斎・ロフトスペースを備えた木造自由設計ホビーガレージ。結露や湿気を抑える木造断熱構造で、大人の秘密基地を実現。',
+      'plan-storage': '敷地境界15cm・台形地・三角地・旗竿地にジャストフィットする木造特注ストッカー倉庫。軒ゼロ設計・変形地対応で敷地の余白を無駄なく最大活用。',
+      'plan-agri': 'トラクター・コンバインの作業動線から逆算する木造アグリシェッド（大型農業用倉庫）。市街化調整区域の建築許可・農地転用・確認申請まで一括代行。',
+      'plan-workshop': '木造トラス構法による15m無柱大空間。スタジオ・道場・配送デポ・事業用倉庫・作業場を鉄骨造より低コスト・短工期で実現。',
+      'case-studies': '【施工実例】市街化調整区域・敷地境界15cm・既存アスファルト活用など、大手規格品で断られた厳しい条件を解決した木造自由設計ガレージの施工写真・図面・ドキュメンタリー。',
+      'stories': '木造自由設計ガレージ物語。収納・敷地変形・確認申請・コストなど、実際のお客様の課題解決ストーリーと役立つ建築コラム。',
+      'saishin': '【公式LP】再進の家｜鳩山ニュータウン 2,180万円（税込）。HEAT20 G2超高断熱・ほぼ光熱費0円・建築士と大工さんが躯体から生まれ変わらせた技術で裏付けられた安心の終の住処。3D間取り＆360度WEB内覧公開中。',
+      'saishin-tech': '【技術レポート】再進の家｜建築士と大工によるフルスケルトン金物補強・屋根遮熱通気銀次郎・APW430トリプルガラス樹脂窓・インフラ完全更新の工学エビデンス。',
+      'saishin-spec': '【物件スペック】再進の家｜HEAT20 G2温熱シミュレーションデータ（無暖房で朝15℃キープ）、鳩山ニュータウン周辺環境の正直な事実と生活網、詳細物件概要。',
+      'saishin-ads': '【広告ポータル】再進の家｜Facebook/Instagram/Threads 広告・SNSマーケティング。Meta広告特別カテゴリ完全準拠・ターゲット自己選定クリエイティブ集。',
+      'eie': 'スマイチ不動産 (EIE)｜中古戸建×リノベ・土地探し×ガレージ。ガレージを建てられる広い土地探しから預かり売り地情報までワンストップ対応。',
+      're': 'スマイチ リフォーム (RE)｜新築の2/3〜半額で新築以上の暖かさと耐震性を実現するフルスケルトン高断熱再生リノベーション。',
+      'admin': '専任スタッフ管理ポータル｜スマイチ'
+    };
+
     if (titleMap[currentRoute]) {
       document.title = titleMap[currentRoute];
     }
 
-    // Google Analytics 4 (GA4) 仮想ページビュー送信
     const currentPath = getPathFromRoute(currentRoute);
+    const currentUrl = `https://smile049.jp${currentPath === '/' ? '' : currentPath}`;
+
+    // 動的Canonical・Description・OGP同期
+    const canonicalElem = document.getElementById('canonical-url');
+    if (canonicalElem) canonicalElem.setAttribute('href', currentUrl);
+
+    const descElem = document.getElementById('meta-description');
+    if (descElem && descriptionMap[currentRoute]) {
+      descElem.setAttribute('content', descriptionMap[currentRoute]);
+    }
+
+    const ogUrlElem = document.getElementById('og-url');
+    if (ogUrlElem) ogUrlElem.setAttribute('content', currentUrl);
+
+    const ogTitleElem = document.getElementById('og-title');
+    if (ogTitleElem && titleMap[currentRoute]) ogTitleElem.setAttribute('content', titleMap[currentRoute]);
+
+    const ogDescElem = document.getElementById('og-description');
+    if (ogDescElem && descriptionMap[currentRoute]) ogDescElem.setAttribute('content', descriptionMap[currentRoute]);
+
+    // Google Analytics 4 (GA4) 仮想ページビュー送信
     const pageTitle = titleMap[currentRoute] || document.title;
     trackPageView(currentPath, pageTitle);
   }, [currentRoute]);
