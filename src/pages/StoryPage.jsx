@@ -85,6 +85,41 @@ export default function StoryPage({ setCurrentRoute }) {
     return matchesCat && matchesQuery;
   });
 
+  // 個別コラム選択時の SEO メタタグ動的更新 & URL同期
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+
+    if (activeColumn) {
+      document.title = `${activeColumn.title}｜木造自由設計ガレージ【スマイチ】`;
+
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', activeColumn.description);
+
+      const ogTitle = document.querySelector('meta[property="og:title"]');
+      if (ogTitle) ogTitle.setAttribute('content', `${activeColumn.title}｜スマイチ`);
+
+      const ogDesc = document.querySelector('meta[property="og:description"]');
+      if (ogDesc) ogDesc.setAttribute('content', activeColumn.description);
+
+      const ogUrl = document.querySelector('meta[property="og:url"]');
+      if (ogUrl) ogUrl.setAttribute('content', `https://smile049.jp/column/${activeColumn.slug}`);
+
+      const canonical = document.querySelector('link[rel="canonical"]');
+      if (canonical) canonical.setAttribute('href', `https://smile049.jp/column/${activeColumn.slug}`);
+
+      if (window.location.pathname !== `/column/${activeColumn.slug}`) {
+        window.history.replaceState(null, '', `/column/${activeColumn.slug}`);
+      }
+    } else if (mainTab === 'columns') {
+      document.title = '悩み解決型 SEOコラム・建築士の専門解説｜木造自由設計ガレージ【スマイチ】埼玉・関東';
+      const canonical = document.querySelector('link[rel="canonical"]');
+      if (canonical) canonical.setAttribute('href', 'https://smile049.jp/stories');
+      if (window.location.pathname.startsWith('/column/')) {
+        window.history.replaceState(null, '', '/stories');
+      }
+    }
+  }, [activeColumn, mainTab]);
+
   const navigateTo = (route) => {
     if (route === 'simulator') {
       Analytics.trackSimulatorStart('column_page');
@@ -383,6 +418,59 @@ export default function StoryPage({ setCurrentRoute }) {
                     </button>
                   </div>
                 )}
+
+                {/* 内部リンク・トピッククラスター（関連記事） */}
+                <div style={{ marginTop: 44, paddingTop: 32, borderTop: '2px dashed #e2e8f0' }}>
+                  <h3 style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span>💡 この記事を読んだ方におすすめのお悩み解決コラム</span>
+                  </h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+                    {columns
+                      .filter(c => c.slug !== activeColumn.slug)
+                      .slice(0, 3)
+                      .map(rel => (
+                        <div
+                          key={rel.id}
+                          onClick={() => {
+                            setSelectedColumnSlug(rel.slug);
+                            window.scrollTo({ top: 120, behavior: 'smooth' });
+                          }}
+                          style={{
+                            background: '#f8fafc',
+                            borderRadius: 12,
+                            padding: '16px',
+                            border: '1px solid #e2e8f0',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = '#f1f5f9';
+                            e.currentTarget.style.borderColor = 'var(--color-primary)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = '#f8fafc';
+                            e.currentTarget.style.borderColor = '#e2e8f0';
+                          }}
+                        >
+                          <div>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: '#0284c7', background: '#e0f2fe', padding: '2px 8px', borderRadius: 4, display: 'inline-block', marginBottom: 8 }}>
+                              {rel.badge || rel.category}
+                            </span>
+                            <h4 style={{ fontSize: 13.5, fontWeight: 800, color: '#1e293b', lineHeight: 1.45, margin: '0 0 8px' }}>
+                              {rel.title}
+                            </h4>
+                          </div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: 4, marginTop: 8 }}>
+                            <span>記事を読む</span>
+                            <ArrowRight size={14} />
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
 
               </article>
             </div>

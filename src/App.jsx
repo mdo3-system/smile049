@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import TopPage from './pages/TopPage';
@@ -7,18 +7,20 @@ import PlanStoragePage from './pages/PlanStoragePage';
 import PlanAgriPage from './pages/PlanAgriPage';
 import PlanWorkshopPage from './pages/PlanWorkshopPage';
 import CaseStudiesPage from './pages/CaseStudiesPage';
-import SimulatorPage from './pages/SimulatorPage';
-import StaffAdminPage from './pages/StaffAdminPage';
 import StoryPage from './pages/StoryPage';
 import SaishinLpPage from './pages/SaishinLpPage';
 import SaishinTechPage from './pages/SaishinTechPage';
 import SaishinSpecPage from './pages/SaishinSpecPage';
-import SaishinAdsPortalPanel from './components/SaishinAdsPortalPanel';
 import EieRealEstatePage from './pages/EieRealEstatePage';
 import ReRenovationPage from './pages/ReRenovationPage';
 import ChatRoomModal from './components/ChatRoomModal';
 import { MessageSquare } from 'lucide-react';
 import { trackPageView, Analytics } from './utils/analytics';
+
+// 重厚な3Dライブラリ(Three.js)を含むシミュレーターと管理画面をCode Splitting(遅延読込)して初期表示を劇的軽量化
+const SimulatorPage = lazy(() => import('./pages/SimulatorPage'));
+const StaffAdminPage = lazy(() => import('./pages/StaffAdminPage'));
+const SaishinAdsPortalPanel = lazy(() => import('./components/SaishinAdsPortalPanel'));
 
 // パスとルート識別子の相互変換マップ
 const ROUTE_MAP = {
@@ -202,23 +204,36 @@ export default function App() {
         {currentRoute === 'saishin' && <SaishinLpPage onNavigate={handleRouteNavigation} />}
         {currentRoute === 'saishin-tech' && <SaishinTechPage onNavigate={handleRouteNavigation} />}
         {currentRoute === 'saishin-spec' && <SaishinSpecPage onNavigate={handleRouteNavigation} />}
-        {currentRoute === 'saishin-ads' && <SaishinAdsPortalPanel />}
+        {currentRoute === 'saishin-ads' && (
+          <Suspense fallback={<div style={{ padding: 40, textAlign: 'center', color: '#64748b' }}>広告ポータルを読み込み中...</div>}>
+            <SaishinAdsPortalPanel />
+          </Suspense>
+        )}
         {currentRoute === 'eie' && <EieRealEstatePage onNavigate={handleRouteNavigation} />}
         {currentRoute === 're' && <ReRenovationPage onNavigate={handleRouteNavigation} />}
         {currentRoute === 'simulator' && (
-          <SimulatorPage 
-            setCurrentRoute={handleRouteNavigation} 
-            externalModelData={customerModelData}
-          />
+          <Suspense fallback={
+            <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#0f172a', color: '#ffffff' }}>
+              <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8, color: '#38bdf8' }}>3Dシミュレーターを準備中...</div>
+              <div style={{ fontSize: 13, color: '#94a3b8' }}>ミリ単位の自由設計・自動積算エンジンを起動しています</div>
+            </div>
+          }>
+            <SimulatorPage 
+              setCurrentRoute={handleRouteNavigation} 
+              externalModelData={customerModelData}
+            />
+          </Suspense>
         )}
         {currentRoute === 'admin' && (
-          <StaffAdminPage 
-            setCurrentRoute={handleRouteNavigation}
-            onLoadCustomerModel={(model) => {
-              setCustomerModelData(model);
-              handleRouteNavigation('simulator');
-            }}
-          />
+          <Suspense fallback={<div style={{ padding: 40, textAlign: 'center', color: '#64748b' }}>管理ポータルを読み込み中...</div>}>
+            <StaffAdminPage 
+              setCurrentRoute={handleRouteNavigation}
+              onLoadCustomerModel={(model) => {
+                setCustomerModelData(model);
+                handleRouteNavigation('simulator');
+              }}
+            />
+          </Suspense>
         )}
       </main>
 
