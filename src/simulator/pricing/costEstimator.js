@@ -1,12 +1,35 @@
 /**
- * 建築積算・数量計算・概算見積もりモジュール
- * 【単一責任の原則 (SRP): 建築数量算出および概算工事費用の計算責務】
+ * 建築積算・数量計算・精密原価/見積もりモジュール (costEstimator.js)
+ * 
+ * ユーザー指定積算基準（原価 × 1.33 = 見積額）に基づく精密積算エンジン
+ * 
+ * 【工事区分】
+ * A. 本体工事（必ずかかるもの）
+ *   ① 木工事 (17㎡:42万, 36㎡:62万按分)
+ *   ② 開口部・サッシ工事 (三和シャッター & LIXILカタログ定価マスタ)
+ *   ③ 屋根工事 (19㎡:18万, 38㎡:37万按分)
+ *   ④ 外壁工事 (68㎡:45万, 149㎡:78万按分)
+ *   ⑤ 基礎工事 (@1.2万円/m)
+ *   ⑥ 建材工事 (17㎡:6万, 36㎡:17万按分)
+ *   ⑦ 申請手続き費用 (確認申請図書作成・提出代行)
+ * 
+ * B. 付帯工事・追加工事（現地調査・ヒアリングで確定する別途費用）
+ *   ・解体工事・整地工事
+ *   ・電気工事
+ *   ・空調工事
+ *   ・土間打設工事
+ *   ・給排水衛生設備工事
+ *   ・地盤調査費用
+ *   ・測量・行政調査費用
  */
 
+// 乗率定数 (原価 × 1.33 ＝ 見積額、粗利率約24.8%)
+export const MARKUP_RATE = 1.33;
+
 /**
- * 柱芯座標、外壁座標、軒高、開口部リストから各種建築数量と概算費用を算出
+ * 柱芯座標、外壁座標、軒高、開口部リストから建築数量と精密費用を算出
  */
-export const calculateBuildingQuantities = (corePts, outerPts, hPts, dimensions, openings) => {
+export const calculateBuildingQuantities = (corePts, outerPts, hPts, dimensions, openings = []) => {
   const { wFront: wF, wBack: wB, dLeft: dL, dRight: dR, roofSlope: slopeVal, foundationHeight: foundationH } = dimensions;
 
   // 1. 床面積 (グリーンの定理によるポリゴン面積)
@@ -17,7 +40,7 @@ export const calculateBuildingQuantities = (corePts, outerPts, hPts, dimensions,
   }
   const floorAreaM2 = Math.abs(floorMm2) / 2 / 1000000;
   const tsubo = floorAreaM2 * 0.3025;
-  const floorFormula = `[(間口平均 ${(wF + wB) / 2}mm) × (奥行平均 ${(dL + dR) / 2}mm)]`;
+  const floorFormula = `[(間口平均 ${((wF + wB) / 2).toFixed(0)}mm) × (奥行平均 ${((dL + dR) / 2).toFixed(0)}mm)]`;
   const floorVal = `${floorAreaM2.toFixed(2)} ㎡ (${tsubo.toFixed(2)} 坪)`;
 
   // 2. 基礎長さ
@@ -77,8 +100,17 @@ export const calculateBuildingQuantities = (corePts, outerPts, hPts, dimensions,
   const wallsFormula = `${w0.formula}\n${w1.formula}\n${w2.formula}\n${w3.formula}`;
   const wallsVal = `純外壁総面積: ${totalNetWallM2.toFixed(2)} ㎡`;
 
-  // 概算建築費用目安算出 (坪22万円〜 + 基礎・開口部・屋根係数)
-  const approxCost = Math.round((tsubo * 220000 + totalFoundM * 25000 + roofRealM2 * 18000 + totalOpM2 * 45000) / 10000) * 10000;
+  // 精密積算（本体工事原価 × 1.33）
+  const estimate = generate7CategoriesEstimate({
+    floorAreaM2,
+    tsubo,
+    totalFoundM,
+    roofRealM2,
+    totalOpM2,
+    totalNetWallM2
+  }, dimensions, openings);
+
+  const approxCost = estimate.mainWorksTotalPrice; // 本体工事見積合計（税抜）
 
   return {
     floorFormula,
@@ -97,141 +129,289 @@ export const calculateBuildingQuantities = (corePts, outerPts, hPts, dimensions,
     wallsFormula,
     wallsVal,
     totalNetWallM2,
-    approxCost
+    approxCost,
+    detailedEstimate: estimate
   };
 };
 
 /**
- * 概算見積書 7大枠 ＆ 薄墨（該当外・未選択オプション）データ生成
- * 
- * 7大枠：
- * ① 本体工事
- * ② 基礎工事
- * ③ シャッター・開口部工事
- * ④ コンクリート土間工事
- * ⑤ 電気工事
- * ⑥ ユニック・揚重・運搬費
- * ⑦ 調査・申請費
+ * ユーザー指定原価基準による本体工事7項目 ＆ 付帯工事（別途費用）生成
  */
 export const generate7CategoriesEstimate = (quantities, dimensions, openings = []) => {
-  const { floorAreaM2 = 25, tsubo = 7.5, totalFoundM = 20, roofRealM2 = 28, totalOpM2 = 8, totalNetWallM2 = 45 } = quantities || {};
+  const { 
+    floorAreaM2 = 20, 
+    totalFoundM = 18, 
+    roofRealM2 = 24, 
+    totalNetWallM2 = 48 
+  } = quantities || {};
 
-  // ① 本体工事 (木造在来軸組 + 外壁・屋根ガルバリウム軒出0)
-  const mainStructureCost = Math.round(tsubo * 220000);
-  const exteriorRoofCost = Math.round(roofRealM2 * 18000 + totalNetWallM2 * 9000);
-  const cat1Total = mainStructureCost + exteriorRoofCost;
+  // =========================================================================
+  // 【A. 本体工事 原価計算 (Cost)】
+  // =========================================================================
 
-  // ② 基礎工事 (外周長×25,000円)
-  const cat2Total = Math.round(totalFoundM * 25000);
+  // ① 木工事：17㎡で42万円、36㎡で62万円の按分
+  // 傾き = 200,000 / 19 ≒ 10,526円/㎡
+  const woodSlope = (620000 - 420000) / (36 - 17);
+  const costWood = Math.max(260000, Math.round(420000 + (floorAreaM2 - 17) * woodSlope));
 
-  // ③ シャッター・開口部工事
-  let shutterCost = 0;
-  let windowCost = 0;
-  let doorCost = 0;
-  (openings || []).forEach(op => {
-    if (op.type === 'shutter') shutterCost += (op.width > 3500 ? 280000 : 190000);
-    else if (op.type === 'door') doorCost += 75000;
-    else if (op.type === 'window') windowCost += 42000;
-  });
-  if (openings.length === 0) {
-    shutterCost = 190000; // 標準1台分
+  // ② 開口部・サッシ工事 (三和シャッター & LIXILカタログ定価マスタ)
+  let costOpenings = 0;
+  let catalogList = [];
+  
+  const shutterOps = openings.filter(o => o.type === 'shutter');
+  const doorOps = openings.filter(o => o.type === 'door');
+  const windowOps = openings.filter(o => o.type === 'window');
+
+  // シャッター（三和シャッターカタログ定価準拠、原価掛率0.55）
+  if (shutterOps.length === 0) {
+    // 標準1台
+    const listPrice = 260000;
+    const cost = Math.round(listPrice * 0.55); // 143,000円
+    costOpenings += cost;
+    catalogList.push({
+      maker: '三和シャッター',
+      product: 'ガレージ用軽量手動シャッター（W2.7m×H2.4m耐風圧仕様）',
+      listPrice,
+      cost,
+      qty: 1
+    });
+  } else {
+    shutterOps.forEach((op, idx) => {
+      let listPrice = 260000;
+      let name = '軽量手動シャッター（W2.7m×H2.4m）';
+      if (op.width > 3500) {
+        listPrice = 420000;
+        name = `ワイド手動シャッター（W${(op.width/1000).toFixed(1)}m特注）`;
+      } else if (op.width > 2800) {
+        listPrice = 330000;
+        name = `中型手動シャッター（W${(op.width/1000).toFixed(1)}m）`;
+      }
+      const cost = Math.round(listPrice * 0.55);
+      costOpenings += cost;
+      catalogList.push({
+        maker: '三和シャッター',
+        product: `${name}`,
+        listPrice,
+        cost,
+        qty: 1
+      });
+    });
   }
-  const cat3Total = shutterCost + windowCost + doorCost;
 
-  // ④ コンクリート土間工事 (8,500円/㎡)
-  const cat4Total = Math.round(floorAreaM2 * 8500);
+  // ドア（LIXIL ロンカラーガラスドア/框ドア、定価92,000円、原価掛率0.50）
+  doorOps.forEach((op) => {
+    const listPrice = 92000;
+    const cost = Math.round(listPrice * 0.50); // 46,000円
+    costOpenings += cost;
+    catalogList.push({
+      maker: 'LIXIL',
+      product: 'アルミ框ドア ロンカラーガラスドア（片開き・防犯シリンダー）',
+      listPrice,
+      cost,
+      qty: 1
+    });
+  });
 
-  // ⑤ 電気工事 (基本一式)
-  const cat5Total = 160000;
+  // 窓（LIXIL アトモスII/デュオPG 引違い窓、定価58,000円、原価掛率0.50）
+  windowOps.forEach((op) => {
+    let listPrice = 58000;
+    let name = 'アルミサッシ 引違い窓 2枚建（W1.6m×H0.9m・網戸付）';
+    if (op.width <= 900) {
+      listPrice = 38000;
+      name = '小窓アルミサッシ（W0.7m×H0.7m・網戸付）';
+    } else if (op.height >= 1700) {
+      listPrice = 86000;
+      name = '掃き出しテラス窓（W1.6m×H1.8m）';
+    }
+    const cost = Math.round(listPrice * 0.50);
+    costOpenings += cost;
+    catalogList.push({
+      maker: 'LIXIL',
+      product: name,
+      listPrice,
+      cost,
+      qty: 1
+    });
+  });
 
-  // ⑥ ユニック・揚重・運搬費
-  const cat6Total = 120000;
+  // ③ 屋根工事：19㎡で18万円、38㎡で37万円の按分
+  // 傾き = 190,000 / 19 = 10,000円/㎡
+  const costRoof = Math.max(120000, Math.round(180000 + (roofRealM2 - 19) * 10000));
 
-  // ⑦ 調査・申請費 (基本地盤調査・設計製図)
-  const cat7Total = 110000;
+  // ④ 外壁工事：68㎡で45万円、149㎡で78万円（按分傾き約4,074円/㎡）
+  const wallSlope = (780000 - 450000) / (149 - 68);
+  const costWall = Math.max(280000, Math.round(450000 + (totalNetWallM2 - 68) * wallSlope));
 
-  const grandTotal = cat1Total + cat2Total + cat3Total + cat4Total + cat5Total + cat6Total + cat7Total;
+  // ⑤ 基礎工事：＠1.2万円/ｍ
+  const costFoundation = Math.max(120000, Math.round(totalFoundM * 12000));
 
-  const categories = [
+  // ⑥ 建材工事：17㎡で6万円、36㎡で17万円の按分
+  // 傾き = 110,000 / 19 ≒ 5,789円/㎡
+  const materialSlope = (170000 - 60000) / (36 - 17);
+  const costBuildingMaterial = Math.max(40000, Math.round(60000 + (floorAreaM2 - 17) * materialSlope));
+
+  // ⑦ 申請手続き費用 (建築確認申請図書作成・行政提出代行)
+  const costPermit = 180000;
+
+  // =========================================================================
+  // 【A. 本体工事 見積額計算 (Price = 原価 × 1.33)】
+  // =========================================================================
+  const priceWood = Math.round(costWood * MARKUP_RATE);
+  const priceOpenings = Math.round(costOpenings * MARKUP_RATE);
+  const priceRoof = Math.round(costRoof * MARKUP_RATE);
+  const priceWall = Math.round(costWall * MARKUP_RATE);
+  const priceFoundation = Math.round(costFoundation * MARKUP_RATE);
+  const priceBuildingMaterial = Math.round(costBuildingMaterial * MARKUP_RATE);
+  const pricePermit = Math.round(costPermit * MARKUP_RATE);
+
+  // 原価合計 & 見積合計
+  const mainWorksTotalCost = costWood + costOpenings + costRoof + costWall + costFoundation + costBuildingMaterial + costPermit;
+  const mainWorksTotalPrice = priceWood + priceOpenings + priceRoof + priceWall + priceFoundation + priceBuildingMaterial + pricePermit;
+  const profitAmount = mainWorksTotalPrice - mainWorksTotalCost;
+  const profitRate = ((profitAmount / mainWorksTotalPrice) * 100).toFixed(1);
+
+  // 本体工事7大項目データ
+  const mainWorksItems = [
     {
       id: 1,
-      title: '① 本体工事（木造躯体・外壁屋根ガルバリウム鋼板）',
-      selectedCost: cat1Total,
-      items: [
-        { name: `木造軸組躯体工（土台・柱・梁・母屋・金物一式）`, spec: `${tsubo.toFixed(1)}坪`, cost: mainStructureCost, selected: true },
-        { name: `外壁・屋根ガルバリウム鋼板張り（軒出0シャープ仕様）`, spec: `外壁${totalNetWallM2.toFixed(1)}㎡ + 屋根${roofRealM2.toFixed(1)}㎡`, cost: exteriorRoofCost, selected: true },
-        { name: `内装OSB合板化粧仕上げ（壁・天井素地現し）`, spec: '室内全面', cost: 240000, selected: false, ghost: true, note: '※DIY施工も可能' },
-        { name: `高性能断熱材施工（グラスウール＋透湿気密シート）`, spec: '壁・屋根充填', cost: 360000, selected: false, ghost: true, note: '※エアコン効率向上' }
-      ]
+      num: '①',
+      name: '木工事',
+      spec: `床面積 ${floorAreaM2.toFixed(1)}㎡ (土台・柱・梁・筋交い・構造金物一式)`,
+      calcBasis: '床面積按分（17㎡:42万 / 36㎡:62万基準）',
+      cost: costWood,
+      price: priceWood,
+      isCore: true
     },
     {
       id: 2,
-      title: '② 基礎工事（鉄筋コンクリート基礎）',
-      selectedCost: cat2Total,
-      items: [
-        { name: `RC造布基礎工事（根切り・砕石転圧・型枠・配筋・生コン打設）`, spec: `全周 ${totalFoundM.toFixed(1)}m`, cost: cat2Total, selected: true },
-        { name: `深基礎・高基礎割増（敷地高低差300mm超の場合）`, spec: '高低差対応', cost: 160000, selected: false, ghost: true, note: '※現地調査後に確定' },
-        { name: `柱脚金物補強・独立基礎（柱追加箇所）`, spec: '1箇所あたり', cost: 45000, selected: false, ghost: true, note: '※間取り変更時' }
-      ]
+      num: '②',
+      name: '開口部・サッシ工事',
+      spec: `三和シャッター${shutterOps.length || 1}台 ＋ LIXIL建具${doorOps.length + windowOps.length}箇所`,
+      calcBasis: 'LIXIL＆三和シャッター公式カタログ定価マスタ連動',
+      cost: costOpenings,
+      price: priceOpenings,
+      catalogList,
+      isCore: true
     },
     {
       id: 3,
-      title: '③ シャッター・開口部工事',
-      selectedCost: cat3Total,
-      items: [
-        { name: `ガレージ用軽量手動シャッター（耐風圧仕様）`, spec: `${(openings.filter(o => o.type === 'shutter').length || 1)}台`, cost: shutterCost, selected: true },
-        ...(doorCost > 0 ? [{ name: `アルミ框ドア（片開き・防犯シリンダー鍵付）`, spec: `${openings.filter(o => o.type === 'door').length}箇所`, cost: doorCost, selected: true }] : []),
-        ...(windowCost > 0 ? [{ name: `アルミサッシ引き違い窓（型板ガラス・網戸付）`, spec: `${openings.filter(o => o.type === 'window').length}箇所`, cost: windowCost, selected: true }] : []),
-        { name: `電動リモコン化オプション（静音開閉・スマホ連動）`, spec: '1台あたり', cost: 180000, selected: false, ghost: true, note: '※車内から雨に濡れず開閉' },
-        { name: `オーバースライダー木目調シャッター変更`, spec: '高速開閉タイプ', cost: 380000, selected: false, ghost: true, note: '※プレミアム外観' },
-        { name: `高断熱ペアガラス窓（アルゴンガス入・防犯合わせ）`, spec: '1窓あたり', cost: 48000, selected: false, ghost: true, note: '※結露防止' }
-      ]
+      num: '③',
+      name: '屋根工事',
+      spec: `屋根実面積 ${roofRealM2.toFixed(1)}㎡ (ガルバリウム鋼板立平葺き・防水ルーフィング)`,
+      calcBasis: '屋根実面積按分（19㎡:18万 / 38㎡:37万基準）',
+      cost: costRoof,
+      price: priceRoof,
+      isCore: true
     },
     {
       id: 4,
-      title: '④ コンクリート土間工事',
-      selectedCost: cat4Total,
-      items: [
-        { name: `床土間コンクリート打設（厚120mm・ワイヤーメッシュ・金ゴテ仕上）`, spec: `${floorAreaM2.toFixed(1)}㎡ (${tsubo.toFixed(1)}坪)`, cost: cat4Total, selected: true },
-        { name: `ガレージ床専用 高耐久防塵塗装（エポキシクリア仕上）`, spec: 'オイル・タイヤ痕防止', cost: 98000, selected: false, ghost: true, note: '※ショールーム風光沢' },
-        { name: `乗り入れ段差解消コンクリートスロープ打設`, spec: '前面道路接続', cost: 65000, selected: false, ghost: true, note: '※段差に応じて調整' }
-      ]
+      num: '④',
+      name: '外壁工事',
+      spec: `純外壁面積 ${totalNetWallM2.toFixed(1)}㎡ (ガルバリウム鋼板角波・透湿防水シート・役物)`,
+      calcBasis: '純外壁面積按分（68㎡:45万 / 149㎡:78万基準）',
+      cost: costWall,
+      price: priceWall,
+      isCore: true
     },
     {
       id: 5,
-      title: '⑤ 電気設備工事',
-      selectedCost: cat5Total,
-      items: [
-        { name: `基本電気配線工事（分電盤・LED照明器具・2口コンセント・スイッチ）`, spec: '基本一式', cost: cat5Total, selected: true },
-        { name: `EV（電気自動車）専用 200V充電コンセント設置`, spec: '屋外防雨型', cost: 48000, selected: false, ghost: true, note: '※EV・PHEV対応' },
-        { name: `人感センサー連動 外部防犯スポットライトLED`, spec: '夜間自動点灯', cost: 28000, selected: false, ghost: true, note: '※防犯・夜間視認性' },
-        { name: `動力200V増設・エアコン専用先行配管回路`, spec: '200V回路', cost: 55000, selected: false, ghost: true, note: '※工房・エアコン用' }
-      ]
+      num: '⑤',
+      name: '基礎工事',
+      spec: `外周長 ${totalFoundM.toFixed(1)}m (鉄筋コンクリート布基礎・アンカーボルト緊結)`,
+      calcBasis: '外周メートル単価 ＠1.2万円/m',
+      cost: costFoundation,
+      price: priceFoundation,
+      isCore: true
     },
     {
       id: 6,
-      title: '⑥ ユニック・揚重・運搬費',
-      selectedCost: cat6Total,
-      items: [
-        { name: `構造プレカット材・外壁長尺ガルバリウム運搬費 ＆ クレーン揚重代`, spec: '建方揚重一式', cost: cat6Total, selected: true },
-        { name: `狭小地・4t進入困難路 小運搬割増（2t車小分け・手運び）`, spec: '進入路特殊対応', cost: 68000, selected: false, ghost: true, note: '※進入路4m未満の場合' }
-      ]
+      num: '⑥',
+      name: '建材工事',
+      spec: `床面積 ${floorAreaM2.toFixed(1)}㎡ (下地合板・耐水ボード・留付副資材一式)`,
+      calcBasis: '床面積按分（17㎡:6万 / 36㎡:17万基準）',
+      cost: costBuildingMaterial,
+      price: priceBuildingMaterial,
+      isCore: true
     },
     {
       id: 7,
-      title: '⑦ 調査・申請費',
-      selectedCost: cat7Total,
-      items: [
-        { name: `現地地盤調査（スウェーデン式サウンディング試験）＆ 製図作成`, spec: '調査一式', cost: cat7Total, selected: true },
-        { name: `建築確認申請 代行手数料（10㎡超・用途地域確認・完了検査）`, spec: '行政申請代行', cost: 260000, selected: false, ghost: true, note: '※都市計画区域等で必須' },
-        { name: `防火・準防火地域 延焼ライン耐火建築確認図書作成`, spec: '防火仕様設計', cost: 120000, selected: false, ghost: true, note: '※指定地域の場合のみ' }
-      ]
+      num: '⑦',
+      name: '申請手続き費用',
+      spec: '専任建築士による確認申請図書作成・構造チェック・行政提出代行一式',
+      calcBasis: '建築士事務所直営ワンストップ定額',
+      cost: costPermit,
+      price: pricePermit,
+      isCore: true
     }
   ];
 
+  // =========================================================================
+  // 【B. 付帯工事・追加工事（現地調査・ヒアリングで確定する別途費用）】
+  // =========================================================================
+  const additionalWorksItems = [
+    {
+      id: 'add_01',
+      name: '解体工事・整地工事',
+      desc: '既存の物置・ブロック塀・樹木の解体撤去、残土すき取り、砕石地盤整地',
+      status: '別途・現地調査後にお見積り',
+      approxRange: '約15万 〜 45万円（状況による）'
+    },
+    {
+      id: 'add_02',
+      name: '電気工事',
+      desc: '敷地内からの幹線引込、屋内分電盤新設、LED照明、2口コンセント、スイッチ配線',
+      status: '別途・ご要望仕様に応じお見積り',
+      approxRange: '約12万 〜 25万円（標準ガレージ配線）'
+    },
+    {
+      id: 'add_03',
+      name: '空調工事',
+      desc: '換気設備、ガレージ用エアコン設置、専用200V電源配管工事',
+      status: '別途・ご要望に応じお見積り',
+      approxRange: '約8万 〜 20万円'
+    },
+    {
+      id: 'add_04',
+      name: '土間打設工事',
+      desc: '床土間コンクリート打設（厚120mm・ワイヤーメッシュ配筋・金ゴテ仕上げ）',
+      status: '別途・床仕上げご希望時にお見積り',
+      approxRange: `約${Math.round(floorAreaM2 * 8500 / 10000)}万円 (${floorAreaM2.toFixed(1)}㎡ @8,500円/㎡)`
+    },
+    {
+      id: 'add_05',
+      name: '給排水衛生設備工事',
+      desc: '洗車用外部散水栓、スロップシンク（手洗い流し）、給排水配管接続工事',
+      status: '別途・水回りご希望時にお見積り',
+      approxRange: '約10万 〜 30万円'
+    },
+    {
+      id: 'add_06',
+      name: '地盤調査費用',
+      desc: 'スウェーデン式サウンディング（SWS）試験による地耐力測定・判定書作成',
+      status: '別途・建築確認申請時に実施',
+      approxRange: '約4万 〜 7万円'
+    },
+    {
+      id: 'add_07',
+      name: '測量・行政調査費用',
+      desc: '敷地境界確認測量、市街化調整区域適合証明調査、農地転用調査等の特殊手続き',
+      status: '別途・敷地法規条件に応じお見積り',
+      approxRange: '約10万 〜 25万円'
+    }
+  ];
+
+  const taxAmount = Math.round(mainWorksTotalPrice * 0.1);
+  const mainWorksTotalPriceWithTax = mainWorksTotalPrice + taxAmount;
+
   return {
-    grandTotal,
-    categories
+    markupRate: MARKUP_RATE,
+    mainWorksItems,
+    mainWorksTotalCost,
+    mainWorksTotalPrice,
+    profitAmount,
+    profitRate,
+    taxAmount,
+    mainWorksTotalPriceWithTax,
+    additionalWorksItems
   };
 };
-

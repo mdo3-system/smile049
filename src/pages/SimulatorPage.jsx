@@ -1908,11 +1908,11 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
               justifyContent: 'space-between'
             }}>
               <div>
-                <div style={{ fontSize: 11, color: '#64748b', fontWeight: 700 }}>概算建築費用目安</div>
-                <div style={{ fontSize: 10, color: '#94a3b8' }}>※基礎・構造・建具・屋根連動</div>
+                <div style={{ fontSize: 11, color: '#64748b', fontWeight: 700 }}>本体工事 御見積目安（税抜）</div>
+                <div style={{ fontSize: 10, color: '#94a3b8' }}>※木工・サッシ・屋根外壁・基礎・建材・申請</div>
               </div>
               <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--color-primary-dark)' }}>
-                {calculations.approxCost.toLocaleString()} <span style={{ fontSize: 13, fontWeight: 500 }}>円〜</span>
+                {calculations.approxCost.toLocaleString()} <span style={{ fontSize: 13, fontWeight: 500 }}>円</span>
               </div>
             </div>
 
@@ -1937,7 +1937,7 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
               }}
             >
               <FileText size={15} color="#38bdf8" />
-              <span>📄 概算御見積書（7大枠・薄墨オプション）を確認</span>
+              <span>📄 概算御見積書（本体工事7項目 ＆ 別途付帯工事）を開く</span>
             </button>
           </div>
         </div>
