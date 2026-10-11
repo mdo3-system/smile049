@@ -4,12 +4,14 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { 
   ArrowLeft, BookOpen, Save, FolderOpen, Undo2, Redo2, 
   Camera, Eye, EyeOff, ZoomIn, HelpCircle, Layers, CheckCircle2, AlertCircle,
-  Maximize2, Minimize2, Compass, Move, ChevronRight, Sliders, FileText, Check, MessageSquare, Sparkles
+  Maximize2, Minimize2, Compass, Move, ChevronRight, Sliders, FileText, Check, MessageSquare, Sparkles, Share2
 } from 'lucide-react';
 import ManualModal from '../components/ManualModal';
 import ParseRequestModal from '../components/ParseRequestModal';
 import ChatRoomModal from '../components/ChatRoomModal';
 import EstimateDetailModal from '../components/EstimateDetailModal';
+import ShareModal from '../components/ShareModal';
+import { decodeDesignFromParam } from '../utils/shareUtils';
 import { APP_VERSION } from '../version.js';
 import { WALL_KEYS, WALL_NAMES_JA, WALL_OUTER_OFFSET, WALL_INNER_OFFSET, isFloorLevelOpening } from '../simulator/constants';
 import { getCorePoints, getOffsetPoints, calculateAngles, getGirderHeight, getWallSpan } from '../simulator/geometry/buildingGeometry';
@@ -91,6 +93,10 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
   const [chatRoomId, setChatRoomId] = useState(null);
   // 概算見積書モーダル (7大枠 ＆ 薄墨オプション)
   const [isEstimateModalOpen, setIsEstimateModalOpen] = useState(false);
+  // 設計結果URL共有モーダル
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  // 共有モデル読み込み完了トースト表示
+  const [sharedRestoredToast, setSharedRestoredToast] = useState(false);
 
   // 3D全画面表示モード (スマホで3Dモデルを最大化して鑑賞)
   const [is3dFullScreen, setIs3dFullScreen] = useState(false);
@@ -255,7 +261,26 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
     if (s.openings) setOpenings(s.openings);
     if (s.shelfUnits) setShelfUnits(s.shelfUnits);
     if (s.vehicles) setVehicles(s.vehicles);
+    if (s.groundType) setGroundType(s.groundType);
+    if (s.skyType) setSkyType(s.skyType);
   };
+
+  // URLクエリパラメータ (?design=... または ?d=...) からの共有モデル自動復元
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const designParam = urlParams.get('design') || urlParams.get('d');
+    if (designParam) {
+      const restored = decodeDesignFromParam(designParam);
+      if (restored) {
+        restoreState(restored);
+        pushHistory(restored);
+        setIsManualOpen(false); // 共有モデルを開いたときはマニュアルを自動表示せずモデルを直接見せる
+        setSharedRestoredToast(true);
+        setTimeout(() => setSharedRestoredToast(false), 6000);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     // GA4 3Dシミュレーター起動トラッキング
@@ -666,6 +691,46 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
         onOpenParseRequest={() => setIsParseRequestOpen(true)}
       />
 
+      {/* 設計結果URL共有モーダル */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        designState={{ dimensions, openings, shelfUnits, vehicles, groundType, skyType }}
+        floorArea={calculations?.floorVal ? parseFloat(calculations.floorVal) : 0}
+        approxCost={calculations?.approxCost || 0}
+      />
+
+      {/* 共有モデル読み込み完了トースト */}
+      {sharedRestoredToast && (
+        <div style={{
+          position: 'fixed',
+          top: 54,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 9998,
+          background: 'linear-gradient(135deg, #166534 0%, #15803d 100%)',
+          color: '#ffffff',
+          padding: '10px 20px',
+          borderRadius: 30,
+          boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          fontSize: 13,
+          fontWeight: 700,
+          border: '1px solid #86efac'
+        }}>
+          <CheckCircle2 size={18} color="#86efac" />
+          <span>共有された設計モデルを読み込みました！</span>
+          <button
+            onClick={() => setSharedRestoredToast(false)}
+            style={{ background: 'transparent', border: 'none', color: '#bbf7d0', cursor: 'pointer', padding: '0 4px', fontSize: 13 }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* 隠しファイルインプット */}
       <input type="file" ref={fileInputRef} onChange={handleLoadJson} accept=".json" style={{ display: 'none' }} />
 
@@ -725,7 +790,7 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
           </div>
         </div>
 
-        {/* 右: アクション（見積書 / パース依頼 / 相談 / マニュアル / 全画面切替） */}
+        {/* 右: アクション（見積書 / 共有 / パース依頼 / 相談 / マニュアル / 全画面切替） */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 5, overflowX: 'auto', paddingLeft: 4 }}>
           <button
             onClick={() => {
@@ -739,6 +804,31 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
             <FileText size={13} color="var(--color-primary)" />
             <span className="sim-btn-text-full">見積書(7大枠)</span>
             <span className="sim-btn-text-short">見積</span>
+          </button>
+
+          <button
+            onClick={() => {
+              trackEvent('share_modal_open', { source: 'simulator_topbar' });
+              setIsShareModalOpen(true);
+            }}
+            className="btn-secondary sim-top-btn"
+            style={{
+              padding: '5px 8px',
+              fontSize: 11.5,
+              borderRadius: 6,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              whiteSpace: 'nowrap',
+              border: '1px solid #16a34a',
+              color: '#16a34a',
+              background: '#f0fdf4'
+            }}
+            title="この設計をURLで保存・家族やSNSで共有"
+          >
+            <Share2 size={13} color="#16a34a" />
+            <span className="sim-btn-text-full">URL共有</span>
+            <span className="sim-btn-text-short">共有</span>
           </button>
 
           <button
@@ -839,18 +929,29 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
           flexShrink: 0,
           zIndex: 20
         }}>
-          {/* 保存・読込 ＆ Undo/Redo */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 6 }}>
-            <button onClick={handleSaveJson} className="btn-secondary" style={{ padding: '6px 4px', fontSize: 11, borderRadius: 4, justifyContent: 'center' }}>
+          {/* 保存・読込・共有 ＆ Undo/Redo */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 5 }}>
+            <button onClick={handleSaveJson} className="btn-secondary" style={{ padding: '6px 2px', fontSize: 11, borderRadius: 4, justifyContent: 'center' }}>
               <Save size={13} /> 保存
             </button>
-            <button onClick={() => fileInputRef.current?.click()} className="btn-secondary" style={{ padding: '6px 4px', fontSize: 11, borderRadius: 4, justifyContent: 'center' }}>
+            <button onClick={() => fileInputRef.current?.click()} className="btn-secondary" style={{ padding: '6px 2px', fontSize: 11, borderRadius: 4, justifyContent: 'center' }}>
               <FolderOpen size={13} /> 読込
             </button>
-            <button onClick={handleUndo} className="btn-secondary" style={{ padding: '6px 4px', fontSize: 11, borderRadius: 4, justifyContent: 'center' }}>
+            <button 
+              onClick={() => {
+                trackEvent('share_modal_open', { source: 'simulator_sidebar' });
+                setIsShareModalOpen(true);
+              }} 
+              className="btn-secondary" 
+              style={{ padding: '6px 2px', fontSize: 11, borderRadius: 4, justifyContent: 'center', color: '#16a34a', borderColor: '#86efac', background: '#f0fdf4' }}
+              title="設計をURLで共有"
+            >
+              <Share2 size={13} /> 共有
+            </button>
+            <button onClick={handleUndo} className="btn-secondary" style={{ padding: '6px 2px', fontSize: 11, borderRadius: 4, justifyContent: 'center' }}>
               <Undo2 size={13} /> 戻る
             </button>
-            <button onClick={handleRedo} className="btn-secondary" style={{ padding: '6px 4px', fontSize: 11, borderRadius: 4, justifyContent: 'center' }}>
+            <button onClick={handleRedo} className="btn-secondary" style={{ padding: '6px 2px', fontSize: 11, borderRadius: 4, justifyContent: 'center' }}>
               <Redo2 size={13} /> 進む
             </button>
           </div>

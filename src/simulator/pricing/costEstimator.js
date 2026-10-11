@@ -250,8 +250,14 @@ export const generate7CategoriesEstimate = (quantities, dimensions, openings = [
   const materialSlope = (170000 - 60000) / (36 - 17);
   const costBuildingMaterial = Math.max(40000, Math.round(60000 + (floorAreaM2 - 17) * materialSlope));
 
-  // ⑦ 申請手続き費用 (建築確認申請図書作成・行政提出代行)
-  const costPermit = 180000;
+  // ⑦ 申請手続き費用 (確認申請費：100㎡未満は7万円、市街化調整区域は＋2万円)
+  const isAdjustArea = dimensions?.isAdjustArea || false;
+  let basePermitCost = floorAreaM2 < 100 ? 70000 : 120000;
+  if (isAdjustArea) {
+    basePermitCost += 20000; // 調整区域加算
+  }
+  const costPermit = basePermitCost;
+
 
   // =========================================================================
   // 【A. 本体工事 見積額計算 (Price = 原価 × 1.33)】
@@ -337,8 +343,8 @@ export const generate7CategoriesEstimate = (quantities, dimensions, openings = [
       id: 7,
       num: '⑦',
       name: '申請手続き費用',
-      spec: '専任建築士による確認申請図書作成・構造チェック・行政提出代行一式',
-      calcBasis: '建築士事務所直営ワンストップ定額',
+      spec: `確認申請図書作成・提出代行一式${isAdjustArea ? '（市街化調整区域 適合協議含む）' : '（100㎡未満）'}`,
+      calcBasis: isAdjustArea ? '調整区域基準（原価7万＋調整区域加算2万）' : '確認申請基準（100㎡未満：原価7万円）',
       cost: costPermit,
       price: pricePermit,
       isCore: true

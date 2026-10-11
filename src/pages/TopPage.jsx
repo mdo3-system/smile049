@@ -1564,7 +1564,7 @@ export default function TopPage({ setCurrentRoute }) {
               </div>
             </div>
 
-            {/* Q5: カクイチ・他社で断られた難条件や行政指導、施工エリア */}
+            {/* Q5: 大手鉄骨規格メーカーや他社で断られた難条件、法令順守サポート、施工エリア */}
             <div style={{
               background: '#ffffff',
               borderRadius: 'var(--radius-lg)',
@@ -1588,13 +1588,13 @@ export default function TopPage({ setCurrentRoute }) {
                   Q5
                 </div>
                 <h3 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', margin: 0 }}>
-                  カクイチなどの大手鉄骨規格メーカーや他社に断られた難条件でも相談できますか？
+                  大手鉄骨規格メーカーや他社に断られた難しい敷地・条件でも相談できますか？
                 </h3>
               </div>
               <div style={{ paddingLeft: 48 }}>
                 <p style={{ fontSize: 14.5, color: '#475569', lineHeight: 1.8, margin: '0 0 12px 0' }}>
                   <strong>はい、まさに「他社で規格が合わない・断られた」難条件こそ、スマイチが最も強みを発揮する領域です。</strong><br />
-                  カクイチ等の鉄骨規格品で「敷地に余白・デッドスペースができる」「冬の結露で困る」というお客様の受け皿として、ミリ単位の自由設計で土地ジャストフィットを実現します。
+                  大手の鉄骨規格品で「敷地に余白・デッドスペースができる」「冬の結露で困る」というお客様の受け皿として、ミリ単位の自由設計で土地ジャストフィットを実現します。
                 </p>
                 <div style={{
                   background: '#fff7ed',
@@ -1607,7 +1607,7 @@ export default function TopPage({ setCurrentRoute }) {
                   lineHeight: 1.7
                 }}>
                   <strong>【専任建築士による実際の難案件クリア実績】</strong><br />
-                  ・<strong>埼玉県北本市（違法建築是正救済）</strong>：10坪のセルフビルド無確認建築に対し、行政との協議を経て<strong>建物を丸ごとジャッキアップして適法基礎を打設・合法化</strong>。<br />
+                  ・<strong>埼玉県北本市（行政指導の円満解決・合法化）</strong>：施主様が自ら建てられたセルフビルド小屋への行政指導に対し、難解な法規用語をかみ砕いて施主様にお伝えし、行政と協議のうえ<strong>建物をジャッキアップして適法な鉄筋コンクリート基礎を打設・緊結</strong>。建築主様・行政の双方から深く感謝された解決事例。<br />
                   ・<strong>青農地からの店舗建築</strong>：市街化調整区域の難関「農振農用地（青地）」から除外・転用を勝ち取り、20坪日用品販売店舗を建築。<br />
                   ・<strong>敷地境界15cm・既存舗装活用</strong>：隣地境界ギリギリへの軒ゼロ配置と、既存アスファルトを活かした解体費ゼロの特殊布基礎工法。
                 </div>

@@ -20,9 +20,12 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
     return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}-${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}`;
   });
 
+  const [isAdjustArea, setIsAdjustArea] = useState(false);
+
   if (!isOpen) return null;
 
-  const estimate = generate7CategoriesEstimate(quantities, dimensions, openings);
+  const estimate = generate7CategoriesEstimate(quantities, { ...dimensions, isAdjustArea }, openings);
+
   const {
     mainWorksItems,
     mainWorksTotalCost,
@@ -316,6 +319,33 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
               </div>
             </div>
           </div>
+
+          {/* 用途地域・申請区分オプション */}
+          <div className="no-print" style={{
+            background: '#f8fafc',
+            border: '1px solid #cbd5e1',
+            borderRadius: 8,
+            padding: '10px 16px',
+            marginBottom: 20,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            fontSize: 12.5
+          }}>
+            <span style={{ color: '#475569', fontWeight: 600 }}>
+              敷地の用途地域（建築確認申請 区分）：
+            </span>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', fontWeight: 700, color: isAdjustArea ? '#b45309' : '#1e293b' }}>
+              <input 
+                type="checkbox" 
+                checked={isAdjustArea} 
+                onChange={e => setIsAdjustArea(e.target.checked)} 
+                style={{ width: 16, height: 16, cursor: 'pointer' }}
+              />
+              <span>市街化調整区域（適合協議 ＋2万円加算）</span>
+            </label>
+          </div>
+
 
           {/* =========================================================================
               セクション 1: 【A. 本体工事（必ずかかるもの）】

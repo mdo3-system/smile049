@@ -1,8 +1,12 @@
 SetEnvIf Request_URI ".*" Ngx_Cache_NoCacheMode=off
 SetEnvIf Request_URI ".*" Ngx_Cache_AllCacheMode
 RewriteEngine on
+RewriteCond %{HTTP_HOST} ^www\.smile049\.jp$ [NC]
+RewriteRule ^(.*)$ https://smile049.jp/$1 [R=301,L]
+
 RewriteCond %{HTTPS} !on
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
 
 # SPA Fallback Routing
 <IfModule mod_rewrite.c>

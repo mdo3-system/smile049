@@ -40,6 +40,12 @@ const ROUTE_MAP = {
 };
 
 const getRouteFromPath = (pathname) => {
+  if (typeof window !== 'undefined') {
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.has('design') || searchParams.has('d')) {
+      return 'simulator';
+    }
+  }
   const cleanPath = (pathname || '').replace(/\/+$/, '').toLowerCase();
   if (!cleanPath || cleanPath === '') return 'top';
   if (cleanPath === '/simulator') return 'simulator';
