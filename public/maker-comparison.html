@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>主要4大メーカー vs スマイチ木造自由設計 徹底比較表（A4印刷・PDF出力用）</title>
+  <style>
+    /* 基本リセット & 共通スタイル */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+      color: #1e293b;
+      background: #f1f5f9;
+      line-height: 1.45;
+      font-size: 11.5px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* 印刷コントロールバー（画面上部） */
+    .print-control-bar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: #1e293b;
+      color: #ffffff;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .print-control-bar h1 {
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-print {
+      background: #2d6a4f;
+      color: #ffffff;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+    .btn-print:hover {
+      background: #1b4332;
+    }
+    .btn-back {
+      background: transparent;
+      color: #94a3b8;
+      border: 1px solid #475569;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-back:hover {
+      color: #ffffff;
+      border-color: #cbd5e1;
+    }
+
+    /* A4シートコンテナ（A4横 Landscape） */
+    .a4-container {
+      width: 297mm;
+      min-height: 210mm;
+      margin: 20px auto;
+      background: #ffffff;
+      padding: 12mm 15mm;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      position: relative;
+    }
+
+    /* シートヘッダー */
+    .sheet-header {
+      border-bottom: 2px solid #2d6a4f;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .sheet-title-group h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+    .sheet-title-group p {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+    .sheet-meta {
+      text-align: right;
+      font-size: 10px;
+      color: #64748b;
+      line-height: 1.3;
+    }
+    .sheet-meta .brand {
+      font-size: 13px;
+      font-weight: 800;
+      color: #2d6a4f;
+    }
+
+    /* 重要ポイント要約バナー */
+    .summary-banner {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-bottom: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+    .summary-card {
+      font-size: 10.5px;
+      line-height: 1.4;
+    }
+    .summary-card strong {
+      display: block;
+      color: #166534;
+      font-size: 11.5px;
+      margin-bottom: 2px;
+    }
+
+    /* 比較テーブル */
+    table.comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin-bottom: 12px;
+    }
+    table.comparison-table th,
+    table.comparison-table td {
+      border: 1px solid #cbd5e1;
+      padding: 5px 6px;
+      vertical-align: middle;
+      font-size: 10px;
+      line-height: 1.35;
+    }
+    table.comparison-table thead th {
+      background: #f8fafc;
+      color: #334155;
+      font-weight: 700;
+      text-align: center;
+      padding: 7px 4px;
+    }
+    table.comparison-table thead th.col-sumaichi {
+      background: #2d6a4f;
+      color: #ffffff;
+      font-size: 11.5px;
+      font-weight: 800;
+    }
+    table.comparison-table thead th.col-rival {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+
+    /* 列幅設定 */
+    .col-category { width: 13%; }
+    .col-item     { width: 15%; }
+    .col-caku     { width: 18%; }
+    .col-inaba    { width: 18%; }
+    .col-yodo     { width: 18%; }
+    .col-suma     { width: 18%; }
+
+    /* スマイチ列のハイライト */
+    table.comparison-table td.cell-sumaichi {
+      background: #f0fdf4;
+      border-left: 2px solid #2d6a4f;
+      border-right: 2px solid #2d6a4f;
+      font-weight: 600;
+      color: #14532d;
+    }
+    table.comparison-table tr.total-row td.cell-sumaichi {
+      background: #dcfce7;
+      font-weight: 800;
+      font-size: 11px;
+    }
+
+    /* カテゴリ見出しセル */
+    .category-header {
+      background: #f1f5f9;
+      font-weight: 800;
+      color: #334155;
+      text-align: center;
+      letter-spacing: -0.2px;
+    }
+
+    /* 判定バッジ */
+    .badge-win {
+      display: inline-block;
+      background: #15803d;
+      color: #ffffff;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 9.5px;
+      font-weight: 800;
+      margin-right: 3px;
+    }
+    .badge-draw {
+      display: inline-block;
+      background: #64748b;
+      color: #ffffff;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 9.5px;
+      font-weight: 700;
+      margin-right: 3px;
+    }
+    .badge-care {
+      display: inline-block;
+      background: #c2410c;
+      color: #ffffff;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 9.5px;
+      font-weight: 800;
+      margin-right: 3px;
+    }
+
+    /* 金額・注釈 */
+    .price-num {
+      font-weight: 800;
+      font-size: 11px;
+    }
+    .text-red {
+      color: #b91c1c;
+      font-weight: 700;
+    }
+    .text-green {
+      color: #15803d;
+      font-weight: 700;
+    }
+
+    /* フッター解説ボックス */
+    .sheet-footer-box {
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 8px 12px;
+      background: #f8fafc;
+      display: grid;
+      grid-template-columns: 1.2fr 1.8fr;
+      gap: 12px;
+      font-size: 9.5px;
+      line-height: 1.4;
+      color: #475569;
+    }
+    .sheet-footer-box strong {
+      color: #0f172a;
+      display: block;
+      margin-bottom: 2px;
+      font-size: 10.5px;
+    }
+
+    /* 印刷用CSS設定 (A4 Landscape) */
+    @media print {
+      @page {
+        size: A4 landscape;
+        margin: 8mm 10mm;
+      }
+      body {
+        background: #ffffff;
+        font-size: 10.5px;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .a4-container {
+        width: 100% !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+      }
+      .sheet-header {
+        margin-bottom: 8px;
+        padding-bottom: 6px;
+      }
+      table.comparison-table th,
+      table.comparison-table td {
+        padding: 4px 5px;
+        font-size: 9.5px;
+      }
+      .summary-banner {
+        padding: 6px 10px;
+        margin-bottom: 8px;
+      }
+      .sheet-footer-box {
+        padding: 6px 10px;
+        font-size: 9px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 画面上部の印刷操作バー（印刷時は自動非表示） -->
+  <div class="print-control-bar no-print">
+    <div style="display: flex; alignItems: center; gap: 16px;">
+      <a href="/simulator" class="btn-back">← 3Dシミュレーターへ戻る</a>
+      <h1>📄 大手主要4大メーカー vs スマイチ木造自由設計 徹底比較表</h1>
+    </div>
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <span style="font-size: 12px; color: #cbd5e1;">A4横（1枚完結）で最適レイアウトされています</span>
+      <button onclick="window.print()" class="btn-print">
+        🖨️ A4で印刷 / PDFとして保存
+      </button>
+    </div>
+  </div>
+
+  <!-- A4シートコンテナ -->
+  <div class="a4-container">
+    
+    <!-- シートヘッダー -->
+    <header class="sheet-header">
+      <div class="sheet-title-group">
+        <h2>【主要4大メーカー vs スマイチ木造自由設計】ガレージ・倉庫 構造・実質総額・敷地対応 徹底比較表</h2>
+        <p>「部材本体だけの見かけの価格」と、実際に完成して使える「必須工事込みの実質総額」のカラクリを建築士が公正比較</p>
+      </div>
+      <div class="sheet-meta">
+        <div class="brand">木造自由設計【スマイチ】</div>
+        <div>株式会社 住ま居る 建築士事務所</div>
+        <div>埼玉県鶴ヶ島市町屋176-5 / smile049.jp</div>
+      </div>
+    </header>
+
+    <!-- 3大決定打 サマリーバナー -->
+    <div class="summary-banner">
+      <div class="summary-card">
+        <strong>① 部材価格の錯覚と「実質差額80万円」の真実</strong>
+        量販スチール物置（部材45万）に必須の「布基礎＋組立＋確認申請」を足すと実質総額は約110万円。スマイチ（17㎡約190万円・布基礎＆確認申請込み）との実質差額は約80万円です。
+      </div>
+      <div class="summary-card">
+        <strong>② 結露ゼロ ＆ 夏涼しい天然調湿・遮熱構造</strong>
+        鉄骨・スチール特有の「冬の雨漏り級結露（愛車サビ・資材カビ）」や「夏のサウナ化」を、木造ならではの天然調湿性と外壁通気層・ガルバリウム鋼板が根本からシャットアウトします。
+      </div>
+      <div class="summary-card">
+        <strong>③ 境界15cm寄せ ＆ どこでも木ネジDIY</strong>
+        規格モジュールに土地を合わせるのではなく、敷地に合わせてミリ単位で設計。敷地境界15cmの限界納まりと、柱や壁どこにでも棚や工具フックをビス留めできる圧倒的自由度。
+      </div>
+    </div>
+
+    <!-- メイン比較テーブル -->
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th class="col-category">比較項目</th>
+          <th class="col-caku">A社（本格鉄骨造）<br><span style="font-size:9px; font-weight:normal;">広スペースハウス等</span></th>
+          <th class="col-inaba">B社（大手スチール）<br><span style="font-size:9px; font-weight:normal;">ガレーディア等</span></th>
+          <th class="col-yodo">C社・D社（規格物置）<br><span style="font-size:9px; font-weight:normal;">ラヴィージュ / カールフォーマ</span></th>
+          <th class="col-suma col-sumaichi">★ スマイチ（木造自由設計）<br><span style="font-size:9.5px; font-weight:normal; color:#dcfce7;">専任建築士直営・自社施工</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- 1. 構造と基本性能 -->
+        <tr>
+          <td class="category-header">基本構造・工法</td>
+          <td>軽量H形鋼・鉄骨ブレース構造<br>（頑丈な骨組み）</td>
+          <td>スチール鋼板・ボルト組立構造<br>（規格プレハブ）</td>
+          <td>スチール鋼板・カラー鋼板仕様<br>（規格プレハブ）</td>
+          <td class="cell-sumaichi"><span class="badge-win">特長</span>在来木造軸組＋金物工法<br>（外壁ガルバ＋構造計算・耐力壁）</td>
+        </tr>
+        <tr>
+          <td class="category-header">結露・湿気対策<br><span style="font-size:9px; color:#64748b;">愛車のサビ・資材カビ</span></td>
+          <td><span class="badge-care">注意</span>金属屋根・鉄骨に水滴が発生しやすい。結露軽減材はオプション</td>
+          <td><span class="badge-care">注意</span>鉄板が外気で冷え、冬場や梅雨に天井から水滴が垂れるリスク</td>
+          <td><span class="badge-care">注意</span>金属密閉構造のため結露リスク高。不燃結露軽減材の追加推奨</td>
+          <td class="cell-sumaichi"><span class="badge-win">優位</span><strong>結露ゼロ配慮</strong><br>木材の天然調湿＋透湿防水シート＋通気胴縁二重構造で湿気放出</td>
+        </tr>
+        <tr>
+          <td class="category-header">夏の遮熱・居住性<br><span style="font-size:9px; color:#64748b;">熱気・室内温度</span></td>
+          <td><span class="badge-care">注意</span>直射日光で鉄骨・金属板が蓄熱し、日中は極めて高温に</td>
+          <td><span class="badge-care">注意</span>遮熱層がなく日中はサウナ状態。長時間の作業は困難</td>
+          <td><span class="badge-care">注意</span>鉄板が熱せられ庫内温度が上昇しやすい</td>
+          <td class="cell-sumaichi"><span class="badge-win">優位</span><strong>木材断熱＋通気層</strong><br>熱伝導率が鉄の1/400の木材により、熱がこもりにくく快適</td>
+        </tr>
+
+        <!-- 2. 敷地対応力・寸法自由度 -->
+        <tr>
+          <td class="category-header">サイズ・形状の自由度<br><span style="font-size:9px; color:#64748b;">変形地・敷地適応</span></td>
+          <td><span class="badge-draw">規格</span>間口・奥行きは規定スパンのみ。<br>敷地に1m以上の余白が発生しやすい</td>
+          <td><span class="badge-draw">規格</span>規格モジュール固定。<br>10cm単位の微調整は不可</td>
+          <td><span class="badge-draw">規格</span>決められたカタログ寸法のみ。<br>台形地や斜め地は非対応</td>
+          <td class="cell-sumaichi"><span class="badge-win">圧倒</span><strong>1mm単位の自由設計</strong><br>正面・背面・左右奥行きを独立可変。台形地・三角地・隅欠き対応</td>
+        </tr>
+        <tr>
+          <td class="category-header">敷地境界への寄せ幅<br><span style="font-size:9px; color:#64748b;">デッドスペース削減</span></td>
+          <td><span class="badge-care">要確認</span>屋根の出（ケラバ）や基礎幅のため、境界から30〜50cm以上離隔</td>
+          <td><span class="badge-care">要確認</span>屋根水切り・雨樋が出っ張り、境界線から離す必要あり</td>
+          <td><span class="badge-care">要確認</span>屋根出幅の制約で隣地境界に寄せにくい</td>
+          <td class="cell-sumaichi"><span class="badge-win">限界突破</span><strong>境界15cm寄せ（軒ゼロ）</strong><br>雨樋・屋根を面一納まりとし、敷地境界から外壁まで実質15cm可能</td>
+        </tr>
+        <tr>
+          <td class="category-header">内部棚・DIY自由度<br><span style="font-size:9px; color:#64748b;">ビス留め・棚増設</span></td>
+          <td><span class="badge-care">難</span>鉄骨のため木ネジ不可。<br>高額な専用ボルト留め棚が必要</td>
+          <td><span class="badge-care">難</span>薄鉄板のためビスが効かず、純正オプション棚に限定される</td>
+          <td><span class="badge-care">難</span>壁面に木ネジを打つと外板を貫通・サビ・雨漏りの原因になる</td>
+          <td class="cell-sumaichi"><span class="badge-win">自在</span><strong>どこでも木ネジOK</strong><br>柱・梁・下地合板へ市販ビスで棚・フック・作業台・ロフトを自在設置</td>
+        </tr>
+
+        <!-- 3. 価格体系と必須工事の実態 -->
+        <tr>
+          <td class="category-header">表示価格に含まれるもの<br><span style="font-size:9px; color:#64748b;">カタログ・見積提示</span></td>
+          <td>鉄骨本体部材 ＋ 自社建方組立費<br><span class="text-red">※布基礎・申請・土間は別途</span></td>
+          <td>スチール本体部材のみ<br><span class="text-red">※組立・基礎・申請・土間すべて別途</span></td>
+          <td>スチール本体部材のみ<br><span class="text-red">※組立・基礎・申請・土間すべて別途</span></td>
+          <td class="cell-sumaichi"><span class="badge-win">コミコミ</span><strong>本体工事7項目すべて込</strong><br>木工事＋三和シャッター＋屋根外壁＋<strong>標準布基礎＋確認申請</strong></td>
+        </tr>
+        <tr>
+          <td class="category-header">建築確認申請・法規対応<br><span style="font-size:9px; color:#64748b;">市街化調整区域・農地転用</span></td>
+          <td><span class="badge-draw">提携先</span>提携設計事務所または施主手配。<br>市街化調整区域は難航する場合あり</td>
+          <td><span class="badge-care">非対応</span>メーカーは申請を行わない。<br>施主が地域の設計事務所を別途手配</td>
+          <td><span class="badge-care">非対応</span>申請代行なし。<br>別途設計事務所費用（約15〜25万）</td>
+          <td class="cell-sumaichi"><span class="badge-win">自社直営</span><strong>建築士ワンストップ</strong><br>都市計画法43条・農地転用・適合証明・確認申請・完了検査を一括代行</td>
+        </tr>
+        <tr class="total-row">
+          <td class="category-header" style="background:#e2e8f0; font-size:10.5px;">【実質総額の比較目安】<br><span style="font-size:8.5px; font-weight:normal;">17㎡（約5坪・1台用）</span></td>
+          <td>約 200万 〜 240万円<br><span style="font-size:8.5px; color:#64748b;">（部材120万＋基礎40万＋組立込＋申請20万＋土間）</span></td>
+          <td>約 110万 〜 130万円<br><span style="font-size:8.5px; color:#64748b;">（部材45万＋基礎30万＋組立15万＋申請20万＋土間）</span></td>
+          <td>約 110万 〜 135万円<br><span style="font-size:8.5px; color:#64748b;">（部材45万＋基礎30万＋組立15万＋申請20万＋土間）</span></td>
+          <td class="cell-sumaichi"><span class="price-num">約 190万円（税別）</span><br><span style="font-size:8.5px; color:#166534;">（本体＋布基礎＋三和シャッター＋確認申請込）</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- フッター解説ボックス -->
+    <footer class="sheet-footer-box">
+      <div>
+        <strong>■ お客様へのご提案・説明のポイント（商談要点）</strong>
+        <ul>
+          <li><strong>「部材40万円」の量販物置と比べて高く見える理由</strong>：量販物置には必須の「布基礎工事（約30万）」「組立費（約15万）」「確認申請（約20万）」が含まれていません。実際に使える状態にする実質総額は約110万円です。</li>
+          <li><strong>実質差額80万円で得られる圧倒的価値</strong>：結露ゼロで愛車がサビない天然調湿性、夏涼しい遮熱性、敷地境界15cm寄せによる土地の有効活用、どこでも木ネジが打てるDIY性、将来の部屋化・リノベ耐性が手に入ります。</li>
+        </ul>
+      </div>
+      <div>
+        <strong>■ 建築士がワンストップで責任施工する安心感</strong>
+        <ul>
+          <li>大手量販店やネット通販では「確認申請や基礎工事、市街化調整区域の手続きは施主様でお近くの設計事務所・基礎屋を探してください」と分離発注（責任の押し付け合い）になりがちです。</li>
+          <li>スマイチでは、専任建築士事務所が「敷地調査・行政協議・構造計算・確認申請・基礎工事・木造建て方・アフターメンテ」まで自社ワンストップで一貫対応するため、中間マージンや引き継ぎトラブルが一切ありません。</li>
+        </ul>
+      </div>
+    </footer>
+
+  </div>
+
+</body>
+</html>

@@ -428,6 +428,32 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
             <Target size={16} />
             <span>再進の家 広告・SNSポータル (Facebook / Instagram / Threads)</span>
           </button>
+
+          <a
+            href="/maker-comparison.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              marginLeft: 'auto',
+              padding: '8px 16px',
+              fontSize: 12.5,
+              fontWeight: 700,
+              background: 'rgba(56, 189, 248, 0.12)',
+              border: '1px solid #38bdf8',
+              borderRadius: 6,
+              color: '#38bdf8',
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              alignSelf: 'center',
+              transition: 'all 0.2s ease'
+            }}
+            title="大手主要4社との構造・実質総額比較表を別タブで開く（A4横印刷・PDF出力）"
+          >
+            <FileText size={15} color="#38bdf8" />
+            <span>4社徹底比較表 (A4印刷)</span>
+          </a>
         </div>
       </div>
 

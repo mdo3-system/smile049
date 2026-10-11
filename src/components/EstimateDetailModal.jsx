@@ -144,6 +144,32 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
               <span>{isAdminMode ? '管理者モード：ON (原価表示中)' : '管理者モード切替'}</span>
             </button>
 
+            {/* 大手4社比較表ボタン */}
+            <a
+              href="/maker-comparison.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                background: 'rgba(56, 189, 248, 0.15)',
+                border: '1px solid #38bdf8',
+                color: '#38bdf8',
+                padding: '5px 11px',
+                borderRadius: 6,
+                fontSize: 12,
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5,
+                textDecoration: 'none',
+                transition: 'all 0.2s ease'
+              }}
+              title="大手主要4社との構造・実質総額徹底比較シートを別タブで開く（A4横印刷・PDF出力対応）"
+            >
+              <FileText size={13} color="#38bdf8" />
+              <span>4社比較表 (A4)</span>
+            </a>
+
             <button
               type="button"
               onClick={handlePrint}
@@ -161,7 +187,7 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
               }}
             >
               <Printer size={14} />
-              <span>印刷 / PDF</span>
+              <span>御見積印刷 / PDF</span>
             </button>
             <button
               type="button"
