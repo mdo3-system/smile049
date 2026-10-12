@@ -544,3 +544,11 @@ select:focus {
   border-color: #f59e0b;
   box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
 }
+
+/* ダークセクション & 高コントラスト・フォールバック */
+.bg-\[\#2b2725\], .bg-\[\#231f1d\] { background-color: #231f1d !important; }
+.bg-\[\#383330\], .bg-\[\#2f2925\] { background-color: #2f2925 !important; }
+.bg-\[\#33271f\] { background-color: #33271f !important; }
+.text-stone-300 { color: #d6d3d1 !important; }
+.text-stone-200 { color: #e7e5e4 !important; }
+.border-stone-600 { border-color: #57534e !important; }

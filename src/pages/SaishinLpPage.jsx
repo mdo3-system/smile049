@@ -75,13 +75,15 @@ export default function SaishinLpPage({ onNavigate }) {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-4">
-            <button
-              onClick={() => setModalType('doc')}
-              className="px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-300 transition flex items-center gap-1.5"
+            <a
+              href="/saishin-dual-life-guide.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-300 transition flex items-center gap-1.5 shadow-sm"
             >
               <FileText className="w-3.5 h-3.5 text-amber-700" />
-              <span>資料請求(PDF)</span>
-            </button>
+              <span>公式ガイド閲覧(PDF)</span>
+            </a>
             <button
               onClick={() => setModalType('tour')}
               className="px-3.5 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-bold bg-amber-600 hover:bg-amber-500 text-white shadow-md shadow-amber-600/20 transition flex items-center gap-1.5"
@@ -213,7 +215,7 @@ export default function SaishinLpPage({ onNavigate }) {
           </div>
 
           {/* アクションボタン */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-4">
             <a
               href="#virtual-tour"
               className="w-full sm:w-auto px-8 py-4 rounded-xl text-sm font-bold bg-amber-500 hover:bg-amber-400 text-stone-950 shadow-xl shadow-amber-500/25 transition flex items-center justify-center gap-2 group"
@@ -228,6 +230,24 @@ export default function SaishinLpPage({ onNavigate }) {
               <Calendar className="w-4 h-4 text-amber-300" />
               <span>プライベート内覧会（エアコン1台の快適さを体感）</span>
             </button>
+          </div>
+
+          {/* 公式特製ガイドブック即時閲覧バナー */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-stone-900/85 backdrop-blur-md border border-amber-500/50 text-xs text-stone-200 shadow-lg">
+            <span className="font-bold text-amber-400 flex items-center gap-1">
+              <FileText className="w-3.5 h-3.5" />
+              【公式無料公開】
+            </span>
+            <span>大人の二拠点生活完全ガイド（A4全5ページ / PDF）</span>
+            <a
+              href="/saishin-dual-life-guide.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-1 text-amber-300 hover:text-white underline font-bold transition flex items-center gap-0.5"
+            >
+              Webで今すぐ読む
+              <ArrowRight className="w-3 h-3" />
+            </a>
           </div>
         </div>
 
@@ -1246,12 +1266,20 @@ export default function SaishinLpPage({ onNavigate }) {
                 <Calendar className="w-4 h-4 text-white" />
                 <span>冬の快適体感 ＆ 光熱費試算会を予約する（無料）</span>
               </button>
-              <button
-                onClick={() => setModalType('doc')}
+              <a
+                href="/saishin-dual-life-guide.html"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full sm:w-auto px-6 py-3.5 rounded-xl font-bold bg-white hover:bg-stone-50 text-stone-800 border border-stone-300 shadow-sm transition flex items-center justify-center gap-2 text-xs sm:text-sm"
               >
                 <FileText className="w-4 h-4 text-amber-600" />
-                <span>無料ガイドブックを請求する</span>
+                <span>公式ガイドをWebで今すぐ読む（無料）</span>
+              </a>
+              <button
+                onClick={() => setModalType('doc')}
+                className="w-full sm:w-auto px-4 py-3 rounded-xl font-semibold text-stone-600 hover:text-stone-900 hover:bg-amber-100/50 transition flex items-center justify-center gap-1.5 text-xs"
+              >
+                <span>紙の資料郵送を請求</span>
               </button>
             </div>
           </div>
@@ -1417,62 +1445,94 @@ export default function SaishinLpPage({ onNavigate }) {
       {/* =========================================================================
           8. クロージング（段階式オファー：心理的ハードルの低い手挙げの誘導）
       ========================================================================= */}
-      <section className="py-20 bg-[#2b2725] text-white text-center relative overflow-hidden">
+      <section 
+        style={{ backgroundColor: '#231f1d', color: '#ffffff' }}
+        className="py-20 text-center relative overflow-hidden"
+      >
         <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
-          <span className="text-xs font-bold text-amber-300 tracking-widest uppercase bg-amber-950/80 border border-amber-500/40 px-3.5 py-1 rounded-full inline-block mb-3">
+          <span 
+            style={{ backgroundColor: 'rgba(120, 53, 15, 0.6)', borderColor: '#d97706', color: '#fde68a' }}
+            className="text-xs font-bold tracking-widest uppercase border px-3.5 py-1 rounded-full inline-block mb-3"
+          >
             STEP-BY-STEP OFFERS
           </span>
-          <h2 className="text-2xl sm:text-4xl font-black mb-4 text-white">
-            「賢いセカンドライフ」を一歩踏み出したいご夫婦へ。<br />
+          <h2 style={{ color: '#ffffff' }} className="text-2xl sm:text-4xl font-black mb-4">
+            「賢いセカンドライフ・週末別邸」を一歩踏み出したい方へ。<br />
             無理のない2つの安心ステップ
           </h2>
-          <p className="text-stone-300 text-xs sm:text-base max-w-2xl mx-auto mb-10 leading-relaxed">
-            強引な売り込みや突然の訪問営業は一切いたしません。まずは無料ガイドブックでゆっくりご検討いただくか、現地でエアコン1台の暖かさをご体感ください。
+          <p style={{ color: '#d6d3d1' }} className="text-xs sm:text-base max-w-2xl mx-auto mb-10 leading-relaxed">
+            強引な売り込みや突然の訪問・電話営業は一切いたしません。<br />
+            まずは公式特製ガイドブック（無料）をWebでご覧いただくか、現地でエアコン1台の快適さをお確かめください。
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left max-w-3xl mx-auto mb-12">
-            {/* オファー1：無料ガイドブック */}
-            <div className="p-6 sm:p-8 rounded-3xl bg-[#383330] border border-stone-600 shadow-xl flex flex-col justify-between">
+            {/* オファー1：大人の二拠点生活完全ガイド */}
+            <div 
+              style={{ backgroundColor: '#2f2925', borderColor: '#57483f' }}
+              className="p-6 sm:p-8 rounded-3xl border shadow-2xl flex flex-col justify-between"
+            >
               <div>
-                <span className="text-[11px] font-bold text-stone-300 bg-stone-700/80 px-2.5 py-1 rounded-full">
-                  オファー 01（Web/PDF・無料）
+                <span 
+                  style={{ backgroundColor: '#443a34', color: '#fef3c7' }}
+                  className="text-[11px] font-bold px-2.5 py-1 rounded-full inline-block"
+                >
+                  オファー 01（Web/PDF即時閲覧・無料）
                 </span>
-                <h3 className="text-base sm:text-lg font-bold text-white mt-3 mb-2 leading-snug">
-                  『50代〜70代のための失敗しない家選び：老後資金を守り、夫婦で健康に暮らす高断熱リノベの秘密』
+                <h3 style={{ color: '#ffffff' }} className="text-base sm:text-lg font-bold mt-3 mb-2 leading-snug">
+                  『都心から約1時間の週末別邸：大人の二拠点生活完全ガイド』
                 </h3>
-                <p className="text-xs text-stone-300 leading-relaxed mb-6">
-                  新築建売との生涯コスト比較データ、Qセルズ年間8,789kWh発電シミュレーション根拠、見えない配管施工写真、自宅売却の進め方をまとめた特製小冊子を進呈。
+                <p style={{ color: '#d6d3d1' }} className="text-xs leading-relaxed mb-6">
+                  全5ページ（A4印刷・PDF対応）。軽井沢との徹底比較表、酷暑・極寒をエアコン1台で克服する遮熱＆断熱工学、8.0kW太陽光発電の経済性、現地写真と物件詳細を網羅。
                 </p>
               </div>
-              <button
-                onClick={() => setModalType('doc')}
-                className="w-full py-3.5 rounded-xl font-bold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition flex items-center justify-center gap-2 text-xs sm:text-sm shadow"
-              >
-                <FileText className="w-4 h-4 text-amber-300" />
-                <span>無料ガイドブックを請求する（即時）</span>
-              </button>
+              <div className="space-y-2.5">
+                <a
+                  href="/saishin-dual-life-guide.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ backgroundColor: '#d97706', color: '#ffffff' }}
+                  className="w-full py-3.5 rounded-xl font-bold hover:opacity-90 transition flex items-center justify-center gap-2 text-xs sm:text-sm shadow-md"
+                >
+                  <FileText className="w-4 h-4 text-white" />
+                  <span>📖 Webですぐ読む・PDF保存（無料・登録不要）</span>
+                </a>
+                <button
+                  onClick={() => setModalType('doc')}
+                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)', color: '#f5f5f4', borderColor: 'rgba(255, 255, 255, 0.2)' }}
+                  className="w-full py-2.5 rounded-xl font-semibold border hover:bg-white/15 transition flex items-center justify-center gap-2 text-xs"
+                >
+                  <span>✉ 紙の小冊子を郵送請求（営業電話なし）</span>
+                </button>
+              </div>
             </div>
 
             {/* オファー2：現地体感会 */}
-            <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#383330] to-amber-950/60 border border-amber-500/50 shadow-xl flex flex-col justify-between">
+            <div 
+              style={{ backgroundColor: '#33271f', borderColor: '#b45309' }}
+              className="p-6 sm:p-8 rounded-3xl border shadow-2xl flex flex-col justify-between"
+            >
               <div>
-                <span className="text-[11px] font-bold text-amber-300 bg-amber-900/60 px-2.5 py-1 rounded-full border border-amber-500/40">
+                <span 
+                  style={{ backgroundColor: 'rgba(180, 83, 9, 0.4)', color: '#fde68a', borderColor: '#b45309' }}
+                  className="text-[11px] font-bold px-2.5 py-1 rounded-full border inline-block"
+                >
                   オファー 02（1日2組限定・完全予約制）
                 </span>
-                <h3 className="text-base sm:text-lg font-bold text-white mt-3 mb-2 leading-snug">
-                  「エアコン1台で本当に家中暖かいの？」<br />
-                  冬の快適体感 ＆ 光熱費試算会
+                <h3 style={{ color: '#ffffff' }} className="text-base sm:text-lg font-bold mt-3 mb-2 leading-snug">
+                  「エアコン1台で本当に家中快適？」<br />
+                  現地体感 ＆ 光熱費試算会
                 </h3>
-                <p className="text-xs text-stone-200 leading-relaxed mb-6">
-                  他の来場者を気にせず、エアコン1台で家じゅう暖かい空気感と静寂を現地体感。現在お住まいのご自宅の売却・買取査定のご相談も窓口ひとつで承ります。
+                <p style={{ color: '#d6d3d1' }} className="text-xs leading-relaxed mb-6">
+                  他の来場者を気にせず、エアコン1台で家じゅう快適な空気感と閑静な環境を現地体感。現在お住まいのご自宅の売却・買取査定のご相談も窓口ひとつで承ります。
                 </p>
               </div>
               <button
                 onClick={() => setModalType('tour')}
-                className="w-full py-3.5 rounded-xl font-bold bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-stone-950 font-black shadow-lg shadow-amber-500/30 transition flex items-center justify-center gap-2 text-xs sm:text-sm"
+                style={{ backgroundColor: '#f59e0b', color: '#1c1917' }}
+                className="w-full py-3.5 rounded-xl font-black hover:opacity-90 transition flex items-center justify-center gap-2 text-xs sm:text-sm shadow-lg"
               >
-                <Calendar className="w-4 h-4 text-stone-950" />
-                <span>体感会・光熱費試算会を予約する</span>
+                <Calendar className="w-4 h-4 text-stone-900" />
+                <span>体感会・光熱費試算会を予約する（無料）</span>
               </button>
             </div>
           </div>
@@ -1517,13 +1577,13 @@ export default function SaishinLpPage({ onNavigate }) {
               </span>
               <h3 className="text-xl sm:text-2xl font-black mt-2">
                 {modalType === 'doc'
-                  ? '『50代〜70代のための失敗しない家選び』無料ガイドブック請求'
-                  : '【1日2組限定】冬の快適体感 ＆ 光熱費試算会 予約'}
+                  ? '『都心から約1時間の週末別邸：大人の二拠点生活完全ガイド』資料請求'
+                  : '【1日2組限定】現地体感 ＆ 光熱費試算会 予約'}
               </h3>
               <p className="text-xs text-stone-500 mt-1">
                 {modalType === 'doc'
-                  ? '新築との生涯コスト比較・Qセルズ8.0kW年間8,789kWh試算・自宅売却サポート資料を即時送付'
-                  : 'エアコン1台で家じゅう暖かい空間を現地体感。現在のお住まいの売却・買取相談も承ります'}
+                  ? '営業電話・強引な営業は一切行いません。軽井沢対比・酷暑極寒遮熱工学・太陽光8kW収支をまとめた小冊子を郵送。送信後すぐにWeb版もご覧いただけます'
+                  : 'エアコン1台で家じゅう快適な空間を現地体感。現在のお住まいの売却・買取相談も承ります'}
               </p>
             </div>
 
