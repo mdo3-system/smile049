@@ -135,35 +135,40 @@ export default function SaishinLpPage({ onNavigate }) {
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 py-16 text-center text-white">
           <div className="inline-flex flex-wrap items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs md:text-sm font-semibold tracking-wider text-amber-300 mb-6 shadow-xl animate-fade-in">
             <Sparkles className="w-4 h-4 text-amber-400" />
-            <span>自社物件・売主直接販売（仲介手数料 約85万円不要）</span>
+            <span>【売主直売】仲介手数料 約85万円不要</span>
             <span className="hidden sm:inline text-stone-400">｜</span>
-            <span className="text-emerald-300 font-bold">仮住まい不要・引越し1回のみ・自宅売却サポート</span>
+            <span className="text-emerald-300 font-bold">仮住まい不要・引越し1回で叶う、ご夫婦の温もりあるセカンドライフ</span>
           </div>
 
-          {/* メインコピー（認知的不協和＋苦痛の回避） */}
+          {/* メインコピー（感情の情景＋コントラスト） */}
           <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.3] mb-6 drop-shadow-lg">
-            50代〜70代からの家選び。<br />
+            「朝、布団から出るのが怖くない。」<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200">
-              3,000万円超の新築を買って、<br className="sm:hidden" />老後資金と冬の寒さに悩むのはもうやめませんか？
+              ただそれだけで、人生の冬は<br className="sm:hidden" />こんなにも幸せになる。
             </span>
           </h1>
 
-          {/* サブコピー */}
-          <p className="text-sm sm:text-lg md:text-xl text-stone-200 max-w-3xl mx-auto mb-8 font-normal leading-relaxed drop-shadow">
-            夫婦二人暮らしにちょうどいい。新築の性能をはるかに凌駕する<br className="hidden sm:inline" />
-            <strong className="text-white font-bold">『超高断熱＆光熱費極小化リノベーション住宅』</strong>という新しい選択。<br />
-            比企郡鳩山町ニュータウン内／<span className="font-extrabold text-amber-300 underline underline-offset-4">2,180万円（税込）</span>／HEAT20 G2超／Qセルズ太陽光8.0kW（年間8,789kWh発電）／現行耐震適合／配管・配線全新品／駐車2台
-          </p>
+          {/* サブヘッド & サブコピー */}
+          <div className="max-w-3xl mx-auto mb-8 space-y-3">
+            <p className="text-sm sm:text-base md:text-lg font-bold text-amber-300 drop-shadow">
+              3,000万円超の新築ローンと冬の冷え込みに怯える日々を終わらせる、ご夫婦2人のための「2,180万円・極暖平屋感覚リノベ」。
+            </p>
+            <p className="text-xs sm:text-base text-stone-200 font-normal leading-relaxed drop-shadow">
+              子育てを終えた今、本当に欲しかったのは広すぎる部屋ではなく、<br className="hidden sm:inline" />
+              <strong className="text-white font-bold">「家中どこにいても春のように暖かく、お金の心配が一切ない穏やかな毎日」</strong>でした。<br />
+              比企郡鳩山町 ｜ <span className="font-extrabold text-amber-300 underline underline-offset-4">2,180万円（税込・売主直売）</span> ｜ 真冬でも靴下がいらないHEAT20 G2超高断熱 ＆ 電気代高騰を寄せ付けないQセルズ8.0kW太陽光
+            </p>
+          </div>
 
-          {/* 権威付けバッジ（アイコン配置） */}
+          {/* 権威付けバッジ（スペック名を生活実感・安心へ変換） */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-4xl mx-auto mb-10 text-left">
             <div className="bg-stone-900/85 backdrop-blur-md p-3.5 rounded-xl border border-white/15 shadow-lg flex items-center gap-3">
               <div className="p-2.5 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30 shrink-0">
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <div>
-                <div className="text-[11px] text-stone-400 font-medium">耐震金物補強</div>
-                <div className="text-xs sm:text-sm font-bold text-white">現行耐震適合・構造計算</div>
+                <div className="text-[11px] text-stone-400 font-medium">大地震でも安心の骨組み</div>
+                <div className="text-xs sm:text-sm font-bold text-white">構造計算・現行耐震適合</div>
               </div>
             </div>
 
@@ -172,7 +177,7 @@ export default function SaishinLpPage({ onNavigate }) {
                 <Wrench className="w-5 h-5" />
               </div>
               <div>
-                <div className="text-[11px] text-stone-400 font-medium">隠蔽インフラ一新</div>
+                <div className="text-[11px] text-stone-400 font-medium">30年後も水漏れ知らず</div>
                 <div className="text-xs sm:text-sm font-bold text-white">配管・電気配線全面新品</div>
               </div>
             </div>
@@ -182,8 +187,8 @@ export default function SaishinLpPage({ onNavigate }) {
                 <Sun className="w-5 h-5" />
               </div>
               <div>
-                <div className="text-[11px] text-stone-400 font-medium">Qセルズ 8.0kW</div>
-                <div className="text-xs sm:text-sm font-bold text-white">年間8,789kWh創エネ</div>
+                <div className="text-[11px] text-stone-400 font-medium">物価高でも電気代相殺</div>
+                <div className="text-xs sm:text-sm font-bold text-white">年金生活を守る8.0kW太陽光</div>
               </div>
             </div>
 
@@ -192,8 +197,8 @@ export default function SaishinLpPage({ onNavigate }) {
                 <Flame className="w-5 h-5" />
               </div>
               <div>
-                <div className="text-[11px] text-stone-400 font-medium">真冬も無暖房15℃</div>
-                <div className="text-xs sm:text-sm font-bold text-white">HEAT20 G2超高断熱</div>
+                <div className="text-[11px] text-stone-400 font-medium">夜中もヒートショックなし</div>
+                <div className="text-xs sm:text-sm font-bold text-white">真冬も無暖房15℃（G2超）</div>
               </div>
             </div>
           </div>
@@ -230,14 +235,15 @@ export default function SaishinLpPage({ onNavigate }) {
       <section className="py-20 bg-stone-100 text-stone-900 border-b border-stone-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
-            <span className="text-xs font-bold text-amber-700 tracking-widest uppercase bg-amber-100 px-3 py-1 rounded-full">
-              PROBLEM & EMPATHY
+            <span className="text-xs font-bold text-amber-800 tracking-widest uppercase bg-amber-200/60 border border-amber-300 px-3.5 py-1 rounded-full">
+              REAL PAIN & TRUTH
             </span>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-stone-900 mt-3 leading-snug">
-              「今の暮らし、こんなお悩みはありませんか？」
+              「寒い家で我慢を重ね、老後資金を減らし続ける毎日に、<br className="hidden sm:inline" />不安はありませんか？」
             </h2>
-            <p className="text-stone-600 text-sm sm:text-base mt-3">
-              子育てを終え、セカンドライフを迎えられた50代・60代・70代のご夫婦が直面する切実な現実。
+            <p className="text-stone-600 text-xs sm:text-base mt-3 max-w-2xl mx-auto leading-relaxed">
+              子育てを終え、これからの人生をご夫婦で穏やかに楽しみたい50代・60代・70代が、<br className="hidden sm:inline" />
+              誰にも言えずに抱えている6つの切実な本音。
             </p>
           </div>
 
@@ -247,21 +253,21 @@ export default function SaishinLpPage({ onNavigate }) {
                 1
               </div>
               <div>
-                <h3 className="font-bold text-stone-900 text-base mb-1">子供が独立して2階を持て余している</h3>
+                <h3 className="font-bold text-stone-900 text-base mb-1">階段の上り下りが億劫で、2階は物置同然の開かずの間に</h3>
                 <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
-                  急な階段の上り下りが億劫になり、使わない部屋の掃除ばかり。夫婦二人で暮らすには広すぎて維持・修繕の負担が重い。
+                  急な階段を上るたびに膝や腰に負担。使わない部屋の掃除と草むしりに追われ、「夫婦2人には広すぎて持て余している」とため息が出る。
                 </p>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-200 flex items-start gap-4">
-              <div className="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm shrink-0">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-red-200 bg-red-50/30 flex items-start gap-4">
+              <div className="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center font-bold text-sm shrink-0">
                 2
               </div>
               <div>
-                <h3 className="font-bold text-stone-900 text-base mb-1">冬場、脱衣所やトイレが寒くてヒートショックが怖い</h3>
-                <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
-                  暖房の効いた部屋を出ると身震いする寒さ。急激な温度差が心筋梗塞や脳梗塞の引き金になり、将来の健康寿命に大きな不安がある。
+                <h3 className="font-bold text-stone-900 text-base mb-1">一番怖いのは、真冬の脱衣所やトイレでの「ヒートショック」</h3>
+                <p className="text-xs sm:text-sm text-stone-700 leading-relaxed">
+                  暖房の効いた部屋を一歩出ると凍える寒さ。「ある晩、連れ合いが風呂場で倒れたらどうしよう」という恐怖を、毎年冬が来るたびに心のどこかで怯えている。
                 </p>
               </div>
             </div>
@@ -271,9 +277,9 @@ export default function SaishinLpPage({ onNavigate }) {
                 3
               </div>
               <div>
-                <h3 className="font-bold text-stone-900 text-base mb-1">高騰する電気・ガス代と、将来の老後資金の目減り</h3>
+                <h3 className="font-bold text-stone-900 text-base mb-1">電気代の明細を見るたび溜息。年金生活で新築ローンは絶対組みたくない</h3>
                 <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
-                  年金生活を見据える中、3,000万円超の新築ローンを組むのはリスク。かといって今の家も毎月の光熱費や突発的な修繕費が怖い。
+                  物価も電気代も上がり続ける時代。3,000万超の新築ローンで老後資金を枯渇させるのは自殺行為。かといって今の古い家も毎月の光熱費と修繕費が怖い。
                 </p>
               </div>
             </div>
@@ -283,33 +289,33 @@ export default function SaishinLpPage({ onNavigate }) {
                 4
               </div>
               <div>
-                <h3 className="font-bold text-stone-900 text-base mb-1">夫婦お互いの生活リズムを尊重できる間取りがない</h3>
+                <h3 className="font-bold text-stone-900 text-base mb-1">夫婦お互いの趣味や就寝リズムを邪魔せず、気配を感じて暮らしたい</h3>
                 <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
-                  就寝時間や起床時間、趣味のテレビや読書。お互いを尊重して適度なプライベート空間を持ちたいが、孤立するのは寂しい。
+                  就寝時間、テレビや読書。お互いの生活リズムを尊重した個室空間が欲しいけれど、完全に孤立して気配が分からなくなるのは寂しい。
                 </p>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-amber-200 bg-amber-50/40 flex items-start gap-4">
-              <div className="w-8 h-8 rounded-full bg-amber-500 text-stone-950 flex items-center justify-center font-bold text-sm shrink-0">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-amber-200 bg-amber-50/50 flex items-start gap-4">
+              <div className="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center font-bold text-sm shrink-0">
                 5
               </div>
               <div>
-                <h3 className="font-bold text-stone-900 text-base mb-1">建て替え・リノベの「仮住まい」や「2回引越し」が体力的に無理</h3>
+                <h3 className="font-bold text-stone-900 text-base mb-1">リフォーム工事中の「仮住まい探し」や「2回の引越し」が体力的に無理</h3>
                 <p className="text-xs sm:text-sm text-stone-700 leading-relaxed">
-                  自宅の大規模工事は、仮住まい探し・2回分の引越し作業・家賃など莫大な労力と費用がかかり、そこで諦めてしまう方が大多数です。
+                  自宅の大規模工事は、仮住まい探し・荷造りと荷解きを2回繰り返す過酷な重労働。費用も労力も限界で、住み替えそのものを諦めてしまう。
                 </p>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-amber-200 bg-amber-50/40 flex items-start gap-4">
-              <div className="w-8 h-8 rounded-full bg-amber-500 text-stone-950 flex items-center justify-center font-bold text-sm shrink-0">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-amber-200 bg-amber-50/50 flex items-start gap-4">
+              <div className="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center font-bold text-sm shrink-0">
                 6
               </div>
               <div>
-                <h3 className="font-bold text-stone-900 text-base mb-1">「いま住んでいる自宅が売れるかどうか」の不安で動けない</h3>
+                <h3 className="font-bold text-stone-900 text-base mb-1">「いま住んでいる自宅が売れるかどうか」が不安で決断できない</h3>
                 <p className="text-xs sm:text-sm text-stone-700 leading-relaxed">
-                  持ち家がいくらで売れるか分からず、二重ローンや売れ残りのリスクが怖くて住み替えの決断ができない。
+                  持ち家がいくらで売れるのか見当がつかず、売れ残った場合の二重生活リスクが怖くて、前に進むことができない。
                 </p>
               </div>
             </div>
@@ -321,28 +327,28 @@ export default function SaishinLpPage({ onNavigate }) {
               THE 4-POINT ANSWER
             </span>
             <h3 className="text-2xl sm:text-3xl font-black text-amber-200 mb-3">
-              「そのお悩み、すべて『再進の家』が解決します。」
+              「我慢も不安も、すべて過去のものに。<br className="hidden sm:inline" />『再進の家』がご夫婦の余生をお守りします。」
             </h3>
             <p className="text-stone-300 text-xs sm:text-base max-w-2xl mx-auto leading-relaxed mb-6">
-              価格・性能・将来の修繕費、そして住み替えの心労まで。<br className="hidden sm:inline" />
+              価格・暖かさ・将来の修繕費、そして住み替えに伴う心労まで。<br className="hidden sm:inline" />
               50代〜70代のセカンドライフを阻む4大バリアを完全解消しました。
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs text-left max-w-3xl mx-auto">
               <div className="bg-stone-800/80 p-3 rounded-xl border border-stone-700">
-                <span className="text-amber-400 font-bold block mb-0.5">① 価格の不安解消</span>
-                <span className="text-stone-300 text-[11px]">2,180万で老後資金にゆとり＋建物評価0で節税</span>
+                <span className="text-amber-400 font-bold block mb-0.5">① お金の不安を解消</span>
+                <span className="text-stone-300 text-[11px]">2,180万で手元資金を守り、建物評価0で固定資産税激減</span>
               </div>
               <div className="bg-stone-800/80 p-3 rounded-xl border border-stone-700">
-                <span className="text-amber-400 font-bold block mb-0.5">② 健康・寒さの解消</span>
-                <span className="text-stone-300 text-[11px]">HEAT20 G2超高断熱＋Qセルズ8kW太陽光</span>
+                <span className="text-amber-400 font-bold block mb-0.5">② 寒さ・命の不安を解消</span>
+                <span className="text-stone-300 text-[11px]">HEAT20 G2超高断熱＋Qセルズ8kWで光熱費を相殺</span>
               </div>
               <div className="bg-stone-800/80 p-3 rounded-xl border border-stone-700">
-                <span className="text-amber-400 font-bold block mb-0.5">③ 修繕費の不安解消</span>
-                <span className="text-stone-300 text-[11px]">配管・配線全新品＋耐震適合補強</span>
+                <span className="text-amber-400 font-bold block mb-0.5">③ 修繕・耐震の不安解消</span>
+                <span className="text-stone-300 text-[11px]">配管・電気配線全面新品＋構造計算による耐震金物補強</span>
               </div>
               <div className="bg-stone-800/80 p-3 rounded-xl border border-stone-700">
-                <span className="text-emerald-400 font-bold block mb-0.5">④ 仮住まいの心労解消</span>
-                <span className="text-stone-300 text-[11px]">完成済みで引越し1回＋自宅売却・買取支援</span>
+                <span className="text-emerald-400 font-bold block mb-0.5">④ 引越し・売却の心労解消</span>
+                <span className="text-stone-300 text-[11px]">完成済みで引越し1回完結＋自宅売却・買取をワンストップ</span>
               </div>
             </div>
           </div>
@@ -375,23 +381,23 @@ export default function SaishinLpPage({ onNavigate }) {
                 <div className="lg:w-1/2">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold mb-4">
                     <Coins className="w-4 h-4" />
-                    <span>コア・バリュー 01</span>
+                    <span>コア・バリュー 01 ｜ お金の解放</span>
                   </div>
                   <h3 className="text-2xl sm:text-3xl font-bold mb-4 leading-snug">
-                    経済的な安心：<br />
-                    2,180万円で実現する「ランニングコスト・ゼロ」の暮らし
+                    【価格と暖かさの革命】<br />
+                    新築の2/3の予算で手に入れる、一生「寒さとお金の不安」から解放される暮らし
                   </h3>
                   <p className="text-stone-300 text-sm sm:text-base leading-relaxed mb-6">
-                    初期費用を新築（約3,000万〜4,000万円）から<strong className="text-amber-300">約820万円以上抑制</strong>。さらにHEAT20 G2クラスの超高断熱と、<strong className="text-amber-300">Qセルズ太陽光発電8.0kW（年間推定発電量 8,789 kWh）</strong>の圧倒的な自家消費により、高騰する電気代をほぼゼロ化します。
+                    初期費用を新築（約3,000万〜4,000万円）から<strong className="text-amber-300">約820万〜1,800万円抑制</strong>。さらに真冬でも家中春の暖かさを保つHEAT20 G2クラスの超高断熱と、<strong className="text-amber-300">Qセルズ太陽光8.0kW（年間8,789kWh創エネ）</strong>の自家消費により、毎月跳ね上がる電気代をほぼ相殺します。
                   </p>
                   <p className="text-stone-400 text-xs sm:text-sm leading-relaxed mb-6">
-                    浮いた資金で、ご夫婦での国内旅行や温泉巡り、お孫さんへのプレゼントなど老後資金にゆとりが生まれます。あえて築25年超の骨組みを活用しているため建物評価額が低く、<strong className="text-emerald-400">毎年の固定資産税も新築に比べ劇的に節税</strong>できます。
+                    「毎月の光熱費を気にしてエアコンを我慢する」生活は、今日でおしまいです。浮いた資金で、ご夫婦での温泉旅行やお孫さんへのプレゼントなど、心にゆとりのある余生が広がります。築25年超の良質な躯体を活かしているため、<strong className="text-emerald-400">毎年の固定資産税も新築の数分の一</strong>で済みます。
                   </p>
 
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <div className="p-3.5 rounded-xl bg-stone-900/80 border border-stone-700">
-                      <div className="text-stone-400 mb-1">初期費用の抑制</div>
-                      <div className="text-lg font-black text-amber-400">約 1,000 万円 浮く</div>
+                      <div className="text-stone-400 mb-1">手元に残る老後資金</div>
+                      <div className="text-lg font-black text-amber-400">約 1,000 万円 ゆとり</div>
                     </div>
                     <div className="p-3.5 rounded-xl bg-stone-900/80 border border-stone-700">
                       <div className="text-stone-400 mb-1">30年の生涯コスト差額</div>
@@ -432,9 +438,9 @@ export default function SaishinLpPage({ onNavigate }) {
                   </div>
 
                   <div className="mt-5 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-center">
-                    <span className="text-xs text-amber-300 font-bold">
-                      浮いた約1,820万円は、ご夫婦の豊かな時間・旅行・健康維持のために。
-                    </span>
+                    <p className="text-xs text-amber-300 font-bold">
+                      浮いた約 1,820 万円で、夫婦の老後生活に揺るぎない安心が手に入ります
+                    </p>
                   </div>
                 </div>
               </div>
@@ -446,13 +452,14 @@ export default function SaishinLpPage({ onNavigate }) {
             <div className="p-8 sm:p-10 rounded-3xl bg-stone-800/80 border border-stone-700 shadow-xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-bold mb-4">
                 <Wrench className="w-4 h-4" />
-                <span>コア・バリュー 02（最大の差別化ポイント）</span>
+                <span>コア・バリュー 02 ｜ 30年の耐久性</span>
               </div>
               <h3 className="text-2xl sm:text-3xl font-bold mb-3 leading-snug">
-                構造的な安心：プロの目で躯体から見直した「見えない部分」へのこだわり
+                【目に見えない安心】<br />
+                大工歴40年の熟練の技と構造計算。骨組みから配管まで新品に蘇らせた「30年安心の耐久性」
               </h3>
               <p className="text-stone-300 text-sm sm:text-base leading-relaxed max-w-3xl mb-8">
-                上辺だけの壁紙やキッチンの交換ではありません。建築士と熟練大工が一度すべての骨組み（フルスケルトン）まで解体し、木造建築の深い知見と構造計算に基づいて躯体を強固に再構築しました。
+                表側だけのクロスやキッチンの貼り替えではありません。建築士と熟練大工が一度すべての骨組み（フルスケルトン）まで解体し、木の一本一本の健全性を精査。構造計算に基づき、最新の耐震金物で緊結・再構築しました。
               </p>
 
               {/* 4枚の実写・現場構造証拠写真 */}
@@ -465,7 +472,7 @@ export default function SaishinLpPage({ onNavigate }) {
                   />
                   <div className="p-3">
                     <div className="text-xs font-bold text-white mb-1">01. フルスケルトン金物補強</div>
-                    <div className="text-[11px] text-stone-400">柱・梁・筋交いを現わしにし、最新基準の金物で緊結・耐震補強。</div>
+                    <div className="text-[11px] text-stone-400">柱・梁・筋交いを現わしにし、大地震に耐えうる最新金物で緊結。</div>
                   </div>
                 </div>
 
@@ -477,7 +484,7 @@ export default function SaishinLpPage({ onNavigate }) {
                   />
                   <div className="p-3">
                     <div className="text-xs font-bold text-white mb-1">02. 遮熱通気部材「銀次郎」</div>
-                    <div className="text-[11px] text-stone-400">屋根垂木下に通気層を確保し、夏の輻射熱を完全遮断。</div>
+                    <div className="text-[11px] text-stone-400">屋根垂木下に通気層を確保し、酷暑の熱気を家に入れません。</div>
                   </div>
                 </div>
 
@@ -489,7 +496,7 @@ export default function SaishinLpPage({ onNavigate }) {
                   />
                   <div className="p-3">
                     <div className="text-xs font-bold text-white mb-1">03. トリプル樹脂サッシ</div>
-                    <div className="text-[11px] text-stone-400">世界水準の断熱窓を採用。結露を根絶し高窓から採光。</div>
+                    <div className="text-[11px] text-stone-400">世界基準の断熱窓。嫌な窓の結露を根絶し、外の騒音も遮断。</div>
                   </div>
                 </div>
 
@@ -500,15 +507,15 @@ export default function SaishinLpPage({ onNavigate }) {
                     className="w-full h-40 object-cover"
                   />
                   <div className="p-3">
-                    <div className="text-xs font-bold text-white mb-1">04. 配管・インフラ完全更新</div>
-                    <div className="text-[11px] text-stone-400">床下・壁内の給水・給湯・排水・電気配線を新品に交換。</div>
+                    <div className="text-xs font-bold text-white mb-1">04. 配管・インフラ完全新品</div>
+                    <div className="text-[11px] text-stone-400">見えない給排水管・電気配線を全交換。将来の水漏れリスクをゼロに。</div>
                   </div>
                 </div>
               </div>
 
               <div className="p-4 rounded-xl bg-stone-900/80 border border-stone-700 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="text-xs sm:text-sm text-stone-300">
-                  <strong className="text-white">建築技術者としての本気度：</strong> なぜここまでの構造補強・断熱改修が必要なのか、CAD断面図や構造計算データを公開しています。
+                  <strong className="text-white">建築士・大工チームの誠実な約束：</strong> なぜここまでの構造補強・断熱改修が必要なのか、CAD図面や構造計算書を包み隠さず公開しています。
                 </div>
                 <button
                   onClick={() => onNavigate ? onNavigate('saishin-tech') : (window.location.href = '/saishin/technology')}
@@ -526,25 +533,26 @@ export default function SaishinLpPage({ onNavigate }) {
             <div className="p-8 sm:p-10 rounded-3xl bg-stone-800/80 border border-stone-700 shadow-xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold mb-4">
                 <Compass className="w-4 h-4" />
-                <span>コア・バリュー 03</span>
+                <span>コア・バリュー 03 ｜ 心地よい距離感</span>
               </div>
               <h3 className="text-2xl sm:text-3xl font-bold mb-4 leading-snug">
-                暮らしのゆとり：つかず離れず、自然と調和する大人の空間
+                【夫婦の程よい距離感】<br />
+                1階だけで快適に完結する「平屋感覚」。お互いの時間を尊重しながら、温もりを感じ合える間取り
               </h3>
               <p className="text-stone-300 text-sm sm:text-base leading-relaxed max-w-3xl mb-6">
-                夫婦であっても、就寝時間や読書・テレビの趣味は異なります。それぞれのプライベート時間を尊重できるよう、1階に<strong className="text-amber-300">独立した2つの寝室</strong>を配置しました。
+                夫婦であっても、就寝時間や読書・テレビの趣味は異なります。それぞれのプライベート時間を尊重できるよう、1階に<strong className="text-amber-300">独立した2つの寝室</strong>を配置しました。階段を使わずにワンフロアですべてが完結します。
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-stone-300">
                 <div className="p-5 rounded-2xl bg-stone-900/80 border border-stone-700">
                   <div className="font-bold text-white text-base mb-2">気配を感じる絶妙な距離感</div>
                   <p className="text-xs leading-relaxed text-stone-400">
-                    リビングと廊下を挟んで適度な距離を保ちながら、物音や明かりでお互いの安心感を確認できる設計。平屋感覚で1階だけで生活が完結します。
+                    リビングと廊下を挟んで適度な距離を保ちながら、物音や明かりでお互いの安心感を確認できる設計。足腰に負担のない平屋感覚で、一生快適に過ごせます。
                   </p>
                 </div>
                 <div className="p-5 rounded-2xl bg-stone-900/80 border border-stone-700">
                   <div className="font-bold text-white text-base mb-2">美味しい空気を吸いながらの散歩が日課に</div>
                   <p className="text-xs leading-relaxed text-stone-400">
-                    南東・南西角地で窓を開ければ澄んだ空気と見晴らしの良い景色。喧騒のない閑静な住宅街での朝夕の散歩が、お二人の健康的な新しい習慣になります。
+                    南東・南西角地で窓を開ければ澄んだ空気と見晴らしの良い景色。排気ガスや騒音のない閑静な住宅街での朝夕の散歩が、お二人の健康的な新しい習慣になります。
                   </p>
                 </div>
               </div>
@@ -1171,29 +1179,29 @@ export default function SaishinLpPage({ onNavigate }) {
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-10">
             <span className="text-xs font-bold text-amber-400 tracking-widest uppercase bg-amber-950 px-3 py-1 rounded-full border border-amber-800">
-              DEVELOPER'S STORY
+              DEVELOPER'S HEART
             </span>
             <h2 className="text-2xl sm:text-4xl font-black mt-3">
               「なぜ、私たちはこの家をつくったのか？」
             </h2>
             <p className="text-stone-400 text-xs sm:text-sm mt-2">
-              子育てを終えられた50代・60代・70代のご夫婦へ、私たちがどうしても伝えたかった想い
+              一生懸命働いて子育てを終えられたご夫婦へ、大工と建築士がどうしても伝えたかった想い
             </p>
           </div>
 
           <div className="p-8 sm:p-10 rounded-3xl bg-stone-800/80 border border-stone-700 shadow-xl space-y-6 text-sm sm:text-base leading-relaxed text-stone-300">
             <p className="font-bold text-white text-base sm:text-lg">
               「子育てを終え、これからの人生をご夫婦お二人で穏やかに楽しみたい――。<br className="hidden sm:inline" />
-              そんなお客様が、3,000万円以上もする新築建売を買って高額なローンと高騰する電気代に悩まされる姿を、私たちは見たくありませんでした。」
+              そんな大切なお客様が、3,000万円以上もする新築建売を買って高額なローンに怯えたり、冬の寒さで体を壊したりする姿を、私たちはどうしても見たくありませんでした。」
             </p>
             <p>
-              だからこそ、あえて建物評価額が低く固定資産税の負担が極めて少ない『築25年超の優良物件』を厳選。余分な購入コストを極限まで削り、その浮いた予算をすべて<strong className="text-amber-300">『冬暖かく夏涼しい、HEAT20 G2超のモンスター断熱性能』</strong>と、<strong className="text-amber-300">『光熱費を極小化するQセルズ8.0kW太陽光発電』</strong>、そして<strong className="text-amber-300">『見えない配管・電気配線の全面新品交換』</strong>に注ぎ込みました。
+              だからこそ、あえて建物評価額が低く固定資産税の負担が極めて少ない『築25年超の良質な優良骨組み』を厳選。無駄な購入コストを極限まで削り、浮いた予算のすべてを<strong className="text-amber-300">『真冬でも靴下がいらない、HEAT20 G2超の極暖断熱』</strong>と、<strong className="text-amber-300">『電気代高騰を相殺するQセルズ8.0kW太陽光発電』</strong>、そして<strong className="text-amber-300">『見えない配管・電気配線の完全新品交換』</strong>に注ぎ込みました。
             </p>
             <p>
-              子ども部屋のための広いだけの家はいりません。さらに、今の家の建て替えやリフォームに伴う『仮住まい探し』や『2回の引っ越し』という過酷な心労を完全になくし、カギを受け取って1回引っ越すだけで新生活がスタートできる仕組みを整えました。
+              子ども部屋のための広いだけの家はいりません。さらに、今の家の建て替えに伴う『仮住まい探し』や『2回の過酷な引越し』という心労を完全になくし、カギを受け取って引越し1回だけで新しい生活がスタートできる安心の体制を整えました。
             </p>
             <p className="text-amber-200 font-medium">
-              ご夫婦2人が健康で、お金の心配なく、一生安心して笑って暮らせる『人生後半の最高の拠点』をお届けしたかったのです。
+              ご夫婦2人が健康で、お金の心配なく、一生安心して笑って暮らせる『人生後半の最高の拠点』をお届けしたい――それが私たちの唯一の願いです。
             </p>
             <div className="pt-4 border-t border-stone-700 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-xs text-stone-400">
@@ -1220,11 +1228,11 @@ export default function SaishinLpPage({ onNavigate }) {
             STEP-BY-STEP OFFERS
           </span>
           <h2 className="text-2xl sm:text-4xl font-black mb-4">
-            「賢い家選び」を始めたいご夫婦へ。<br />
-            無理のない2つの手挙げステップ
+            「賢いセカンドライフ」を一歩踏み出したいご夫婦へ。<br />
+            無理のない2つの安心ステップ
           </h2>
           <p className="text-stone-400 text-xs sm:text-base max-w-2xl mx-auto mb-10 leading-relaxed">
-            強引な売り込みや突然の訪問営業は一切いたしません。まずは無料ガイドブックでご納得いただくか、現地でエアコン1台の暖かさをご体感ください。
+            強引な売り込みや突然の訪問営業は一切いたしません。まずは無料ガイドブックでゆっくりご検討いただくか、現地でエアコン1台の暖かさをご体感ください。
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left max-w-3xl mx-auto mb-12">
@@ -1257,11 +1265,11 @@ export default function SaishinLpPage({ onNavigate }) {
                   オファー 02（1日2組限定・完全予約制）
                 </span>
                 <h3 className="text-base sm:text-lg font-bold text-white mt-3 mb-2 leading-snug">
-                  「エアコン1台で本当に暖かいの？」<br />
+                  「エアコン1台で本当に家中暖かいの？」<br />
                   冬の快適体感 ＆ 光熱費試算会
                 </h3>
                 <p className="text-xs text-stone-300 leading-relaxed mb-6">
-                  他の来場者を気にせず、エアコン1台で家じゅう暖かい空気感と静寂を体感。現在お住まいのご自宅の売却・買取査定のご相談も窓口ひとつで承ります。
+                  他の来場者を気にせず、エアコン1台で家じゅう暖かい空気感と静寂を現地体感。現在お住まいのご自宅の売却・買取査定のご相談も窓口ひとつで承ります。
                 </p>
               </div>
               <button
