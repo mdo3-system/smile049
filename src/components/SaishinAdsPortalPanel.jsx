@@ -256,10 +256,10 @@ export default function SaishinAdsPortalPanel() {
           <div className="space-y-6 animate-fade-in">
             <div className="bg-stone-950 p-6 rounded-3xl border border-stone-800">
               <h2 className="text-xl font-bold text-white mb-2">
-                5大ターゲット別 Meta広告クリエイティブセット（コピペで即出稿可能）
+                6大ターゲット別 Meta広告クリエイティブセット（コピペで即出稿可能）
               </h2>
               <p className="text-xs text-stone-400">
-                ペルソナのインサイト（経済性・ヒートショック・奥様共感・夫婦別室・理系構造）に特化した、高クリック率（CTR 2%以上目標）の原稿設計。
+                ペルソナのインサイト（都心二拠点・経済性・ヒートショック・奥様共感・夫婦別室・理系構造）に特化した、高クリック率（CTR 2%以上目標）の原稿設計。
               </p>
             </div>
 
@@ -615,6 +615,80 @@ https://lp.smile049.jp/saishin`}
                   <div>
                     <span className="text-stone-400 text-xs font-bold block mb-1">リンク先URL:</span>
                     <div className="p-3 bg-stone-900 rounded-xl border border-stone-800 text-xs font-mono text-pink-400">
+                      https://lp.smile049.jp/saishin
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* クリエイティブ 6: パターンF【都心二拠点・週末別邸型】（都心シニア・デュアルライフ） */}
+            <div className="bg-stone-950 p-6 sm:p-8 rounded-3xl border border-stone-800 shadow-xl space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-stone-800">
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30">
+                    PATTERN F（都心二拠点・週末別邸型）★新機軸
+                  </span>
+                  <h3 className="text-base sm:text-lg font-bold text-white">
+                    都心から約1時間。2,180万円で手に入る「維持費実質ゼロ」の週末別邸
+                  </h3>
+                </div>
+                <span className="text-xs text-stone-400">配信推奨エリア: 東京23区・武蔵野・さいたま市</span>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-xs sm:text-sm">
+                <div>
+                  <span className="text-stone-400 text-xs font-bold block mb-1">メインテキスト (Primary Text):</span>
+                  <div className="p-4 bg-stone-900 rounded-xl border border-stone-800 text-stone-200 text-xs leading-relaxed whitespace-pre-wrap font-mono">
+{`【東京・都心近郊にお住まいの50代・60代・70代のご夫婦へ】
+
+「週末くらい、人混みやコンクリートから離れて、土の匂いと澄んだ空気の中で過ごしたい」
+そう思っても、軽井沢や那須は片道3時間。通うだけで疲れてしまい、冬の寒さや維持管理費に悩む方が少なくありません。
+
+実は、練馬ICから車で約50分（池袋から東武東上線で約50分）の埼玉県鳩山町に、
+夫婦ふたりの週末二拠点にちょうどいい【2,180万円の極暖プライベートヴィラ】が完成しました。
+
+✔ 土地72坪（南東・南西角地）：小さな家庭菜園やガーデニング、木漏れ日のテラスを満喫
+✔ 維持費ゼロ設計：Qセルズ大容量8.0kW太陽光が年間8,789kWh発電。不在時も電力を創出し、固定費の負担を極小化
+✔ 日本一の酷暑の夏も、底冷えする真冬もエアコン1台：屋根遮熱「銀次郎」× HEAT20 G2超高断熱（冬の別荘の底冷え・凍結とは無縁）
+✔ 完全フルスケルトン再生：水回り（タカラ高品位ホーロー）・見えない配管・電気配線まで完全新品
+
+都心の狭いマンションに閉じこもる週末を卒業して、
+「都心と自然を行き来する、豊かな大人の休日」を一歩踏み出しませんか？
+
+売り込みは一切ありません。まずは現地で、澄み切った空気とエアコン1台の暖かさをご体感ください。
+
+▼ 詳細・特製ガイドブック（PDF）はこちら
+https://lp.smile049.jp/saishin`}
+                  </div>
+                  <button
+                    onClick={() => handleCopy(`【東京・都心近郊にお住まいの50代・60代・70代のご夫婦へ】\n\n「週末くらい、人混みやコンクリートから離れて、土の匂いと澄んだ空気の中で過ごしたい」\nそう思っても、軽井沢や那須は片道3時間。通うだけで疲れてしまい、冬の寒さや維持管理費に悩む方が少なくありません。\n\n実は、練馬ICから車で約50分（池袋から東武東上線で約50分）の埼玉県鳩山町に、\n夫婦ふたりの週末二拠点にちょうどいい【2,180万円の極暖プライベートヴィラ】が完成しました。\n\n✔ 土地72坪（南東・南西角地）：小さな家庭菜園やガーデニング、木漏れ日のテラスを満喫\n✔ 維持費ゼロ設計：Qセルズ大容量8.0kW太陽光が年間8,789kWh発電。不在時も電力を創出し、固定費の負担を極小化\n✔ 日本一の酷暑の夏も、底冷えする真冬もエアコン1台：屋根遮熱「銀次郎」× HEAT20 G2超高断熱（冬の別荘の底冷え・凍結とは無縁）\n✔ 完全フルスケルトン再生：水回り（タカラ高品位ホーロー）・見えない配管・電気配線まで完全新品\n\n都心の狭いマンションに閉じこもる週末を卒業して、\n「都心と自然を行き来する、豊かな大人の休日」を一歩踏み出しませんか？\n\n売り込みは一切ありません。まずは現地で、澄み切った空気とエアコン1台の暖かさをご体感ください。\n\n▼ 詳細・特製ガイドブック（PDF）はこちら\nhttps://lp.smile049.jp/saishin`, 'ad_f')}
+                    className="mt-2 px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-bold flex items-center gap-1.5 transition"
+                  >
+                    {copiedKey === 'ad_f' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copiedKey === 'ad_f' ? 'コピー完了' : '本文をコピー'}</span>
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <span className="text-stone-400 text-xs font-bold block mb-1">見出し (Headline):</span>
+                    <div className="p-3 bg-stone-900 rounded-xl border border-stone-800 font-bold text-white text-xs">
+                      都心から約1時間。軽井沢の1/3の価格で手に入る「維持費実質ゼロ」の週末別邸
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="text-stone-400 text-xs font-bold block mb-1">推奨クリエイティブ素材（別邸・自然リトリート）:</span>
+                    <div className="p-3 bg-stone-900 rounded-xl border border-stone-800 text-xs text-stone-300 space-y-2">
+                      <div>・<strong>画像素材:</strong> 青空と街並みのドローン動画スナップ ＋ 木天井LDK写真</div>
+                      <div>・<strong>画像帯文字:</strong> 「都心から約1時間の週末別邸」「軽井沢より近くて暖かい家」</div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="text-stone-400 text-xs font-bold block mb-1">リンク先URL:</span>
+                    <div className="p-3 bg-stone-900 rounded-xl border border-stone-800 text-xs font-mono text-emerald-400">
                       https://lp.smile049.jp/saishin
                     </div>
                   </div>

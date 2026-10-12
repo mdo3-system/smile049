@@ -43,12 +43,19 @@ export default function SaishinLpPage({ onNavigate }) {
   const handleFormSubmit = (e) => {
     e.preventDefault();
     setFormSubmitted(true);
+    const isDocRequest = modalType === 'doc';
     setTimeout(() => {
-      alert('お問い合わせありがとうございます。担当者より迅速にご案内いたします。');
+      alert(isDocRequest 
+        ? 'ガイドブックの請求ありがとうございます。別タブにて特製ガイドブック（PDF印刷対応）を開きます。' 
+        : '体感会のご予約ありがとうございます。担当者より迅速にご案内いたします。'
+      );
+      if (isDocRequest) {
+        window.open('/saishin-dual-life-guide.html', '_blank');
+      }
       setModalType(null);
       setFormSubmitted(false);
       setFormData({ name: '', phone: '', email: '', message: '' });
-    }, 800);
+    }, 600);
   };
 
   return (
@@ -139,7 +146,7 @@ export default function SaishinLpPage({ onNavigate }) {
             <Sparkles className="w-4 h-4 text-amber-400" />
             <span>【売主直売】仲介手数料 約85万円不要</span>
             <span className="hidden sm:inline text-stone-400">｜</span>
-            <span className="text-emerald-300 font-bold">仮住まい不要・引越し1回で叶う、ご夫婦の温もりあるセカンドライフ</span>
+            <span className="text-emerald-300 font-bold">都心から約1時間の週末別邸 ＆ ご夫婦の温もりあるセカンドライフ</span>
           </div>
 
           {/* メインコピー（感情の情景＋コントラスト） */}
@@ -153,12 +160,12 @@ export default function SaishinLpPage({ onNavigate }) {
           {/* サブヘッド & サブコピー */}
           <div className="max-w-3xl mx-auto mb-8 space-y-3">
             <p className="text-sm sm:text-base md:text-lg font-bold text-amber-300 drop-shadow">
-              3,000万円超の新築ローンと冬の冷え込みに怯える日々を終わらせる、ご夫婦2人のための「2,180万円・極暖平屋感覚リノベ」。
+              高額な新築ローンや維持費のかかる別荘はもういらない。ご夫婦2人のための「2,180万円・維持費実質ゼロの極暖プライベートヴィラ」。
             </p>
             <p className="text-xs sm:text-base text-stone-200 font-normal leading-relaxed drop-shadow">
               子育てを終えた今、本当に欲しかったのは広すぎる部屋ではなく、<br className="hidden sm:inline" />
-              <strong className="text-white font-bold">「家中どこにいても春のように暖かく、お金の心配が一切ない穏やかな毎日」</strong>でした。<br />
-              比企郡鳩山町 ｜ <span className="font-extrabold text-amber-300 underline underline-offset-4">2,180万円（税込・売主直売）</span> ｜ 真冬でも靴下がいらないHEAT20 G2超高断熱 ＆ 電気代高騰を寄せ付けないQセルズ8.0kW太陽光
+              <strong className="text-white font-bold">「日本一の酷暑の夏も、底冷えする真冬も、家中どこにいても春のように快適な拠点」</strong>でした。<br />
+              比企郡鳩山町 ｜ <span className="font-extrabold text-amber-300 underline underline-offset-4">2,180万円（税込・売主直売・土地72坪）</span> ｜ 屋根遮熱「銀次郎」× HEAT20 G2極暖断熱 ＆ Qセルズ8.0kW太陽光発電
             </p>
           </div>
 

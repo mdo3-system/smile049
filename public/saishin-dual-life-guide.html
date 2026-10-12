@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>【公式特製ガイドブック】都心から約1時間の週末別邸：大人の二拠点生活完全ガイド｜再進の家</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700;800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #854d0e;
+      --primary-light: #fef3c7;
+      --stone-900: #1c1917;
+      --stone-800: #292524;
+      --stone-700: #44403c;
+      --stone-600: #57534e;
+      --stone-500: #78716c;
+      --stone-200: #e7e5e4;
+      --stone-100: #f5f5f4;
+      --stone-50: #fafaf9;
+      --accent: #b45309;
+      --emerald: #047857;
+      --bg-cream: #faf8f5;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      color: var(--stone-800);
+      background-color: #57534e;
+      line-height: 1.7;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    h1, h2, h3, .serif {
+      font-family: 'Shippori Mincho', serif;
+    }
+
+    /* 上部操作ツールバー（印刷時非表示） */
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: #1c1917;
+      color: #fff;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .toolbar-title {
+      font-size: 14px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toolbar-btns {
+      display: flex;
+      gap: 12px;
+    }
+    .btn {
+      cursor: pointer;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 13px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      border: none;
+    }
+    .btn-print {
+      background: #f59e0b;
+      color: #1c1917;
+    }
+    .btn-print:hover {
+      background: #d97706;
+    }
+    .btn-back {
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+    }
+    .btn-back:hover {
+      background: rgba(255,255,255,0.25);
+    }
+
+    /* A4 ページコンテナ */
+    .page-container {
+      max-width: 210mm;
+      margin: 24px auto;
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 20mm 18mm 18mm 18mm;
+      margin-bottom: 24px;
+      background: var(--bg-cream);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* ヘッダー・フッター（各ページ共通） */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--stone-200);
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+      font-size: 11px;
+      color: var(--stone-500);
+      font-weight: 500;
+    }
+    .page-header-logo {
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: 0.05em;
+    }
+    .page-footer {
+      border-top: 1px solid var(--stone-200);
+      padding-top: 8px;
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: var(--stone-500);
+    }
+
+    /* 表紙 (Page 1) */
+    .page-cover {
+      background: linear-gradient(145deg, #fdfbf7 0%, #f4ede2 100%);
+      padding: 24mm 20mm;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .cover-badge {
+      display: inline-block;
+      padding: 6px 18px;
+      background: #fef3c7;
+      color: #78350f;
+      border: 1px solid #fde68a;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      margin-bottom: 16px;
+    }
+    .cover-title {
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.35;
+      color: var(--stone-900);
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+    .cover-subtitle {
+      font-size: 15px;
+      color: var(--primary);
+      font-weight: 700;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .cover-hero-img {
+      width: 100%;
+      height: 115mm;
+      border-radius: 16px;
+      object-fit: cover;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+      border: 1px solid var(--stone-200);
+      margin-bottom: 20px;
+    }
+    .cover-points {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      text-align: left;
+      margin-bottom: 20px;
+    }
+    .cover-point-card {
+      background: #ffffff;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--stone-200);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+    .cover-point-num {
+      font-size: 11px;
+      font-weight: 900;
+      color: #b45309;
+      display: block;
+      margin-bottom: 2px;
+    }
+    .cover-point-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--stone-900);
+      line-height: 1.4;
+    }
+    .cover-footer-info {
+      font-size: 11px;
+      color: var(--stone-600);
+      line-height: 1.5;
+      border-top: 1px solid rgba(0,0,0,0.08);
+      padding-top: 12px;
+    }
+
+    /* 各章のスタイル */
+    .chapter-tag {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 4px;
+      display: block;
+    }
+    .chapter-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--stone-900);
+      line-height: 1.35;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--primary-light);
+    }
+    .lead-text {
+      font-size: 13px;
+      line-height: 1.75;
+      color: var(--stone-700);
+      margin-bottom: 16px;
+    }
+    .lead-text strong {
+      color: var(--stone-900);
+      background: linear-gradient(transparent 65%, #fef3c7 65%);
+    }
+
+    /* 比較表 */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11.5px;
+      margin: 14px 0;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--stone-200);
+    }
+    .compare-table th, .compare-table td {
+      padding: 10px 12px;
+      border: 1px solid var(--stone-200);
+      text-align: left;
+    }
+    .compare-table th {
+      background: #f5f5f4;
+      font-weight: 700;
+      color: var(--stone-700);
+    }
+    .compare-table .highlight-col {
+      background: #fefce8;
+      font-weight: bold;
+      color: #78350f;
+    }
+    .badge-win {
+      background: #d97706;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 900;
+      margin-right: 4px;
+    }
+
+    /* 2カラムレイアウト */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 14px 0;
+    }
+    .card {
+      background: #ffffff;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--stone-200);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--stone-900);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .card-text {
+      font-size: 11.5px;
+      color: var(--stone-600);
+      line-height: 1.65;
+    }
+
+    .img-box {
+      width: 100%;
+      height: 52mm;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 1px solid var(--stone-200);
+      margin-top: 8px;
+    }
+
+    /* コールアウト */
+    .callout {
+      background: #fef3c7;
+      border-left: 4px solid #b45309;
+      padding: 12px 16px;
+      border-radius: 0 10px 10px 0;
+      margin: 14px 0;
+      font-size: 12px;
+      color: #78350f;
+      line-height: 1.65;
+    }
+    .callout strong {
+      font-size: 13px;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    /* 物件概要テーブル */
+    .outline-grid {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      border: 1px solid var(--stone-200);
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      font-size: 11.5px;
+      margin: 12px 0;
+    }
+    .outline-label {
+      background: #f5f5f4;
+      padding: 8px 12px;
+      font-weight: 700;
+      color: var(--stone-700);
+      border-bottom: 1px solid var(--stone-200);
+      border-right: 1px solid var(--stone-200);
+    }
+    .outline-val {
+      padding: 8px 12px;
+      color: var(--stone-800);
+      border-bottom: 1px solid var(--stone-200);
+    }
+    .outline-val.price {
+      font-size: 15px;
+      font-weight: 900;
+      color: #b45309;
+      background: #fffbeb;
+    }
+
+    /* 印刷用CSS */
+    @media print {
+      body {
+        background: transparent;
+      }
+      .toolbar {
+        display: none !important;
+      }
+      .page-container {
+        margin: 0;
+        max-width: 100%;
+      }
+      .page {
+        margin: 0;
+        box-shadow: none;
+        page-break-after: always;
+        break-after: page;
+        min-height: 297mm;
+        height: 297mm;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 上部ツールバー -->
+  <div class="toolbar">
+    <div class="toolbar-title">
+      <span>📖 【公式資料】再進の家 大人の二拠点生活完全ガイド（A4・全5ページ）</span>
+    </div>
+    <div class="toolbar-btns">
+      <a href="/saishin" class="btn btn-back">← 総合案内LPへ戻る</a>
+      <button onclick="window.print()" class="btn btn-print">
+        <span>🖨️ 印刷 / PDFとして保存</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="page-container">
+
+    <!-- =========================================================================
+         PAGE 1: 表紙
+    ========================================================================= -->
+    <div class="page page-cover">
+      <div>
+        <span class="cover-badge">SPECIAL DUAL-LIFE GUIDEBOOK</span>
+        <h1 class="cover-title">
+          都心から約1時間の週末別邸。<br />
+          老後資金を守り、夏も冬も快適に過ごす<br />
+          <span style="color: #92400e;">「大人の二拠点生活」完全ガイド</span>
+        </h1>
+        <p class="cover-subtitle">
+          軽井沢の1/3の価格で手に入る、維持費実質ゼロの極暖プライベートヴィラ
+        </p>
+
+        <img src="/assets/saishin/features/feat_01_skeleton.jpg" alt="再進の家" class="cover-hero-img" />
+
+        <div class="cover-points">
+          <div class="cover-point-card">
+            <span class="cover-point-num">POINT 01</span>
+            <div class="cover-point-title">池袋・練馬から約50分。思い立ったらすぐ行ける距離</div>
+          </div>
+          <div class="cover-point-card">
+            <span class="cover-point-num">POINT 02</span>
+            <div class="cover-point-title">留守中も8.0kW太陽光が稼ぎ、維持費ゼロ設計</div>
+          </div>
+          <div class="cover-point-card">
+            <span class="cover-point-num">POINT 03</span>
+            <div class="cover-point-title">夏の酷暑も冬の底冷えも無縁。HEAT20 G2超高断熱</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cover-footer-info">
+        <strong>株式会社 住ま居る / すまいる設計</strong>（建築士・熟練大工 施工チーム）<br />
+        埼玉県鶴ヶ島市町屋176番地5 ｜ 建築士事務所登録：埼玉県知事 第(5)10278号 ｜ 宅地建物取引業：埼玉県知事 (3)第23725号
+      </div>
+    </div>
+
+    <!-- =========================================================================
+         PAGE 2: 第1章 なぜ軽井沢ではなく「鳩山」なのか？
+    ========================================================================= -->
+    <div class="page">
+      <div>
+        <div class="page-header">
+          <span class="page-header-logo">再進の家 ｜ 二拠点生活ガイド</span>
+          <span>CHAPTER 01 ｜ 距離と維持費の真実</span>
+        </div>
+
+        <span class="chapter-tag">CHAPTER 01</span>
+        <h2 class="chapter-title">なぜ、軽井沢ではなく「鳩山」なのか？<br />通い続けられる距離と、維持費ゼロの圧倒的現実性</h2>
+
+        <p class="lead-text">
+          「子育てを終え、週末くらいは人混みやコンクリートから離れて、土の匂いと澄んだ空気の中で過ごしたい――。」<br />
+          そう思って軽井沢や那須、八ヶ岳の別荘を検討される都心のご夫婦が少なくありません。しかし、実際に別荘を持った方の多くが<strong>「通うだけで疲れて月1回しか行かなくなった」「冬は水道管が凍結して寒くて使えない」「毎年の高額な管理費と固定資産税が重荷」</strong>と後悔されています。
+        </p>
+
+        <!-- 3大選択肢の徹底比較表 -->
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th style="width: 22%;">比較項目</th>
+              <th class="highlight-col" style="width: 30%;">再進の家（鳩山・二拠点）</th>
+              <th style="width: 24%;">軽井沢・高原の別荘</th>
+              <th style="width: 24%;">都心狭小マンション</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>都心からのアクセス</strong></td>
+              <td class="highlight-col"><span class="badge-win">圧勝</span><strong>車・電車で約50〜60分</strong><br><small>金曜夜に出て日曜夜に楽々帰宅</small></td>
+              <td>片道2.5〜3.5時間<br><small>渋滞で通うだけで疲弊</small></td>
+              <td>0分（日常の場）<br><small>息抜きの場がない</small></td>
+            </tr>
+            <tr>
+              <td><strong>取得総費用</strong></td>
+              <td class="highlight-col"><span class="badge-win">1/3</span><strong>2,180 万円</strong>（税込/土地込）<br><small>自己資金内で無理なく購入</small></td>
+              <td>5,500万〜8,000万円超<br><small>高額ローンまたは老後資金圧迫</small></td>
+              <td>8,000万〜1億2,000万円<br><small>都心の地価高騰</small></td>
+            </tr>
+            <tr>
+              <td><strong>毎年の維持管理費</strong></td>
+              <td class="highlight-col"><span class="badge-win">実質0円</span><strong>太陽光8kW売電で相殺</strong><br><small>築25年骨組みで固定資産税激減</small></td>
+              <td>年30〜60万円<br><small>管理組合費・除雪費・高額固定資産税</small></td>
+              <td>管理費・修繕積立金で<br>月4〜6万円が一生続く</td>
+            </tr>
+            <tr>
+              <td><strong>冬の寒さ・快適性</strong></td>
+              <td class="highlight-col"><span class="badge-win">極暖</span><strong>HEAT20 G2超高断熱</strong><br><small>真冬でもエアコン1台で家中ぽかぽか</small></td>
+              <td>極寒（氷点下10℃）<br><small>水抜き必須・暖房費月数万円</small></td>
+              <td>気密性はあるが<br>敷地が狭く自然がない</td>
+            </tr>
+            <tr>
+              <td><strong>敷地・庭のゆとり</strong></td>
+              <td class="highlight-col"><strong>正味72.57坪</strong>（角地・家庭菜園可）</td>
+              <td>広いが手入れ・除草が過酷</td>
+              <td>庭なし（ベランダのみ）</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout">
+          <strong>💡 都心シニアにとっての「黄金の距離感（約1時間）」：</strong>
+          練馬ICから関越道で坂戸西スマートIC・鶴ヶ島ICまで約40分。池袋から東武東上線「高坂」駅まで快速48分。「毎週のように通える、近すぎず遠すぎない最高の隠れ家」です。
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">🌱 土地72坪の贅沢：小さな家庭菜園とテラス</div>
+            <p class="card-text">
+              都心マンションでは決して手に入らない、南東・南西角地の豊かな陽当たり。無農薬野菜を育てたり、木漏れ日の下で淹れたてのコーヒーと読書を楽しむ贅沢がここにあります。
+            </p>
+          </div>
+          <div class="card">
+            <div class="card-title">🔒 不在時も安心の「タウン内コミュニティ」</div>
+            <p class="card-text">
+              山奥のポツンと一軒家と異なり、美しい街並みが整備された鳩山ニュータウン内。定期循環バスや近隣の防犯性も高く、平日に留守にしても心配がありません。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-footer">
+        <span>再進の家 ｜ 鳩山ニュータウン高性能再生住宅（土地・建物総額 2,180万円 税込）</span>
+        <span>Page 2</span>
+      </div>
+    </div>
+
+    <!-- =========================================================================
+         PAGE 3: 第2章 酷暑日本一の町だからこそ実現した「夏の遮熱」と「冬の極暖」
+    ========================================================================= -->
+    <div class="page">
+      <div>
+        <div class="page-header">
+          <span class="page-header-logo">再進の家 ｜ 二拠点生活ガイド</span>
+          <span>CHAPTER 02 ｜ 物理工学に裏付けられた温熱性能</span>
+        </div>
+
+        <span class="chapter-tag">CHAPTER 02</span>
+        <h2 class="chapter-title">酷暑日本一の町だからこそ生まれた技術。<br />「真夏の遮熱」と「真冬の極暖」をエアコン1台で叶える</h2>
+
+        <p class="lead-text">
+          鳩山町は、夏場に日本最高気温（40℃近く）を記録することで知られる地域です。また、冬は盆地特有の放射冷却により朝晩の冷え込みが厳しくなります。<br />
+          <strong>「普通の住宅では耐えられない過酷な気候だからこそ、中途半端なリフォームは一切許されない」</strong>――それが建築士と大工チームの設計思想です。
+        </p>
+
+        <div class="grid-2">
+          <!-- 夏の遮熱工学 -->
+          <div class="card" style="border-top: 4px solid #f59e0b;">
+            <div class="card-title" style="color: #b45309;">
+              ☀️ 夏：屋根遮熱部材「銀次郎」で熱線を97%反射
+            </div>
+            <p class="card-text">
+              昔の家で「夏の2階がサウナのように暑くて居られない」最大の原因は、屋根から放射される「輻射熱」です。<br />
+              本物件では屋根垂木下に遮熱通気スペーサー「銀次郎」を隙間なく施工。外気温が40℃になっても熱気を棟から排熱し、天井裏温度を外気並みに抑制。<strong>真夏でもエアコンがすぐに効き、2階で快適に熟睡できます。</strong>
+            </p>
+            <img src="/assets/saishin/features/feat_02_ginjiro.jpg" alt="銀次郎遮熱" class="img-box" />
+          </div>
+
+          <!-- 冬の断熱工学 -->
+          <div class="card" style="border-top: 4px solid #0284c7;">
+            <div class="card-title" style="color: #0369a1;">
+              ❄️ 冬：世界最高峰 YKK APW430樹脂トリプル窓
+            </div>
+            <p class="card-text">
+              住宅の熱逃げの6割を占める窓に、世界トップ水準の「アルゴンガス入り3重ガラス樹脂サッシ」を採用。壁・屋根にも付加断熱を施し、HEAT20 G2クラス（UA値0.34相当）を達成。<br />
+              <strong>真冬の明け方でも無暖房で室温15℃を下回りません。</strong>脱衣所やお風呂場もリビングとほぼ同温に保たれ、命に関わるヒートショックを根本予防します。
+            </p>
+            <img src="/assets/saishin/features/feat_03_window.jpg" alt="トリプル樹脂窓" class="img-box" />
+          </div>
+        </div>
+
+        <div class="callout" style="background: #ecfdf5; border-color: #059669; color: #065f46;">
+          <strong>🌡️ 「冬の別荘あるある＝寒すぎて行きたくない」を完全解決：</strong>
+          一般的な高原の別荘は、真冬に行くと部屋が暖まるまでに数時間かかり、足元が冷え切って風邪をひいてしまいます。「再進の家」は魔法瓶のように家中が保温されるため、冬こそ暖かく、籠もりたくなる極上の安らぎ空間です。
+        </div>
+
+        <div class="card" style="margin-top: 10px;">
+          <div class="card-title">🔬 耐震金物補強とホウ酸防腐防蟻処理（新耐震基準1.5倍相当）</div>
+          <p class="card-text">
+            一度骨組み（スケルトン）まで解体し、木材の強度を一本ずつ検査。ホールダウン金物や筋交いプレートで構造補強を実施。さらに人体に無害で効果が半永久的に持続するホウ酸処理を施し、シロアリや腐朽から建物を30年以上守り続けます。
+          </p>
+        </div>
+      </div>
+
+      <div class="page-footer">
+        <span>再進の家 ｜ 鳩山ニュータウン高性能再生住宅（土地・建物総額 2,180万円 税込）</span>
+        <span>Page 3</span>
+      </div>
+    </div>
+
+    <!-- =========================================================================
+         PAGE 4: 第3章 太陽光8kWと奥様目線の安心設計
+    ========================================================================= -->
+    <div class="page">
+      <div>
+        <div class="page-header">
+          <span class="page-header-logo">再進の家 ｜ 二拠点生活ガイド</span>
+          <span>CHAPTER 03 ｜ 経済性と日々の暮らしやすさ</span>
+        </div>
+
+        <span class="chapter-tag">CHAPTER 03</span>
+        <h2 class="chapter-title">平日に留守にしていても「家が勝手に稼ぐ」。<br />太陽光8.0kWと奥様目線のストレスフリー設計</h2>
+
+        <p class="lead-text">
+          二拠点生活で最も大切なのは、<strong>「使っていない平日に余計なお金がかからないこと」</strong>と、<strong>「週末に訪れた奥様が家事や寒さで疲れてしまわないこと」</strong>です。再進の家は、徹底的にこの2つの課題をクリアしています。
+        </p>
+
+        <div class="grid-2">
+          <!-- 創エネと維持費ゼロ -->
+          <div class="card">
+            <div class="card-title">⚡ Qセルズ8.0kW太陽光（年間8,789kWh発電）</div>
+            <p class="card-text">
+              南向きの屋根一面に20枚の太陽光パネルを搭載。一般家庭の年間消費電力を大きく上回る大容量発電を実現。<br />
+              <strong>平日の不在時も太陽光が売電を続け、電気代高騰時代でも固定費を相殺。</strong>「電気代がもったいないから」と暖房を我慢する必要は一切ありません。
+            </p>
+          </div>
+
+          <!-- 水回りの清潔性 -->
+          <div class="card">
+            <div class="card-title">✨ タカラスタンダード 高品位ホーロー水回り</div>
+            <p class="card-text">
+              キッチン・浴室・洗面はすべて完全新品。<br />
+              金属にガラス質を焼き付けたホーロー素材は、油汚れも水垢もサッと水拭きだけでピカピカに。<strong>別荘に着いてすぐに面倒な大掃除をする必要がなく、家事負担を大幅に削減します。</strong>
+            </p>
+          </div>
+        </div>
+
+        <!-- 1階完結動線 -->
+        <div class="card" style="margin-top: 8px;">
+          <div class="card-title">🏡 日常が1階だけで完結する「平屋ライク動線」</div>
+          <p class="card-text">
+            1階に約16帖の明るいLDK、新品水回り、そして約8帖の主寝室（セカンド寝室）が揃っています。週末の食事・就寝・着替え・お風呂で階段を1段も上る必要がありません。<br />
+            2階は趣味の絵画や書斎、あるいは子どもたちやお孫さんが遊びに来たときの専用ゲストルームとして、ゆったり使い分けができます。将来足腰が弱くなっても、そのまま生涯安心して暮らせる間取りです。
+          </p>
+        </div>
+
+        <!-- 隠蔽インフラ全交換 -->
+        <div class="callout" style="margin-top: 12px;">
+          <strong>🔧 見えない壁の中まで完全新品（給排水管・電気配線全交換）：</strong>
+          中古物件で一番怖い「床下の給排水管の赤錆・漏水」や「古い電気配線のショート事故」を完全予防。床下の架橋ポリエチレン管への全面更新と分電盤の新品引き直しを実施済み。入居後の突発的な修繕費がかかりません。
+        </div>
+
+        <div class="grid-2" style="margin-top: 10px;">
+          <div class="card">
+            <div class="card-title">📦 仮住まい・2回引越しの過酷な心労ゼロ</div>
+            <p class="card-text">
+              今の家の建て替えに伴う「仮住まい探し」や「2回の引っ越し」は不要。鍵を受け取って必要な荷物を運び込むだけで、その週末から新しい二拠点ライフがスタートできます。
+            </p>
+          </div>
+          <div class="card">
+            <div class="card-title">🤝 現在のご自宅の売却・買取も窓口ひとつ</div>
+            <p class="card-text">
+              運営元の株式会社住ま居るは、宅建免許を持つ正規の不動産会社。将来完全移住される際のご自宅の売却査定や買取相談も、ワンストップでサポートいたします。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-footer">
+        <span>再進の家 ｜ 鳩山ニュータウン高性能再生住宅（土地・建物総額 2,180万円 税込）</span>
+        <span>Page 4</span>
+      </div>
+    </div>
+
+    <!-- =========================================================================
+         PAGE 5: 第4章 物件概要・安心インフラ・体感会のご案内
+    ========================================================================= -->
+    <div class="page">
+      <div>
+        <div class="page-header">
+          <span class="page-header-logo">再進の家 ｜ 二拠点生活ガイド</span>
+          <span>CHAPTER 04 ｜ 物件概要と現地体感会のご案内</span>
+        </div>
+
+        <span class="chapter-tag">CHAPTER 04</span>
+        <h2 class="chapter-title">物件概要と安心の生活インフラ。<br />まずは「週末のドライブ」感覚で現地へお越しください</h2>
+
+        <!-- 物件概要 -->
+        <div class="outline-grid">
+          <div class="outline-label">物件名称</div>
+          <div class="outline-val"><strong>再進の家</strong>（鳩山ニュータウン高性能再生住宅）</div>
+
+          <div class="outline-label">販売価格</div>
+          <div class="outline-val price">2,180 万円 <small style="font-size: 11px; font-weight: normal; color: #57534e;">（税込 / 土地・建物総額）</small></div>
+
+          <div class="outline-label">所在地</div>
+          <div class="outline-val">埼玉県比企郡鳩山町鳩ｹ丘2丁目867番400（住居表示：2-9-8）</div>
+
+          <div class="outline-label">交通アクセス</div>
+          <div class="outline-val">
+            ・関越道「坂戸西スマートIC」車約12分 / 「鶴ヶ島IC」車約18分（練馬ICから約50分）<br />
+            ・東武東上線「高坂」駅 バス11分、サブセンターバス停徒歩3分（池袋から快速約48分）
+          </div>
+
+          <div class="outline-label">土地面積</div>
+          <div class="outline-val">正味面積：<strong>239.93㎡（約72.57坪）</strong> / 南西9.9m公道 × 南東5.8m公道の開放的角地</div>
+
+          <div class="outline-label">建物面積・構造</div>
+          <div class="outline-val">延床面積：105.90㎡（約32.03坪） / 木造鋼板葺き / 昭和51年築（フルスケルトン再生済）</div>
+
+          <div class="outline-label">設備・主要仕様</div>
+          <div class="outline-val">
+            Qセルズ太陽光8.0kW / HEAT20 G2超高断熱 / YKK APW430トリプル樹脂窓 / 屋根遮熱銀次郎 / タカラ高品位ホーロー水回り
+          </div>
+
+          <div class="outline-label">取引態様</div>
+          <div class="outline-val"><strong>売主</strong>（※仲介手数料 約85万円不要 ｜ 自宅売却・買取相談ワンストップ対応）</div>
+        </div>
+
+        <div class="grid-2" style="margin-top: 10px;">
+          <div class="card">
+            <div class="card-title">🛒 徒歩圏で生活が完結する安心インフラ</div>
+            <p class="card-text">
+              タウン内には西友やコープ、鳩山町診療所、郵便局が整備されており、車を使わなくても日常の買い物や通院が可能です。別荘地にありがちな「買い出しが大変」というストレスがありません。
+            </p>
+          </div>
+          <div class="card">
+            <div class="card-title">🚗 充実の週末レジャー拠点</div>
+            <p class="card-text">
+              周辺には名門ゴルフ場が多数点在し、秩父・長瀞方面への日帰りドライブや温泉巡り、サイクリングの拠点としても最高のロケーションです。
+            </p>
+          </div>
+        </div>
+
+        <!-- 体感会ご案内ボックス -->
+        <div style="background: #fff; border: 2px solid #b45309; border-radius: 12px; padding: 14px 18px; margin-top: 14px; text-align: center;">
+          <h3 style="font-size: 15px; font-weight: 900; color: #78350f; margin-bottom: 4px;">
+            【1日2組限定・完全予約制】冬の快適体感 ＆ 現地見学会
+          </h3>
+          <p style="font-size: 11.5px; color: #44403c; line-height: 1.6; margin-bottom: 10px;">
+            「エアコン1台で本当に家中暖かいのか？」「都心からのアクセスや周辺の空気感はどうか？」<br />
+            強引な売り込みや突然の営業電話は一切いたしません。週末のドライブがてら、お茶を飲むようなお気持ちでお気軽にお越しください。
+          </p>
+          <div style="font-size: 12px; font-weight: bold; color: #1c1917; background: #fef3c7; padding: 6px 12px; border-radius: 6px; display: inline-block;">
+            ご予約・お問い合わせ：<strong>お電話 049-271-2350</strong> または <strong>Webサイト（https://smile049.jp/saishin）</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-footer">
+        <span>© 2026 株式会社 住ま居る / すまいる設計 All Rights Reserved.</span>
+        <span>Page 5</span>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
