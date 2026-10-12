@@ -257,49 +257,49 @@ export default function SaishinSpecPage({ onNavigate }) {
           </h2>
 
           <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden text-xs sm:text-sm">
-            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
-              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">物件名称</span>
-              <span className="p-4 md:col-span-3 text-stone-900 font-bold">再進の家（鳩山ニュータウン高性能再生住宅）</span>
+            <div className="flex flex-col sm:flex-row border-b border-stone-200">
+              <span className="p-3.5 sm:p-4 bg-stone-100 font-bold text-stone-700 sm:w-48 sm:shrink-0 sm:border-r border-stone-200 flex items-center">物件名称</span>
+              <span className="p-3.5 sm:p-4 text-stone-900 font-bold flex-1 w-full">再進の家（鳩山ニュータウン高性能再生住宅）</span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200 bg-amber-50/50">
-              <span className="p-4 bg-amber-100/70 font-bold text-amber-900 md:border-r border-stone-200">販売価格</span>
-              <span className="p-4 md:col-span-3 text-amber-900 font-extrabold text-lg sm:text-xl">
+            <div className="flex flex-col sm:flex-row border-b border-stone-200 bg-amber-50/50">
+              <span className="p-3.5 sm:p-4 bg-amber-100/70 font-bold text-amber-900 sm:w-48 sm:shrink-0 sm:border-r border-stone-200 flex items-center">販売価格</span>
+              <div className="p-3.5 sm:p-4 text-amber-900 font-extrabold text-lg sm:text-xl flex-1 w-full flex items-baseline gap-2">
                 2,180 万円 <span className="text-xs font-normal text-stone-600">（税込 / 土地・建物総額）</span>
-              </span>
+              </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
-              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">所在地</span>
-              <span className="p-4 md:col-span-3 text-stone-800">
+            <div className="flex flex-col sm:flex-row border-b border-stone-200">
+              <span className="p-3.5 sm:p-4 bg-stone-100 font-bold text-stone-700 sm:w-48 sm:shrink-0 sm:border-r border-stone-200 flex items-center">所在地</span>
+              <span className="p-3.5 sm:p-4 text-stone-800 flex-1 w-full">
                 埼玉県比企郡鳩山町鳩ｹ丘2丁目867番400（住居表示：埼玉県比企郡鳩山町鳩ｹ丘2-9-8）
               </span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
-              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">交通</span>
-              <span className="p-4 md:col-span-3 text-stone-800">
+            <div className="flex flex-col sm:flex-row border-b border-stone-200">
+              <span className="p-3.5 sm:p-4 bg-stone-100 font-bold text-stone-700 sm:w-48 sm:shrink-0 sm:border-r border-stone-200 flex items-center">交通</span>
+              <span className="p-3.5 sm:p-4 text-stone-800 flex-1 w-full">
                 東武東上線「高坂」駅 バス11分、サブセンターバス停より徒歩3分
               </span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
-              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">土地面積</span>
-              <span className="p-4 md:col-span-3 text-stone-800">
+            <div className="flex flex-col sm:flex-row border-b border-stone-200">
+              <span className="p-3.5 sm:p-4 bg-stone-100 font-bold text-stone-700 sm:w-48 sm:shrink-0 sm:border-r border-stone-200 flex items-center">土地面積</span>
+              <span className="p-3.5 sm:p-4 text-stone-800 flex-1 w-full">
                 正味面積：239.93㎡（約72.57坪） / 私道他なし
               </span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
-              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">建物面積・構造</span>
-              <span className="p-4 md:col-span-3 text-stone-800">
+            <div className="flex flex-col sm:flex-row border-b border-stone-200">
+              <span className="p-3.5 sm:p-4 bg-stone-100 font-bold text-stone-700 sm:w-48 sm:shrink-0 sm:border-r border-stone-200 flex items-center">建物面積・構造</span>
+              <span className="p-3.5 sm:p-4 text-stone-800 flex-1 w-full">
                 1階：77.01㎡、2階：28.89㎡（延床面積：105.90㎡ / 約32.03坪） / 木造鋼板葺き / 昭和51年6月30日 築（フルスケルトン再生済）
               </span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
-              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">道路・接道</span>
-              <span className="p-4 md:col-span-3 text-stone-800">
+            <div className="flex flex-col sm:flex-row border-b border-stone-200">
+              <span className="p-3.5 sm:p-4 bg-stone-100 font-bold text-stone-700 sm:w-48 sm:shrink-0 sm:border-r border-stone-200 flex items-center">道路・接道</span>
+              <span className="p-3.5 sm:p-4 text-stone-800 flex-1 w-full">
                 南西9.9m公道に約15m接道、南東5.8m公道に約12m接道（角地・日当たり良好）
               </span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 bg-emerald-50/60">
-              <span className="p-4 bg-emerald-100/70 font-bold text-emerald-900 md:border-r border-stone-200">取引態様</span>
-              <span className="p-4 md:col-span-3 text-emerald-900 font-bold">
+            <div className="flex flex-col sm:flex-row bg-emerald-50/60">
+              <span className="p-3.5 sm:p-4 bg-emerald-100/70 font-bold text-emerald-900 sm:w-48 sm:shrink-0 sm:border-r border-stone-200 flex items-center">取引態様</span>
+              <span className="p-3.5 sm:p-4 text-emerald-900 font-bold flex-1 w-full">
                 売主（仲介手数料 約85万円が不要 ｜ ご自宅の売却・買取相談もワンストップ対応）
               </span>
             </div>

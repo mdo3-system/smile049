@@ -256,10 +256,10 @@ export default function SaishinAdsPortalPanel() {
           <div className="space-y-6 animate-fade-in">
             <div className="bg-stone-950 p-6 rounded-3xl border border-stone-800">
               <h2 className="text-xl font-bold text-white mb-2">
-                4大ターゲット別 Meta広告クリエイティブセット（コピペで即出稿可能）
+                5大ターゲット別 Meta広告クリエイティブセット（コピペで即出稿可能）
               </h2>
               <p className="text-xs text-stone-400">
-                ペルソナのインサイト（経済性・ヒートショック・夫婦別室・理系構造）に特化した、高クリック率（CTR 2%以上目標）の原稿設計。
+                ペルソナのインサイト（経済性・ヒートショック・奥様共感・夫婦別室・理系構造）に特化した、高クリック率（CTR 2%以上目標）の原稿設計。
               </p>
             </div>
 
@@ -540,6 +540,82 @@ https://lp.smile049.jp/saishin`}
                     <span className="text-stone-400 text-xs font-bold block mb-1">リンク先URL:</span>
                     <div className="p-3 bg-stone-900 rounded-xl border border-stone-800 text-xs font-mono text-blue-400">
                       https://lp.smile049.jp/saishin/technology
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* クリエイティブ 5: パターンE【奥様共感・健康長寿型】（冷え性・ヒートショック・毎日の家事） */}
+            <div className="bg-stone-950 p-6 sm:p-8 rounded-3xl border border-stone-800 shadow-xl space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-stone-800">
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-full bg-pink-500/20 text-pink-300 text-xs font-bold border border-pink-500/30">
+                    PATTERN E（奥様共感・健康長寿型）
+                  </span>
+                  <h3 className="text-base sm:text-lg font-bold text-white">
+                    朝、布団から出る時の足元の冷たさ…もう終わりにしませんか？
+                  </h3>
+                </div>
+                <span className="text-xs text-stone-400">配信推奨先: https://lp.smile049.jp/saishin</span>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-xs sm:text-sm">
+                <div>
+                  <span className="text-stone-400 text-xs font-bold block mb-1">メインテキスト (Primary Text):</span>
+                  <div className="p-4 bg-stone-900 rounded-xl border border-stone-800 text-stone-200 text-xs leading-relaxed whitespace-pre-wrap font-mono">
+{`【「毎朝、寒さで目が覚める」「夜中のトイレで身震いする」とお悩みの奥様へ】
+
+真冬の朝、靴下を探して布団から出る辛さや、寒い脱衣所でお風呂に入る時の心臓への負担…。
+「昔の家だから仕方がない」と我慢していませんか？
+
+日本の家で最も怖いのは、暖かいリビングと凍える脱衣所の温度差によって起きる「ヒートショック」です。
+
+比企郡鳩山町に完成した「再進の家（2,180万円）」は、
+エアコン1台をゆるやかにつけておくだけで、LDKだけでなく廊下・トイレ・脱衣所まで家中ぽかぽか。
+真冬の明け方でも室温15℃を下回らない、魔法瓶のような超高断熱（HEAT20 G2）住宅です。
+
+さらに、奥様の毎日を助ける安心設計：
+✔ タカラスタンダード高品位ホーロー水回り（油汚れも水拭きだけでピカピカ）
+✔ 1階だけで日常が完結する平屋ライク設計（将来も階段の上り下りゼロ）
+✔ 大容量8.0kW太陽光発電（電気代高騰を気にせず暖房をつけっぱなしにできる）
+✔ 今の家からの引越しは1回だけ（仮住まい探しや2回引越しの過酷な心労ゼロ）
+
+「本当にエアコン1台で家じゅう暖かいの？」
+売り込みは一切ありません。まずは【1日2組限定・冬の快適体感会】で、ご夫婦で温かい空気感を直接確かめてみませんか？
+
+▼ 詳細・体感会のご予約はこちら（無料ガイドブックも進呈中）
+https://lp.smile049.jp/saishin`}
+                  </div>
+                  <button
+                    onClick={() => handleCopy(`【「毎朝、寒さで目が覚める」「夜中のトイレで身震いする」とお悩みの奥様へ】\n\n真冬の朝、靴下を探して布団から出る辛さや、寒い脱衣所でお風呂に入る時の心臓への負担…。\n「昔の家だから仕方がない」と我慢していませんか？\n\n日本の家で最も怖いのは、暖かいリビングと凍える脱衣所の温度差によって起きる「ヒートショック」です。\n\n比企郡鳩山町に完成した「再進の家（2,180万円）」は、\nエアコン1台をゆるやかにつけておくだけで、LDKだけでなく廊下・トイレ・脱衣所まで家中ぽかぽか。\n真冬の明け方でも室温15℃を下回らない、魔法瓶のような超高断熱（HEAT20 G2）住宅です。\n\nさらに、奥様の毎日を助ける安心設計：\n✔ タカラスタンダード高品位ホーロー水回り（油汚れも水拭きだけでピカピカ）\n✔ 1階だけで日常が完結する平屋ライク設計（将来も階段の上り下りゼロ）\n✔ 大容量8.0kW太陽光発電（電気代高騰を気にせず暖房をつけっぱなしにできる）\n✔ 今の家からの引越しは1回だけ（仮住まい探しや2回引越しの過酷な心労ゼロ）\n\n「本当にエアコン1台で家じゅう暖かいの？」\n売り込みは一切ありません。まずは【1日2組限定・冬の快適体感会】で、ご夫婦で温かい空気感を直接確かめてみませんか？\n\n▼ 詳細・体感会のご予約はこちら（無料ガイドブックも進呈中）\nhttps://lp.smile049.jp/saishin`, 'ad_e')}
+                    className="mt-2 px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-bold flex items-center gap-1.5 transition"
+                  >
+                    {copiedKey === 'ad_e' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copiedKey === 'ad_e' ? 'コピー完了' : '本文をコピー'}</span>
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <span className="text-stone-400 text-xs font-bold block mb-1">見出し (Headline):</span>
+                    <div className="p-3 bg-stone-900 rounded-xl border border-stone-800 font-bold text-white text-xs">
+                      朝の寒さ・冬のお風呂の不安をゼロに。夫婦で暖かく健康に暮らす家（鳩山町2,180万円）
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="text-stone-400 text-xs font-bold block mb-1">推奨クリエイティブ素材（日常実感・温もり写真）:</span>
+                    <div className="p-3 bg-stone-900 rounded-xl border border-stone-800 text-xs text-stone-300 space-y-2">
+                      <div>・<strong>画像素材:</strong> 陽光あふれるLDK・キッチン写真 ＋ タカラホーロー設備写真</div>
+                      <div>・<strong>画像帯文字:</strong> 「靴下がいらない、冬でも暖かい家」「お風呂のヒートショック予防」</div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="text-stone-400 text-xs font-bold block mb-1">リンク先URL:</span>
+                    <div className="p-3 bg-stone-900 rounded-xl border border-stone-800 text-xs font-mono text-pink-400">
+                      https://lp.smile049.jp/saishin
                     </div>
                   </div>
                 </div>

@@ -102,6 +102,14 @@ video.object-cover, img.object-cover {
 .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.grid-cols-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+
+/* カラムスパン */
+.col-span-1 { grid-column: span 1 / span 1; }
+.col-span-2 { grid-column: span 2 / span 2; }
+.col-span-3 { grid-column: span 3 / span 3; }
+.col-span-4 { grid-column: span 4 / span 4; }
+.col-span-full { grid-column: 1 / -1; }
 
 /* ギャップ */
 .gap-1 { gap: 0.25rem; }
@@ -410,6 +418,14 @@ video.object-cover, img.object-cover {
   .sm\:text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
   .sm\:text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
   .sm\:text-5xl { font-size: 3rem; line-height: 1.16; }
+  .sm\:col-span-1 { grid-column: span 1 / span 1; }
+  .sm\:col-span-2 { grid-column: span 2 / span 2; }
+  .sm\:col-span-3 { grid-column: span 3 / span 3; }
+  .sm\:w-44 { width: 11rem; }
+  .sm\:w-48 { width: 12rem; }
+  .sm\:shrink-0 { flex-shrink: 0; }
+  .sm\:border-r { border-right-width: 1px; }
+  .sm\:border-b-0 { border-bottom-width: 0px; }
 }
 
 /* メディアクエリ: md (768px以上) */
@@ -417,9 +433,19 @@ video.object-cover, img.object-cover {
   .md\:block { display: block; }
   .md\:inline { display: inline; }
   .md\:flex { display: flex; }
+  .md\:flex-row { flex-direction: row; }
   .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .md\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .md\:col-span-1 { grid-column: span 1 / span 1; }
+  .md\:col-span-2 { grid-column: span 2 / span 2; }
+  .md\:col-span-3 { grid-column: span 3 / span 3; }
+  .md\:col-span-4 { grid-column: span 4 / span 4; }
+  .md\:col-span-full { grid-column: 1 / -1; }
+  .md\:w-48 { width: 12rem; }
+  .md\:shrink-0 { flex-shrink: 0; }
+  .md\:border-r { border-right-width: 1px; }
+  .md\:border-b-0 { border-bottom-width: 0px; }
   .md\:text-lg { font-size: 1.125rem; line-height: 1.75rem; }
   .md\:text-xl { font-size: 1.25rem; line-height: 1.75rem; }
   .md\:text-2xl { font-size: 1.5rem; line-height: 2rem; }

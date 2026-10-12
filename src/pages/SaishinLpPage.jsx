@@ -1269,51 +1269,51 @@ export default function SaishinLpPage({ onNavigate }) {
           </div>
 
           <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden text-xs sm:text-sm">
-            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
-              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">物件名称</span>
-              <span className="p-4 md:col-span-3 text-stone-900 font-bold">再進の家（鳩山ニュータウン高性能再生住宅）</span>
+            <div className="flex flex-col sm:flex-row border-b border-stone-200">
+              <span className="p-3.5 sm:p-4 bg-stone-100 font-bold text-stone-700 sm:w-48 sm:shrink-0 sm:border-r border-stone-200 flex items-center">物件名称</span>
+              <span className="p-3.5 sm:p-4 text-stone-900 font-bold flex-1 w-full">再進の家（鳩山ニュータウン高性能再生住宅）</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200 bg-amber-50/40">
-              <span className="p-4 bg-amber-100/60 font-bold text-amber-900 md:border-r border-stone-200">価格</span>
-              <span className="p-4 md:col-span-3 text-amber-900 font-extrabold text-lg sm:text-xl flex items-baseline gap-2">
+            <div className="flex flex-col sm:flex-row border-b border-stone-200 bg-amber-50/40">
+              <span className="p-3.5 sm:p-4 bg-amber-100/60 font-bold text-amber-900 sm:w-48 sm:shrink-0 sm:border-r border-stone-200 flex items-center">価格</span>
+              <div className="p-3.5 sm:p-4 text-amber-900 font-extrabold text-lg sm:text-xl flex-1 w-full flex items-baseline gap-2">
                 2,180 万円 <span className="text-xs font-normal text-stone-600">（税込 / 土地・建物総額）</span>
-              </span>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
-              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">所在地</span>
-              <div className="p-4 md:col-span-3 text-stone-900 space-y-1">
+            <div className="flex flex-col sm:flex-row border-b border-stone-200">
+              <span className="p-3.5 sm:p-4 bg-stone-100 font-bold text-stone-700 sm:w-48 sm:shrink-0 sm:border-r border-stone-200 flex items-center">所在地</span>
+              <div className="p-3.5 sm:p-4 text-stone-900 space-y-1 flex-1 w-full">
                 <div>埼玉県比企郡鳩山町鳩ｹ丘2丁目867番400</div>
                 <div className="text-stone-600 text-xs">（住居表示）埼玉県比企郡鳩山町鳩ｹ丘2-9-8</div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
-              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">交通</span>
-              <span className="p-4 md:col-span-3 text-stone-900">
+            <div className="flex flex-col sm:flex-row border-b border-stone-200">
+              <span className="p-3.5 sm:p-4 bg-stone-100 font-bold text-stone-700 sm:w-48 sm:shrink-0 sm:border-r border-stone-200 flex items-center">交通</span>
+              <span className="p-3.5 sm:p-4 text-stone-900 flex-1 w-full">
                 東武東上線「高坂」駅 バス11分、サブセンターバス停より徒歩3分
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
-              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">土地</span>
-              <div className="p-4 md:col-span-3 text-stone-900">
+            <div className="flex flex-col sm:flex-row border-b border-stone-200">
+              <span className="p-3.5 sm:p-4 bg-stone-100 font-bold text-stone-700 sm:w-48 sm:shrink-0 sm:border-r border-stone-200 flex items-center">土地</span>
+              <div className="p-3.5 sm:p-4 text-stone-900 flex-1 w-full">
                 正味面積：239.93㎡（約72.57坪） / 私道他なし
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
-              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">建物</span>
-              <div className="p-4 md:col-span-3 text-stone-900 space-y-1">
+            <div className="flex flex-col sm:flex-row border-b border-stone-200">
+              <span className="p-3.5 sm:p-4 bg-stone-100 font-bold text-stone-700 sm:w-48 sm:shrink-0 sm:border-r border-stone-200 flex items-center">建物</span>
+              <div className="p-3.5 sm:p-4 text-stone-900 space-y-1 flex-1 w-full">
                 <div>1階：77.01㎡、2階：28.89㎡（延床面積：105.90㎡ / 約32.03坪）</div>
                 <div className="text-stone-600 text-xs">木造鋼板葺き / 昭和51年6月30日 築（フルスケルトン性能向上リノベーション済）</div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
-              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">法令上の制限</span>
-              <div className="p-4 md:col-span-3 text-stone-900 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            <div className="flex flex-col sm:flex-row border-b border-stone-200">
+              <span className="p-3.5 sm:p-4 bg-stone-100 font-bold text-stone-700 sm:w-48 sm:shrink-0 sm:border-r border-stone-200 flex items-center">法令上の制限</span>
+              <div className="p-3.5 sm:p-4 text-stone-900 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs flex-1 w-full">
                 <div><span className="font-semibold text-stone-700">土地権利：</span>所有権</div>
                 <div><span className="font-semibold text-stone-700">地目：</span>宅地</div>
                 <div><span className="font-semibold text-stone-700">都市計画：</span>市街化区域</div>
@@ -1322,17 +1322,17 @@ export default function SaishinLpPage({ onNavigate }) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
-              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">備考・道路</span>
-              <div className="p-4 md:col-span-3 text-stone-900 space-y-1">
+            <div className="flex flex-col sm:flex-row border-b border-stone-200">
+              <span className="p-3.5 sm:p-4 bg-stone-100 font-bold text-stone-700 sm:w-48 sm:shrink-0 sm:border-r border-stone-200 flex items-center">備考・道路</span>
+              <div className="p-3.5 sm:p-4 text-stone-900 space-y-1 flex-1 w-full">
                 <div><span className="font-semibold text-stone-700">設備：</span>公営水道・東京電力・本下水</div>
                 <div><span className="font-semibold text-stone-700">接道（角地）：</span>南西9.9m公道に約15m接道、南東5.8m公道に約12m接道</div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
-              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">温熱・性能仕様</span>
-              <div className="p-4 md:col-span-3 text-stone-900 space-y-1">
+            <div className="flex flex-col sm:flex-row border-b border-stone-200">
+              <span className="p-3.5 sm:p-4 bg-stone-100 font-bold text-stone-700 sm:w-48 sm:shrink-0 sm:border-r border-stone-200 flex items-center">温熱・性能仕様</span>
+              <div className="p-3.5 sm:p-4 text-stone-900 space-y-1 flex-1 w-full">
                 <div className="font-semibold text-stone-800">HEAT20 G2水準超高断熱（冬期無暖房でも朝15℃を下回らない家）</div>
                 <div className="text-stone-600 text-xs">
                   YKK APW430高性能トリプルガラス樹脂窓 / 屋根・壁付加断熱 / ホウ酸防腐防蟻処理 / フルスケルトン耐震補強・金物緊結
@@ -1340,9 +1340,9 @@ export default function SaishinLpPage({ onNavigate }) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 border-b border-stone-200">
-              <span className="p-4 bg-stone-100 font-bold text-stone-700 md:border-r border-stone-200">創エネ・主要設備</span>
-              <div className="p-4 md:col-span-3 text-stone-900 space-y-1">
+            <div className="flex flex-col sm:flex-row border-b border-stone-200">
+              <span className="p-3.5 sm:p-4 bg-stone-100 font-bold text-stone-700 sm:w-48 sm:shrink-0 sm:border-r border-stone-200 flex items-center">創エネ・主要設備</span>
+              <div className="p-3.5 sm:p-4 text-stone-900 space-y-1 flex-1 w-full">
                 <div>Qセルズ太陽光発電 8.0kW（20枚・年間推定発電量 8,789 kWh）＋高効率エコキュート（電気代相殺・売電設計）</div>
                 <div className="text-stone-600 text-xs">
                   タカラスタンダード高品位ホーローシステムキッチン・ホーローユニットバス / LIXIL洗面化粧台 / TOTOウォシュレット
@@ -1350,9 +1350,9 @@ export default function SaishinLpPage({ onNavigate }) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 bg-emerald-50/50">
-              <span className="p-4 bg-emerald-100/60 font-bold text-emerald-900 md:border-r border-stone-200">取引態様</span>
-              <span className="p-4 md:col-span-3 text-emerald-900 font-bold">
+            <div className="flex flex-col sm:flex-row bg-emerald-50/50">
+              <span className="p-3.5 sm:p-4 bg-emerald-100/60 font-bold text-emerald-900 sm:w-48 sm:shrink-0 sm:border-r border-stone-200 flex items-center">取引態様</span>
+              <span className="p-3.5 sm:p-4 md:col-span-3 text-emerald-900 font-bold flex-1 w-full">
                 売主（※仲介手数料 約85万円不要 ｜ 自宅売却・買取査定ワンストップ対応）
               </span>
             </div>
