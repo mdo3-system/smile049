@@ -271,8 +271,8 @@ video.object-cover, img.object-cover {
 .text-stone-800 { color: #292524; }
 .text-stone-700 { color: #44403c; }
 .text-stone-600 { color: #57534e; }
-.text-stone-500 { color: #78716c; }
-.text-stone-400 { color: #a8a29e; }
+.text-stone-500 { color: #44403c; } /* シニア老眼対策：コントラスト引き上げ */
+.text-stone-400 { color: #57534e; } /* シニア老眼対策：コントラスト引き上げ */
 .text-stone-300 { color: #d6d3d1; }
 .text-stone-200 { color: #e7e5e4; }
 .text-stone-100 { color: #f5f5f4; }
@@ -331,20 +331,51 @@ video.object-cover, img.object-cover {
 .drop-shadow { filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5)); }
 .drop-shadow-md { filter: drop-shadow(0 4px 3px rgba(0, 0, 0, 0.7)); }
 
-/* タイポグラフィ */
-.text-xs { font-size: 0.75rem; line-height: 1rem; }
-.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-.text-base { font-size: 1rem; line-height: 1.5rem; }
-.text-lg { font-size: 1.125rem; line-height: 1.75rem; }
-.text-xl { font-size: 1.25rem; line-height: 1.75rem; }
-.text-2xl { font-size: 1.5rem; line-height: 2rem; }
-.text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
-.text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+/* タイポグラフィ（シニア・50〜70代の老眼対策：底上げ設計） */
+.text-xs { font-size: 0.8125rem; line-height: 1.4rem; } /* 13px (旧12pxから底上げ) */
+.text-sm { font-size: 0.9375rem; line-height: 1.55rem; } /* 15px (旧14pxから底上げ) */
+.text-base { font-size: 1.0625rem; line-height: 1.75rem; } /* 17px (旧16pxから底上げ) */
+.text-lg { font-size: 1.1875rem; line-height: 1.85rem; } /* 19px */
+.text-xl { font-size: 1.375rem; line-height: 1.95rem; } /* 22px */
+.text-2xl { font-size: 1.625rem; line-height: 2.15rem; } /* 26px */
+.text-3xl { font-size: 2rem; line-height: 2.4rem; }
+.text-4xl { font-size: 2.375rem; line-height: 2.75rem; }
 .text-5xl { font-size: 3rem; line-height: 1.16; }
 .text-6xl { font-size: 3.75rem; line-height: 1.1; }
 
-.text-\[10px\] { font-size: 10px; line-height: 14px; }
-.text-\[11px\] { font-size: 11px; line-height: 15px; }
+.text-\[10px\] { font-size: 11px; line-height: 15px; }
+.text-\[11px\] { font-size: 12px; line-height: 16px; }
+
+/* スマホ閲覧時（50代〜70代がFacebook経由で閲覧する際の老眼対策） */
+@media (max-width: 768px) {
+  body {
+    font-size: 16px;
+    letter-spacing: 0.02em;
+  }
+  .text-xs { font-size: 0.875rem !important; line-height: 1.5rem !important; } /* スマホ14px保証 */
+  .text-sm { font-size: 1rem !important; line-height: 1.65rem !important; }    /* スマホ16px保証 */
+  .text-base { font-size: 1.125rem !important; line-height: 1.8rem !important; } /* スマホ18px保証 */
+  .text-lg { font-size: 1.25rem !important; line-height: 1.85rem !important; }
+  .text-xl { font-size: 1.45rem !important; line-height: 1.95rem !important; }
+  .text-2xl { font-size: 1.7rem !important; line-height: 2.2rem !important; }
+  .text-\[10px\], .text-\[11px\] { font-size: 13px !important; line-height: 17px !important; }
+}
+
+/* 文字サイズ「大きめ」モード（シニア向けワンタップ拡大） */
+.font-large {
+  font-size: 118% !important;
+}
+.font-large .text-xs { font-size: 1rem !important; line-height: 1.65rem !important; }
+.font-large .text-sm { font-size: 1.125rem !important; line-height: 1.8rem !important; }
+.font-large .text-base { font-size: 1.25rem !important; line-height: 1.95rem !important; }
+.font-large .text-lg { font-size: 1.375rem !important; line-height: 2.1rem !important; }
+.font-large .text-xl { font-size: 1.6rem !important; line-height: 2.25rem !important; }
+.font-large .text-2xl { font-size: 1.85rem !important; line-height: 2.45rem !important; }
+.font-large .text-\[10px\], .font-large .text-\[11px\] { font-size: 14px !important; }
+.font-large p, .font-large span, .font-large li, .font-large td, .font-large th {
+  line-height: 1.85 !important;
+}
+
 
 .font-normal { font-weight: 400; }
 .font-medium { font-weight: 500; }

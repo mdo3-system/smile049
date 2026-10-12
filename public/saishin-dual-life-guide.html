@@ -375,25 +375,144 @@
       background: #fffbeb;
     }
 
-    /* 印刷用CSS */
+    /* シニア・老眼向け文字拡大モード */
+    body.large-text {
+      font-size: 118% !important;
+    }
+    body.large-text p, body.large-text span, body.large-text td, body.large-text th {
+      line-height: 1.85 !important;
+    }
+    body.large-text .card-title {
+      font-size: 15px !important;
+    }
+    body.large-text .card-text {
+      font-size: 13.5px !important;
+    }
+
+    /* スマホ画面表示（50代〜70代の老眼対策レスポンシブ） */
+    @media screen and (max-width: 768px) {
+      body {
+        background-color: var(--bg-cream);
+        font-size: 15px;
+        line-height: 1.8;
+      }
+      .toolbar {
+        padding: 10px 14px;
+        flex-direction: column;
+        gap: 8px;
+        align-items: stretch;
+      }
+      .toolbar-title {
+        font-size: 13px;
+        justify-content: center;
+        text-align: center;
+      }
+      .toolbar-btns {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .btn {
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+      .page-container {
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      .page {
+        width: 100% !important;
+        min-height: auto !important;
+        padding: 24px 16px !important;
+        margin-bottom: 20px;
+        box-shadow: none;
+        border-bottom: 6px solid #e7e5e4;
+      }
+      .page-cover {
+        padding: 32px 16px !important;
+      }
+      .page-cover h1 {
+        font-size: 22px !important;
+        line-height: 1.4 !important;
+      }
+      .cover-subtitle {
+        font-size: 13px !important;
+      }
+      .grid-2, .grid-3 {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+      }
+      .compare-table {
+        font-size: 12.5px !important;
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+      .compare-table th, .compare-table td {
+        padding: 10px 8px !important;
+      }
+      .outline-grid {
+        grid-template-columns: 1fr !important;
+      }
+      .outline-label {
+        border-bottom: none !important;
+        background: #f5f5f4 !important;
+        padding: 8px 12px !important;
+        font-weight: bold;
+      }
+      .outline-val {
+        padding: 8px 12px 14px 12px !important;
+        border-bottom: 1px solid #e7e5e4 !important;
+      }
+      .card-title {
+        font-size: 15px !important;
+      }
+      .card-text {
+        font-size: 13.5px !important;
+        line-height: 1.75 !important;
+      }
+      .stat-num {
+        font-size: 24px !important;
+      }
+      .sec-title {
+        font-size: 18px !important;
+      }
+      .sec-lead {
+        font-size: 13.5px !important;
+      }
+    }
+
+    /* 印刷用CSS（A4縦を厳格維持） */
     @media print {
       body {
-        background: transparent;
+        background: transparent !important;
       }
       .toolbar {
         display: none !important;
       }
       .page-container {
-        margin: 0;
-        max-width: 100%;
+        margin: 0 !important;
+        max-width: 100% !important;
       }
       .page {
-        margin: 0;
-        box-shadow: none;
-        page-break-after: always;
-        break-after: page;
-        min-height: 297mm;
-        height: 297mm;
+        margin: 0 !important;
+        box-shadow: none !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        min-height: 297mm !important;
+        height: 297mm !important;
+        width: 210mm !important;
+        padding: 20mm 18mm 18mm 18mm !important;
+      }
+      .grid-2 {
+        grid-template-columns: 1fr 1fr !important;
+      }
+      .grid-3 {
+        grid-template-columns: repeat(3, 1fr) !important;
+      }
+      .outline-grid {
+        grid-template-columns: 120px 1fr !important;
       }
     }
   </style>
@@ -406,6 +525,9 @@
       <span>📖 【公式資料】再進の家 大人の二拠点生活完全ガイド（A4・全5ページ）</span>
     </div>
     <div class="toolbar-btns">
+      <button onclick="document.body.classList.toggle('large-text')" class="btn" style="background: #3b82f6; color: #fff;">
+        <span>🔍 文字サイズ拡大/標準</span>
+      </button>
       <a href="/saishin" class="btn btn-back">← 総合案内LPへ戻る</a>
       <button onclick="window.print()" class="btn btn-print">
         <span>🖨️ 印刷 / PDFとして保存</span>

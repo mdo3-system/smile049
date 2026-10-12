@@ -32,6 +32,7 @@ import VirtualTour360 from '../components/VirtualTour360';
 export default function SaishinLpPage({ onNavigate }) {
   const [modalType, setModalType] = useState(null); // 'doc' | 'tour' | null
   const [activePlanFloor, setActivePlanFloor] = useState('1f'); // '1f' | '2f'
+  const [isLargeFont, setIsLargeFont] = useState(false); // 50〜70代老眼対策：文字サイズ拡大トグル
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -59,37 +60,60 @@ export default function SaishinLpPage({ onNavigate }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#faf8f5] text-stone-800 font-sans selection:bg-amber-500 selection:text-white">
+    <div className={`min-h-screen bg-[#faf8f5] text-stone-800 font-sans selection:bg-amber-500 selection:text-white transition-all ${isLargeFont ? 'font-large' : ''}`}>
       {/* =========================================================================
           LP専用上部バー & 3大コンテンツナビゲーション
       ========================================================================= */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-stone-200 text-stone-800 shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="font-extrabold text-stone-900 text-base sm:text-lg tracking-wider">
+        <div className="max-w-6xl mx-auto px-3 sm:px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span className="font-extrabold text-stone-900 text-sm sm:text-lg tracking-wider">
               再進の家 <span className="text-amber-700 font-semibold text-xs sm:text-sm">｜ 鳩山ニュータウン</span>
             </span>
-            <span className="hidden md:inline-block px-2.5 py-0.5 rounded text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+            <span className="hidden lg:inline-block px-2.5 py-0.5 rounded text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
               HEAT20 G2・自社物件直売
             </span>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-1.5 sm:gap-3">
+            {/* シニア・老眼向け文字サイズ切替ボタン */}
+            <div className="flex items-center gap-0.5 bg-stone-100 p-0.5 rounded-lg border border-stone-300 text-xs shrink-0">
+              <span className="text-[11px] text-stone-600 font-bold px-1 hidden md:inline">文字</span>
+              <button
+                type="button"
+                onClick={() => setIsLargeFont(false)}
+                className={`px-2 py-1 rounded text-xs font-bold transition ${!isLargeFont ? 'bg-amber-700 text-white shadow-xs' : 'text-stone-600 hover:text-stone-900'}`}
+                title="標準文字サイズ"
+              >
+                標準
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsLargeFont(true)}
+                className={`px-2 py-1 rounded text-xs font-bold transition ${isLargeFont ? 'bg-amber-700 text-white shadow-xs' : 'text-stone-600 hover:text-stone-900'}`}
+                title="文字を大きく表示（老眼・シニア向け）"
+              >
+                大
+              </button>
+            </div>
+
             <a
               href="/saishin-dual-life-guide.html"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-300 transition flex items-center gap-1.5 shadow-sm"
+              className="px-2.5 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-300 transition flex items-center gap-1 shadow-sm shrink-0"
             >
               <FileText className="w-3.5 h-3.5 text-amber-700" />
-              <span>公式ガイド閲覧(PDF)</span>
+              <span className="hidden sm:inline">公式ガイド閲覧(PDF)</span>
+              <span className="sm:hidden">ガイド</span>
             </a>
             <button
               onClick={() => setModalType('tour')}
-              className="px-3.5 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-bold bg-amber-600 hover:bg-amber-500 text-white shadow-md shadow-amber-600/20 transition flex items-center gap-1.5"
+              className="px-3 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-bold bg-amber-600 hover:bg-amber-500 text-white shadow-md shadow-amber-600/20 transition flex items-center gap-1 shrink-0"
             >
               <Calendar className="w-3.5 h-3.5 text-white" />
-              <span>プライベート内覧会</span>
+              <span className="hidden sm:inline">プライベート内覧会</span>
+              <span className="sm:hidden">内覧予約</span>
             </button>
           </div>
         </div>
@@ -1557,6 +1581,20 @@ export default function SaishinLpPage({ onNavigate }) {
           </div>
         </div>
       </footer>
+
+      {/* =========================================================================
+          シニア・老眼向け フローティング文字サイズ調整バー（スマホ閲覧常時配慮）
+      ========================================================================= */}
+      <div className="fixed bottom-4 right-4 z-40 bg-stone-900/95 backdrop-blur-md text-white px-2.5 py-1.5 rounded-2xl shadow-2xl border border-stone-600 flex items-center gap-2 text-xs">
+        <button
+          type="button"
+          onClick={() => setIsLargeFont(!isLargeFont)}
+          className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition ${isLargeFont ? 'bg-amber-500 text-stone-950 shadow-md' : 'bg-stone-800 text-stone-200 hover:bg-stone-700'}`}
+          title="50代〜70代の老眼対策：ワンタップで全体の文字を拡大します"
+        >
+          <span>{isLargeFont ? '🔍 文字：大（標準に戻す）' : '🔍 文字を大きくする'}</span>
+        </button>
+      </div>
 
       {/* =========================================================================
           モーダル（資料請求 / 内覧予約フォーム）
