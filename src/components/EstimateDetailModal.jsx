@@ -114,35 +114,37 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
                 概算建築御見積書（本体工事積算 ＆ 付帯工事内訳）
               </h3>
               <p style={{ margin: '2px 0 0 0', fontSize: 11.5, color: '#94a3b8' }}>
-                木造自由設計ガレージ・倉庫 スマイチ（原価・按分基準算定システム）
+                木造自由設計ガレージ・倉庫 スマイチ（リアルタイム自動算定システム）
               </p>
             </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            {/* 管理者モード切替スイッチ */}
-            <button
-              type="button"
-              onClick={() => setIsAdminMode(!isAdminMode)}
-              style={{
-                background: isAdminMode ? '#dc2626' : 'rgba(255,255,255,0.12)',
-                border: isAdminMode ? '1px solid #ef4444' : '1px solid rgba(255,255,255,0.2)',
-                color: '#ffffff',
-                padding: '5px 11px',
-                borderRadius: 6,
-                fontSize: 12,
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 5,
-                transition: 'all 0.2s ease'
-              }}
-              title="原価と見積額の両建て表示切り替え（社内・管理者用）"
-            >
-              <Lock size={13} />
-              <span>{isAdminMode ? '管理者モード：ON (原価表示中)' : '管理者モード切替'}</span>
-            </button>
+            {/* 管理者モード切替スイッチ（一般ユーザーには完全非表示：URLに?admin=1または/adminページ時のみ表示） */}
+            {(typeof window !== 'undefined' && (window.location.search.includes('admin') || window.location.pathname.includes('admin'))) && (
+              <button
+                type="button"
+                onClick={() => setIsAdminMode(!isAdminMode)}
+                style={{
+                  background: isAdminMode ? '#dc2626' : 'rgba(255,255,255,0.12)',
+                  border: isAdminMode ? '1px solid #ef4444' : '1px solid rgba(255,255,255,0.2)',
+                  color: '#ffffff',
+                  padding: '5px 11px',
+                  borderRadius: 6,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  transition: 'all 0.2s ease'
+                }}
+                title="原価と見積額の両建て表示切り替え（社内・管理者用）"
+              >
+                <Lock size={13} />
+                <span>{isAdminMode ? '管理者モード：ON (原価表示中)' : '管理者モード切替'}</span>
+              </button>
+            )}
 
             {/* 大手4社比較表ボタン */}
             <a
@@ -423,9 +425,11 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
                         </td>
                         <td style={{ padding: '10px 12px', color: '#334155' }}>
                           <div style={{ fontWeight: 600 }}>{item.spec}</div>
-                          <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>
-                            {item.calcBasis}
-                          </div>
+                          {isAdminMode && item.calcBasis && (
+                            <div style={{ fontSize: 11, color: '#991b1b', marginTop: 3, background: '#fef2f2', padding: '2px 6px', borderRadius: 4, display: 'inline-block' }}>
+                              【内部算定基準】{item.calcBasis}
+                            </div>
+                          )}
                           {item.id === 2 && item.catalogList?.length > 0 && (
                             <button
                               type="button"
@@ -623,7 +627,7 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
             marginBottom: 20
           }}>
             <strong>【お見積りに関する備考】</strong><br />
-            1. 本御見積書は、3Dシミュレーターにて入力された設計寸法に基づき、所定の積算基準（原価按分式 × 1.33）によりリアルタイムに自動算出した概算金額です。<br />
+            1. 本御見積書は、3Dシミュレーターにて入力された設計寸法に基づき、所定の積算基準によりリアルタイムに自動算出した概算金額です。<br />
             2. 本書記載の「A. 本体工事」以外の工事（B. 付帯工事・追加工事）につきましては、現地確認およびお客様との仕様お打ち合わせ完了後に、正式な本見積書にてご提示申し上げます。<br />
             3. 特殊な狭小進入路（4tトラック進入不可等）や軟弱地盤判定等がある場合は、別途割増費用が発生する可能性がございます。
           </div>
@@ -673,7 +677,7 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
               }}
             >
               <ShieldCheck size={17} />
-              <span>この寸法で見積もり・無料AIフォトパースを依頼する</span>
+              <span>この寸法で見積もりを依頼する</span>
             </button>
           </div>
 
