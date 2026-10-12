@@ -224,38 +224,6 @@ export default function Footer({ setCurrentRoute }) {
                   <span style={{ color: '#5eead4' }}>★</span> 無料3Dシミュレーター＋自動見積もり
                 </a>
               </li>
-              <li style={{ marginTop: 12, paddingTop: 10, borderTop: '1px dashed #334155' }}>
-                <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 700, letterSpacing: '0.05em' }}>
-                  【特設プロジェクト ＆ 不動産・リフォーム】
-                </span>
-              </li>
-              <li>
-                <a
-                  href="/saishin"
-                  onClick={(e) => { e.preventDefault(); setCurrentRoute('saishin'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  style={{ color: '#fbbf24', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left', textDecoration: 'none' }}
-                >
-                  <span style={{ color: '#fbbf24' }}>🏡</span> 【再進の家】鳩山 2,180万円・HEAT20 G2（360°内覧）
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/eie"
-                  onClick={(e) => { e.preventDefault(); setCurrentRoute('eie'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  style={{ color: '#34d399', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left', textDecoration: 'none' }}
-                >
-                  <span style={{ color: '#34d399' }}>📍</span> スマイチ不動産（EIE）土地探し×ガレージ（売り地5区画）
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/re"
-                  onClick={(e) => { e.preventDefault(); setCurrentRoute('re'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  style={{ color: '#60a5fa', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left', textDecoration: 'none' }}
-                >
-                  <span style={{ color: '#60a5fa' }}>🔨</span> スマイチリフォーム（RE）断熱・耐震フルスケルトン再生
-                </a>
-              </li>
             </ul>
           </div>
 
