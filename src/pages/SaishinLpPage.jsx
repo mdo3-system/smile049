@@ -23,7 +23,9 @@ import {
   Check,
   AlertCircle,
   MapPin,
-  TrendingDown
+  TrendingDown,
+  HelpCircle,
+  Heart
 } from 'lucide-react';
 import VirtualTour360 from '../components/VirtualTour360';
 
@@ -1058,6 +1060,192 @@ export default function SaishinLpPage({ onNavigate }) {
                   鳩山ニュータウン 高台の美しい街並み
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          5.5. 奥様目線の生活実感 Q&A（エモーショナル・リアルライフ安心設計）
+      ========================================================================= */}
+      <section className="py-20 bg-[#f7f3eb] text-stone-900 border-b border-stone-200">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12">
+            <span className="text-xs font-bold text-amber-800 tracking-widest uppercase bg-amber-100/90 px-3.5 py-1 rounded-full border border-amber-300 inline-flex items-center gap-1.5">
+              <Heart className="w-3.5 h-3.5 text-amber-700" />
+              <span>REAL LIFE Q&A ｜ 奥様目線の暮らし実感</span>
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-black text-stone-900 mt-3 leading-snug">
+              「エアコン1台で本当に寒くないの？」<br />
+              奥様が一番気になる5つの疑問に率直にお答えします
+            </h2>
+            <p className="text-stone-600 text-xs sm:text-sm mt-3 max-w-2xl mx-auto leading-relaxed">
+              UA値や工法などの難しい建築用語よりも大切なのは、<strong>「毎朝、毎晩、どれだけ体がラクに、笑顔で暮らせるか」</strong>。
+              これからのご夫婦お二人の生活実感をまとめました。
+            </p>
+          </div>
+
+          <div className="space-y-5">
+            {/* Q1: 朝の寒さと夜のトイレ */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-md">
+              <div className="flex items-start gap-4">
+                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-600 text-white font-black text-sm flex items-center justify-center shadow-sm">
+                  Q1
+                </span>
+                <div className="flex-1">
+                  <h3 className="text-base sm:text-lg font-bold text-stone-900 leading-snug">
+                    真冬の朝、布団から出る時の足元の冷たさや、夜中のトイレは本当に寒くありませんか？
+                  </h3>
+                  <div className="mt-4 pt-4 border-t border-stone-100 flex items-start gap-3 text-stone-700 text-xs sm:text-sm leading-relaxed">
+                    <span className="flex-shrink-0 px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-xs mt-0.5">
+                      回答
+                    </span>
+                    <div className="space-y-2">
+                      <p className="font-bold text-stone-900">
+                        靴下を探さずにスリッパなしでも歩けます。夜中に起きたときの身震いするような寒さとも無縁です。
+                      </p>
+                      <p className="text-stone-600">
+                        HEAT20 G2基準を満たす超高断熱（樹脂トリプルガラス＋付加断熱）により、エアコン1台を20℃前後のゆるやかな設定にしておくだけで、LDKだけでなく廊下・トイレ・洗面所まで室温差がほとんど生じません。「朝起きるのが億劫でなくなった」「冬でも手足が冷えない」という心地よさを現地でご体感いただけます。
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Q2: お風呂・脱衣所のヒートショック */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-md">
+              <div className="flex items-start gap-4">
+                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-600 text-white font-black text-sm flex items-center justify-center shadow-sm">
+                  Q2
+                </span>
+                <div className="flex-1">
+                  <h3 className="text-base sm:text-lg font-bold text-stone-900 leading-snug">
+                    冬場のお風呂や脱衣所で倒れる「ヒートショック」が一番不安です。高齢になっても大丈夫ですか？
+                  </h3>
+                  <div className="mt-4 pt-4 border-t border-stone-100 flex items-start gap-3 text-stone-700 text-xs sm:text-sm leading-relaxed">
+                    <span className="flex-shrink-0 px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-xs mt-0.5">
+                      回答
+                    </span>
+                    <div className="space-y-2">
+                      <p className="font-bold text-stone-900">
+                        服を脱ぐときの寒さがなく、心臓や血管への負担を劇的に減らします。
+                      </p>
+                      <p className="text-stone-600">
+                        日本の住まいでヒートショックが起きる最大の原因は「暖かい居間」と「凍える脱衣所・浴室」の10℃以上の温度差です。再進の家は家全体が魔法瓶のように断熱されているため、脱衣所とお風呂場もリビングに近い温度を保ちます。湯冷めしにくく、長風呂で体を痛めるリスクも予防できます。
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Q3: 太陽光8.0kWと冬の暖房代 */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-md">
+              <div className="flex items-start gap-4">
+                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-600 text-white font-black text-sm flex items-center justify-center shadow-sm">
+                  Q3
+                </span>
+                <div className="flex-1">
+                  <h3 className="text-base sm:text-lg font-bold text-stone-900 leading-snug">
+                    「エアコンを一日中つけっぱなしにしたら電気代が跳ね上がるのでは？」と我慢してしまいそうです。
+                  </h3>
+                  <div className="mt-4 pt-4 border-t border-stone-100 flex items-start gap-3 text-stone-700 text-xs sm:text-sm leading-relaxed">
+                    <span className="flex-shrink-0 px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-xs mt-0.5">
+                      回答
+                    </span>
+                    <div className="space-y-2">
+                      <p className="font-bold text-stone-900">
+                        Qセルズ大容量8.0kW太陽光（年間発電8,789kWh）が稼働するため、電気代を我慢する生活は終わります。
+                      </p>
+                      <p className="text-stone-600">
+                        一般的な住宅の倍近い8.0kWソーラーを搭載しており、晴れた日中にたっぷり創エネ。高気密・高断熱住宅は一度暖まると熱が逃げないため、エアコンを細かく消すよりも「弱で一定運転」する方が消費電力が極めて少なくなります。年金暮らしでも電気代の請求書に怯える心配はありません。
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Q4: 水回りのお手入れ・お掃除 */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-md">
+              <div className="flex items-start gap-4">
+                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-600 text-white font-black text-sm flex items-center justify-center shadow-sm">
+                  Q4
+                </span>
+                <div className="flex-1">
+                  <h3 className="text-base sm:text-lg font-bold text-stone-900 leading-snug">
+                    水回り（キッチン・浴室・洗面）のお掃除やお手入れの負担はどう変わりますか？
+                  </h3>
+                  <div className="mt-4 pt-4 border-t border-stone-100 flex items-start gap-3 text-stone-700 text-xs sm:text-sm leading-relaxed">
+                    <span className="flex-shrink-0 px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-xs mt-0.5">
+                      回答
+                    </span>
+                    <div className="space-y-2">
+                      <p className="font-bold text-stone-900">
+                        タカラスタンダードの「高品位ホーロー」を採用。油汚れも水垢もサッと水拭きだけで落ちます。
+                      </p>
+                      <p className="text-stone-600">
+                        キッチンとお風呂は完全新品。金属にガラス質を高熱で焼き付けたホーロー素材は、油性ペンで落書きしても水拭きで消えるほど頑丈で傷つきません。ゴシゴシ洗いの重労働やカビ取り剤のツンとした臭いから解放され、家事の時間をゆったりとした読書やお茶の時間に変えられます。
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Q5: 2階建てだけど将来の足腰は？平屋ライク動線 */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-md">
+              <div className="flex items-start gap-4">
+                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-600 text-white font-black text-sm flex items-center justify-center shadow-sm">
+                  Q5
+                </span>
+                <div className="flex-1">
+                  <h3 className="text-base sm:text-lg font-bold text-stone-900 leading-snug">
+                    2階建てですが、将来足腰が痛くなったり階段がつらくなったらどう暮らせばいいですか？
+                  </h3>
+                  <div className="mt-4 pt-4 border-t border-stone-100 flex items-start gap-3 text-stone-700 text-xs sm:text-sm leading-relaxed">
+                    <span className="flex-shrink-0 px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-xs mt-0.5">
+                      回答
+                    </span>
+                    <div className="space-y-2">
+                      <p className="font-bold text-stone-900">
+                        日常の生活はすべて「1階だけで完結する平屋感覚」で過ごせる間取り設計です。
+                      </p>
+                      <p className="text-stone-600">
+                        1階にLDK（約16帖）・新品水回り・そして約8帖の主寝室（セカンド寝室）が揃っているため、普段の食事・就寝・着替え・お風呂で階段を1段も上る必要がありません。2階は、書斎・趣味の道具置き場、あるいは盆正月に子どもたちやお孫さんが泊まりに来たときの専用ゲストルームとして、無理なく使い分けができます。
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 現地体感への誘導バナー */}
+          <div className="mt-10 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-amber-100/80 to-amber-50 border border-amber-300 text-center">
+            <h4 className="text-base sm:text-lg font-extrabold text-stone-900 mb-2">
+              「本当に暖かいかどうか」は、ご夫婦で現地でお確かめください
+            </h4>
+            <p className="text-xs sm:text-sm text-stone-600 mb-6 max-w-xl mx-auto">
+              百聞は一見にしかず。冷え込みの厳しい日ほど、この家の真価がはっきりと分かります。<br className="hidden sm:inline" />
+              強引な営業はいたしませんので、お茶を飲むようなお気持ちでお気軽にお越しください。
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                onClick={() => setModalType('tour')}
+                className="w-full sm:w-auto px-6 py-3.5 rounded-xl font-bold bg-amber-600 hover:bg-amber-500 text-white shadow-md shadow-amber-900/10 transition flex items-center justify-center gap-2 text-xs sm:text-sm"
+              >
+                <Calendar className="w-4 h-4 text-white" />
+                <span>冬の快適体感 ＆ 光熱費試算会を予約する（無料）</span>
+              </button>
+              <button
+                onClick={() => setModalType('doc')}
+                className="w-full sm:w-auto px-6 py-3.5 rounded-xl font-bold bg-white hover:bg-stone-50 text-stone-800 border border-stone-300 shadow-sm transition flex items-center justify-center gap-2 text-xs sm:text-sm"
+              >
+                <FileText className="w-4 h-4 text-amber-600" />
+                <span>無料ガイドブックを請求する</span>
+              </button>
             </div>
           </div>
         </div>
