@@ -41,11 +41,32 @@ const ROUTE_MAP = {
   'admin': '/admin'
 };
 
+const isLocalEnvironment = () => {
+  if (typeof window === 'undefined') return true;
+  const host = window.location.hostname;
+  return host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.');
+};
+
 const getRouteFromPath = (pathname) => {
   if (typeof window !== 'undefined') {
     const searchParams = new URLSearchParams(window.location.search);
     if (searchParams.has('design') || searchParams.has('d')) {
       return 'simulator';
+    }
+
+    // サブドメイン（lp.smile049.jp, eie.smile049.jp, re.smile049.jp）の判定
+    const host = window.location.hostname.toLowerCase();
+    const cleanPathCheck = (pathname || '').replace(/\/+$/, '').toLowerCase();
+    if (host.startsWith('lp.smile049.jp')) {
+      if (cleanPathCheck === '/technology' || cleanPathCheck === '/tech' || cleanPathCheck === '/saishin/technology') return 'saishin-tech';
+      if (cleanPathCheck === '/spec' || cleanPathCheck === '/environment' || cleanPathCheck === '/saishin/spec') return 'saishin-spec';
+      return 'saishin';
+    }
+    if (host.startsWith('eie.smile049.jp')) {
+      return 'eie';
+    }
+    if (host.startsWith('re.smile049.jp')) {
+      return 're';
     }
   }
   const cleanPath = (pathname || '').replace(/\/+$/, '').toLowerCase();
@@ -59,7 +80,15 @@ const getRouteFromPath = (pathname) => {
   if (cleanPath === '/stories' || cleanPath === '/story' || cleanPath === '/column' || cleanPath.startsWith('/column/') || cleanPath.startsWith('/stories/')) return 'stories';
   if (cleanPath === '/saishin/technology' || cleanPath === '/saishin/tech' || cleanPath === '/saishin/structure') return 'saishin-tech';
   if (cleanPath === '/saishin/spec' || cleanPath === '/saishin/specification' || cleanPath === '/saishin/environment') return 'saishin-spec';
-  if (cleanPath === '/saishin/ads' || cleanPath === '/admin/saishin-ads' || cleanPath === '/saishin-ads') return 'saishin-ads';
+  
+  // 社外秘・広告管理ポータル: ローカル環境のみ許可（本番サーバー公開・外部アクセスは自動遮断）
+  if (cleanPath === '/saishin/ads' || cleanPath === '/admin/saishin-ads' || cleanPath === '/saishin-ads') {
+    if (isLocalEnvironment()) {
+      return 'saishin-ads';
+    }
+    return 'top';
+  }
+
   if (cleanPath === '/saishin' || cleanPath === '/lp/saishin' || cleanPath === '/saishin-no-ie') return 'saishin';
   if (cleanPath === '/eie' || cleanPath === '/realestate' || cleanPath === '/fudosan') return 'eie';
   if (cleanPath === '/re' || cleanPath === '/renovation' || cleanPath === '/reform') return 're';

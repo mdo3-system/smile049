@@ -263,18 +263,18 @@ export default function SaishinAdsPortalPanel() {
               </p>
             </div>
 
-            {/* クリエイティブ 1: 経済合理性・老後資金軸 */}
+            {/* クリエイティブ 1: パターンA【認知的不協和・問いかけ型】（新築検討層への不協和） */}
             <div className="bg-stone-950 p-6 sm:p-8 rounded-3xl border border-stone-800 shadow-xl space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-stone-800">
                 <div className="flex items-center gap-2">
                   <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30">
-                    PATTERN A（費用重視層）
+                    PATTERN A（認知的不協和・問いかけ型）
                   </span>
                   <h3 className="text-base sm:text-lg font-bold text-white">
-                    新築3,500万円は高すぎる。2,180万円で手に入れる「生涯光熱費ほぼゼロ」の終の住処
+                    3,000万円超の新築を買って、高額ローンと冬の寒さに悩むのはもうやめませんか？
                   </h3>
                 </div>
-                <span className="text-xs text-stone-400">配信推奨先: 総合案内LP（/saishin）</span>
+                <span className="text-xs text-stone-400">配信推奨先: https://lp.smile049.jp/saishin</span>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-xs sm:text-sm">
@@ -282,26 +282,27 @@ export default function SaishinAdsPortalPanel() {
                   <div>
                     <span className="text-stone-400 text-xs font-bold block mb-1">メインテキスト (Primary Text):</span>
                     <div className="p-4 bg-stone-900 rounded-xl border border-stone-800 text-stone-200 text-xs leading-relaxed whitespace-pre-wrap relative font-mono">
-{`【50代・60代からの住み替えをご検討の方へ】
+{`【鳩山町および近隣にお住まいの50代・60代・70代のご夫婦へ】
 
-「定年後の年金生活で、毎月の高い光熱費や家の修繕費が不安…」
-「子供が独立して今の家は広すぎるが、新築に3,500万円以上かけると老後資金が圧迫される…」
+3,000万円以上の新築建売を買って、高額なローンと冬の寒さに悩むのは、もうやめませんか？
 
-そんな切実な悩みに、建築士と大工さんがひとつの明確な答えを出しました。
+「子どもも独立したし、これからは夫婦2人で暖かく穏やかに暮らしたい」
+そう思って家を探すと、周辺の新築は3,000万円超。一見綺麗ですが、冬場は寒く、高騰する電気代に頭を悩ませる方が後を絶ちません。
 
-鳩山ニュータウンに誕生した、フルスケルトン再生住宅「再進の家」。
+実は、比企郡鳩山町に「2,180万円」でありながら、一般新築の性能をはるかに凌駕する超高断熱（HEAT20 G2超）＆電気代を極小化する創エネリノベーション住宅が完成しました。
 
-✔ 販売価格 2,180万円（税込・売主直売で仲介手数料なし）
-✔ 新築と比べて初期費用を約1,000万円抑制
-✔ HEAT20 G2超高断熱 ＋ 太陽光発電7.1kWh自家消費で「毎月の光熱費を極小化」
-✔ 昭和51年築の減価償却により「将来の固定資産税が激減」
+なぜ、新築より約820万円も安いのに、新築以上の快適さが出せるのか？
+秘密は「あえて築25年超の骨組みを活用し、建物評価0で固定資産税を節税。浮いた予算を『片流れ屋根への変更＋Qセルズ8.0kW太陽光（年間8,789kWh発電）』や『見えない配管・配線の全面新品交換』に集中投資したから」です。
+さらに完成済み物件のため、建て替えのような「仮住まい探し」や「2回の引越し」の心労も一切ゼロ。カギを受け取って今の家から1回引っ越すだけで済みます。
 
-浮いた約1,820万円の生涯資金で、ご夫婦での国内旅行や趣味、健康づくりを心ゆくまでお楽しみいただけます。
+「本当にエアコン1台で家じゅう暖かいの？」と疑問に思った方へ。
+売り込みは一切ありません。まずは【1日2組限定・冬の快適体感会＆光熱費試算会】でご自身の体で確かめてみませんか？
 
-まずはWeb上で24時間自由に内覧できる「3D間取り ＆ 360度バーチャル内覧ツアー」をご覧ください。`}
+▼ 詳細・体感会のご予約はこちら（無料ガイドブックも進呈中）
+https://lp.smile049.jp/saishin`}
                     </div>
                     <button
-                      onClick={() => handleCopy(`【50代・60代からの住み替えをご検討の方へ】\n\n「定年後の年金生活で、毎月の高い光熱費や家の修繕費が不安…」\n「子供が独立して今の家は広すぎるが、新築に3,500万円以上かけると老後資金が圧迫される…」\n\nそんな切実な悩みに、建築士と大工さんがひとつの明確な答えを出しました。\n\n鳩山ニュータウンに誕生した、フルスケルトン再生住宅「再進の家」。\n\n✔ 販売価格 2,180万円（税込・売主直売で仲介手数料なし）\n✔ 新築と比べて初期費用を約1,000万円抑制\n✔ HEAT20 G2超高断熱 ＋ 太陽光発電7.1kWh自家消費で「毎月の光熱費を極小化」\n✔ 昭和51年築の減価償却により「将来の固定資産税が激減」\n\n浮いた約1,820万円の生涯資金で、ご夫婦での国内旅行や趣味、健康づくりを心ゆくまでお楽しみいただけます。\n\nまずはWeb上で24時間自由に内覧できる「3D間取り ＆ 360度バーチャル内覧ツアー」をご覧ください。`, 'ad_a')}
+                      onClick={() => handleCopy(`【鳩山町および近隣にお住まいの50代・60代・70代のご夫婦へ】\n\n3,000万円以上の新築建売を買って、高額なローンと冬の寒さに悩むのは、もうやめませんか？\n\n「子どもも独立したし、これからは夫婦2人で暖かく穏やかに暮らしたい」\nそう思って家を探すと、周辺の新築は3,000万円超。一見綺麗ですが、冬場は寒く、高騰する電気代に頭を悩ませる方が後を絶ちません。\n\n実は、比企郡鳩山町に「2,180万円」でありながら、一般新築の性能をはるかに凌駕する超高断熱（HEAT20 G2超）＆電気代を極小化する創エネリノベーション住宅が完成しました。\n\nなぜ、新築より約820万円も安いのに、新築以上の快適さが出せるのか？\n秘密は「あえて築25年超の骨組みを活用し、建物評価0で固定資産税を節税。浮いた予算を『片流れ屋根への変更＋Qセルズ8.0kW太陽光（年間8,789kWh発電）』や『見えない配管・配線の全面新品交換』に集中投資したから」です。\nさらに完成済み物件のため、建て替えのような「仮住まい探し」や「2回の引越し」の心労も一切ゼロ。カギを受け取って今の家から1回引っ越すだけで済みます。\n\n「本当にエアコン1台で家じゅう暖かいの？」と疑問に思った方へ。\n売り込みは一切ありません。まずは【1日2組限定・冬の快適体感会＆光熱費試算会】でご自身の体で確かめてみませんか？\n\n▼ 詳細・体感会のご予約はこちら（無料ガイドブックも進呈中）\nhttps://lp.smile049.jp/saishin`, 'ad_a')}
                       className="mt-2 px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-bold flex items-center gap-1.5 transition"
                     >
                       {copiedKey === 'ad_a' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -314,16 +315,15 @@ export default function SaishinAdsPortalPanel() {
                   <div>
                     <span className="text-stone-400 text-xs font-bold block mb-1">見出し (Headline):</span>
                     <div className="p-3 bg-stone-900 rounded-xl border border-stone-800 font-bold text-white text-xs">
-                      新築の約2/3の価格で叶える、光熱費ゼロの終の住処（2,180万円・鳩山）
+                      新築より約820万円安いのに新築より暖かい家。鳩山町2,180万円
                     </div>
                   </div>
 
                   <div>
-                    <span className="text-stone-400 text-xs font-bold block mb-1">推奨クリエイティブ素材:</span>
-                    <div className="p-3 bg-stone-900 rounded-xl border border-stone-800 text-xs text-stone-300 space-y-1">
-                      <div>・<strong>動画素材:</strong> 太陽光が差し込む吹き抜けLDK動画（`ldk_sunlight.mp4`）</div>
-                      <div>・<strong>画像帯文字:</strong> 「新築比較で生涯約1,820万円おトク」「初期費用1,000万浮く」</div>
-                      <div>・<strong>CTAボタン:</strong> 「詳しくはこちら」または「予約する」</div>
+                    <span className="text-stone-400 text-xs font-bold block mb-1">推奨クリエイティブ素材（案1-A / 案1-B）:</span>
+                    <div className="p-3 bg-stone-900 rounded-xl border border-stone-800 text-xs text-stone-300 space-y-2">
+                      <div>・<strong>案1-A:</strong> 物件前でスタッフが笑顔で立つ写真 ＋ 帯文字「3,000万円超の新築を買って冬の寒さと高額ローンに悩むのはもうやめませんか？」</div>
+                      <div>・<strong>案1-B:</strong> 片流れ屋根に並んだ太陽光パネル写真 ＋ 帯文字「なぜ新築より約820万円安いのに新築より暖かい家ができるのか？」</div>
                     </div>
                   </div>
 
@@ -337,42 +337,47 @@ export default function SaishinAdsPortalPanel() {
               </div>
             </div>
 
-            {/* クリエイティブ 2: 健康・ヒートショック軸 */}
+            {/* クリエイティブ 2: パターンB【開発ストーリー・人間味型】（信頼と共感の獲得） */}
             <div className="bg-stone-950 p-6 sm:p-8 rounded-3xl border border-stone-800 shadow-xl space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-stone-800">
                 <div className="flex items-center gap-2">
                   <span className="px-3 py-1 rounded-full bg-red-500/20 text-red-300 text-xs font-bold border border-red-500/30">
-                    PATTERN B（健康・断熱重視層）
+                    PATTERN B（開発ストーリー・人間味型）
                   </span>
                   <h3 className="text-base sm:text-lg font-bold text-white">
-                    冬の朝、廊下が寒くない家に住み替えませんか？HEAT20 G2「無暖房でも15℃キープ」
+                    子ども部屋のための広いだけの家は、もういりません
                   </h3>
                 </div>
-                <span className="text-xs text-stone-400">配信推奨先: 物件スペックLP（/saishin/spec）</span>
+                <span className="text-xs text-stone-400">配信推奨先: https://lp.smile049.jp/saishin</span>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-xs sm:text-sm">
                 <div>
                   <span className="text-stone-400 text-xs font-bold block mb-1">メインテキスト (Primary Text):</span>
                   <div className="p-4 bg-stone-900 rounded-xl border border-stone-800 text-stone-200 text-xs leading-relaxed whitespace-pre-wrap font-mono">
-{`【冬の脱衣所・廊下の寒さに悩むご夫婦へ】
+{`【子ども部屋のための広いだけの家は、もういりません】
 
-築30年を超えた日本の家で、冬の明け方に室温が8℃近くまで急低下し、ヒートショックのリスクを抱えていませんか？
+初めまして。比企郡で住宅再生を手掛ける住ま居る／すまいる設計の代表です。
 
-「再進の家」は、HEAT20 G2クラスの超高断熱リノベーションを実施。
+子育てを終え、人生の後半戦をご夫婦お二人で楽しもうとされている方に、どうしてもお伝えしたいことがあり投稿しました。
 
-✔ YKK APW430高性能トリプルガラス樹脂窓で結露を根絶
-✔ 外気温0℃の厳しい真冬でも、無暖房で朝15℃を下回らない家
-✔ エアコン1台で家中どこでも同じ暖かさ
-✔ トイレ・お風呂の温度差がなく、将来の健康寿命を延伸
+50代〜70代からの家選びで一番大切なのは、見た目の豪華さではなく「健康・お金のゆとり・将来の安心」だと私たちは考えています。
 
-立地は都心駅前ではなく、澄んだ空気と静けさに包まれた鳩山ニュータウン。
-「駅近の喧騒に費用をかけるより、一生健康で暮らせる住まいを手に入れたい」というご夫婦に選ばれています。
+だからこそ、この家づくりでは表面だけのきれいなリフォームは一切やめました。
+屋根を一度解体して片流れに変更し、Qセルズ8.0kW太陽光パネルを設置（年間8,789kWh発電・ほぼ自家消費を超える創エネ設計）。さらに、ご入居後に突発的な修繕費用がかからないよう、壁の裏にある電気配線や給水給湯配管まで全て新品に取り換えました。
 
-1日1組限定の「エアコン1台の暖かさ体感見学会」受付中。`}
+さらに、自宅の建て替えで誰もが苦しむ「仮住まい探し」や「2回の引っ越し」の心労をゼロにし、カギを受け取って今の家から1回引っ越すだけで済むように完成させました。
+
+「老後資金を守りながら、冬暖かく、電気代を気にせず笑って暮らせる拠点を作りたい」
+そんな私たちの情熱とこだわりの詰まった家が、1棟限定で完成しました。
+
+開発者の想いと見えない施工裏話をまとめた『50代〜70代のための失敗しない家選びガイド』を無料でお届けしています。気になる方は下記リンクよりお気軽にどうぞ。
+
+▼ 『失敗しない家選びガイド』無料ダウンロードはこちら
+https://lp.smile049.jp/saishin`}
                   </div>
                   <button
-                    onClick={() => handleCopy(`【冬の脱衣所・廊下の寒さに悩むご夫婦へ】\n\n築30年を超えた日本の家で、冬の明け方に室温が8℃近くまで急低下し、ヒートショックのリスクを抱えていませんか？\n\n「再進の家」は、HEAT20 G2クラスの超高断熱リノベーションを実施。\n\n✔ YKK APW430高性能トリプルガラス樹脂窓で結露を根絶\n✔ 外気温0℃の厳しい真冬でも、無暖房で朝15℃を下回らない家\n✔ エアコン1台で家中どこでも同じ暖かさ\n✔ トイレ・お風呂の温度差がなく、将来の健康寿命を延伸\n\n立地は都心駅前ではなく、澄んだ空気と静けさに包まれた鳩山ニュータウン。\n「駅近の喧騒に費用をかけるより、一生健康で暮らせる住まいを手に入れたい」というご夫婦に選ばれています。\n\n1日1組限定の「エアコン1台の暖かさ体感見学会」受付中。`, 'ad_b')}
+                    onClick={() => handleCopy(`【子ども部屋のための広いだけの家は、もういりません】\n\n初めまして。比企郡で住宅再生を手掛ける住ま居る／すまいる設計の代表です。\n\n子育てを終え、人生の後半戦をご夫婦お二人で楽しもうとされている方に、どうしてもお伝えしたいことがあり投稿しました。\n\n50代〜70代からの家選びで一番大切なのは、見た目の豪華さではなく「健康・お金のゆとり・将来の安心」だと私たちは考えています。\n\nだからこそ、この家づくりでは表面だけのきれいなリフォームは一切やめました。\n屋根を一度解体して片流れに変更し、Qセルズ8.0kW太陽光パネルを設置（年間8,789kWh発電・ほぼ自家消費を超える創エネ設計）。さらに、ご入居後に突発的な修繕費用がかからないよう、壁の裏にある電気配線や給水給湯配管まで全て新品に取り換えました。\n\nさらに、自宅の建て替えで誰もが苦しむ「仮住まい探し」や「2回の引っ越し」の心労をゼロにし、カギを受け取って今の家から1回引っ越すだけで済むように完成させました。\n\n「老後資金を守りながら、冬暖かく、電気代を気にせず笑って暮らせる拠点を作りたい」\nそんな私たちの情熱とこだわりの詰まった家が、1棟限定で完成しました。\n\n開発者の想いと見えない施工裏話をまとめた『50代〜70代のための失敗しない家選びガイド』を無料でお届けしています。気になる方は下記リンクよりお気軽にどうぞ。\n\n▼ 『失敗しない家選びガイド』無料ダウンロードはこちら\nhttps://lp.smile049.jp/saishin`, 'ad_b')}
                     className="mt-2 px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-bold flex items-center gap-1.5 transition"
                   >
                     {copiedKey === 'ad_b' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -384,64 +389,64 @@ export default function SaishinAdsPortalPanel() {
                   <div>
                     <span className="text-stone-400 text-xs font-bold block mb-1">見出し (Headline):</span>
                     <div className="p-3 bg-stone-900 rounded-xl border border-stone-800 font-bold text-white text-xs">
-                      真冬の朝も15℃以上をキープ。HEAT20 G2超高断熱住宅（2,180万円）
+                      50代からの家選び。子ども部屋のための広いだけの家は、もういりません
                     </div>
                   </div>
 
                   <div>
-                    <span className="text-stone-400 text-xs font-bold block mb-1">推奨クリエイティブ素材:</span>
-                    <div className="p-3 bg-stone-900 rounded-xl border border-stone-800 text-xs text-stone-300 space-y-1">
-                      <div>・<strong>画像素材:</strong> トリプルガラス樹脂サッシ写真（`feat_03_window.jpg`）または温熱温度差グラフ</div>
-                      <div>・<strong>画像帯文字:</strong> 「ヒートショックの不安ゼロへ」「無暖房でも朝15℃」</div>
+                    <span className="text-stone-400 text-xs font-bold block mb-1">推奨クリエイティブ素材（カルーセル表紙 / スライド）:</span>
+                    <div className="p-3 bg-stone-900 rounded-xl border border-stone-800 text-xs text-stone-300 space-y-2">
+                      <div>・<strong>1枚目:</strong> 代表者笑顔写真 ＋ 建物 ＋ 「子ども部屋のための広いだけの家は、もういりません」</div>
+                      <div>・<strong>3枚目:</strong> 壁裏の配管・配線工事現場 ＋ 「見えない配管・配線まで全新品に交換！」</div>
                     </div>
                   </div>
 
                   <div>
                     <span className="text-stone-400 text-xs font-bold block mb-1">リンク先URL:</span>
                     <div className="p-3 bg-stone-900 rounded-xl border border-stone-800 text-xs font-mono text-red-400">
-                      https://lp.smile049.jp/saishin/spec
+                      https://lp.smile049.jp/saishin
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* クリエイティブ 3: 大人の暮らし・夫婦別室間取り軸 */}
+            {/* クリエイティブ 3: パターンC【資産防衛・比較ノウハウ型】（理屈での納得） */}
             <div className="bg-stone-950 p-6 sm:p-8 rounded-3xl border border-stone-800 shadow-xl space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-stone-800">
                 <div className="flex items-center gap-2">
                   <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30">
-                    PATTERN C（間取り・暮らし重視層）
+                    PATTERN C（資産防衛・比較ノウハウ型）
                   </span>
                   <h3 className="text-base sm:text-lg font-bold text-white">
-                    就寝時間も趣味も違うから。「つかず離れず、気配を感じる独立2寝室」
+                    新築より約820万円安いのに、新築より暖かい？ 賢い家選びと資産防衛3つの条件
                   </h3>
                 </div>
-                <span className="text-xs text-stone-400">配信推奨先: 総合案内LP（/saishin#virtual-tour）</span>
+                <span className="text-xs text-stone-400">配信推奨先: https://lp.smile049.jp/saishin</span>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-xs sm:text-sm">
                 <div>
                   <span className="text-stone-400 text-xs font-bold block mb-1">メインテキスト (Primary Text):</span>
                   <div className="p-4 bg-stone-900 rounded-xl border border-stone-800 text-stone-200 text-xs leading-relaxed whitespace-pre-wrap font-mono">
-{`【夫婦それぞれの時間を大切にしたい大人の住まい】
+{`【新築より約820万円安いのに、新築より暖かい？】
+50代・60代・70代夫婦が知っておくべき「賢い家選びと資産防衛」3つの条件
 
-仲が良いご夫婦でも、就寝時間や起きる時間、テレビや読書の趣味は違うもの。
+今の時代、高額な新築ローンを組むのはリスクです。
+夫婦二人暮らしにちょうどいい「賢い住まい選び」のポイントをご存知ですか？
 
-「同じ寝室だと物音で相手を起こしてしまう…」
-「かといって完全に別々の階に孤立するのは寂しい…」
+① 固定資産税の節税：築25年超の物件は建物評価がほぼ0。新築に比べて毎年の税負担が劇的に軽くなります。
+② 光熱費リスクの遮断：HEAT20 G2超の断熱性＋Qセルズ8.0kW太陽光発電（年間8,789kWh）で、電気代高騰時代でも固定費に怯えません。
+③ 見えないインフラの完全刷新：配管・配線・耐震基準を現行適合＆全新品にすることで、将来の修繕費ゼロへ。
+④ 仮住まいゼロ・引越し1回のみ：自社不動産部門が現在のお住まいの売却・買取査定まで窓口ひとつでサポート。
 
-再進の家は、1階に「独立した2つの寝室」を設けた絶妙な平屋ライク間取りです。
+近隣の新築建売（3,000万円超）と本物件（2,180万円）の年間トータルコスト比較データを公開中！
 
-✔ 階段を使わず1階だけで快適な日常生活が完結
-✔ 廊下を挟んでお互いの気配や明かりを感じられる安心感
-✔ 2階は趣味や大容量収納に使えるフリースペース
-✔ 朝夕は澄み切った空気の中で閑静な街並みを夫婦で散歩
-
-3D立体間取り図と360度ツアーで、大人のゆとり空間を今すぐ体感してください。`}
+▼ 試算比較データ＆現地体感会のご案内はこちら
+https://lp.smile049.jp/saishin`}
                   </div>
                   <button
-                    onClick={() => handleCopy(`【夫婦それぞれの時間を大切にしたい大人の住まい】\n\n仲が良いご夫婦でも、就寝時間や起きる時間、テレビや読書の趣味は違うもの。\n\n「同じ寝室だと物音で相手を起こしてしまう…」\n「かといって完全に別々の階に孤立するのは寂しい…」\n\n再進の家は、1階に「独立した2つの寝室」を設けた絶妙な平屋ライク間取りです。\n\n✔ 階段を使わず1階だけで快適な日常生活が完結\n✔ 廊下を挟んでお互いの気配や明かりを感じられる安心感\n✔ 2階は趣味や大容量収納に使えるフリースペース\n✔ 朝夕は澄み切った空気の中で閑静な街並みを夫婦で散歩\n\n3D立体間取り図と360度ツアーで、大人のゆとり空間を今すぐ体感してください。`, 'ad_c')}
+                    onClick={() => handleCopy(`【新築より約820万円安いのに、新築より暖かい？】\n50代・60代・70代夫婦が知っておくべき「賢い家選びと資産防衛」3つの条件\n\n今の時代、高額な新築ローンを組むのはリスクです。\n夫婦二人暮らしにちょうどいい「賢い住まい選び」のポイントをご存知ですか？\n\n① 固定資産税の節税：築25年超の物件は建物評価がほぼ0。新築に比べて毎年の税負担が劇的に軽くなります。\n② 光熱費リスクの遮断：HEAT20 G2超の断熱性＋Qセルズ8.0kW太陽光発電（年間8,789kWh）で、電気代高騰時代でも固定費に怯えません。\n③ 見えないインフラの完全刷新：配管・配線・耐震基準を現行適合＆全新品にすることで、将来の修繕費ゼロへ。\n④ 仮住まいゼロ・引越し1回のみ：自社不動産部門が現在のお住まいの売却・買取査定まで窓口ひとつでサポート。\n\n近隣の新築建売（3,000万円超）と本物件（2,180万円）の年間トータルコスト比較データを公開中！\n\n▼ 試算比較データ＆現地体感会のご案内はこちら\nhttps://lp.smile049.jp/saishin`, 'ad_c')}
                     className="mt-2 px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-bold flex items-center gap-1.5 transition"
                   >
                     {copiedKey === 'ad_c' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -453,22 +458,22 @@ export default function SaishinAdsPortalPanel() {
                   <div>
                     <span className="text-stone-400 text-xs font-bold block mb-1">見出し (Headline):</span>
                     <div className="p-3 bg-stone-900 rounded-xl border border-stone-800 font-bold text-white text-xs">
-                      つかず離れず、気配を共有する夫婦別室の心地よさ（3D間取り図公開）
+                      新築と本物件の生涯トータルコスト徹底比較データを公開中
                     </div>
                   </div>
 
                   <div>
-                    <span className="text-stone-400 text-xs font-bold block mb-1">推奨クリエイティブ素材:</span>
-                    <div className="p-3 bg-stone-900 rounded-xl border border-stone-800 text-xs text-stone-300 space-y-1">
-                      <div>・<strong>画像素材:</strong> 1階3D立体間取り図パース（`3d_plan_1f.jpg`）</div>
-                      <div>・<strong>画像帯文字:</strong> 「平屋感覚で暮らす」「夫婦独立2寝室の間取り」</div>
+                    <span className="text-stone-400 text-xs font-bold block mb-1">推奨クリエイティブ素材（比較図解・インフォグラフィック）:</span>
+                    <div className="p-3 bg-stone-900 rounded-xl border border-stone-800 text-xs text-stone-300 space-y-2">
+                      <div>・<strong>図解比較画像:</strong> 「どちらがこれからの暮らしに賢い選択ですか？」（左:新築3,000万超 / 右:本物件2,180万）</div>
+                      <div>・<strong>下部帯コピー:</strong> 「浮いた約820万円で夫婦の老後資金・趣味・旅行にゆとりを」</div>
                     </div>
                   </div>
 
                   <div>
                     <span className="text-stone-400 text-xs font-bold block mb-1">リンク先URL:</span>
                     <div className="p-3 bg-stone-900 rounded-xl border border-stone-800 text-xs font-mono text-emerald-400">
-                      https://lp.smile049.jp/saishin#virtual-tour
+                      https://lp.smile049.jp/saishin
                     </div>
                   </div>
                 </div>
@@ -536,6 +541,156 @@ export default function SaishinAdsPortalPanel() {
                     <div className="p-3 bg-stone-900 rounded-xl border border-stone-800 text-xs font-mono text-blue-400">
                       https://lp.smile049.jp/saishin/technology
                     </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* カルーセル広告用 5枚スライドコピーセット */}
+            <div className="bg-stone-950 p-6 sm:p-8 rounded-3xl border border-stone-800 shadow-xl space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-stone-800">
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs font-bold border border-purple-500/30">
+                    CAROUSEL SET（横スライド5枚ストーリー型）
+                  </span>
+                  <h3 className="text-base sm:text-lg font-bold text-white">
+                    見込み客自身に「この家が一番賢い選択だ」とストーリーで納得させるカルーセル広告
+                  </h3>
+                </div>
+                <span className="text-xs text-stone-400">配信面: Facebook / Instagramフィード</span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
+                <div className="p-4 bg-stone-900 rounded-2xl border border-stone-800 space-y-2">
+                  <span className="px-2 py-0.5 rounded bg-purple-950 text-purple-300 text-[10px] font-bold">1枚目（表紙）</span>
+                  <div className="font-bold text-white">代表者笑顔写真 ＋ 建物</div>
+                  <p className="text-amber-300 font-bold leading-relaxed text-[11px]">
+                    「子ども部屋のための広いだけの家は、もういりません」<br />
+                    夫婦2人にちょうどいい、新築以上の超高断熱リノベーション住宅
+                  </p>
+                </div>
+
+                <div className="p-4 bg-stone-900 rounded-2xl border border-stone-800 space-y-2">
+                  <span className="px-2 py-0.5 rounded bg-stone-800 text-stone-300 text-[10px] font-bold">2枚目（屋根）</span>
+                  <div className="font-bold text-white">片流れ屋根 ＋ Qセルズ8kW</div>
+                  <p className="text-stone-300 leading-relaxed text-[11px]">
+                    「屋根を壊してまで片流れにした理由」<br />
+                    年間8,789kWh創エネで、電気代高騰時代でも固定費に怯えない暮らし
+                  </p>
+                </div>
+
+                <div className="p-4 bg-stone-900 rounded-2xl border border-stone-800 space-y-2">
+                  <span className="px-2 py-0.5 rounded bg-stone-800 text-stone-300 text-[10px] font-bold">3枚目（配管）</span>
+                  <div className="font-bold text-white">壁裏の配管・電気配線工事</div>
+                  <p className="text-stone-300 leading-relaxed text-[11px]">
+                    「見えない配管・配線まで全新品に交換！」<br />
+                    表側だけ綺麗にする上辺リフォームはしない。将来の突発的修繕リスクをゼロへ
+                  </p>
+                </div>
+
+                <div className="p-4 bg-stone-900 rounded-2xl border border-stone-800 space-y-2">
+                  <span className="px-2 py-0.5 rounded bg-stone-800 text-stone-300 text-[10px] font-bold">4枚目（設備）</span>
+                  <div className="font-bold text-white">新品キッチン・浴室・2台駐車</div>
+                  <p className="text-stone-300 leading-relaxed text-[11px]">
+                    「水回り全新品＆車2台駐車」<br />
+                    現行耐震適合。仮住まい不要・引越し1回のみ。50代〜70代のセカンドライフを豊かに
+                  </p>
+                </div>
+
+                <div className="p-4 bg-stone-900 rounded-2xl border border-amber-500/30 bg-amber-500/5 space-y-2">
+                  <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold">5枚目（オファー）</span>
+                  <div className="font-bold text-amber-400">ガイドブック表紙画像</div>
+                  <p className="text-white font-bold leading-relaxed text-[11px]">
+                    【完全予約制・無料進呈】<br />
+                    『50代〜70代のための失敗しない家選びガイド』＆「エアコン1台で暖かい」現地体感会
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* 神田流 画像内文字入れ全8パターン＆作成テクニック解説 */}
+            <div className="bg-stone-950 p-6 sm:p-8 rounded-3xl border border-stone-800 shadow-xl space-y-6">
+              <div className="pb-4 border-b border-stone-800">
+                <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30 inline-block mb-2">
+                  EMOTIONAL COPY GUIDELINES（神田流エモーショナル・マーケティング）
+                </span>
+                <h3 className="text-lg sm:text-xl font-bold text-white">
+                  広告臭いカタログ写真を排除し、タイムラインで指を止める画像内コピー全8パターン
+                </h3>
+                <p className="text-xs text-stone-400 mt-1">
+                  Facebookユーザーはプロのカタログ写真を瞬時に「売り込み」と判断してスルーします。生活感・現場のリアル・文字の力（座布団帯）で勝負します。
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+                {/* パターン 1: 1枚画像広告用 */}
+                <div className="p-5 bg-stone-900 rounded-2xl border border-stone-800 space-y-3">
+                  <div className="font-bold text-amber-400 flex items-center justify-between">
+                    <span>【パターン1】1枚画像広告用：認知的不協和＆強烈な問いかけ</span>
+                    <span className="text-[10px] bg-stone-800 px-2 py-0.5 rounded text-stone-300">案1-A / 案1-B</span>
+                  </div>
+                  <div className="p-3.5 bg-stone-950 rounded-xl border border-stone-800 text-xs space-y-2">
+                    <strong className="text-white block">案1-A（問いかけ＆ギャップ訴求）：</strong>
+                    <div className="text-stone-300 pl-2 border-l-2 border-amber-500 space-y-0.5">
+                      <div>上部帯：【比企郡にお住まいの50代・60代・70代のご夫婦へ】</div>
+                      <div className="text-amber-300 font-bold">メイン：3,000万円超の新築を買って 冬の寒さと高額ローンに悩むのは もうやめませんか？</div>
+                      <div>サブ：2,180万円で叶える「HEAT20 G2超」の超高断熱×創エネ住宅</div>
+                      <div className="text-red-400 font-bold">右下バッジ：【先着10名】エアコン1台で暖かい体感会 開催中</div>
+                    </div>
+                  </div>
+                  <div className="p-3.5 bg-stone-950 rounded-xl border border-stone-800 text-xs space-y-2">
+                    <strong className="text-white block">案1-B（比較・価格ギャップ訴求）：</strong>
+                    <div className="text-stone-300 pl-2 border-l-2 border-amber-500 space-y-0.5">
+                      <div className="text-amber-300 font-bold">メイン：なぜ新築より約820万円安いのに 新築より暖かい家ができるのか？</div>
+                      <div>サブ：築25年超の建物評価0を活用＝固定資産税も劇的節税！ 浮いた予算を超高断熱とQセルズ8kWソーラーへ集中投資。</div>
+                      <div>下部帯：2,180万円／鳩山ニュータウン内／見学予約受付中</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* パターン 3 & 4: 現場リアル対比 ＆ インフォグラフィック */}
+                <div className="p-5 bg-stone-900 rounded-2xl border border-stone-800 space-y-3">
+                  <div className="font-bold text-emerald-400 flex items-center justify-between">
+                    <span>【パターン3＆4】現場リアル対比 ＆ 図解インフォグラフィック</span>
+                    <span className="text-[10px] bg-stone-800 px-2 py-0.5 rounded text-stone-300">自己説得型</span>
+                  </div>
+                  <div className="p-3.5 bg-stone-950 rounded-xl border border-stone-800 text-xs space-y-2">
+                    <strong className="text-white block">パターン3（現場のリアル・誠実さ強調型）：</strong>
+                    <p className="text-stone-400 text-[11px]">左:配管引き直し施工現場写真 ／ 右:完成後の新築同様美しいLDK写真</p>
+                    <div className="text-stone-300 pl-2 border-l-2 border-emerald-500 space-y-0.5">
+                      <div className="text-amber-300 font-bold">中央帯：「表面だけ綺麗にする『上辺リフォーム』は絶対にしません。」</div>
+                      <div>補足：割高な新築建売を買わなくても、2,180万円で「新築以上の暖かさと安心」は手に入ります。壁の裏の配管・配線まで全面刷新済み！</div>
+                    </div>
+                  </div>
+                  <div className="p-3.5 bg-stone-950 rounded-xl border border-stone-800 text-xs space-y-2">
+                    <strong className="text-white block">パターン4（図解・インフォグラフィック型 比較画像）：</strong>
+                    <div className="text-stone-300 pl-2 border-l-2 border-emerald-500 space-y-0.5">
+                      <div className="text-white font-bold">タイトル：「どちらが、これからの暮らしに賢い選択ですか？」</div>
+                      <div className="text-[11px] grid grid-cols-2 gap-2 mt-1">
+                        <div className="text-stone-400">左: 新築建売 3,000万超／冬寒い／電気代直撃／税高額</div>
+                        <div className="text-emerald-300 font-bold">右: 本物件 2,180万（820万得）／HEAT20 G2／Qセルズ8kW／税激減</div>
+                      </div>
+                      <div className="text-amber-300 font-bold mt-1">下部キャッチ：浮いた約820万円で、夫婦の老後資金・趣味・旅行にゆとりを。</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 画像作成テクニック3箇条 */}
+              <div className="p-4 bg-stone-900/80 rounded-2xl border border-stone-800 text-xs">
+                <div className="font-bold text-white mb-2">クリエイティブ作成時の3つの鉄則テクニック：</div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-stone-300">
+                  <div className="p-2.5 bg-stone-950 rounded-xl">
+                    <strong className="text-amber-300 block mb-0.5">① 太めのゴシック体を使用</strong>
+                    スマホ画面は小さいため、明朝体や細字はスルーされます。濃背景に白太文字、白背景に濃紺太文字で可読性を最大化。
+                  </div>
+                  <div className="p-2.5 bg-stone-950 rounded-xl">
+                    <strong className="text-amber-300 block mb-0.5">② テキストの背景に「帯（座布団）」を敷く</strong>
+                    写真の上に直文字を置くと同化します。黒・濃紺・赤・黄色の単色帯を敷いて文字を一目で読ませます。
+                  </div>
+                  <div className="p-2.5 bg-stone-950 rounded-xl">
+                    <strong className="text-amber-300 block mb-0.5">③ 文字量を画像全体の20〜30%に抑える</strong>
+                    詰め込みすぎると画像がゴチャつきます。詳しい説明は広告本文に委ね、画像では「感情の引き金」だけを引きます。
                   </div>
                 </div>
               </div>
