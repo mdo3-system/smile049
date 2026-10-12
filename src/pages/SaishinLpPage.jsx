@@ -170,28 +170,27 @@ export default function SaishinLpPage({ onNavigate }) {
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 py-16 text-center text-white">
           <div className="inline-flex flex-wrap items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs md:text-sm font-semibold tracking-wider text-amber-300 mb-6 shadow-xl animate-fade-in">
             <Sparkles className="w-4 h-4 text-amber-400" />
-            <span>【売主直売】仲介手数料 約85万円不要</span>
+            <span>【都心から約1時間の週末別邸 ＆ 終の棲家】</span>
             <span className="hidden sm:inline text-stone-400">｜</span>
-            <span className="text-emerald-300 font-bold">都心から約1時間の週末別邸 ＆ ご夫婦の温もりあるセカンドライフ</span>
+            <span className="text-emerald-300 font-bold">軽井沢の1/3の価格（2,180万円）で毎週通えるプライベートヴィラ</span>
           </div>
 
-          {/* メインコピー（感情の情景＋コントラスト） */}
+          {/* メインコピー（二拠点・週末隠れ家 × 極暖の生活実感） */}
           <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.3] mb-6 drop-shadow-lg">
-            「朝、布団から出るのが怖くない。」<br />
+            金曜の夜、都心を抜け出して深呼吸。<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200">
-              ただそれだけで、人生の冬は<br className="sm:hidden" />こんなにも幸せになる。
+              冬の寒さも、夏の酷暑も忘れる<br className="sm:hidden" />「大人の週末隠れ家」。
             </span>
           </h1>
 
           {/* サブヘッド & サブコピー */}
           <div className="max-w-3xl mx-auto mb-8 space-y-3">
             <p className="text-sm sm:text-base md:text-lg font-bold text-amber-300 drop-shadow">
-              高額な新築ローンや維持費のかかる別荘はもういらない。ご夫婦2人のための「2,180万円・維持費実質ゼロの極暖プライベートヴィラ」。
+              「朝、布団から出るのが怖くない。」ただそれだけで、人生の冬はこんなにも幸せになる。<br className="hidden sm:inline" />
+              別荘特有の「冬の極寒・水道管凍結・湿気・高額管理費」のストレスをすべてゼロにした、HEAT20 G2極暖の邸宅。
             </p>
             <p className="text-xs sm:text-base text-stone-200 font-normal leading-relaxed drop-shadow">
-              子育てを終えた今、本当に欲しかったのは広すぎる部屋ではなく、<br className="hidden sm:inline" />
-              <strong className="text-white font-bold">「日本一の酷暑の夏も、底冷えする真冬も、家中どこにいても春のように快適な拠点」</strong>でした。<br />
-              比企郡鳩山町 ｜ <span className="font-extrabold text-amber-300 underline underline-offset-4">2,180万円（税込・売主直売・土地72坪）</span> ｜ 屋根遮熱「銀次郎」× HEAT20 G2極暖断熱 ＆ Qセルズ8.0kW太陽光発電
+              比企郡鳩山町 ｜ <span className="font-extrabold text-amber-300 underline underline-offset-4">2,180万円（税込・売主直売・土地72坪・仲介手数料0円）</span> ｜ 屋根遮熱「銀次郎」× APW430トリプル樹脂窓 ＆ Qセルズ8.0kW太陽光発電
             </p>
           </div>
 
@@ -279,6 +278,221 @@ export default function SaishinLpPage({ onNavigate }) {
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 text-stone-400 flex flex-col items-center text-xs animate-bounce">
           <span>SCROLL</span>
           <ChevronDown className="w-4 h-4" />
+        </div>
+      </section>
+
+      {/* =========================================================================
+          【SEO / AEO 構造化データ（Schema.org JSON-LD）】
+          Googleリッチリザルト & AI検索（Perplexity / SearchGPT）引用エンジン用
+      ========================================================================= */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "SingleFamilyResidence",
+                "@id": "https://lp.smile049.jp/saishin/#residence",
+                "name": "再進の家（鳩山ニュータウン高性能再生住宅）",
+                "description": "都心から約1時間の週末別邸・二拠点生活。軽井沢の1/3の価格で手に入る、維持費実質ゼロのHEAT20 G2極暖プライベートヴィラ。Qセルズ太陽光8.0kW・APW430トリプル樹脂窓。",
+                "url": "https://lp.smile049.jp/saishin",
+                "address": {
+                  "@type": "PostalAddress",
+                  "postalCode": "350-0313",
+                  "addressRegion": "埼玉県",
+                  "addressLocality": "比企郡鳩山町",
+                  "streetAddress": "鳩ｹ丘2丁目867番400"
+                },
+                "geo": {
+                  "@type": "GeoCoordinates",
+                  "latitude": 35.9866,
+                  "longitude": 139.3491
+                },
+                "numberOfRooms": 4,
+                "floorSize": {
+                  "@type": "QuantitativeValue",
+                  "value": 105.9,
+                  "unitCode": "MTK"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "price": "21800000",
+                  "priceCurrency": "JPY",
+                  "priceValidUntil": "2027-12-31",
+                  "availability": "https://schema.org/InStock",
+                  "seller": {
+                    "@type": "RealEstateAgent",
+                    "name": "株式会社 住ま居る",
+                    "telephone": "049-271-2350",
+                    "url": "https://smile049.jp"
+                  }
+                }
+              },
+              {
+                "@type": "FAQPage",
+                "@id": "https://lp.smile049.jp/saishin/#faq",
+                "mainEntity": [
+                  {
+                    "@type": "Question",
+                    "name": "鳩山の冬の寒さ・夏の酷暑でもエアコン1台で本当に家中快適ですか？",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "はい。HEAT20 G2（UA値0.34相当）の超高断熱に加え、YKK APW430トリプルガラス樹脂窓、屋根遮熱材『銀次郎』を採用しているため、夏の強烈な西日や冬の底冷え（外気0℃）でも無暖房で朝15℃以上を維持し、エアコン1台で家じゅう快適です。"
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "週末や留守が多い二拠点生活の場合、維持費や電気代はどうなりますか？",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "南面屋根にQセルズ太陽光発電8.0kW（年間発電量8,789kWh）を搭載しており、留守中も発電・売電を継続するため、光熱費は年間を通じて実質ゼロ〜プラス収支となります。また別荘地と異なり高額な別荘管理費も不要です。"
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "将来足腰が弱くなった場合、2階建てでも暮らせますか？",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "1階にLDK（約16帖）・新品水回り・約8帖の主寝室が揃っているため、日常の生活はすべて1階だけで完結する平屋感覚で暮らせます。2階は趣味や来客用ゲストルームとして使えます。"
+                    }
+                  }
+                ]
+              }
+            ]
+          })
+        }}
+      />
+
+      {/* =========================================================================
+          1.5. 【情景描写】大人の週末ダイアリー ＆ 従来の別荘ストレス完全解消
+      ========================================================================= */}
+      <section className="py-20 bg-[#f9f6f0] text-stone-900 border-b border-stone-200">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12">
+            <span className="text-xs font-bold text-amber-800 tracking-widest uppercase bg-amber-100 border border-amber-300 px-3.5 py-1 rounded-full">
+              WEEKEND VILLA DIARY
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-stone-900 mt-3 leading-snug">
+              金曜夜から始まる、<br className="sm:hidden" />「大人の二拠点生活」という至福の時間
+            </h2>
+            <p className="text-stone-600 text-xs sm:text-base mt-2 max-w-2xl mx-auto leading-relaxed">
+              都心からわずか60分。大渋滞に巻き込まれることなく、毎週のように通える「もう一つのわが家」の過ごし方。
+            </p>
+          </div>
+
+          {/* タイムラインカード（映画のような情景描写） */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
+            <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex flex-col justify-between">
+              <div>
+                <span className="text-[11px] font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-full">金曜 20:30 到着</span>
+                <h3 className="font-bold text-stone-900 text-sm sm:text-base mt-2.5 mb-1.5">都心を脱出、夜風の澄んだ森の隠れ家へ</h3>
+                <p className="text-xs text-stone-600 leading-relaxed">
+                  関越道で約50分。ドアを開けるとエアコン1台ですでに家じゅう春の暖かさ。冷え切った部屋を温める苦労は一切ありません。
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex flex-col justify-between">
+              <div>
+                <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full">土曜 07:30 朝の贅沢</span>
+                <h3 className="font-bold text-stone-900 text-sm sm:text-base mt-2.5 mb-1.5">野鳥のさえずりと、テラスの挽きたて珈琲</h3>
+                <p className="text-xs text-stone-600 leading-relaxed">
+                  陽射しが差し込む角地。素足で歩いても床が冷たくないLDKからテラスへ。澄んだ空気を胸いっぱいに吸い込む朝のひととき。
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex flex-col justify-between">
+              <div>
+                <span className="text-[11px] font-bold text-blue-800 bg-blue-50 px-2.5 py-1 rounded-full">土曜 11:00 趣味の時間</span>
+                <h3 className="font-bold text-stone-900 text-sm sm:text-base mt-2.5 mb-1.5">車で15分の名門ゴルフ場、または小さな家庭菜園</h3>
+                <p className="text-xs text-stone-600 leading-relaxed">
+                  周辺に多数点在するゴルフ場へ出かけるもよし、南西角地の豊かな陽当たりで無農薬野菜を育てるもよし。大人の自由時間が広がります。
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex flex-col justify-between">
+              <div>
+                <span className="text-[11px] font-bold text-purple-800 bg-purple-50 px-2.5 py-1 rounded-full">日曜 16:00 帰路へ</span>
+                <h3 className="font-bold text-stone-900 text-sm sm:text-base mt-2.5 mb-1.5">渋滞知らずで都心へ。留守中も家が稼ぐ</h3>
+                <p className="text-xs text-stone-600 leading-relaxed">
+                  日曜夕方の関越道も最短アクセス。留守中も8.0kW太陽光が発電し売電収入を生み出し、換気システムが空気を清浄に保ちます。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 別荘の4大ストレスゼロの理由 */}
+          <div className="bg-white p-6 sm:p-10 rounded-3xl border border-amber-200 shadow-md">
+            <div className="text-center mb-8">
+              <span className="text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
+                WHY HATOYAMA?
+              </span>
+              <h3 className="text-xl sm:text-2xl font-black text-stone-900 mt-2">
+                従来の別荘で後悔した人へ。<br className="sm:hidden" />「4大ストレス」をすべてゼロにする理由
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="p-4 sm:p-5 rounded-2xl bg-stone-50 border border-stone-200">
+                <div className="text-xs font-bold text-red-600 mb-1 flex items-center gap-1">
+                  <span>✕ 従来の別荘：</span>
+                  <span className="text-stone-500">冬が寒すぎて行けない・水道管凍結の恐怖</span>
+                </div>
+                <div className="text-sm font-bold text-stone-900 mb-1 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>【再進の家】真冬もエアコン1台で無暖房15℃キープ</span>
+                </div>
+                <p className="text-xs text-stone-600 pl-5 leading-relaxed">
+                  HEAT20 G2極暖断熱＋世界最高峰APW430トリプル樹脂サッシ。凍結防止ヒーターや水抜きの手間も一切不要です。
+                </p>
+              </div>
+
+              <div className="p-4 sm:p-5 rounded-2xl bg-stone-50 border border-stone-200">
+                <div className="text-xs font-bold text-red-600 mb-1 flex items-center gap-1">
+                  <span>✕ 従来の別荘：</span>
+                  <span className="text-stone-500">留守中の湿気・カビ・空気の淀み</span>
+                </div>
+                <div className="text-sm font-bold text-stone-900 mb-1 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>【再進の家】24時間計画換気で留守中も常に清涼</span>
+                </div>
+                <p className="text-xs text-stone-600 pl-5 leading-relaxed">
+                  高気密・高断熱と換気設計により、2週間ぶりに訪れてもカビ臭さはゼロ。いつでも新築のような爽やかな空気で迎えられます。
+                </p>
+              </div>
+
+              <div className="p-4 sm:p-5 rounded-2xl bg-stone-50 border border-stone-200">
+                <div className="text-xs font-bold text-red-600 mb-1 flex items-center gap-1">
+                  <span>✕ 従来の別荘：</span>
+                  <span className="text-stone-500">毎年の高額な管理費・山奥の防犯不安</span>
+                </div>
+                <div className="text-sm font-bold text-stone-900 mb-1 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>【再進の家】管理費0円 ＆ 美しいタウン内の安心コミュニティ</span>
+                </div>
+                <p className="text-xs text-stone-600 pl-5 leading-relaxed">
+                  別荘管理組合の年30万〜60万円の管理費は不要。西友や診療所が徒歩圏に揃うインフラ完備のニュータウンで防犯性も抜群です。
+                </p>
+              </div>
+
+              <div className="p-4 sm:p-5 rounded-2xl bg-stone-50 border border-stone-200">
+                <div className="text-xs font-bold text-red-600 mb-1 flex items-center gap-1">
+                  <span>✕ 従来の別荘：</span>
+                  <span className="text-stone-500">電気代高騰と固定資産税の二重負担</span>
+                </div>
+                <div className="text-sm font-bold text-stone-900 mb-1 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>【再進の家】8.0kW太陽光売電で「維持費実質ゼロ」</span>
+                </div>
+                <p className="text-xs text-stone-600 pl-5 leading-relaxed">
+                  留守中も年間8,789kWhの太陽光が電気を生み出し売電。築年数を活かした建物評価額の低さにより、固定資産税もわずかです。
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

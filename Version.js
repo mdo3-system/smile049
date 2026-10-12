@@ -92,9 +92,10 @@
 // - 2026/10/12 v0.1.94: THETA 360°バーチャル内見画像6枚の画質・露出・ガンマ改善、都心二拠点・週末別邸向け特製A4ガイドブックHTML（saishin-dual-life-guide.html）新設、総合案内LPおよびFB広告ポータル（PATTERN F）反映
 // - 2026/10/12 v0.1.95: フッター直前のクロージングオファー枠における白文字・白枠視認性障害の完全解消、ヘッダー・ファーストビュー・Q&A直下への「大人の二拠点生活完全ガイド（Web即時閲覧/PDF）」直結導線配備
 // - 2026/10/12 v0.1.96: 50代〜70代老眼＆スマホ閲覧対策（スマホ最低フォントサイズ14〜16px底上げ、行間・コントラスト強化、ワンタップ文字拡大トグル機能、特製ガイドブックHTMLの完全スマホレスポンシブ化）
+// - 2026/10/12 v0.1.97: 都心二拠点・週末別邸向けエモーショナル強化（FVコピー改修、WEEKEND VILLA DIARY、別荘4大ストレスゼロ比較セクション新設）およびAEO/SEO構造化データ（Schema.org JSON-LD: SingleFamilyResidence / FAQPage）配備
 
-window.APP_VERSION = '0.1.96';
-export const APP_VERSION = '0.1.96';
+window.APP_VERSION = '0.1.97';
+export const APP_VERSION = '0.1.97';
 
 
 
