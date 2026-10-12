@@ -50,17 +50,17 @@ export default function SaishinLpPage({ onNavigate }) {
   };
 
   return (
-    <div className="min-h-screen bg-stone-900 text-stone-100 font-sans selection:bg-amber-500 selection:text-white">
+    <div className="min-h-screen bg-[#faf8f5] text-stone-800 font-sans selection:bg-amber-500 selection:text-white">
       {/* =========================================================================
           LP専用上部バー & 3大コンテンツナビゲーション
       ========================================================================= */}
-      <header className="sticky top-0 z-40 bg-stone-950/90 backdrop-blur-md border-b border-stone-800 text-stone-200">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-stone-200 text-stone-800 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="font-extrabold text-white text-base sm:text-lg tracking-wider">
-              再進の家 <span className="text-amber-400 font-normal text-xs sm:text-sm">｜ 鳩山ニュータウン</span>
+            <span className="font-extrabold text-stone-900 text-base sm:text-lg tracking-wider">
+              再進の家 <span className="text-amber-700 font-semibold text-xs sm:text-sm">｜ 鳩山ニュータウン</span>
             </span>
-            <span className="hidden md:inline-block px-2.5 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+            <span className="hidden md:inline-block px-2.5 py-0.5 rounded text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
               HEAT20 G2・自社物件直売
             </span>
           </div>
@@ -68,46 +68,46 @@ export default function SaishinLpPage({ onNavigate }) {
           <div className="flex items-center gap-2 sm:gap-4">
             <button
               onClick={() => setModalType('doc')}
-              className="px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition flex items-center gap-1.5"
+              className="px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-300 transition flex items-center gap-1.5"
             >
-              <FileText className="w-3.5 h-3.5 text-amber-300" />
+              <FileText className="w-3.5 h-3.5 text-amber-700" />
               <span>資料請求(PDF)</span>
             </button>
             <button
               onClick={() => setModalType('tour')}
-              className="px-3.5 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-bold bg-amber-500 hover:bg-amber-400 text-stone-950 shadow-lg shadow-amber-500/20 transition flex items-center gap-1.5"
+              className="px-3.5 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-bold bg-amber-600 hover:bg-amber-500 text-white shadow-md shadow-amber-600/20 transition flex items-center gap-1.5"
             >
-              <Calendar className="w-3.5 h-3.5 text-stone-950" />
+              <Calendar className="w-3.5 h-3.5 text-white" />
               <span>プライベート内覧会</span>
             </button>
           </div>
         </div>
 
         {/* 3ページのLP（販売戦略 3大コンテンツナビゲーション） */}
-        <div className="bg-stone-900 border-t border-stone-800/80 px-4">
+        <div className="bg-[#f5f1eb] border-t border-stone-200 px-4">
           <div className="max-w-6xl mx-auto flex items-center justify-start sm:justify-center gap-2 sm:gap-8 overflow-x-auto py-2 text-xs font-bold scrollbar-none">
-            <span className="text-stone-400 px-2 py-1 shrink-0 font-medium">【LP構成】</span>
+            <span className="text-stone-500 px-2 py-1 shrink-0 font-medium">【LP構成】</span>
             <button
               onClick={() => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="px-3 py-1 rounded-md bg-amber-500 text-stone-950 shrink-0 flex items-center gap-1 shadow-sm"
+              className="px-3 py-1 rounded-md bg-amber-700 text-white shrink-0 flex items-center gap-1 shadow-sm"
             >
               <span>① 総合案内（全体ストーリー）</span>
             </button>
             <button
               onClick={() => onNavigate ? onNavigate('saishin-tech') : (window.location.href = '/saishin/technology')}
-              className="px-3 py-1 rounded-md text-stone-300 hover:text-white hover:bg-stone-800 shrink-0 flex items-center gap-1 transition"
+              className="px-3 py-1 rounded-md text-stone-600 hover:text-stone-900 hover:bg-stone-200/70 shrink-0 flex items-center gap-1 transition"
             >
               <span>② 構造・技術エビデンス詳説</span>
-              <ArrowRight className="w-3 h-3 text-amber-400" />
+              <ArrowRight className="w-3 h-3 text-amber-600" />
             </button>
             <button
               onClick={() => onNavigate ? onNavigate('saishin-spec') : (window.location.href = '/saishin/spec')}
-              className="px-3 py-1 rounded-md text-stone-300 hover:text-white hover:bg-stone-800 shrink-0 flex items-center gap-1 transition"
+              className="px-3 py-1 rounded-md text-stone-600 hover:text-stone-900 hover:bg-stone-200/70 shrink-0 flex items-center gap-1 transition"
             >
               <span>③ 物件スペック＆周辺環境</span>
-              <ArrowRight className="w-3 h-3 text-amber-400" />
+              <ArrowRight className="w-3 h-3 text-amber-600" />
             </button>
           </div>
         </div>
@@ -358,57 +358,57 @@ export default function SaishinLpPage({ onNavigate }) {
       {/* =========================================================================
           3. 3つのコア・バリュー（選ばれる理由）
       ========================================================================= */}
-      <section className="py-20 bg-stone-900 text-white">
+      <section className="py-20 bg-[#f7f4ee] text-stone-900 border-b border-stone-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
-            <span className="text-xs font-bold text-amber-400 tracking-widest uppercase bg-amber-950 px-3 py-1 rounded-full border border-amber-800">
+            <span className="text-xs font-bold text-amber-800 tracking-widest uppercase bg-amber-100 px-3.5 py-1 rounded-full border border-amber-300">
               CORE VALUES
             </span>
-            <h2 className="text-2xl sm:text-4xl font-black mt-3">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-stone-900 mt-3">
               なぜ「再進の家」が選ばれるのか<br />
-              <span className="text-stone-400 text-base sm:text-xl font-normal">
+              <span className="text-stone-600 text-base sm:text-xl font-normal">
                 本質を見極める大人のための3つの確信
               </span>
             </h2>
           </div>
 
-          <div className="space-y-16">
+          <div className="space-y-12">
             {/* -------------------------------------------------------------
                 ① 経済的な安心：2,180万円で実現する「ランニングコスト・ゼロ」の暮らし
             ------------------------------------------------------------- */}
-            <div className="p-8 sm:p-10 rounded-3xl bg-stone-800/80 border border-stone-700 shadow-xl">
+            <div className="p-8 sm:p-10 rounded-3xl bg-white border border-stone-200/90 shadow-md text-stone-900">
               <div className="flex flex-col lg:flex-row gap-8 items-center">
                 <div className="lg:w-1/2">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold mb-4">
-                    <Coins className="w-4 h-4" />
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold mb-4">
+                    <Coins className="w-4 h-4 text-emerald-600" />
                     <span>コア・バリュー 01 ｜ お金の解放</span>
                   </div>
-                  <h3 className="text-2xl sm:text-3xl font-bold mb-4 leading-snug">
+                  <h3 className="text-2xl sm:text-3xl font-extrabold text-stone-900 mb-4 leading-snug">
                     【価格と暖かさの革命】<br />
                     新築の2/3の予算で手に入れる、一生「寒さとお金の不安」から解放される暮らし
                   </h3>
-                  <p className="text-stone-300 text-sm sm:text-base leading-relaxed mb-6">
-                    初期費用を新築（約3,000万〜4,000万円）から<strong className="text-amber-300">約820万〜1,800万円抑制</strong>。さらに真冬でも家中春の暖かさを保つHEAT20 G2クラスの超高断熱と、<strong className="text-amber-300">Qセルズ太陽光8.0kW（年間8,789kWh創エネ）</strong>の自家消費により、毎月跳ね上がる電気代をほぼ相殺します。
+                  <p className="text-stone-700 text-sm sm:text-base leading-relaxed mb-6">
+                    初期費用を新築（約3,000万〜4,000万円）から<strong className="text-amber-800 font-bold">約820万〜1,800万円抑制</strong>。さらに真冬でも家中春の暖かさを保つHEAT20 G2クラスの超高断熱と、<strong className="text-amber-800 font-bold">Qセルズ太陽光8.0kW（年間8,789kWh創エネ）</strong>の自家消費により、毎月跳ね上がる電気代をほぼ相殺します。
                   </p>
-                  <p className="text-stone-400 text-xs sm:text-sm leading-relaxed mb-6">
-                    「毎月の光熱費を気にしてエアコンを我慢する」生活は、今日でおしまいです。浮いた資金で、ご夫婦での温泉旅行やお孫さんへのプレゼントなど、心にゆとりのある余生が広がります。築25年超の良質な躯体を活かしているため、<strong className="text-emerald-400">毎年の固定資産税も新築の数分の一</strong>で済みます。
+                  <p className="text-stone-600 text-xs sm:text-sm leading-relaxed mb-6">
+                    「毎月の光熱費を気にしてエアコンを我慢する」生活は、今日でおしまいです。浮いた資金で、ご夫婦での温泉旅行やお孫さんへのプレゼントなど、心にゆとりのある余生が広がります。築25年超の良質な躯体を活かしているため、<strong className="text-emerald-700 font-bold">毎年の固定資産税も新築の数分の一</strong>で済みます。
                   </p>
 
                   <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div className="p-3.5 rounded-xl bg-stone-900/80 border border-stone-700">
-                      <div className="text-stone-400 mb-1">手元に残る老後資金</div>
-                      <div className="text-lg font-black text-amber-400">約 1,000 万円 ゆとり</div>
+                    <div className="p-3.5 rounded-xl bg-[#faf8f5] border border-stone-200">
+                      <div className="text-stone-500 mb-1 font-medium">手元に残る老後資金</div>
+                      <div className="text-lg font-black text-amber-700">約 1,000 万円 ゆとり</div>
                     </div>
-                    <div className="p-3.5 rounded-xl bg-stone-900/80 border border-stone-700">
-                      <div className="text-stone-400 mb-1">30年の生涯コスト差額</div>
-                      <div className="text-lg font-black text-emerald-400">約 1,820 万円 軽減</div>
+                    <div className="p-3.5 rounded-xl bg-[#faf8f5] border border-stone-200">
+                      <div className="text-stone-500 mb-1 font-medium">30年の生涯コスト差額</div>
+                      <div className="text-lg font-black text-emerald-700">約 1,820 万円 軽減</div>
                     </div>
                   </div>
                 </div>
 
                 {/* 新築との生涯コストシミュレーショングラフ */}
-                <div className="lg:w-1/2 w-full bg-stone-950 p-6 rounded-2xl border border-stone-700">
-                  <div className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-4 flex items-center justify-between">
+                <div className="lg:w-1/2 w-full bg-stone-900 text-white p-6 rounded-2xl border border-stone-800 shadow-inner">
+                  <div className="text-xs font-bold text-stone-300 uppercase tracking-wider mb-4 flex items-center justify-between">
                     <span>生涯住居コストシミュレーション（30年間）</span>
                     <span className="text-[10px] bg-stone-800 px-2 py-0.5 rounded text-stone-300">独自試算</span>
                   </div>
@@ -449,77 +449,77 @@ export default function SaishinLpPage({ onNavigate }) {
             {/* -------------------------------------------------------------
                 ② 構造的な安心：プロの目で躯体から見直した「見えない部分」へのこだわり
             ------------------------------------------------------------- */}
-            <div className="p-8 sm:p-10 rounded-3xl bg-stone-800/80 border border-stone-700 shadow-xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-bold mb-4">
-                <Wrench className="w-4 h-4" />
+            <div className="p-8 sm:p-10 rounded-3xl bg-white border border-stone-200/90 shadow-md text-stone-900">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-800 border border-blue-200 text-xs font-bold mb-4">
+                <Wrench className="w-4 h-4 text-blue-600" />
                 <span>コア・バリュー 02 ｜ 30年の耐久性</span>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-bold mb-3 leading-snug">
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-stone-900 mb-3 leading-snug">
                 【目に見えない安心】<br />
                 大工歴40年の熟練の技と構造計算。骨組みから配管まで新品に蘇らせた「30年安心の耐久性」
               </h3>
-              <p className="text-stone-300 text-sm sm:text-base leading-relaxed max-w-3xl mb-8">
+              <p className="text-stone-700 text-sm sm:text-base leading-relaxed max-w-3xl mb-8">
                 表側だけのクロスやキッチンの貼り替えではありません。建築士と熟練大工が一度すべての骨組み（フルスケルトン）まで解体し、木の一本一本の健全性を精査。構造計算に基づき、最新の耐震金物で緊結・再構築しました。
               </p>
 
               {/* 4枚の実写・現場構造証拠写真 */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <div className="bg-stone-900 rounded-xl overflow-hidden border border-stone-700">
+                <div className="bg-[#faf8f5] rounded-xl overflow-hidden border border-stone-200 shadow-sm">
                   <img
                     src="/assets/saishin/features/feat_01_skeleton.jpg"
                     alt="スケルトン解体・構造金物補強"
                     className="w-full h-40 object-cover"
                   />
                   <div className="p-3">
-                    <div className="text-xs font-bold text-white mb-1">01. フルスケルトン金物補強</div>
-                    <div className="text-[11px] text-stone-400">柱・梁・筋交いを現わしにし、大地震に耐えうる最新金物で緊結。</div>
+                    <div className="text-xs font-bold text-stone-900 mb-1">01. フルスケルトン金物補強</div>
+                    <div className="text-[11px] text-stone-600">柱・梁・筋交いを現わしにし、大地震に耐えうる最新金物で緊結。</div>
                   </div>
                 </div>
 
-                <div className="bg-stone-900 rounded-xl overflow-hidden border border-stone-700">
+                <div className="bg-[#faf8f5] rounded-xl overflow-hidden border border-stone-200 shadow-sm">
                   <img
                     src="/assets/saishin/features/feat_02_ginjiro.jpg"
                     alt="遮熱通気スペーサー銀次郎"
                     className="w-full h-40 object-cover"
                   />
                   <div className="p-3">
-                    <div className="text-xs font-bold text-white mb-1">02. 遮熱通気部材「銀次郎」</div>
-                    <div className="text-[11px] text-stone-400">屋根垂木下に通気層を確保し、酷暑の熱気を家に入れません。</div>
+                    <div className="text-xs font-bold text-stone-900 mb-1">02. 遮熱通気部材「銀次郎」</div>
+                    <div className="text-[11px] text-stone-600">屋根垂木下に通気層を確保し、酷暑の熱気を家に入れません。</div>
                   </div>
                 </div>
 
-                <div className="bg-stone-900 rounded-xl overflow-hidden border border-stone-700">
+                <div className="bg-[#faf8f5] rounded-xl overflow-hidden border border-stone-200 shadow-sm">
                   <img
                     src="/assets/saishin/features/feat_03_window.jpg"
                     alt="YKK APW430高性能トリプルガラス樹脂窓"
                     className="w-full h-40 object-cover"
                   />
                   <div className="p-3">
-                    <div className="text-xs font-bold text-white mb-1">03. トリプル樹脂サッシ</div>
-                    <div className="text-[11px] text-stone-400">世界基準の断熱窓。嫌な窓の結露を根絶し、外の騒音も遮断。</div>
+                    <div className="text-xs font-bold text-stone-900 mb-1">03. トリプル樹脂サッシ</div>
+                    <div className="text-[11px] text-stone-600">世界基準の断熱窓。嫌な窓の結露を根絶し、外の騒音も遮断。</div>
                   </div>
                 </div>
 
-                <div className="bg-stone-900 rounded-xl overflow-hidden border border-stone-700">
+                <div className="bg-[#faf8f5] rounded-xl overflow-hidden border border-stone-200 shadow-sm">
                   <img
                     src="/assets/saishin/features/feat_04_plumbing.jpg"
                     alt="給排水管・電気配線の完全リプレイス"
                     className="w-full h-40 object-cover"
                   />
                   <div className="p-3">
-                    <div className="text-xs font-bold text-white mb-1">04. 配管・インフラ完全新品</div>
-                    <div className="text-[11px] text-stone-400">見えない給排水管・電気配線を全交換。将来の水漏れリスクをゼロに。</div>
+                    <div className="text-xs font-bold text-stone-900 mb-1">04. 配管・インフラ完全新品</div>
+                    <div className="text-[11px] text-stone-600">見えない給排水管・電気配線を全交換。将来の水漏れリスクをゼロに。</div>
                   </div>
                 </div>
               </div>
 
-              <div className="p-4 rounded-xl bg-stone-900/80 border border-stone-700 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="text-xs sm:text-sm text-stone-300">
-                  <strong className="text-white">建築士・大工チームの誠実な約束：</strong> なぜここまでの構造補強・断熱改修が必要なのか、CAD図面や構造計算書を包み隠さず公開しています。
+              <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-xs sm:text-sm text-stone-800">
+                  <strong className="text-stone-900 font-bold">建築士・大工チームの誠実な約束：</strong> なぜここまでの構造補強・断熱改修が必要なのか、CAD図面や構造計算書を包み隠さず公開しています。
                 </div>
                 <button
                   onClick={() => onNavigate ? onNavigate('saishin-tech') : (window.location.href = '/saishin/technology')}
-                  className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shrink-0 flex items-center gap-1.5 transition"
+                  className="px-4 py-2 rounded-lg bg-blue-700 hover:bg-blue-600 text-white text-xs font-bold shrink-0 flex items-center gap-1.5 transition shadow-sm"
                 >
                   <span>構造・技術エビデンスを詳しく読む</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -530,28 +530,28 @@ export default function SaishinLpPage({ onNavigate }) {
             {/* -------------------------------------------------------------
                 ③ 暮らしのゆとり：つかず離れず、自然と調和する大人の空間
             ------------------------------------------------------------- */}
-            <div className="p-8 sm:p-10 rounded-3xl bg-stone-800/80 border border-stone-700 shadow-xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold mb-4">
-                <Compass className="w-4 h-4" />
+            <div className="p-8 sm:p-10 rounded-3xl bg-white border border-stone-200/90 shadow-md text-stone-900">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold mb-4">
+                <Compass className="w-4 h-4 text-amber-600" />
                 <span>コア・バリュー 03 ｜ 心地よい距離感</span>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-bold mb-4 leading-snug">
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-stone-900 mb-4 leading-snug">
                 【夫婦の程よい距離感】<br />
                 1階だけで快適に完結する「平屋感覚」。お互いの時間を尊重しながら、温もりを感じ合える間取り
               </h3>
-              <p className="text-stone-300 text-sm sm:text-base leading-relaxed max-w-3xl mb-6">
-                夫婦であっても、就寝時間や読書・テレビの趣味は異なります。それぞれのプライベート時間を尊重できるよう、1階に<strong className="text-amber-300">独立した2つの寝室</strong>を配置しました。階段を使わずにワンフロアですべてが完結します。
+              <p className="text-stone-700 text-sm sm:text-base leading-relaxed max-w-3xl mb-6">
+                夫婦であっても、就寝時間や読書・テレビの趣味は異なります。それぞれのプライベート時間を尊重できるよう、1階に<strong className="text-amber-800 font-bold">独立した2つの寝室</strong>を配置しました。階段を使わずにワンフロアですべてが完結します。
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-stone-300">
-                <div className="p-5 rounded-2xl bg-stone-900/80 border border-stone-700">
-                  <div className="font-bold text-white text-base mb-2">気配を感じる絶妙な距離感</div>
-                  <p className="text-xs leading-relaxed text-stone-400">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-stone-800">
+                <div className="p-5 rounded-2xl bg-[#faf8f5] border border-stone-200">
+                  <div className="font-bold text-stone-900 text-base mb-2">気配を感じる絶妙な距離感</div>
+                  <p className="text-xs leading-relaxed text-stone-600">
                     リビングと廊下を挟んで適度な距離を保ちながら、物音や明かりでお互いの安心感を確認できる設計。足腰に負担のない平屋感覚で、一生快適に過ごせます。
                   </p>
                 </div>
-                <div className="p-5 rounded-2xl bg-stone-900/80 border border-stone-700">
-                  <div className="font-bold text-white text-base mb-2">美味しい空気を吸いながらの散歩が日課に</div>
-                  <p className="text-xs leading-relaxed text-stone-400">
+                <div className="p-5 rounded-2xl bg-[#faf8f5] border border-stone-200">
+                  <div className="font-bold text-stone-900 text-base mb-2">美味しい空気を吸いながらの散歩が日課に</div>
+                  <p className="text-xs leading-relaxed text-stone-600">
                     南東・南西角地で窓を開ければ澄んだ空気と見晴らしの良い景色。排気ガスや騒音のない閑静な住宅街での朝夕の散歩が、お二人の健康的な新しい習慣になります。
                   </p>
                 </div>
@@ -564,100 +564,100 @@ export default function SaishinLpPage({ onNavigate }) {
       {/* =========================================================================
           理屈での正当化：新築建売 vs 本物件 徹底比較表（感情の後に頭で納得）
       ========================================================================= */}
-      <section className="py-20 bg-stone-950 text-white border-t border-stone-800">
+      <section className="py-20 bg-[#f0ebe3] text-stone-900 border-t border-stone-200">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
-            <span className="text-xs font-bold text-amber-400 tracking-widest uppercase bg-amber-950 px-3 py-1 rounded-full border border-amber-800">
+            <span className="text-xs font-bold text-amber-800 tracking-widest uppercase bg-amber-100 px-3.5 py-1 rounded-full border border-amber-300">
               LOGICAL COMPARISON
             </span>
-            <h2 className="text-2xl sm:text-4xl font-black mt-3 leading-snug">
+            <h2 className="text-2xl sm:text-4xl font-extrabold mt-3 leading-snug text-stone-900">
               「どちらが、これからの人生に賢い選択ですか？」<br />
-              <span className="text-stone-400 text-base sm:text-xl font-normal">
+              <span className="text-stone-600 text-base sm:text-xl font-normal">
                 近隣新築建売住宅と本物件の冷徹なコスト・性能比較
               </span>
             </h2>
-            <p className="text-stone-400 text-xs sm:text-sm mt-3 max-w-2xl mx-auto">
-              人間は感情で欲しくなり、最後に理屈（数字）で納得します。50代〜70代のご夫婦にとってどちらがリスクが少ないか、事実を整理しました。
+            <p className="text-stone-600 text-xs sm:text-sm mt-3 max-w-2xl mx-auto">
+              人は感情で欲しくなり、最後に理屈（数字）で納得します。50代〜70代のご夫婦にとってどちらがリスクが少ないか、客観的な事実を整理しました。
             </p>
           </div>
 
           {/* 比較テーブル */}
-          <div className="bg-stone-900 rounded-3xl border border-stone-800 shadow-2xl overflow-hidden">
+          <div className="bg-white rounded-3xl border border-stone-300 shadow-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs sm:text-sm border-collapse">
                 <thead>
-                  <tr className="border-b border-stone-800 bg-stone-950/70">
-                    <th className="p-4 sm:p-5 font-bold text-stone-400 w-1/4">比較項目</th>
-                    <th className="p-4 sm:p-5 font-bold text-stone-400 w-1/3">近隣の新築建売住宅</th>
-                    <th className="p-4 sm:p-5 font-bold text-amber-300 bg-amber-500/10 w-5/12 border-l border-amber-500/30">
+                  <tr className="border-b border-stone-200 bg-stone-100/90 text-stone-800">
+                    <th className="p-4 sm:p-5 font-bold text-stone-600 w-1/4">比較項目</th>
+                    <th className="p-4 sm:p-5 font-bold text-stone-600 w-1/3">近隣の新築建売住宅</th>
+                    <th className="p-4 sm:p-5 font-extrabold text-amber-900 bg-amber-50/80 w-5/12 border-l border-amber-300">
                       再進の家（2,180万フルリノベ）
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-800 text-stone-300">
-                  <tr className="hover:bg-stone-800/40 transition">
-                    <td className="p-4 sm:p-5 font-bold text-white bg-stone-950/30">購入価格（初期費用）</td>
-                    <td className="p-4 sm:p-5 text-stone-400">3,000万円超〜3,500万円</td>
-                    <td className="p-4 sm:p-5 font-bold text-amber-300 bg-amber-500/5 border-l border-amber-500/30">
-                      <div className="text-base sm:text-lg text-amber-400 font-black">2,180 万円（税込）</div>
-                      <div className="text-[11px] text-emerald-400 mt-0.5">約820万〜1,320万円を老後資金・趣味・旅行へ</div>
+                <tbody className="divide-y divide-stone-200 text-stone-700">
+                  <tr className="hover:bg-stone-50 transition">
+                    <td className="p-4 sm:p-5 font-bold text-stone-900 bg-stone-50/80">購入価格（初期費用）</td>
+                    <td className="p-4 sm:p-5 text-stone-600">3,000万円超〜3,500万円</td>
+                    <td className="p-4 sm:p-5 font-bold text-amber-900 bg-amber-50/40 border-l border-amber-200">
+                      <div className="text-base sm:text-lg text-amber-700 font-black">2,180 万円（税込）</div>
+                      <div className="text-[11px] text-emerald-700 font-bold mt-0.5">約820万〜1,320万円を老後資金・趣味・旅行へ</div>
                     </td>
                   </tr>
 
-                  <tr className="hover:bg-stone-800/40 transition">
-                    <td className="p-4 sm:p-5 font-bold text-white bg-stone-950/30">断熱性能（冬の暖かさ）</td>
-                    <td className="p-4 sm:p-5 text-stone-400">
+                  <tr className="hover:bg-stone-50 transition">
+                    <td className="p-4 sm:p-5 font-bold text-stone-900 bg-stone-50/80">断熱性能（冬の暖かさ）</td>
+                    <td className="p-4 sm:p-5 text-stone-600">
                       一般省エネ基準（等級4〜5程度）<br />
-                      <span className="text-[11px] text-stone-500">※冬の朝は10℃前後まで下がり寒い</span>
+                      <span className="text-[11px] text-stone-400">※冬の朝は10℃前後まで下がり寒い</span>
                     </td>
-                    <td className="p-4 sm:p-5 font-bold text-emerald-300 bg-amber-500/5 border-l border-amber-500/30">
-                      <div className="text-base sm:text-lg text-emerald-400 font-black">HEAT20 G2超（新築以上）</div>
-                      <div className="text-[11px] text-stone-300 mt-0.5">真冬の未明も無暖房15℃キープ・ヒートショック予防</div>
+                    <td className="p-4 sm:p-5 font-bold text-emerald-900 bg-amber-50/40 border-l border-amber-200">
+                      <div className="text-base sm:text-lg text-emerald-700 font-black">HEAT20 G2超（新築以上）</div>
+                      <div className="text-[11px] text-stone-600 mt-0.5">真冬の未明も無暖房15℃キープ・ヒートショック予防</div>
                     </td>
                   </tr>
 
-                  <tr className="hover:bg-stone-800/40 transition">
-                    <td className="p-4 sm:p-5 font-bold text-white bg-stone-950/30">毎月の光熱費（電気代）</td>
-                    <td className="p-4 sm:p-5 text-stone-400">
+                  <tr className="hover:bg-stone-50 transition">
+                    <td className="p-4 sm:p-5 font-bold text-stone-900 bg-stone-50/80">毎月の光熱費（電気代）</td>
+                    <td className="p-4 sm:p-5 text-stone-600">
                       電気代高騰の影響を直撃<br />
-                      <span className="text-[11px] text-stone-500">※太陽光なし、または小容量が多い</span>
+                      <span className="text-[11px] text-stone-400">※太陽光なし、または小容量が多い</span>
                     </td>
-                    <td className="p-4 sm:p-5 font-bold text-amber-300 bg-amber-500/5 border-l border-amber-500/30">
-                      <div className="text-base sm:text-lg text-amber-400 font-black">Qセルズ 8.0kW搭載</div>
-                      <div className="text-[11px] text-stone-300 mt-0.5">年間8,789kWh発電・自家消費＆売電で固定費極小化</div>
+                    <td className="p-4 sm:p-5 font-bold text-amber-900 bg-amber-50/40 border-l border-amber-200">
+                      <div className="text-base sm:text-lg text-amber-700 font-black">Qセルズ 8.0kW搭載</div>
+                      <div className="text-[11px] text-stone-600 mt-0.5">年間8,789kWh発電・自家消費＆売電で固定費極小化</div>
                     </td>
                   </tr>
 
-                  <tr className="hover:bg-stone-800/40 transition">
-                    <td className="p-4 sm:p-5 font-bold text-white bg-stone-950/30">毎年の固定資産税</td>
-                    <td className="p-4 sm:p-5 text-stone-400">
+                  <tr className="hover:bg-stone-50 transition">
+                    <td className="p-4 sm:p-5 font-bold text-stone-900 bg-stone-50/80">毎年の固定資産税</td>
+                    <td className="p-4 sm:p-5 text-stone-600">
                       新築建物評価のため高額<br />
-                      <span className="text-[11px] text-stone-500">※毎年10万〜15万円前後の税負担</span>
+                      <span className="text-[11px] text-stone-400">※毎年10万〜15万円前後の税負担</span>
                     </td>
-                    <td className="p-4 sm:p-5 font-bold text-emerald-300 bg-amber-500/5 border-l border-amber-500/30">
-                      <div className="text-base sm:text-lg text-emerald-400 font-black">建物評価ほぼ0で大幅節税</div>
-                      <div className="text-[11px] text-stone-300 mt-0.5">築25年超の骨組み活用で毎年の税金負担が極小</div>
-                    </td>
-                  </tr>
-
-                  <tr className="hover:bg-stone-800/40 transition">
-                    <td className="p-4 sm:p-5 font-bold text-white bg-stone-950/30">配管・電気配線インフラ</td>
-                    <td className="p-4 sm:p-5 text-stone-400">新築のため新品</td>
-                    <td className="p-4 sm:p-5 font-bold text-white bg-amber-500/5 border-l border-amber-500/30">
-                      <div className="text-base sm:text-lg text-white font-black">目に見えない配管・配線 全新品</div>
-                      <div className="text-[11px] text-stone-300 mt-0.5">表面だけのリフォームではない。突発的な修繕リスク0</div>
+                    <td className="p-4 sm:p-5 font-bold text-emerald-900 bg-amber-50/40 border-l border-amber-200">
+                      <div className="text-base sm:text-lg text-emerald-700 font-black">建物評価ほぼ0で大幅節税</div>
+                      <div className="text-[11px] text-stone-600 mt-0.5">築25年超の骨組み活用で毎年の税金負担が極小</div>
                     </td>
                   </tr>
 
-                  <tr className="hover:bg-stone-800/40 transition">
-                    <td className="p-4 sm:p-5 font-bold text-white bg-stone-950/30">住み替え・仮住まいの負担</td>
-                    <td className="p-4 sm:p-5 text-stone-400">
+                  <tr className="hover:bg-stone-50 transition">
+                    <td className="p-4 sm:p-5 font-bold text-stone-900 bg-stone-50/80">配管・電気配線インフラ</td>
+                    <td className="p-4 sm:p-5 text-stone-600">新築のため新品</td>
+                    <td className="p-4 sm:p-5 font-bold text-stone-900 bg-amber-50/40 border-l border-amber-200">
+                      <div className="text-base sm:text-lg text-stone-900 font-black">目に見えない配管・配線 全新品</div>
+                      <div className="text-[11px] text-stone-600 mt-0.5">表面だけのリフォームではない。突発的な修繕リスク0</div>
+                    </td>
+                  </tr>
+
+                  <tr className="hover:bg-stone-50 transition">
+                    <td className="p-4 sm:p-5 font-bold text-stone-900 bg-stone-50/80">住み替え・仮住まいの負担</td>
+                    <td className="p-4 sm:p-5 text-stone-600">
                       建売会社は「今の家の売却」に無関心<br />
-                      <span className="text-[11px] text-stone-500">※リフォームの場合は仮住まい＋2回引越しが必須</span>
+                      <span className="text-[11px] text-stone-400">※リフォームの場合は仮住まい＋2回引越しが必須</span>
                     </td>
-                    <td className="p-4 sm:p-5 font-bold text-emerald-300 bg-amber-500/5 border-l border-amber-500/30">
-                      <div className="text-base sm:text-lg text-emerald-400 font-black">引越し1回のみ ＋ 自宅売却支援</div>
-                      <div className="text-[11px] text-stone-300 mt-0.5">完成済み即入居・自社不動産部門が自宅売却・買取を窓口代行</div>
+                    <td className="p-4 sm:p-5 font-bold text-emerald-900 bg-amber-50/40 border-l border-amber-200">
+                      <div className="text-base sm:text-lg text-emerald-700 font-black">引越し1回のみ ＋ 自宅売却支援</div>
+                      <div className="text-[11px] text-stone-600 mt-0.5">完成済み即入居・自社不動産部門が自宅売却・買取を窓口代行</div>
                     </td>
                   </tr>
                 </tbody>
@@ -670,35 +670,35 @@ export default function SaishinLpPage({ onNavigate }) {
       {/* =========================================================================
           新強み：仮住まい不要 ＆ 自宅売却・買取ワンストップサポート
       ========================================================================= */}
-      <section className="py-20 bg-stone-900 text-white border-t border-stone-800">
+      <section className="py-20 bg-[#faf8f5] text-stone-900 border-t border-stone-200">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="bg-gradient-to-br from-stone-850 via-stone-900 to-amber-950/30 p-8 sm:p-12 rounded-3xl border border-amber-500/30 shadow-2xl">
+          <div className="bg-gradient-to-br from-white via-amber-50/40 to-emerald-50/30 p-8 sm:p-12 rounded-3xl border border-amber-300 shadow-xl">
             <div className="flex flex-col lg:flex-row items-center gap-8">
               <div className="lg:w-7/12 space-y-4">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold">
-                  <HeartHandshake className="w-3.5 h-3.5" />
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-bold">
+                  <HeartHandshake className="w-3.5 h-3.5 text-emerald-700" />
                   <span>50代〜70代に選ばれる最大の理由</span>
                 </span>
 
-                <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight">
+                <h3 className="text-2xl sm:text-3xl font-black text-stone-900 leading-tight">
                   「今の家の建て替えやリフォームで、<br />
-                  <span className="text-amber-300">仮住まい探しや2回の引っ越し</span>に苦しむのは、もうやめませんか？」
+                  <span className="text-amber-800">仮住まい探しや2回の引っ越し</span>に苦しむのは、もうやめませんか？」
                 </h3>
 
-                <p className="text-stone-300 text-xs sm:text-sm leading-relaxed">
-                  50代以上のご夫婦が今の家の寒さや老朽化を感じながらも住み替えをためらう最大の理由は、<strong className="text-white">「仮住まい探しの面倒」「大量の荷物を抱えた2回の引っ越しによる体力・気力の限界」「無駄な仮住まい費用」</strong>です。
+                <p className="text-stone-700 text-xs sm:text-sm leading-relaxed">
+                  50代以上のご夫婦が今の家の寒さや老朽化を感じながらも住み替えをためらう最大の理由は、<strong className="text-stone-900">「仮住まい探しの面倒」「大量の荷物を抱えた2回の引っ越しによる体力・気力の限界」「無駄な仮住まい費用」</strong>です。
                 </p>
 
-                <p className="text-stone-300 text-xs sm:text-sm leading-relaxed">
-                  本物件はすでにフルリノベーションが完成しているため、<strong className="text-emerald-300 font-bold">カギを受け取って今の家から1回引っ越すだけ</strong>。仮住まいの心労も無駄な敷金・賃料も一切かかりません。
+                <p className="text-stone-700 text-xs sm:text-sm leading-relaxed">
+                  本物件はすでにフルリノベーションが完成しているため、<strong className="text-emerald-800 font-bold">カギを受け取って今の家から1回引っ越すだけ</strong>。仮住まいの心労も無駄な敷金・賃料も一切かかりません。
                 </p>
 
-                <div className="p-4 rounded-2xl bg-stone-950/70 border border-stone-700 text-xs space-y-2">
-                  <div className="font-bold text-amber-300 flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <div className="p-4 rounded-2xl bg-white border border-stone-200 text-xs space-y-2 shadow-sm">
+                  <div className="font-bold text-amber-900 flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                     <span>不動産事業（スマイチ不動産）直営だからできる「自宅売却・買取ワンストップサポート」</span>
                   </div>
-                  <p className="text-stone-400 pl-6 leading-relaxed">
+                  <p className="text-stone-600 pl-6 leading-relaxed">
                     「今の家がいくらで売れるか分からない」「売れる前に新しい家を買って大丈夫か」という不安もすべてお任せください。当社が窓口ひとつで現在のご自宅の無料査定・仲介売却・買取相談までトータルでお手伝いいたします。二重ローンの心配なく、新築以上の暖かい暮らしへスムーズにお引越しいただけます。
                   </p>
                 </div>
@@ -706,18 +706,18 @@ export default function SaishinLpPage({ onNavigate }) {
 
               {/* ビジュアルカード */}
               <div className="lg:w-5/12 w-full space-y-3">
-                <div className="bg-stone-950 p-5 rounded-2xl border border-stone-800 text-center">
-                  <div className="text-xs font-bold text-stone-400 mb-1">一般のリフォーム・建て替えの場合</div>
-                  <div className="text-red-400 font-bold text-sm">仮住まい探し ＋ 引越し2回 ＋ 家賃負担</div>
+                <div className="bg-stone-100 p-5 rounded-2xl border border-stone-200 text-center">
+                  <div className="text-xs font-bold text-stone-500 mb-1">一般のリフォーム・建て替えの場合</div>
+                  <div className="text-red-600 font-bold text-sm">仮住まい探し ＋ 引越し2回 ＋ 家賃負担</div>
                   <div className="text-[11px] text-stone-500 mt-1">「体力的に無理」「気力が持たない」と挫折</div>
                 </div>
 
-                <div className="text-center font-bold text-amber-400 text-lg">▼ 「再進の家」なら</div>
+                <div className="text-center font-bold text-amber-700 text-lg">▼ 「再進の家」なら</div>
 
-                <div className="bg-gradient-to-r from-amber-500/20 to-emerald-500/20 p-5 rounded-2xl border border-amber-500/40 text-center">
-                  <div className="text-xs font-bold text-amber-300 mb-1">完成済み ＆ 自社不動産直営サポート</div>
-                  <div className="text-emerald-300 font-black text-base sm:text-lg">カギ受取 → 引越し1回だけで即完了！</div>
-                  <div className="text-[11px] text-stone-300 mt-2">
+                <div className="bg-gradient-to-r from-amber-100/80 to-emerald-100/80 p-5 rounded-2xl border border-emerald-300 text-center shadow-sm">
+                  <div className="text-xs font-bold text-amber-900 mb-1">完成済み ＆ 自社不動産直営サポート</div>
+                  <div className="text-emerald-900 font-black text-base sm:text-lg">カギ受取 → 引越し1回だけで即完了！</div>
+                  <div className="text-[11px] text-stone-700 mt-2">
                     現在の持ち家売却査定・買取まで窓口一本化。<br />
                     面倒な手続きと不安をゼロにします。
                   </div>
@@ -731,39 +731,39 @@ export default function SaishinLpPage({ onNavigate }) {
       {/* =========================================================================
           4. 3D間取り図 ＆ WEBバーチャル内覧ツアー（24時間体感）
       ========================================================================= */}
-      <section id="virtual-tour" className="py-20 bg-stone-950 text-white border-t border-b border-stone-800">
+      <section id="virtual-tour" className="py-20 bg-white text-stone-900 border-t border-b border-stone-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold mb-3 border border-amber-500/30">
-              <Compass className="w-4 h-4 text-amber-400" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-bold mb-3 border border-amber-200">
+              <Compass className="w-4 h-4 text-amber-600" />
               <span>3D間取りパース ＆ 360°WEBバーチャル内覧</span>
             </div>
-            <h2 className="text-2xl sm:text-4xl font-black">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-stone-900">
               立体間取りで全体を把握し、360度で中を歩く
             </h2>
-            <p className="text-stone-400 text-xs sm:text-sm mt-3 max-w-2xl mx-auto">
+            <p className="text-stone-600 text-xs sm:text-sm mt-3 max-w-2xl mx-auto">
               営業マンへの気兼ねは一切不要です。3Dパースで夫婦別室の絶妙な距離感を確かめながら、全天球パノラマですべての部屋を自由にご見学いただけます。
             </p>
           </div>
 
           {/* 3D間取り図ビューワー */}
-          <div className="mb-12 bg-stone-900 rounded-3xl p-6 sm:p-8 border border-stone-800 shadow-2xl">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 pb-4 border-b border-stone-800">
+          <div className="mb-12 bg-[#faf8f5] rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-md">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 pb-4 border-b border-stone-200">
               <div>
-                <span className="text-xs font-bold text-amber-400 uppercase tracking-widest">3D FLOOR PLAN</span>
-                <h3 className="text-lg sm:text-xl font-bold text-white mt-1">
+                <span className="text-xs font-bold text-amber-700 uppercase tracking-widest">3D FLOOR PLAN</span>
+                <h3 className="text-lg sm:text-xl font-bold text-stone-900 mt-1">
                   {activePlanFloor === '1f' ? '1階 3D立体間取り図（LDK・夫婦別寝室・水回り）' : '2階 3D立体間取り図（吹き抜け・大容量フリースペース）'}
                 </h3>
               </div>
 
               {/* 1F / 2F 切り替えタブ */}
-              <div className="flex p-1 bg-stone-950 rounded-xl border border-stone-800">
+              <div className="flex p-1 bg-stone-100 rounded-xl border border-stone-200">
                 <button
                   onClick={() => setActivePlanFloor('1f')}
                   className={`px-5 py-2 rounded-lg text-xs font-bold transition ${
                     activePlanFloor === '1f'
-                      ? 'bg-amber-500 text-stone-950 shadow-md'
-                      : 'text-stone-400 hover:text-white'
+                      ? 'bg-amber-600 text-white shadow-sm'
+                      : 'text-stone-600 hover:text-stone-900'
                   }`}
                 >
                   1階 平面3D（メイン居住空間）
@@ -772,8 +772,8 @@ export default function SaishinLpPage({ onNavigate }) {
                   onClick={() => setActivePlanFloor('2f')}
                   className={`px-5 py-2 rounded-lg text-xs font-bold transition ${
                     activePlanFloor === '2f'
-                      ? 'bg-amber-500 text-stone-950 shadow-md'
-                      : 'text-stone-400 hover:text-white'
+                      ? 'bg-amber-600 text-white shadow-sm'
+                      : 'text-stone-600 hover:text-stone-900'
                   }`}
                 >
                   2階 平面3D（趣味・収納・吹き抜け）
@@ -782,29 +782,29 @@ export default function SaishinLpPage({ onNavigate }) {
             </div>
 
             {/* 3D間取り図画像表示 */}
-            <div className="relative rounded-2xl overflow-hidden border border-stone-800 bg-stone-950 flex items-center justify-center">
+            <div className="relative rounded-2xl overflow-hidden border border-stone-200 bg-white flex items-center justify-center">
               <img
                 src={activePlanFloor === '1f' ? '/assets/saishin/plans/3d_plan_1f.jpg' : '/assets/saishin/plans/3d_plan_2f.jpg'}
                 alt={activePlanFloor === '1f' ? '1階 3D立体間取り図' : '2階 3D立体間取り図'}
                 className="w-full max-h-[550px] object-contain transition-all duration-300"
               />
-              <div className="absolute bottom-3 right-3 bg-stone-900/80 backdrop-blur-md px-3 py-1 rounded-full text-stone-300 text-xs border border-white/10">
+              <div className="absolute bottom-3 right-3 bg-stone-900/80 backdrop-blur-md px-3 py-1 rounded-full text-white text-xs">
                 {activePlanFloor === '1f' ? '延床面積 77.01㎡（約23.29坪）' : '延床面積 28.89㎡（約8.74坪）'}
               </div>
             </div>
 
             {/* 間取りの設計解説 */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4 text-xs text-stone-300">
-              <div className="p-3 bg-stone-950/60 rounded-xl border border-stone-800">
-                <span className="font-bold text-amber-400 block mb-0.5">① 夫婦独立の2寝室（1階）</span>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4 text-xs text-stone-700">
+              <div className="p-3 bg-white rounded-xl border border-stone-200 shadow-sm">
+                <span className="font-bold text-amber-800 block mb-0.5">① 夫婦独立の2寝室（1階）</span>
                 お互いの睡眠を邪魔せず、気配を感じられる絶妙なレイアウト。
               </div>
-              <div className="p-3 bg-stone-950/60 rounded-xl border border-stone-800">
-                <span className="font-bold text-amber-400 block mb-0.5">② 吹き抜け＆高窓LDK</span>
+              <div className="p-3 bg-white rounded-xl border border-stone-200 shadow-sm">
+                <span className="font-bold text-amber-800 block mb-0.5">② 吹き抜け＆高窓LDK</span>
                 杉板天井とシーリングファン。冬も日差しが奥まで届くパノラマ空間。
               </div>
-              <div className="p-3 bg-stone-950/60 rounded-xl border border-stone-800">
-                <span className="font-bold text-amber-400 block mb-0.5">③ 2階は大型多目的スペース</span>
+              <div className="p-3 bg-white rounded-xl border border-stone-200 shadow-sm">
+                <span className="font-bold text-amber-800 block mb-0.5">③ 2階は大型多目的スペース</span>
                 趣味部屋、季節物の大容量収納、来客用スペースとして自在に活用。
               </div>
             </div>
@@ -818,12 +818,12 @@ export default function SaishinLpPage({ onNavigate }) {
           <div className="text-center">
             <button
               onClick={() => setModalType('tour')}
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-sm font-bold bg-amber-500 hover:bg-amber-400 text-stone-950 shadow-xl shadow-amber-500/20 transition"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-sm font-bold bg-amber-600 hover:bg-amber-500 text-white shadow-lg shadow-amber-600/20 transition"
             >
-              <Calendar className="w-4 h-4" />
+              <Calendar className="w-4 h-4 text-white" />
               <span>実際に現地を体感する（プライベート見学予約）</span>
             </button>
-            <p className="text-xs text-stone-400 mt-2">
+            <p className="text-xs text-stone-500 mt-2">
               ※1日1組限定。エアコン1台で家全体が暖かい感動をぜひ現地でお確かめください。
             </p>
           </div>
@@ -1175,44 +1175,44 @@ export default function SaishinLpPage({ onNavigate }) {
       {/* =========================================================================
           7. 開発者・設計者の声（人間関係を売る開発ストーリー）
       ========================================================================= */}
-      <section className="py-20 bg-stone-900 text-white border-b border-stone-800">
+      <section className="py-20 bg-[#fcfaf7] text-stone-900 border-b border-stone-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-10">
-            <span className="text-xs font-bold text-amber-400 tracking-widest uppercase bg-amber-950 px-3 py-1 rounded-full border border-amber-800">
+            <span className="text-xs font-bold text-amber-800 tracking-widest uppercase bg-amber-100/90 px-3.5 py-1 rounded-full border border-amber-300">
               DEVELOPER'S HEART
             </span>
-            <h2 className="text-2xl sm:text-4xl font-black mt-3">
+            <h2 className="text-2xl sm:text-4xl font-black mt-3 text-stone-900">
               「なぜ、私たちはこの家をつくったのか？」
             </h2>
-            <p className="text-stone-400 text-xs sm:text-sm mt-2">
+            <p className="text-stone-600 text-xs sm:text-sm mt-2 font-medium">
               一生懸命働いて子育てを終えられたご夫婦へ、大工と建築士がどうしても伝えたかった想い
             </p>
           </div>
 
-          <div className="p-8 sm:p-10 rounded-3xl bg-stone-800/80 border border-stone-700 shadow-xl space-y-6 text-sm sm:text-base leading-relaxed text-stone-300">
-            <p className="font-bold text-white text-base sm:text-lg">
+          <div className="p-8 sm:p-10 rounded-3xl bg-white border border-stone-200 shadow-xl space-y-6 text-sm sm:text-base leading-relaxed text-stone-700">
+            <p className="font-bold text-stone-900 text-base sm:text-lg leading-snug">
               「子育てを終え、これからの人生をご夫婦お二人で穏やかに楽しみたい――。<br className="hidden sm:inline" />
               そんな大切なお客様が、3,000万円以上もする新築建売を買って高額なローンに怯えたり、冬の寒さで体を壊したりする姿を、私たちはどうしても見たくありませんでした。」
             </p>
             <p>
-              だからこそ、あえて建物評価額が低く固定資産税の負担が極めて少ない『築25年超の良質な優良骨組み』を厳選。無駄な購入コストを極限まで削り、浮いた予算のすべてを<strong className="text-amber-300">『真冬でも靴下がいらない、HEAT20 G2超の極暖断熱』</strong>と、<strong className="text-amber-300">『電気代高騰を相殺するQセルズ8.0kW太陽光発電』</strong>、そして<strong className="text-amber-300">『見えない配管・電気配線の完全新品交換』</strong>に注ぎ込みました。
+              だからこそ、あえて建物評価額が低く固定資産税の負担が極めて少ない『築25年超の良質な優良骨組み』を厳選。無駄な購入コストを極限まで削り、浮いた予算のすべてを<strong className="text-amber-900 font-bold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">『真冬でも靴下がいらない、HEAT20 G2超の極暖断熱』</strong>と、<strong className="text-amber-900 font-bold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">『電気代高騰を相殺するQセルズ8.0kW太陽光発電』</strong>、そして<strong className="text-amber-900 font-bold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">『見えない配管・電気配線の完全新品交換』</strong>に注ぎ込みました。
             </p>
             <p>
               子ども部屋のための広いだけの家はいりません。さらに、今の家の建て替えに伴う『仮住まい探し』や『2回の過酷な引越し』という心労を完全になくし、カギを受け取って引越し1回だけで新しい生活がスタートできる安心の体制を整えました。
             </p>
-            <p className="text-amber-200 font-medium">
+            <p className="text-amber-900 font-semibold bg-amber-50/70 p-4 rounded-2xl border border-amber-200">
               ご夫婦2人が健康で、お金の心配なく、一生安心して笑って暮らせる『人生後半の最高の拠点』をお届けしたい――それが私たちの唯一の願いです。
             </p>
-            <div className="pt-4 border-t border-stone-700 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-xs text-stone-400">
+            <div className="pt-4 border-t border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-xs text-stone-500 font-medium">
                 株式会社 住ま居る / すまいる設計（建築士・熟練大工 施工チーム）
               </div>
               <button
                 onClick={() => onNavigate ? onNavigate('saishin-tech') : (window.location.href = '/saishin/technology')}
-                className="text-amber-400 hover:text-amber-300 text-xs font-bold flex items-center gap-1 transition"
+                className="text-amber-800 hover:text-amber-900 text-xs font-bold flex items-center gap-1 transition group"
               >
-                <span>詳しい構造計算と再生工程コラムを読む</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span className="group-hover:underline">詳しい構造計算と再生工程コラムを読む</span>
+                <ArrowRight className="w-3.5 h-3.5 text-amber-700 group-hover:translate-x-0.5 transition-transform" />
               </button>
             </div>
           </div>
@@ -1222,36 +1222,36 @@ export default function SaishinLpPage({ onNavigate }) {
       {/* =========================================================================
           8. クロージング（段階式オファー：心理的ハードルの低い手挙げの誘導）
       ========================================================================= */}
-      <section className="py-20 bg-stone-950 text-white text-center relative overflow-hidden">
+      <section className="py-20 bg-[#2b2725] text-white text-center relative overflow-hidden">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
-          <span className="text-xs font-bold text-amber-400 tracking-widest uppercase bg-amber-950/80 border border-amber-500/30 px-3 py-1 rounded-full inline-block mb-3">
+          <span className="text-xs font-bold text-amber-300 tracking-widest uppercase bg-amber-950/80 border border-amber-500/40 px-3.5 py-1 rounded-full inline-block mb-3">
             STEP-BY-STEP OFFERS
           </span>
-          <h2 className="text-2xl sm:text-4xl font-black mb-4">
+          <h2 className="text-2xl sm:text-4xl font-black mb-4 text-white">
             「賢いセカンドライフ」を一歩踏み出したいご夫婦へ。<br />
             無理のない2つの安心ステップ
           </h2>
-          <p className="text-stone-400 text-xs sm:text-base max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-stone-300 text-xs sm:text-base max-w-2xl mx-auto mb-10 leading-relaxed">
             強引な売り込みや突然の訪問営業は一切いたしません。まずは無料ガイドブックでゆっくりご検討いただくか、現地でエアコン1台の暖かさをご体感ください。
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left max-w-3xl mx-auto mb-12">
             {/* オファー1：無料ガイドブック */}
-            <div className="p-6 sm:p-8 rounded-3xl bg-stone-900 border border-stone-800 shadow-xl flex flex-col justify-between">
+            <div className="p-6 sm:p-8 rounded-3xl bg-[#383330] border border-stone-600 shadow-xl flex flex-col justify-between">
               <div>
-                <span className="text-[11px] font-bold text-stone-400 bg-stone-800 px-2.5 py-1 rounded-full">
+                <span className="text-[11px] font-bold text-stone-300 bg-stone-700/80 px-2.5 py-1 rounded-full">
                   オファー 01（Web/PDF・無料）
                 </span>
                 <h3 className="text-base sm:text-lg font-bold text-white mt-3 mb-2 leading-snug">
                   『50代〜70代のための失敗しない家選び：老後資金を守り、夫婦で健康に暮らす高断熱リノベの秘密』
                 </h3>
-                <p className="text-xs text-stone-400 leading-relaxed mb-6">
+                <p className="text-xs text-stone-300 leading-relaxed mb-6">
                   新築建売との生涯コスト比較データ、Qセルズ年間8,789kWh発電シミュレーション根拠、見えない配管施工写真、自宅売却の進め方をまとめた特製小冊子を進呈。
                 </p>
               </div>
               <button
                 onClick={() => setModalType('doc')}
-                className="w-full py-3.5 rounded-xl font-bold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition flex items-center justify-center gap-2 text-xs sm:text-sm"
+                className="w-full py-3.5 rounded-xl font-bold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition flex items-center justify-center gap-2 text-xs sm:text-sm shadow"
               >
                 <FileText className="w-4 h-4 text-amber-300" />
                 <span>無料ガイドブックを請求する（即時）</span>
@@ -1259,22 +1259,22 @@ export default function SaishinLpPage({ onNavigate }) {
             </div>
 
             {/* オファー2：現地体感会 */}
-            <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-stone-900 to-amber-950/40 border border-amber-500/30 shadow-xl flex flex-col justify-between">
+            <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#383330] to-amber-950/60 border border-amber-500/50 shadow-xl flex flex-col justify-between">
               <div>
-                <span className="text-[11px] font-bold text-amber-300 bg-amber-500/20 px-2.5 py-1 rounded-full border border-amber-500/30">
+                <span className="text-[11px] font-bold text-amber-300 bg-amber-900/60 px-2.5 py-1 rounded-full border border-amber-500/40">
                   オファー 02（1日2組限定・完全予約制）
                 </span>
                 <h3 className="text-base sm:text-lg font-bold text-white mt-3 mb-2 leading-snug">
                   「エアコン1台で本当に家中暖かいの？」<br />
                   冬の快適体感 ＆ 光熱費試算会
                 </h3>
-                <p className="text-xs text-stone-300 leading-relaxed mb-6">
+                <p className="text-xs text-stone-200 leading-relaxed mb-6">
                   他の来場者を気にせず、エアコン1台で家じゅう暖かい空気感と静寂を現地体感。現在お住まいのご自宅の売却・買取査定のご相談も窓口ひとつで承ります。
                 </p>
               </div>
               <button
                 onClick={() => setModalType('tour')}
-                className="w-full py-3.5 rounded-xl font-bold bg-amber-500 hover:bg-amber-400 text-stone-950 shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-2 text-xs sm:text-sm"
+                className="w-full py-3.5 rounded-xl font-bold bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-stone-950 font-black shadow-lg shadow-amber-500/30 transition flex items-center justify-center gap-2 text-xs sm:text-sm"
               >
                 <Calendar className="w-4 h-4 text-stone-950" />
                 <span>体感会・光熱費試算会を予約する</span>
@@ -1287,17 +1287,17 @@ export default function SaishinLpPage({ onNavigate }) {
       {/* =========================================================================
           フッター
       ========================================================================= */}
-      <footer className="bg-stone-950 text-stone-400 py-12 border-t border-stone-800 text-xs">
+      <footer className="bg-[#1f1c1a] text-stone-400 py-12 border-t border-stone-800 text-xs">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center space-y-4">
           <div className="font-bold text-stone-200 text-sm">
             株式会社 住ま居る / すまいる設計
           </div>
-          <p className="text-stone-500 max-w-xl mx-auto leading-relaxed">
+          <p className="text-stone-400 max-w-xl mx-auto leading-relaxed">
             〒350-2224 埼玉県鶴ヶ島市町屋176番地5<br />
             建設業許可：埼玉県知事(般-8)第66822号 / 宅地建物取引業：埼玉県知事(3)第23725号<br />
             建築士事務所登録：埼玉県知事 第(5)10278号
           </p>
-          <div className="text-stone-600 text-[11px] pt-4 border-t border-stone-900">
+          <div className="text-stone-500 text-[11px] pt-4 border-t border-stone-800">
             © 2026 SMILE Co., Ltd. All Rights Reserved.
           </div>
         </div>

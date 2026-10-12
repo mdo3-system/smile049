@@ -83,9 +83,10 @@
 // - 2026/10/12 v0.1.87: 開発用ローカルポートを3000から5173（FIXED_LOGIC.md準拠）へ変更
 // - 2026/10/12 v0.1.88: 同一Wi-Fi/LAN内の別端末アクセスを許可するためViteにhost: trueを設定
 // - 2026/10/12 v0.1.89: 再進の家 総合案内LP（/saishin）のFV・見出し・コピーを生活実感とエモーショナルストーリーへ全面リライト
+// - 2026/10/12 v0.1.90: 再進の家 総合案内LP（/saishin）のデザインカラーを黒基調から温かみのあるアイボリー＆ウッド調へ全面刷新
 
-window.APP_VERSION = '0.1.89';
-export const APP_VERSION = '0.1.89';
+window.APP_VERSION = '0.1.90';
+export const APP_VERSION = '0.1.90';
 
 
 
