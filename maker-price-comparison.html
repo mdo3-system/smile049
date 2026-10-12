@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>【大手4社 vs スマイチ】ガレージ・倉庫 価格＆実質総額 徹底比較カタログ（A4印刷・商談用シート）</title>
+  <style>
+    /* リセット & 基本設計 */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+      color: #1e293b;
+      background: #f8fafc;
+      line-height: 1.45;
+      font-size: 11px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* 印刷コントロールバー（画面上部固定） */
+    .no-print-bar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+    .bar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .bar-title {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge-sub {
+      background: #2d6a4f;
+      color: #fff;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .bar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .filter-btn {
+      background: #334155;
+      color: #cbd5e1;
+      border: 1px solid #475569;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: #2d6a4f;
+      color: #ffffff;
+      border-color: #52b788;
+    }
+    .btn-print {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      border: none;
+      padding: 7px 18px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+      transition: transform 0.1s, background 0.2s;
+    }
+    .btn-print:hover {
+      transform: translateY(-1px);
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    }
+
+    /* 印刷用紙コンテナ */
+    .sheet-wrapper {
+      max-width: 1140px;
+      margin: 20px auto;
+      padding: 0 15px 40px;
+    }
+
+    .a4-page {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 24px 28px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      margin-bottom: 25px;
+      page-break-after: always;
+      position: relative;
+    }
+    .a4-page:last-child {
+      page-break-after: auto;
+      margin-bottom: 0;
+    }
+
+    /* ページヘッダー */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 2px solid #1b4332;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+    }
+    .page-header h2 {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .page-header .corp-info {
+      text-align: right;
+      font-size: 9.5px;
+      color: #64748b;
+      line-height: 1.35;
+    }
+    .page-header .corp-name {
+      font-weight: 700;
+      color: #1b4332;
+      font-size: 11px;
+    }
+
+    /* キーポイントサマリーボックス */
+    .summary-alert {
+      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      border: 1px solid #86efac;
+      border-left: 5px solid #16a34a;
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap: 12px;
+      font-size: 10px;
+    }
+    .alert-col h4 {
+      font-size: 11px;
+      color: #166534;
+      margin-bottom: 3px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 800;
+    }
+    .alert-col p {
+      color: #14532d;
+      line-height: 1.4;
+    }
+
+    /* 比較テーブル */
+    .comp-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin-bottom: 16px;
+    }
+    table.comp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10px;
+      line-height: 1.35;
+    }
+    table.comp-table th, table.comp-table td {
+      border: 1px solid #cbd5e1;
+      padding: 6px 8px;
+      text-align: left;
+      vertical-align: middle;
+    }
+    table.comp-table th {
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 700;
+      text-align: center;
+      font-size: 10px;
+      white-space: nowrap;
+    }
+    table.comp-table th.th-maker {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+    table.comp-table th.th-smaichi {
+      background: #1b4332;
+      color: #ffffff;
+      border-color: #1b4332;
+      font-weight: 800;
+    }
+    table.comp-table tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+    table.comp-table tr:hover td {
+      background: #f1f5f9;
+    }
+
+    /* 列ごとの装飾 */
+    .col-model {
+      font-weight: 700;
+      color: #0f172a;
+      white-space: nowrap;
+    }
+    .col-dim {
+      font-family: monospace, sans-serif;
+      font-size: 9.5px;
+      color: #334155;
+    }
+    .col-maker-price {
+      text-align: right;
+      font-weight: 700;
+      color: #0f172a;
+      white-space: nowrap;
+    }
+    .price-sub {
+      display: block;
+      font-size: 8.5px;
+      color: #64748b;
+      font-weight: normal;
+    }
+    .col-total-est {
+      text-align: right;
+      font-weight: 700;
+      color: #b91c1c;
+      background: #fff1f2 !important;
+      white-space: nowrap;
+    }
+    .col-smaichi-price {
+      text-align: right;
+      font-weight: 800;
+      color: #15803d;
+      background: #f0fdf4 !important;
+      border-left: 2px solid #22c55e !important;
+      border-right: 2px solid #22c55e !important;
+      white-space: nowrap;
+      font-size: 11px;
+    }
+    .smaichi-note {
+      display: block;
+      font-size: 8.5px;
+      color: #166534;
+      font-weight: normal;
+    }
+    .col-diff {
+      text-align: center;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .diff-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 9.5px;
+    }
+    .diff-cheap {
+      background: #dcfce7;
+      color: #15803d;
+    }
+    .diff-close {
+      background: #fef3c7;
+      color: #b45309;
+    }
+    .diff-appeal {
+      background: #e0e7ff;
+      color: #4338ca;
+    }
+
+    /* バッジ */
+    .tag {
+      display: inline-block;
+      font-size: 8.5px;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-weight: 600;
+      margin-right: 3px;
+    }
+    .tag-steel { background: #e2e8f0; color: #475569; }
+    .tag-heavy { background: #fee2e2; color: #991b1b; }
+    .tag-wood { background: #dcfce7; color: #166534; }
+    .tag-warning { background: #fef3c7; color: #92400e; }
+
+    /* セクション区切りバー */
+    .sec-subhead {
+      background: #334155;
+      color: #ffffff;
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 4px;
+      margin: 14px 0 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .sec-subhead .sub-note {
+      font-size: 9.5px;
+      font-weight: normal;
+      color: #cbd5e1;
+    }
+
+    /* フッター注釈 & プレゼン解説 */
+    .page-footer-memo {
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 9px;
+      color: #475569;
+      line-height: 1.45;
+    }
+    .page-footer-memo strong {
+      color: #0f172a;
+    }
+    .memo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    /* 印刷用CSS */
+    @media print {
+      @page {
+        size: A4 landscape; /* A4横向き */
+        margin: 8mm 10mm 8mm 10mm;
+      }
+      body {
+        background: #ffffff !important;
+        font-size: 9.5px;
+      }
+      .no-print-bar {
+        display: none !important;
+      }
+      .sheet-wrapper {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .a4-page {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        margin-bottom: 0 !important;
+        page-break-after: always;
+      }
+      .a4-page:last-child {
+        page-break-after: avoid;
+      }
+      table.comp-table th, table.comp-table td {
+        padding: 4px 6px !important;
+        font-size: 8.8px !important;
+      }
+      .summary-alert {
+        padding: 6px 10px !important;
+        margin-bottom: 8px !important;
+      }
+      .sec-subhead {
+        margin: 8px 0 4px !important;
+        padding: 4px 8px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 操作バー（画面上部） -->
+  <div class="no-print-bar">
+    <div class="bar-left">
+      <div class="bar-title">
+        <span>📊 主要4社 vs スマイチ木造自由設計 価格＆実質総額 徹底比較</span>
+        <span class="badge-sub">A4横 PDF・印刷対応</span>
+      </div>
+    </div>
+    <div class="bar-right">
+      <button class="filter-btn active" onclick="filterMaker('all')">全メーカー一括</button>
+      <button class="filter-btn" onclick="filterMaker('kakuichi')">カクイチ</button>
+      <button class="filter-btn" onclick="filterMaker('inaba')">イナバ</button>
+      <button class="filter-btn" onclick="filterMaker('yodoko')">ヨドコウ</button>
+      <button class="filter-btn" onclick="filterMaker('takubo')">タクボ</button>
+      <button class="btn-print" onclick="window.print()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        <span>A4横で印刷 / PDF保存</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="sheet-wrapper">
+
+    <!-- ========================================================
+         PAGE 1: カクイチ（広スペースハウス・HHD・大型ハウスL）vs スマイチ
+         ======================================================== -->
+    <div class="a4-page maker-sec" id="sec-kakuichi">
+      <div class="page-header">
+        <div>
+          <h2>
+            <span style="color:#2d6a4f;">■ PAGE 1</span>
+            <span>株式会社カクイチ（本格鉄骨造） vs スマイチ木造自由設計</span>
+          </h2>
+          <p style="font-size: 10px; color: #64748b; margin-top: 2px;">
+            本格鉄骨造の代表「広スペースハウス」「HHD」「広スペースハウスL」との実質費用・性能比較
+          </p>
+        </div>
+        <div class="corp-info">
+          <div class="corp-name">木造自由設計ガレージ スマイチ</div>
+          <div>株式会社 住まいる 建築士事務所</div>
+          <div>比較基準日: 2026年10月現在（税込10%）</div>
+        </div>
+      </div>
+
+      <div class="summary-alert">
+        <div class="alert-col">
+          <h4>💡 カクイチの価格体系の特徴</h4>
+          <p>「本体部材＋自社建方組立費込」の提示が多いが、<strong>布基礎・土間コン・確認申請は別途</strong>。実質総額は提示価格＋約50〜90万円が必要。</p>
+        </div>
+        <div class="alert-col">
+          <h4>⚖️ スマイチとの比較ポイント</h4>
+          <p>2台用・3台用で<strong>スマイチの方が数十万〜100万円以上割安</strong>になるケースが多数。さらに木造特有の「無結露・天然遮熱・ミリ単位自由設計」が付帯。</p>
+        </div>
+        <div class="alert-col">
+          <h4>🏆 スマイチのコミコミ標準内容</h4>
+          <p>スマイチ価格には<strong>「木構造・三和シャッター・外壁サイディング・布基礎工事・建築士による確認申請費」が全て最初から含まれます</strong>。</p>
+        </div>
+      </div>
+
+      <div class="sec-subhead">
+        <span>① 広スペースハウス（軒高3.0m〜3.5m：一般ガレージ・農機具格納庫）</span>
+        <span class="sub-note">カクイチ価格：本体＋組立費込（基礎・土間・申請別途）／ スマイチ価格：本体＋布基礎＋申請込</span>
+      </div>
+
+      <div class="comp-table-wrap">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th class="th-maker" style="width: 14%;">商品名・規模</th>
+              <th class="th-maker" style="width: 9%;">代表型番</th>
+              <th class="th-maker" style="width: 17%;">有効・外形寸法 (W×D×H)</th>
+              <th class="th-maker" style="width: 13%;">カクイチ提示価格 (税込)</th>
+              <th class="th-maker" style="width: 12%;">カクイチ実質総額目安<br><span style="font-size:8px;font-weight:normal;">(基礎+申請+土間加算)</span></th>
+              <th class="th-smaichi" style="width: 15%;">スマイチ木造自由設計<br><span style="font-size:8px;font-weight:normal;">(基礎・申請・建具込)</span></th>
+              <th class="th-smaichi" style="width: 11%;">実質価格差・優位性</th>
+              <th style="width: 9%;">備考・特徴</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-model"><span class="tag tag-heavy">鉄骨</span>広スペースハウス 2台用</td>
+              <td>KKS-2031</td>
+              <td class="col-dim">間口 6.0m × 奥行 5.7m × 軒高 3.0m (約34.2㎡)</td>
+              <td class="col-maker-price">2,101,000円〜2,410,100円<span class="price-sub">本体＋建方組立費込</span></td>
+              <td class="col-total-est">約270万〜300万円</td>
+              <td class="col-smaichi-price">約 2,650,000 円<span class="smaichi-note">布基礎＋三和シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-cheap">スマイチが約15〜35万安</span></td>
+              <td>結露ゼロ・敷地ミリ調整可</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-heavy">鉄骨</span>広スペースハウス 2台用(深型)</td>
+              <td>KKS-2040</td>
+              <td class="col-dim">間口 6.0m × 奥行 7.2m × 軒高 3.0m (約43.2㎡)</td>
+              <td class="col-maker-price">1,613,600円<span class="price-sub">部材のみ(工事込約260万〜)</span></td>
+              <td class="col-total-est">約320万〜340万円</td>
+              <td class="col-smaichi-price">約 3,180,000 円<span class="smaichi-note">布基礎＋三和シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-close">同等水準（木造の快適性）</span></td>
+              <td>作業場＋車2台ゆったり</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-heavy">鉄骨</span>広スペースハウス 3台用</td>
+              <td>HKS-3040</td>
+              <td class="col-dim">間口 8.9m × 奥行 7.2m × 軒高 3.5m (約64.1㎡)</td>
+              <td class="col-maker-price">3,137,090円<span class="price-sub">組立込特価(定価371万〜)</span></td>
+              <td class="col-total-est">約380万〜410万円</td>
+              <td class="col-smaichi-price">約 4,150,000 円<span class="smaichi-note">布基礎＋シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-close">同等水準</span></td>
+              <td>最深積雪75cm対応</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-heavy">鉄骨</span>広スペース 3台(スライド柱)</td>
+              <td>OHHK-3031</td>
+              <td class="col-dim">間口 8.9m × 奥行 5.7m × 軒高 3.5m (約50.7㎡)</td>
+              <td class="col-maker-price">3,112,010円<span class="price-sub">本体＋組立費込</span></td>
+              <td class="col-total-est">約380万〜400万円</td>
+              <td class="col-smaichi-price">約 3,750,000 円<span class="smaichi-note">布基礎＋シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-cheap">スマイチが約15〜25万安</span></td>
+              <td>中柱スライド開口</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-heavy">鉄骨</span>広スペース 3台(スライド柱)</td>
+              <td>OHHK-3040</td>
+              <td class="col-dim">間口 8.9m × 奥行 7.2m × 軒高 3.5m (約64.1㎡)</td>
+              <td class="col-maker-price">3,486,560円<span class="price-sub">本体＋組立費込</span></td>
+              <td class="col-total-est">約420万〜450万円</td>
+              <td class="col-smaichi-price">約 4,180,000 円<span class="smaichi-note">布基礎＋シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-cheap">スマイチが約10〜30万安</span></td>
+              <td>農機具・大型車格納</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-heavy">鉄骨</span>広スペースハウス 4台用</td>
+              <td>HKS-4040</td>
+              <td class="col-dim">間口 11.7m × 奥行 7.2m × 軒高 3.5m (約84.2㎡)</td>
+              <td class="col-maker-price">3,710,410円<span class="price-sub">組立込特価(基礎込例450万)</span></td>
+              <td class="col-total-est">約460万〜490万円</td>
+              <td class="col-smaichi-price">約 5,280,000 円<span class="smaichi-note">布基礎＋シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-appeal">トラス構造・自由間取り</span></td>
+              <td>農機・資材・車4台</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-heavy">鉄骨</span>広スペースハウス 5台用</td>
+              <td>HKS-5040</td>
+              <td class="col-dim">間口 14.6m × 奥行 7.2m × 軒高 3.5m (約105.1㎡)</td>
+              <td class="col-maker-price">4,865,740円<span class="price-sub">組立込特価(定価541万〜)</span></td>
+              <td class="col-total-est">約600万〜640万円</td>
+              <td class="col-smaichi-price">約 6,450,000 円<span class="smaichi-note">布基礎＋シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-close">同等水準</span></td>
+              <td>大型作業場兼用</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sec-subhead">
+        <span>② HHDシリーズ（切妻屋根型・デザインガレージ）</span>
+        <span class="sub-note">カクイチ：部材のみ（基礎・組立別途）／ スマイチ：布基礎＋建具＋申請すべてコミコミ</span>
+      </div>
+
+      <div class="comp-table-wrap">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th class="th-maker" style="width: 14%;">シリーズ・用途</th>
+              <th class="th-maker" style="width: 9%;">代表型番</th>
+              <th class="th-maker" style="width: 17%;">有効・外形寸法 (W×D×H)</th>
+              <th class="th-maker" style="width: 13%;">カクイチ提示価格 (税込)</th>
+              <th class="th-maker" style="width: 12%;">カクイチ実質総額目安<br><span style="font-size:8px;font-weight:normal;">(組立+基礎+申請加算)</span></th>
+              <th class="th-smaichi" style="width: 15%;">スマイチ木造自由設計<br><span style="font-size:8px;font-weight:normal;">(基礎・申請・建具込)</span></th>
+              <th class="th-smaichi" style="width: 11%;">実質価格差・優位性</th>
+              <th style="width: 9%;">備考・特徴</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-model"><span class="tag tag-heavy">切妻</span>MINI-HHD(1台用小型)</td>
+              <td>MINI-HHD-2834</td>
+              <td class="col-dim">間口 2.48m × 奥行 3.44m × 全高 1.95m (約8.5㎡)</td>
+              <td class="col-maker-price">805,000円<span class="price-sub">部材のみ・工事費別</span></td>
+              <td class="col-total-est">約135万〜150万円</td>
+              <td class="col-smaichi-price">約 1,180,000 円<span class="smaichi-note">布基礎＋シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-cheap">スマイチが約20〜30万安</span></td>
+              <td>バイク・秘密基地・ホビー</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-heavy">切妻</span>MINI-HHD(1台深型)</td>
+              <td>MINI-HHD-2855</td>
+              <td class="col-dim">間口 2.48m × 奥行 5.60m × 全高 1.95m (約13.9㎡)</td>
+              <td class="col-maker-price">1,000,000円<span class="price-sub">部材のみ・工事費別</span></td>
+              <td class="col-total-est">約165万〜185万円</td>
+              <td class="col-smaichi-price">約 1,620,000 円<span class="smaichi-note">布基礎＋シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-cheap">スマイチが約10〜20万安</span></td>
+              <td>乗用車格納・無垢木空間</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-heavy">切妻</span>HHD (2台用標準)</td>
+              <td>HHD-2034</td>
+              <td class="col-dim">間口 6.00m × 奥行 6.24m × 全高 2.30m (約37.4㎡)</td>
+              <td class="col-maker-price">2,133,500円<span class="price-sub">部材のみ・工事費別</span></td>
+              <td class="col-total-est">約295万〜325万円</td>
+              <td class="col-smaichi-price">約 2,820,000 円<span class="smaichi-note">布基礎＋三和シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-cheap">スマイチが約20〜40万安</span></td>
+              <td>勾配屋根・外壁自由選択</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-heavy">切妻</span>HHD (3台用ワイド)</td>
+              <td>HHD-3034EF</td>
+              <td class="col-dim">間口 9.00m × 奥行 7.68m × 全高 2.30m (約69.1㎡)</td>
+              <td class="col-maker-price">3,307,600円<span class="price-sub">部材のみ・工事費別</span></td>
+              <td class="col-total-est">約435万〜470万円</td>
+              <td class="col-smaichi-price">約 4,380,000 円<span class="smaichi-note">布基礎＋三和シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-close">同等水準</span></td>
+              <td>デザイン勾配屋根</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="page-footer-memo">
+        <strong>【カクイチ検討中のお客様へのプレゼン要点】</strong>
+        <div class="memo-grid">
+          <div>
+            ・「部材＋建方込み」と表記されていても、布基礎工事・申請費用（約50〜80万円）を合算するとスマイチと同等かそれ以上になります。<br>
+            ・鉄骨特有の「冬の結露滴下」「夏の屋根からの強烈な輻射熱」に対し、スマイチ木造は自然な調湿機能と遮熱通気層で愛車を錆や熱から守ります。
+          </div>
+          <div>
+            ・カクイチはモジュール寸法が固定されているため、敷地境界との間に無駄なデッドスペース（30〜50cm）が発生します。<br>
+            ・スマイチなら「敷地境界から15cm寄せ」「台形敷地への斜めカット」も自由自在。土地を100%有効活用できます。
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ========================================================
+         PAGE 2: 稲葉製作所（ガレーディア・アルシア・イナバ倉庫）vs スマイチ
+         ======================================================== -->
+    <div class="a4-page maker-sec" id="sec-inaba">
+      <div class="page-header">
+        <div>
+          <h2>
+            <span style="color:#2d6a4f;">■ PAGE 2</span>
+            <span>株式会社稲葉製作所［イナバ物置］ vs スマイチ木造自由設計</span>
+          </h2>
+          <p style="font-size: 10px; color: #64748b; margin-top: 2px;">
+            定番スチールガレージ「ガレーディア」「アルシア」「イナバ倉庫」の実質総額との比較
+          </p>
+        </div>
+        <div class="corp-info">
+          <div class="corp-name">木造自由設計ガレージ スマイチ</div>
+          <div>株式会社 住まいる 建築士事務所</div>
+          <div>比較基準日: 2026年10月現在（税込10%）</div>
+        </div>
+      </div>
+
+      <div class="summary-alert">
+        <div class="alert-col">
+          <h4>⚠️ イナバ「実売45万円」の落とし穴</h4>
+          <p>量販店やネット通販の実売価格は<strong>「鉄板部材の箱代のみ」</strong>です。布基礎・組立・確認申請を加算すると<strong>実質110万〜130万円</strong>になります。</p>
+        </div>
+        <div class="alert-col">
+          <h4>💎 高級アルシアならスマイチが圧勝</h4>
+          <p>デザインガレージ「アルシア」は実売でも120万〜280万円。<strong>同等の金額を出すなら、スマイチで本物の木造オーダーメイドが余裕で建ちます</strong>。</p>
+        </div>
+        <div class="alert-col">
+          <h4>🛠️ どこでも木ネジDIYの自由度</h4>
+          <p>イナバの薄鋼板壁は棚やフックの増設に専用オプションが必要ですが、スマイチは<strong>柱・間柱・下地合板へ好きな位置に木ネジ打ち込み放題</strong>です。</p>
+        </div>
+      </div>
+
+      <div class="sec-subhead">
+        <span>① ガレーディア（GRN：スチールシャッターガレージ）</span>
+        <span class="sub-note">イナバ実売：本体部材のみ ／ スマイチ：布基礎＋三和シャッター＋確認申請コミコミ</span>
+      </div>
+
+      <div class="comp-table-wrap">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th class="th-maker" style="width: 14%;">収容規模・仕様</th>
+              <th class="th-maker" style="width: 9%;">代表型番</th>
+              <th class="th-maker" style="width: 17%;">外形寸法 (W×D×H mm)</th>
+              <th class="th-maker" style="width: 13%;">定価 / 実売相場 (税込)</th>
+              <th class="th-maker" style="width: 12%;">イナバ実質総額目安<br><span style="font-size:8px;font-weight:normal;">(基礎+組立+申請加算)</span></th>
+              <th class="th-smaichi" style="width: 15%;">スマイチ木造自由設計<br><span style="font-size:8px;font-weight:normal;">(基礎・申請・建具込)</span></th>
+              <th class="th-smaichi" style="width: 11%;">実質価格差・総額検証</th>
+              <th style="width: 9%;">備考・特徴</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-model"><span class="tag tag-steel">スチール</span>1台用（標準高）</td>
+              <td>GRN-2652S</td>
+              <td class="col-dim">2630 × 5275 × 2360 (約13.9㎡)</td>
+              <td class="col-maker-price">定価約62万<br><strong>実売 約43万〜46万円</strong></td>
+              <td class="col-total-est">約110万〜125万円</td>
+              <td class="col-smaichi-price">約 1,650,000 円<span class="smaichi-note">布基礎＋三和シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-close">実質差額 約45〜50万円</span></td>
+              <td>結露ゼロ・夏の遮熱性能</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-steel">スチール</span>1台用（ハイルーフ）</td>
+              <td>GRN-2652H</td>
+              <td class="col-dim">2630 × 5275 × 2660 (約13.9㎡)</td>
+              <td class="col-maker-price">定価約65万<br><strong>実売 453,310円</strong></td>
+              <td class="col-total-est">約115万〜130万円</td>
+              <td class="col-smaichi-price">約 1,680,000 円<span class="smaichi-note">布基礎＋三和シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-close">実質差額 約40〜50万円</span></td>
+              <td>背高SUV・ワンボックス対応</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-steel">スチール</span>1台用（ワイド・深型）</td>
+              <td>GRN-3162S</td>
+              <td class="col-dim">3130 × 6275 × 2360 (約19.6㎡)</td>
+              <td class="col-maker-price">定価約67万<br><strong>実売 468,050円</strong></td>
+              <td class="col-total-est">約120万〜138万円</td>
+              <td class="col-smaichi-price">約 1,920,000 円<span class="smaichi-note">布基礎＋三和シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-close">実質差額 約55〜65万円</span></td>
+              <td>大型車＋棚・作業スペース</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-steel">スチール</span>2台用（短奥行）</td>
+              <td>GRN-3142HL-2</td>
+              <td class="col-dim">6260 × 4275 × 2660 (約26.8㎡)</td>
+              <td class="col-maker-price">定価約110万<br><strong>実売 767,800円</strong></td>
+              <td class="col-total-est">約165万〜185万円</td>
+              <td class="col-smaichi-price">約 2,380,000 円<span class="smaichi-note">布基礎＋三和シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-close">実質差額 約55〜70万円</span></td>
+              <td>奥行狭小地向け並列2台</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-steel">スチール</span>2台用（標準ハイルーフ）</td>
+              <td>GRN-3157HL-2</td>
+              <td class="col-dim">6260 × 5775 × 2660 (約36.2㎡)</td>
+              <td class="col-maker-price">定価約128万<br><strong>実売 約87万〜92万円</strong></td>
+              <td class="col-total-est">約185万〜210万円</td>
+              <td class="col-smaichi-price">約 2,750,000 円<span class="smaichi-note">布基礎＋三和シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-appeal">差額65万で完全木造化</span></td>
+              <td>一番売れ筋の定番2台用</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-steel">スチール</span>2台用（ワイド間口）</td>
+              <td>GRN-3657SL-2</td>
+              <td class="col-dim">7260 × 5775 × 2360 (約41.9㎡)</td>
+              <td class="col-maker-price">定価138万<br><strong>実売 897,325円</strong></td>
+              <td class="col-total-est">約195万〜225万円</td>
+              <td class="col-smaichi-price">約 3,080,000 円<span class="smaichi-note">布基礎＋三和シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-appeal">柱なしワイド開口可能</span></td>
+              <td>大型車2台ゆったり乗降</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sec-subhead">
+        <span>② アルシア（DR：高級デザイナーズガレージ）＆ イナバ倉庫（SGN）</span>
+        <span class="sub-note">アルシア実売価格 vs スマイチ木造自由設計（高級ガレージ同士の真っ向対決）</span>
+      </div>
+
+      <div class="comp-table-wrap">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th class="th-maker" style="width: 14%;">商品・グレード</th>
+              <th class="th-maker" style="width: 9%;">代表型番</th>
+              <th class="th-maker" style="width: 17%;">外形寸法 (W×D×H mm)</th>
+              <th class="th-maker" style="width: 13%;">定価 / 実売相場 (税込)</th>
+              <th class="th-maker" style="width: 12%;">イナバ実質総額目安<br><span style="font-size:8px;font-weight:normal;">(基礎+組立+申請加算)</span></th>
+              <th class="th-smaichi" style="width: 15%;">スマイチ木造自由設計<br><span style="font-size:8px;font-weight:normal;">(基礎・申請・建具込)</span></th>
+              <th class="th-smaichi" style="width: 11%;">実質価格差・優位性</th>
+              <th style="width: 9%;">備考・特徴</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-model"><span class="tag tag-steel">アルシア</span>1台用 TypeA(ハイルーフ)</td>
+              <td>DR-3157HPA</td>
+              <td class="col-dim">3130 × 5775 × 2670 (約18.1㎡)</td>
+              <td class="col-maker-price">定価1,699,500円<br><strong>実売 約1,189,650円</strong></td>
+              <td class="col-total-est">約180万〜205万円</td>
+              <td class="col-smaichi-price">約 1,880,000 円<span class="smaichi-note">布基礎＋シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-cheap">スマイチが約10万安！</span></td>
+              <td>同等価格で本物木造ガレージ</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-steel">アルシア</span>2台用 TypeA(ハイルーフ)</td>
+              <td>DR-3157HPA-2</td>
+              <td class="col-dim">6306 × 5865 × 2670 (約37.0㎡)</td>
+              <td class="col-maker-price">定価2,994,200円<br><strong>実売 約2,095,940円</strong></td>
+              <td class="col-total-est">約290万〜325万円</td>
+              <td class="col-smaichi-price">約 2,850,000 円<span class="smaichi-note">布基礎＋シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-cheap">スマイチが約20〜40万安！</span></td>
+              <td>アルシアより安く自由設計</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-steel">アルシア</span>2台用 TypeC(内装付)</td>
+              <td>DR-3157HPC-2</td>
+              <td class="col-dim">6306 × 5865 × 2670 (約37.0㎡)</td>
+              <td class="col-maker-price">定価4,109,490円<br><strong>実売 約2,847,790円</strong></td>
+              <td class="col-total-est">約375万〜410万円</td>
+              <td class="col-smaichi-price">約 3,350,000 円<span class="smaichi-note">内装下地＋基礎＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-cheap">スマイチが約40〜75万安！</span></td>
+              <td>無垢の木に囲まれた大人の基地</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-heavy">倉庫</span>イナバ倉庫 2連棟ミディアム</td>
+              <td>SGN-358MPN-2</td>
+              <td class="col-dim">6286 × 5886 × 3065 (約37.0㎡)</td>
+              <td class="col-maker-price">定価約175万<br><strong>実売 1,229,500円</strong></td>
+              <td class="col-total-est">約215万〜245万円</td>
+              <td class="col-smaichi-price">約 2,850,000 円<span class="smaichi-note">布基礎＋大型シャッター込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-close">実質差額 約40〜65万円</span></td>
+              <td>農機・資材・多目的倉庫</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="page-footer-memo">
+        <strong>【イナバ検討中のお客様へのプレゼン要点】</strong>
+        <div class="memo-grid">
+          <div>
+            ・「実売45万円」を見て来店されたお客様には、布基礎工事（30万）＋組立（15万）＋建築確認申請（25万）を足した【実質乗り出し115万円】の内訳を提示してください。<br>
+            ・「あと約50万円足せば、夏涼しく冬結露しない、敷地ピッチリの本格木造ガレージが手に入ります」というトークが極めて有効です。
+          </div>
+          <div>
+            ・高級路線の「アルシア」を検討されているお客様には、<strong>「アルシアの実質総額（約300万円）よりもスマイチ（約285万円）の方が安く、しかも本物の木造」</strong>であることを強調してください。
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ========================================================
+         PAGE 3: 淀川製鋼所［ヨドコウ］＆ 田窪工業所［タクボ］vs スマイチ
+         ======================================================== -->
+    <div class="a4-page maker-sec" id="sec-yodoko-takubo">
+      <div class="page-header">
+        <div>
+          <h2>
+            <span style="color:#2d6a4f;">■ PAGE 3</span>
+            <span>ヨドコウ（ラヴィージュIII）＆ タクボ（ベルフォーマ・カールフォーマ）vs スマイチ</span>
+          </h2>
+          <p style="font-size: 10px; color: #64748b; margin-top: 2px;">
+            ガルバリウム鋼板ヨドガレージ、オーバースライド扉タクボガレージとの実質総額対比
+          </p>
+        </div>
+        <div class="corp-info">
+          <div class="corp-name">木造自由設計ガレージ スマイチ</div>
+          <div>株式会社 住まいる 建築士事務所</div>
+          <div>比較基準日: 2026年10月現在（税込10%）</div>
+        </div>
+      </div>
+
+      <div class="sec-subhead">
+        <span>① ヨドコウ：ラヴィージュIII（VGC：ガルバリウム鋼板仕様）＆ ヨド倉庫（SOB）</span>
+        <span class="sub-note">ヨドコウ実売：部材のみ ／ スマイチ：布基礎＋三和シャッター＋確認申請コミコミ</span>
+      </div>
+
+      <div class="comp-table-wrap">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th class="th-maker" style="width: 14%;">収容規模・仕様</th>
+              <th class="th-maker" style="width: 9%;">代表型番</th>
+              <th class="th-maker" style="width: 17%;">外形寸法 (W×D×H mm)</th>
+              <th class="th-maker" style="width: 13%;">定価 / 実売相場 (税込)</th>
+              <th class="th-maker" style="width: 12%;">ヨドコウ実質総額目安<br><span style="font-size:8px;font-weight:normal;">(基礎+組立+申請加算)</span></th>
+              <th class="th-smaichi" style="width: 15%;">スマイチ木造自由設計<br><span style="font-size:8px;font-weight:normal;">(基礎・申請・建具込)</span></th>
+              <th class="th-smaichi" style="width: 11%;">実質価格差・総額検証</th>
+              <th style="width: 9%;">備考・特徴</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-model"><span class="tag tag-steel">ヨド</span>1台用 標準高</td>
+              <td>VGC-2652</td>
+              <td class="col-dim">2655 × 5220 × 2349 (約13.9㎡)</td>
+              <td class="col-maker-price">定価552,200円<br><strong>実売 約374,900円</strong></td>
+              <td class="col-total-est">約105万〜120万円</td>
+              <td class="col-smaichi-price">約 1,650,000 円<span class="smaichi-note">布基礎＋三和シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-close">実質差額 約45〜60万円</span></td>
+              <td>ガルバリウム鋼板外壁</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-steel">ヨド</span>1台用 背高H(間口3m)</td>
+              <td>VGC-3052H</td>
+              <td class="col-dim">3055 × 5220 × 2589 (約15.9㎡)</td>
+              <td class="col-maker-price">定価640,200円<br><strong>実売 約434,600円</strong></td>
+              <td class="col-total-est">約112万〜128万円</td>
+              <td class="col-smaichi-price">約 1,740,000 円<span class="smaichi-note">布基礎＋三和シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-close">実質差額 約50〜60万円</span></td>
+              <td>ハイルーフSUV・大型車</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-steel">ヨド</span>1台用 背高H(最長奥行)</td>
+              <td>VGC-3062H</td>
+              <td class="col-dim">3055 × 6220 × 2589 (約19.0㎡)</td>
+              <td class="col-maker-price">定価702,900円<br><strong>実売 約477,200円</strong></td>
+              <td class="col-total-est">約120万〜138万円</td>
+              <td class="col-smaichi-price">約 1,890,000 円<span class="smaichi-note">布基礎＋三和シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-close">実質差額 約55〜68万円</span></td>
+              <td>奥行6.2m・作業台設置可</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-steel">ヨド</span>2連棟 背高H(間口6.0m)</td>
+              <td>VGC-3059H-2</td>
+              <td class="col-dim">6060 × 5920 × 2589 (約35.9㎡)</td>
+              <td class="col-maker-price">定価1,148,400円<br><strong>実売 約779,700円</strong></td>
+              <td class="col-total-est">約175万〜205万円</td>
+              <td class="col-smaichi-price">約 2,750,000 円<span class="smaichi-note">布基礎＋三和シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-appeal">差額70万で完全木造化</span></td>
+              <td>深型2台用・定番サイズ</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-steel">ヨド</span>2連棟 背高H(間口6.6m特大)</td>
+              <td>VGC-3362H-2</td>
+              <td class="col-dim">6660 × 6220 × 2589 (約41.4㎡)</td>
+              <td class="col-maker-price">定価1,320,000円<br><strong>実売 約896,200円</strong></td>
+              <td class="col-total-est">約195万〜228万円</td>
+              <td class="col-smaichi-price">約 3,080,000 円<span class="smaichi-note">布基礎＋三和シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-appeal">敷地境界ギリギリ対応</span></td>
+              <td>大型ワイド2台用</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-steel">ヨド</span>モデリスタコラボ(2連棟)</td>
+              <td>VMCU-3359H-2</td>
+              <td class="col-dim">6670 × 5920 × 2589 (約39.5㎡)</td>
+              <td class="col-maker-price">定価2,367,200円<br><strong>実売 約1,623,800円</strong></td>
+              <td class="col-total-est">約255万〜290万円</td>
+              <td class="col-smaichi-price">約 2,980,000 円<span class="smaichi-note">布基礎＋三和シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-cheap">スマイチと同等価格！</span></td>
+              <td>デザインスチールガレージ</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sec-subhead">
+        <span>② タクボ：ベルフォーマ（オーバースライド扉）＆ カールフォーマ（巻上げシャッター）</span>
+        <span class="sub-note">タクボ実売：部材のみ ／ スマイチ：布基礎＋三和シャッター＋確認申請コミコミ</span>
+      </div>
+
+      <div class="comp-table-wrap">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th class="th-maker" style="width: 14%;">収容規模・仕様</th>
+              <th class="th-maker" style="width: 9%;">代表型番</th>
+              <th class="th-maker" style="width: 17%;">外形寸法 (W×D×H mm)</th>
+              <th class="th-maker" style="width: 13%;">定価 / 実売相場 (税込)</th>
+              <th class="th-maker" style="width: 12%;">タクボ実質総額目安<br><span style="font-size:8px;font-weight:normal;">(基礎+組立+申請加算)</span></th>
+              <th class="th-smaichi" style="width: 15%;">スマイチ木造自由設計<br><span style="font-size:8px;font-weight:normal;">(基礎・申請・建具込)</span></th>
+              <th class="th-smaichi" style="width: 11%;">実質価格差・総額検証</th>
+              <th style="width: 9%;">備考・特徴</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-model"><span class="tag tag-steel">ベルフォーマ</span>1台用 標準高</td>
+              <td>XS-3153</td>
+              <td class="col-dim">3124 × 5300 × 2450 (約16.6㎡)</td>
+              <td class="col-maker-price">定価733,700円<br><strong>実売 458,722円</strong></td>
+              <td class="col-total-est">約115万〜132万円</td>
+              <td class="col-smaichi-price">約 1,760,000 円<span class="smaichi-note">布基礎＋三和シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-close">実質差額 約45〜60万円</span></td>
+              <td>オーバースライド式扉</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-steel">ベルフォーマ</span>1台用 結露減少型</td>
+              <td>XS-Z2760</td>
+              <td class="col-dim">2734 × 6000 × 2450 (約16.4㎡)</td>
+              <td class="col-maker-price">定価約79万<br><strong>実売 497,700円</strong></td>
+              <td class="col-total-est">約120万〜138万円</td>
+              <td class="col-smaichi-price">約 1,750,000 円<span class="smaichi-note">布基礎＋三和シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-close">実質差額 約40〜55万円</span></td>
+              <td>天井結露減少材ペフ貼り仕様</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-steel">ベルフォーマ</span>2台用 背高H</td>
+              <td>XM-3160-2</td>
+              <td class="col-dim">6248 × 6000 × 2763 (約37.5㎡)</td>
+              <td class="col-maker-price">定価約156万<br><strong>実売 976,400円</strong></td>
+              <td class="col-total-est">約195万〜225万円</td>
+              <td class="col-smaichi-price">約 2,820,000 円<span class="smaichi-note">布基礎＋三和シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-appeal">差額60万で完全木造化</span></td>
+              <td>開閉がスムーズな跳ね上げ扉</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-steel">カールフォーマ</span>2連棟 標準高</td>
+              <td>CM-5454-2相当</td>
+              <td class="col-dim">5508 × 5432 × 2450 (約29.9㎡)</td>
+              <td class="col-maker-price">定価1,188,000円<span class="price-sub">(実売約75万前後)</span></td>
+              <td class="col-total-est">約165万〜190万円</td>
+              <td class="col-smaichi-price">約 2,450,000 円<span class="smaichi-note">布基礎＋三和シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-close">実質差額 約55〜70万円</span></td>
+              <td>手動巻き上げ式シャッター</td>
+            </tr>
+            <tr>
+              <td class="col-model"><span class="tag tag-steel">カールフォーマ</span>2連棟 背高H</td>
+              <td>CM-6260-2</td>
+              <td class="col-dim">6208 × 6132 × 2763 (約38.1㎡)</td>
+              <td class="col-maker-price">定価1,285,000円<span class="price-sub">(実売約82万前後)</span></td>
+              <td class="col-total-est">約180万〜210万円</td>
+              <td class="col-smaichi-price">約 2,850,000 円<span class="smaichi-note">布基礎＋三和シャッター＋申請込</span></td>
+              <td class="col-diff"><span class="diff-badge diff-appeal">差額75万で完全木造化</span></td>
+              <td>定番巻き上げシャッター2連棟</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="page-footer-memo">
+        <strong>【総括：スチール規格物置 vs スマイチ木造自由設計の決定的差別化】</strong>
+        <div class="memo-grid">
+          <div>
+            <strong>① 実質差額はわずか「40万〜70万円」</strong><br>
+            量販店の「部材価格」に必須工事（布基礎＋組立＋確認申請）を足すと、スチール物置の実質総額は110万〜210万円になります。スマイチとの実質差額は数十万円にすぎません。
+          </div>
+          <div>
+            <strong>② 差額以上の圧倒的な価値</strong><br>
+            ・結露ゼロ・真夏の猛暑を遮断する天然断熱・調湿性能<br>
+            ・敷地寸法に10cm単位でピッチリ合わせられる完全自由設計<br>
+            ・棚・フック・工具掛けをどこでも自由に固定できる無垢木構造
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function filterMaker(maker) {
+      // ボタンのアクティブ切り替え
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const p1 = document.getElementById('sec-kakuichi');
+      const p2 = document.getElementById('sec-inaba');
+      const p3 = document.getElementById('sec-yodoko-takubo');
+
+      if (maker === 'all') {
+        p1.style.display = 'block';
+        p2.style.display = 'block';
+        p3.style.display = 'block';
+      } else if (maker === 'kakuichi') {
+        p1.style.display = 'block';
+        p2.style.display = 'none';
+        p3.style.display = 'none';
+      } else if (maker === 'inaba') {
+        p1.style.display = 'none';
+        p2.style.display = 'block';
+        p3.style.display = 'none';
+      } else if (maker === 'yodoko') {
+        p1.style.display = 'none';
+        p2.style.display = 'none';
+        p3.style.display = 'block';
+      } else if (maker === 'takubo') {
+        p1.style.display = 'none';
+        p2.style.display = 'none';
+        p3.style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>
