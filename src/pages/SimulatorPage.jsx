@@ -508,7 +508,15 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
       if (obj.geometry) obj.geometry.dispose();
     }
 
-    const { wFront: wF, wBack: wB, dLeft: dL, dRight: dR, eaveHeight: eaveH, roofSlope: slope, slopeDirection: slopeDir, shapeType, skewOffset } = dimensions;
+    const wF = parseFloat(dimensions.wFront) || 5400;
+    const wB = parseFloat(dimensions.wBack) || wF;
+    const dL = parseFloat(dimensions.dLeft) || 6000;
+    const dR = parseFloat(dimensions.dRight) || dL;
+    const eaveH = parseFloat(dimensions.eaveHeight) || 2800;
+    const slope = parseFloat(dimensions.roofSlope) || 1.5;
+    const slopeDir = dimensions.slopeDirection;
+    const shapeType = dimensions.shapeType;
+    const skewOffset = parseFloat(dimensions.skewOffset) || 0;
 
     const corePts = getCorePoints(wF, wB, dL, dR, shapeType, skewOffset);
     const outerPts = getOffsetPoints(corePts, WALL_OUTER_OFFSET);
@@ -1315,12 +1323,20 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                 type="number" 
                 value={dimensions.wFront} 
                 step="10" 
+                onFocus={(e) => e.target.select()}
                 onChange={(e) => {
-                  const val = parseFloat(e.target.value) || 0;
+                  const val = e.target.value === '' ? '' : (parseFloat(e.target.value) || 0);
                   const up = { ...dimensions, wFront: val };
                   if (dimensions.shapeType === 'regular') up.wBack = val;
                   setDimensions(up);
                   pushHistory(up);
+                }}
+                onBlur={() => {
+                  if (dimensions.wFront === '' || Number(dimensions.wFront) <= 0) {
+                    const up = { ...dimensions, wFront: 5400 };
+                    if (dimensions.shapeType === 'regular') up.wBack = 5400;
+                    setDimensions(up);
+                  }
                 }}
                 style={{ width: '100%', padding: '5px 8px', borderRadius: 4, border: '1px solid #cbd5e1', fontSize: 13, fontWeight: 700 }}
               />
@@ -1331,10 +1347,16 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                 type="number" 
                 value={dimensions.wBack} 
                 step="10" 
+                onFocus={(e) => e.target.select()}
                 onChange={(e) => {
-                  const val = parseFloat(e.target.value) || 0;
+                  const val = e.target.value === '' ? '' : (parseFloat(e.target.value) || 0);
                   setDimensions({ ...dimensions, wBack: val });
                   pushHistory({ ...dimensions, wBack: val });
+                }}
+                onBlur={() => {
+                  if (dimensions.wBack === '' || Number(dimensions.wBack) <= 0) {
+                    setDimensions(prev => ({ ...prev, wBack: Number(prev.wFront) || 5400 }));
+                  }
                 }}
                 style={{ width: '100%', padding: '5px 8px', borderRadius: 4, border: '1px solid #cbd5e1', fontSize: 13, fontWeight: 700 }}
               />
@@ -1345,12 +1367,20 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                 type="number" 
                 value={dimensions.dLeft} 
                 step="10" 
+                onFocus={(e) => e.target.select()}
                 onChange={(e) => {
-                  const val = parseFloat(e.target.value) || 0;
+                  const val = e.target.value === '' ? '' : (parseFloat(e.target.value) || 0);
                   const up = { ...dimensions, dLeft: val };
                   if (dimensions.shapeType === 'regular') up.dRight = val;
                   setDimensions(up);
                   pushHistory(up);
+                }}
+                onBlur={() => {
+                  if (dimensions.dLeft === '' || Number(dimensions.dLeft) <= 0) {
+                    const up = { ...dimensions, dLeft: 6000 };
+                    if (dimensions.shapeType === 'regular') up.dRight = 6000;
+                    setDimensions(up);
+                  }
                 }}
                 style={{ width: '100%', padding: '5px 8px', borderRadius: 4, border: '1px solid #cbd5e1', fontSize: 13, fontWeight: 700 }}
               />
@@ -1361,10 +1391,16 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                 type="number" 
                 value={dimensions.dRight} 
                 step="10" 
+                onFocus={(e) => e.target.select()}
                 onChange={(e) => {
-                  const val = parseFloat(e.target.value) || 0;
+                  const val = e.target.value === '' ? '' : (parseFloat(e.target.value) || 0);
                   setDimensions({ ...dimensions, dRight: val });
                   pushHistory({ ...dimensions, dRight: val });
+                }}
+                onBlur={() => {
+                  if (dimensions.dRight === '' || Number(dimensions.dRight) <= 0) {
+                    setDimensions(prev => ({ ...prev, dRight: Number(prev.dLeft) || 6000 }));
+                  }
                 }}
                 style={{ width: '100%', padding: '5px 8px', borderRadius: 4, border: '1px solid #cbd5e1', fontSize: 13, fontWeight: 700 }}
               />
@@ -1445,13 +1481,19 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                     <label style={{ fontSize: 10.5, fontWeight: 700, color: '#78350f' }}>欠き取り幅 (mm)</label>
                     <input 
                       type="number" 
-                      value={dimensions.cornerCutWidth || 1500} 
+                      value={dimensions.cornerCutWidth !== undefined ? dimensions.cornerCutWidth : 1500} 
                       step="50" 
+                      onFocus={(e) => e.target.select()}
                       onChange={(e) => {
-                        const val = parseFloat(e.target.value) || 0;
+                        const val = e.target.value === '' ? '' : (parseFloat(e.target.value) || 0);
                         const up = { ...dimensions, cornerCutWidth: val };
                         setDimensions(up);
                         pushHistory(up);
+                      }}
+                      onBlur={() => {
+                        if (dimensions.cornerCutWidth === '' || Number(dimensions.cornerCutWidth) <= 0) {
+                          setDimensions(prev => ({ ...prev, cornerCutWidth: 1500 }));
+                        }
                       }}
                       style={{ width: '100%', padding: '4px 6px', borderRadius: 4, border: '1px solid #cbd5e1', fontSize: 12, fontWeight: 700 }}
                     />
@@ -1460,13 +1502,19 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                     <label style={{ fontSize: 10.5, fontWeight: 700, color: '#78350f' }}>欠き取り奥行 (mm)</label>
                     <input 
                       type="number" 
-                      value={dimensions.cornerCutDepth || 1500} 
+                      value={dimensions.cornerCutDepth !== undefined ? dimensions.cornerCutDepth : 1500} 
                       step="50" 
+                      onFocus={(e) => e.target.select()}
                       onChange={(e) => {
-                        const val = parseFloat(e.target.value) || 0;
+                        const val = e.target.value === '' ? '' : (parseFloat(e.target.value) || 0);
                         const up = { ...dimensions, cornerCutDepth: val };
                         setDimensions(up);
                         pushHistory(up);
+                      }}
+                      onBlur={() => {
+                        if (dimensions.cornerCutDepth === '' || Number(dimensions.cornerCutDepth) <= 0) {
+                          setDimensions(prev => ({ ...prev, cornerCutDepth: 1500 }));
+                        }
                       }}
                       style={{ width: '100%', padding: '4px 6px', borderRadius: 4, border: '1px solid #cbd5e1', fontSize: 12, fontWeight: 700 }}
                     />
@@ -1498,7 +1546,16 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                 type="number" 
                 value={dimensions.eaveHeight} 
                 step="10" 
-                onChange={(e) => setDimensions({ ...dimensions, eaveHeight: parseFloat(e.target.value) || 0 })}
+                onFocus={(e) => e.target.select()}
+                onChange={(e) => {
+                  const val = e.target.value === '' ? '' : (parseFloat(e.target.value) || 0);
+                  setDimensions({ ...dimensions, eaveHeight: val });
+                }}
+                onBlur={() => {
+                  if (dimensions.eaveHeight === '' || Number(dimensions.eaveHeight) <= 0) {
+                    setDimensions(prev => ({ ...prev, eaveHeight: 2800 }));
+                  }
+                }}
                 style={{ width: '100%', padding: '5px 8px', borderRadius: 4, border: '1px solid #cbd5e1', fontSize: 12 }}
               />
             </div>
@@ -1510,7 +1567,16 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                 step="0.1" 
                 min="0.1" 
                 max="10.0"
-                onChange={(e) => setDimensions({ ...dimensions, roofSlope: parseFloat(e.target.value) || 0.1 })}
+                onFocus={(e) => e.target.select()}
+                onChange={(e) => {
+                  const val = e.target.value === '' ? '' : (parseFloat(e.target.value) || 0.1);
+                  setDimensions({ ...dimensions, roofSlope: val });
+                }}
+                onBlur={() => {
+                  if (dimensions.roofSlope === '' || Number(dimensions.roofSlope) <= 0) {
+                    setDimensions(prev => ({ ...prev, roofSlope: 1.5 }));
+                  }
+                }}
                 style={{ width: '100%', padding: '5px 8px', borderRadius: 4, border: '1px solid #cbd5e1', fontSize: 12 }}
               />
             </div>
@@ -1645,10 +1711,18 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                         type="number"
                         value={op.width}
                         step="10"
+                        onFocus={(e) => e.target.select()}
                         onChange={(e) => {
                           const updated = [...openings];
-                          updated[idx].width = parseFloat(e.target.value) || 0;
+                          updated[idx].width = e.target.value === '' ? '' : (parseFloat(e.target.value) || 0);
                           setOpenings(updated);
+                        }}
+                        onBlur={() => {
+                          if (op.width === '' || Number(op.width) <= 0) {
+                            const updated = [...openings];
+                            updated[idx].width = op.type === 'shutter' ? 2700 : (op.type === 'window' ? 1600 : 800);
+                            setOpenings(updated);
+                          }
                         }}
                         style={{ width: '100%', padding: '3px 6px', fontSize: 11, borderRadius: 4, border: '1px solid #cbd5e1' }}
                       />
@@ -1659,14 +1733,26 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                         type="number"
                         value={op.height}
                         step="10"
+                        onFocus={(e) => e.target.select()}
                         onChange={(e) => {
-                          const val = parseFloat(e.target.value) || 0;
+                          const val = e.target.value === '' ? '' : (parseFloat(e.target.value) || 0);
                           const updated = [...openings];
                           updated[idx].height = val;
                           if (isFloorLevelOpening(op.type) && (!op.topHeightGL || op.topHeightGL === 50 + op.height)) {
-                            updated[idx].topHeightGL = 50 + val;
+                            updated[idx].topHeightGL = 50 + (Number(val) || 0);
                           }
                           setOpenings(updated);
+                        }}
+                        onBlur={() => {
+                          if (op.height === '' || Number(op.height) <= 0) {
+                            const updated = [...openings];
+                            const defaultH = op.type === 'shutter' ? 2400 : (op.type === 'window' ? 900 : 2000);
+                            updated[idx].height = defaultH;
+                            if (isFloorLevelOpening(op.type)) {
+                              updated[idx].topHeightGL = 50 + defaultH;
+                            }
+                            setOpenings(updated);
+                          }
                         }}
                         style={{ width: '100%', padding: '3px 6px', fontSize: 11, borderRadius: 4, border: '1px solid #cbd5e1' }}
                       />
@@ -1678,17 +1764,25 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <label style={{ fontSize: 10, color: '#64748b' }}>設置高 (上端 GL+ mm)</label>
                         {!isFloorLevelOpening(op.type) && (
-                          <span style={{ fontSize: 9, color: '#94a3b8' }}>下端:{Math.max(50, ((op.topHeightGL ?? 2100) - op.height))}</span>
+                          <span style={{ fontSize: 9, color: '#94a3b8' }}>下端:{Math.max(50, ((Number(op.topHeightGL) || 2100) - (Number(op.height) || 900)))}</span>
                         )}
                       </div>
                       <input
                         type="number"
-                        value={op.topHeightGL !== undefined ? op.topHeightGL : (isFloorLevelOpening(op.type) ? 50 + op.height : 2100)}
+                        value={op.topHeightGL !== undefined ? op.topHeightGL : (isFloorLevelOpening(op.type) ? 50 + (Number(op.height) || 2400) : 2100)}
                         step="10"
+                        onFocus={(e) => e.target.select()}
                         onChange={(e) => {
                           const updated = [...openings];
-                          updated[idx].topHeightGL = parseFloat(e.target.value) || 0;
+                          updated[idx].topHeightGL = e.target.value === '' ? '' : (parseFloat(e.target.value) || 0);
                           setOpenings(updated);
+                        }}
+                        onBlur={() => {
+                          if (op.topHeightGL === '' || Number(op.topHeightGL) <= 0) {
+                            const updated = [...openings];
+                            updated[idx].topHeightGL = isFloorLevelOpening(op.type) ? 50 + (Number(op.height) || 2400) : 2100;
+                            setOpenings(updated);
+                          }
                         }}
                         style={{ width: '100%', padding: '3px 6px', fontSize: 11, borderRadius: 4, border: '1px solid #cbd5e1' }}
                       />
@@ -1699,10 +1793,18 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                         type="number"
                         value={op.clearanceLeft}
                         step="10"
+                        onFocus={(e) => e.target.select()}
                         onChange={(e) => {
                           const updated = [...openings];
-                          updated[idx].clearanceLeft = parseFloat(e.target.value) || 0;
+                          updated[idx].clearanceLeft = e.target.value === '' ? '' : (parseFloat(e.target.value) || 0);
                           setOpenings(updated);
+                        }}
+                        onBlur={() => {
+                          if (op.clearanceLeft === '' || Number(op.clearanceLeft) < 0) {
+                            const updated = [...openings];
+                            updated[idx].clearanceLeft = 200;
+                            setOpenings(updated);
+                          }
                         }}
                         style={{ width: '100%', padding: '3px 6px', fontSize: 11, borderRadius: 4, border: '1px solid #cbd5e1' }}
                       />
@@ -1812,10 +1914,18 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                       type="number"
                       value={shelf.width}
                       step="100"
+                      onFocus={(e) => e.target.select()}
                       onChange={(e) => {
                         const updated = [...shelfUnits];
-                        updated[idx].width = parseFloat(e.target.value) || 0;
+                        updated[idx].width = e.target.value === '' ? '' : (parseFloat(e.target.value) || 0);
                         setShelfUnits(updated);
+                      }}
+                      onBlur={() => {
+                        if (shelf.width === '' || Number(shelf.width) <= 0) {
+                          const updated = [...shelfUnits];
+                          updated[idx].width = 3000;
+                          setShelfUnits(updated);
+                        }
                       }}
                       style={{ width: '100%', padding: '3px 6px', fontSize: 11, borderRadius: 4, border: '1px solid #cbd5e1' }}
                     />

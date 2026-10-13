@@ -28,17 +28,22 @@ export function createSimulatorMaterials({ isSeeThrough = false } = {}) {
       roughness: 0.45,
       transparent: isSeeThrough,
       opacity: isSeeThrough ? 0.35 : 1.0,
+      depthWrite: !isSeeThrough,
       side: THREE.DoubleSide
     }),
     roofMat: new THREE.MeshStandardMaterial({
       color: 0x1f2937,
       roughness: 0.35,
       transparent: isSeeThrough,
-      opacity: isSeeThrough ? 0.35 : 1.0
+      opacity: isSeeThrough ? 0.35 : 1.0,
+      depthWrite: !isSeeThrough
     }),
     ceilingMat: new THREE.MeshStandardMaterial({
       color: 0xeddcc8,
-      roughness: 0.6
+      roughness: 0.6,
+      transparent: isSeeThrough,
+      opacity: isSeeThrough ? 0.35 : 1.0,
+      depthWrite: !isSeeThrough
     }),
     woodMat: new THREE.MeshStandardMaterial({
       color: 0x8c6239,

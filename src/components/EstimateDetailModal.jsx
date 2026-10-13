@@ -9,7 +9,7 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
   const printRef = useRef(null);
   const [customerName, setCustomerName] = useState('');
   const [isAdminMode, setIsAdminMode] = useState(false);
-  const [showCatalogDetails, setShowCatalogDetails] = useState(false);
+  const [showCatalogDetails, setShowCatalogDetails] = useState(true);
 
   const [estimateDate] = useState(() => {
     const d = new Date();
@@ -471,12 +471,13 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
                         </td>
                       </tr>
 
-                      {/* 開口部カタログ内訳アコーディオン展開 */}
+                      {/* 開口部カタログ内訳展開 */}
                       {item.id === 2 && showCatalogDetails && item.catalogList?.length > 0 && (
                         <tr>
                           <td colSpan={isAdminMode ? 5 : 3} style={{ background: '#f8fafc', padding: '10px 16px', borderBottom: '1px solid #e2e8f0' }}>
-                            <div style={{ fontSize: 11.5, fontWeight: 700, color: '#475569', marginBottom: 6 }}>
-                              【開口部公式カタログ定価マスタ連動明細】
+                            <div style={{ fontSize: 11.5, fontWeight: 700, color: '#334155', marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <span>🚪【シャッター・サッシ開口部 規格内訳明細】</span>
+                              <span style={{ fontSize: 11, color: '#64748b', fontWeight: 500 }}>設置数量: 計 {item.catalogList.length} 箇所</span>
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                               {item.catalogList.map((catItem, cIdx) => (
@@ -484,29 +485,30 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'space-between',
-                                  padding: '5px 10px',
+                                  padding: '6px 12px',
                                   background: '#ffffff',
-                                  borderRadius: 4,
+                                  borderRadius: 5,
                                   border: '1px solid #e2e8f0',
-                                  fontSize: 11.5
+                                  fontSize: 12
                                 }}>
-                                  <div>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                                     <span style={{
                                       background: catItem.maker === '三和シャッター' ? '#e0e7ff' : '#ffedd5',
                                       color: catItem.maker === '三和シャッター' ? '#3730a3' : '#9a3412',
-                                      padding: '1px 5px',
-                                      borderRadius: 3,
+                                      padding: '2px 6px',
+                                      borderRadius: 4,
                                       fontWeight: 700,
-                                      marginRight: 6
+                                      fontSize: 11
                                     }}>
                                       {catItem.maker}
                                     </span>
                                     <span style={{ fontWeight: 600, color: '#1e293b' }}>{catItem.product}</span>
+                                    <span style={{ fontSize: 11, color: '#64748b' }}>× {catItem.qty || 1}式</span>
                                   </div>
                                   <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                                    <span style={{ color: '#64748b' }}>カタログ定価: ¥{catItem.listPrice.toLocaleString()}</span>
+                                    <span style={{ color: '#64748b', fontSize: 11.5 }}>カタログ定価: ¥{catItem.listPrice.toLocaleString()}</span>
                                     {isAdminMode && (
-                                      <span style={{ color: '#b91c1c', fontWeight: 600 }}>仕入原価: ¥{catItem.cost.toLocaleString()}</span>
+                                      <span style={{ color: '#b91c1c', fontWeight: 600, fontSize: 11.5 }}>仕入原価: ¥{catItem.cost.toLocaleString()}</span>
                                     )}
                                   </div>
                                 </div>
@@ -523,7 +525,7 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
                 <tr style={{ background: '#f1f5f9', borderTop: '2px solid #cbd5e1', fontWeight: 800 }}>
                   <td style={{ padding: '10px 12px' }}>本体工事 合計</td>
                   <td style={{ padding: '10px 12px', fontSize: 11.5, color: '#64748b' }}>
-                    ※原価に所定の乗率（1.33）を按分適用
+                    {isAdminMode ? '※原価に所定の乗率（1.33）を按分適用' : '※標準仕様・建物規模に基づく概算算定'}
                   </td>
                   {isAdminMode && (
                     <>
