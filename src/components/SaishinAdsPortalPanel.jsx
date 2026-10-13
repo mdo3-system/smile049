@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Sparkles, Copy, Check, ExternalLink, ShieldCheck, AlertTriangle,
   Layers, Target, DollarSign, Image as ImageIcon, Video, Compass,
@@ -250,6 +250,24 @@ export default function SaishinAdsPortalPanel() {
   const toggleTextMode = (adId, mode) => {
     setTextModes(prev => ({ ...prev, [adId]: mode }));
   };
+
+  useEffect(() => {
+    if (!isManualModalOpen) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsManualModalOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isManualModalOpen]);
 
   const handleCopy = (text, key) => {
     navigator.clipboard.writeText(text);
@@ -1020,16 +1038,59 @@ export default function SaishinAdsPortalPanel() {
           運用マニュアル・出稿解説モーダル（担当者向けガイド）
       ========================================================================= */}
       {isManualModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-          <div className="bg-stone-900 border border-stone-700 w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+        <div
+          onClick={() => setIsManualModalOpen(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 99999,
+            backgroundColor: 'rgba(0, 0, 0, 0.85)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+            boxSizing: 'border-box'
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              maxHeight: '92vh',
+              height: '88vh',
+              width: '100%',
+              maxWidth: '920px',
+              display: 'flex',
+              flexDirection: 'column',
+              borderRadius: '24px',
+              backgroundColor: '#1c1917',
+              border: '1px solid #44403c',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
+              overflow: 'hidden'
+            }}
+          >
             {/* モーダルヘッダー */}
-            <div className="p-6 bg-stone-950 border-b border-stone-800 flex items-center justify-between">
+            <div
+              style={{
+                padding: '18px 24px',
+                backgroundColor: '#0c0a09',
+                borderBottom: '1px solid #292524',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexShrink: 0
+              }}
+            >
               <div className="flex items-center gap-3">
                 <div className="p-2.5 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
                   <BookOpen className="w-6 h-6" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
                     Meta広告運用・出稿操作 完全マニュアル
                   </h2>
                   <p className="text-xs text-stone-400">
@@ -1040,13 +1101,23 @@ export default function SaishinAdsPortalPanel() {
               <button
                 onClick={() => setIsManualModalOpen(false)}
                 className="p-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 transition"
+                title="閉じる (Esc)"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* モーダル本文（スクロール可能） */}
-            <div className="p-6 overflow-y-auto space-y-6 text-xs sm:text-sm text-stone-300">
+            {/* モーダル本文（確実にスクロール可能） */}
+            <div
+              style={{
+                flex: 1,
+                minHeight: 0,
+                overflowY: 'auto',
+                padding: '24px',
+                WebkitOverflowScrolling: 'touch'
+              }}
+              className="space-y-6 text-xs sm:text-sm text-stone-300"
+            >
               {/* セクション 1: このツールの目的と意図 */}
               <div className="p-5 bg-stone-950 rounded-2xl border border-stone-800 space-y-3">
                 <h3 className="text-base font-bold text-white flex items-center gap-2">
@@ -1187,7 +1258,20 @@ export default function SaishinAdsPortalPanel() {
             </div>
 
             {/* モーダルフッター */}
-            <div className="p-4 bg-stone-950 border-t border-stone-800 flex justify-end">
+            <div
+              style={{
+                padding: '16px 24px',
+                backgroundColor: '#0c0a09',
+                borderTop: '1px solid #292524',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexShrink: 0
+              }}
+            >
+              <span className="text-stone-400 text-xs hidden sm:inline">
+                ※画面外の黒い背景をクリックするか、キーボードの「Esc」キーでも閉じられます
+              </span>
               <button
                 onClick={() => setIsManualModalOpen(false)}
                 className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-bold transition shadow"
