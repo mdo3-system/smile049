@@ -50,7 +50,7 @@ export default function EieRealEstatePage({ onNavigate }) {
                   中古購入＋リノベ専門店
                 </span>
               </div>
-              <p className="text-[10px] text-stone-400 hidden sm:block">構造設計者が同行するワンストップ仲介 / 埼玉県・関東一円</p>
+              <p className="text-[10px] text-stone-400 hidden sm:block">専門調査機関(JFD)×二級建築士のワンストップ仲介 / 埼玉県・関東一円</p>
             </div>
           </div>
 
@@ -89,7 +89,7 @@ export default function EieRealEstatePage({ onNavigate }) {
           </h1>
 
           <p className="text-sm sm:text-base text-stone-300 max-w-2xl mx-auto mb-10 leading-relaxed">
-            物件探しから構造設計者による耐震調査、リノベ工事、低金利一括ローンまでワンストップ。新築の3/4の予算で、新築以上の広さと快適さを手に入れる。
+            物件探しから専門調査機関（JFD）による精密調査、二級建築士によるリノベ設計・確認申請、低金利一括ローンまでワンストップ。新築の3/4の予算で、新築以上の広さと快適さを手に入れる。
           </p>
 
           {/* 3大比較バナー（新築 vs EIE中古リノベ） */}
@@ -213,10 +213,10 @@ export default function EieRealEstatePage({ onNavigate }) {
                 01
               </div>
               <h3 className="text-base font-bold text-stone-900 mb-2">
-                構造設計者が物件調査・耐震チェック
+                専門機関（JFD）精密調査 ＆ 二級建築士による法規・確認申請
               </h3>
               <p className="text-xs text-stone-600 leading-relaxed">
-                不動産の営業マンは構造がわかりません。EIEは自社の建築士・構造設計者が現地調査に同行。「この壁は抜けるか」「耐震補強にいくらかかるか」を内覧時にその場で判断します。
+                一般的な不動産営業マンでは見抜けない敷地境界・法規・構造の盲点を、専門調査機関（JFD）の精密調査（測量・行政・法務局調査：約10万円）と自社の二級建築士が徹底解明。「この壁は抜けるか」「確認申請が通るか」を事前に明確化します。
               </p>
             </div>
 
@@ -254,7 +254,7 @@ export default function EieRealEstatePage({ onNavigate }) {
             FREE CONSULTATION
           </span>
           <h2 className="text-2xl sm:text-3xl font-black mt-3 mb-4">
-            中古物件探し ＆ 構造設計者同行の無料相談
+            中古物件探し ＆ 専門調査・建築士の無料相談
           </h2>
           <p className="text-xs sm:text-sm text-stone-400 mb-8 leading-relaxed">
             「気になっている中古物件がある」「新築と迷っている」「資金計画を相談したい」など、お気軽にご相談ください。
@@ -326,7 +326,7 @@ export default function EieRealEstatePage({ onNavigate }) {
               disabled={formSubmitted}
               className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2"
             >
-              <span>{formSubmitted ? '送信中...' : '構造設計者に無料相談する'}</span>
+              <span>{formSubmitted ? '送信中...' : '建築士・不動産専門スタッフに無料相談する'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>

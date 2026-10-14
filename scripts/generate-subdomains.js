@@ -38,7 +38,7 @@ const subdomains = [
     title: '【公式】再進の家｜鳩山町 2,180万円・HEAT20 G2・ほぼ光熱費0円の高性能再生住宅',
     description: '練馬ICから車で約50分・埼玉県鳩山町。子供が独立した50代・60代・70代のご夫婦のための【2,180万円 フルスケルトン再生邸宅】。土地72坪・南西角地・Qセルズ大容量8.0kW太陽光発電（年間8,789kWh創エネ）・屋根遮熱銀次郎・タカラ高品位ホーロー設備。エアコン1台で家じゅう極暖の大人セカンドライフ。',
     keywords: '再進の家,鳩山町 リノベーション,鳩山ニュータウン 物件,50代 住み替え 埼玉,二拠点生活 関東,HEAT20 G2 リノベ,光熱費ゼロ住宅 埼玉,タカラスタンダード ホーロー',
-    canonical: 'https://lp.smile049.jp/',
+    canonical: 'https://lp.smile049.jp/saishin/',
     ogpTitle: '【公式】再進の家｜鳩山町 2,180万円・HEAT20 G2・ほぼ光熱費0円の高性能再生住宅',
     ogpDesc: '子供が独立した50代〜70代からの住み替え・週末二拠点。新築以上の断熱性能（HEAT20 G2）とQセルズ太陽光8.0kWを搭載したフルスケルトン再生邸宅。',
     jsonLd: {
@@ -46,10 +46,10 @@ const subdomains = [
       "@graph": [
         {
           "@type": "SingleFamilyResidence",
-          "@id": "https://lp.smile049.jp/#residence",
+          "@id": "https://lp.smile049.jp/saishin/#residence",
           "name": "再進の家 鳩山町松栄モデルハウス",
           "description": "土地72坪・南西角地。HEAT20 G2相当の超高断熱（UA値0.46）と大容量8.0kW太陽光発電を標準搭載したフルスケルトン再生リノベーション邸宅。",
-          "url": "https://lp.smile049.jp/",
+          "url": "https://lp.smile049.jp/saishin/",
           "address": {
             "@type": "PostalAddress",
             "addressLocality": "比企郡鳩山町松栄",
@@ -147,18 +147,18 @@ const subdomains = [
   {
     dir: 'eie',
     subdomain: 'eie.smile049.jp',
-    title: 'EIE不動産｜20代・30代からの中古購入＋リノベ正解ルート【構造設計者同行×一括住宅ローン】',
-    description: '新築4,000万は高すぎる！20代・30代の賢いマイホーム戦略は「中古住宅を買ってリノベが正解」。一級建築士・構造設計者が物件調査から同行し、耐震診断・インスペクション・リノベ費用一括ローン・確認申請までワンストップ対応。埼玉県・関東一円。',
-    keywords: 'EIE不動産,中古住宅 リノベーション 埼玉,中古購入 リノベ 20代 30代,構造設計者 不動産,インスペクション 埼玉,住宅ローン 一括 リノベ,狭山 川越 不動産',
+    title: 'EIE不動産｜20代・30代からの中古購入＋リノベ正解ルート【専門調査(JFD)×二級建築士×一括住宅ローン】',
+    description: '新築4,000万は高すぎる！20代・30代の賢いマイホーム戦略は「中古住宅を買ってリノベが正解」。提携専門調査機関（JFD）による精密物件調査（測量・行政・法務局調査：約10万円）と二級建築士による法規・確認申請・リノベ一括ローンまでワンストップ対応。埼玉県・関東一円。',
+    keywords: 'EIE不動産,中古住宅 リノベーション 埼玉,中古購入 リノベ 20代 30代,JFD 物件調査,二級建築士 リノベ 埼玉,住宅ローン 一括 リノベ,狭山 川越 不動産',
     canonical: 'https://eie.smile049.jp/',
     ogpTitle: 'EIE不動産｜20代・30代からの中古購入＋リノベ正解ルート',
-    ogpDesc: '新築高騰時代の賢い選択。構造設計者が同行する安心の中古＋リノベーション仲介。',
+    ogpDesc: '新築高騰時代の賢い選択。専門調査機関（JFD）と二級建築士が連携する安心の中古＋リノベーション仲介。',
     jsonLd: {
       "@context": "https://schema.org",
       "@type": "RealEstateAgent",
       "@id": "https://eie.smile049.jp/#agent",
       "name": "EIE不動産 / 株式会社 住ま居る",
-      "description": "20代・30代向けの中古住宅購入＋フルリノベーション専門ワンストップ不動産仲介。構造設計者による物件調査・耐震診断・住宅ローン一本化を自社一貫提供。",
+      "description": "20代・30代向けの中古住宅購入＋フルリノベーション専門ワンストップ不動産仲介。専門調査機関（JFD）による精密物件調査と二級建築士による法規・確認申請・住宅ローン一本化を自社一貫提供。",
       "url": "https://eie.smile049.jp/",
       "telephone": "+81-49-271-2350",
       "address": {
@@ -181,7 +181,7 @@ const subdomains = [
               新築4,000万は高すぎる！「中古を買ってリノベ」が正解な3つの理由【EIE不動産】
             </h1>
             <p style="font-size: 16px; color: #94a3b8; line-height: 1.8; margin: 0;">
-              構造設計一級建築士が現地同行 ｜ 物件調査・耐震診断 ｜ 物件価格＋リノベ費用を一括住宅ローン化 ｜ 埼玉県・関東一円対応
+              専門調査機関（JFD）による精密調査 ｜ 二級建築士による法規・確認申請 ｜ 物件価格＋リノベ費用を一括住宅ローン化 ｜ 埼玉県・関東一円対応
             </p>
           </header>
 
@@ -197,10 +197,10 @@ const subdomains = [
 
             <section style="background: #1e293b; padding: 20px; border-radius: 16px; border: 1px solid #334155;">
               <h2 style="font-size: 18px; font-weight: 700; color: #38bdf8; margin-top: 0; margin-bottom: 8px;">
-                🔍 構造設計者が物件調査・耐震同行
+                🔍 専門調査機関（JFD）精密調査×二級建築士
               </h2>
               <p style="font-size: 14px; color: #cbd5e1; line-height: 1.7;">
-                普通の不動産屋にはできない「耐震診断・構造チェック・壁撤去可否」を内覧段階でプロが即座に診断。
+                約10万円で測量・行政・法務局調査を実施。二級建築士が「この壁は抜けるか」「確認申請が通るか」を事前に明確化。
               </p>
             </section>
 
@@ -225,7 +225,7 @@ const subdomains = [
 
           <footer style="padding: 20px; background: #1e293b; border-radius: 12px; border: 1px solid #334155; text-align: center; font-size: 13px; color: #94a3b8;">
             <p style="margin: 0 0 6px;">
-              <strong>宅地建物取引業者免許 埼玉県知事 (3)第23725号</strong> ｜ 株式会社 住ま居る
+              <strong>宅地建物取引業者免許 埼玉県知事 (3)第23725号 ｜ 建築士事務所登録 第(5)10278号</strong> ｜ 株式会社 住ま居る
             </p>
             <p style="margin: 0; font-size: 12px; color: #64748b;">
               ※EIE不動産 ポータルを読み込み中...
@@ -239,11 +239,11 @@ const subdomains = [
     dir: 're',
     subdomain: 're.smile049.jp',
     title: 'スマイチリフォーム RE｜戸建て断熱・耐震・水回りフルリノベーション【埼玉】',
-    description: '冬寒く夏暑い家を、エアコン1台で快適な省エネ住宅へ。基礎外断熱＋床暖房、内窓インプラス、タカラ最高峰ホーロー設備、屋根遮熱銀次郎。構造設計者が耐震と温熱を計算するフルリノベーション。埼玉県全域対応。',
+    description: '冬寒く夏暑い家を、エアコン1台で快適な省エネ住宅へ。基礎外断熱＋床暖房、内窓インプラス、タカラ最高峰ホーロー設備、屋根遮熱銀次郎。二級建築士が耐震と温熱を計算するフルリノベーション。埼玉県全域対応。',
     keywords: 'スマイチリフォーム,戸建て 断熱リフォーム 埼玉,基礎外断熱 床暖房,耐震補強 リノベーション,タカラスタンダード ホーローリフォーム,窓断熱 内窓 埼玉',
     canonical: 'https://re.smile049.jp/',
     ogpTitle: 'スマイチリフォーム RE｜戸建て断熱・耐震・水回りフルリノベーション',
-    ogpDesc: '基礎外断熱＋床暖房で冬の朝もスリッパ不要。構造設計者が手がける本物の断熱・耐震リノベーション。',
+    ogpDesc: '基礎外断熱＋床暖房で冬の朝もスリッパ不要。二級建築士が手がける本物の断熱・耐震リノベーション。',
     jsonLd: {
       "@context": "https://schema.org",
       "@type": "GeneralContractor",
@@ -327,7 +327,7 @@ subdomains.forEach((item) => {
     fs.mkdirSync(targetSubDir, { recursive: true });
   }
 
-  const htmlContent = `<!DOCTYPE html>
+  const buildHtml = (customCanonical) => `<!DOCTYPE html>
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
@@ -346,13 +346,13 @@ subdomains.forEach((item) => {
     <title>${item.title}</title>
     <meta name="description" content="${item.description}" />
     <meta name="keywords" content="${item.keywords}" />
-    <link rel="canonical" href="${item.canonical}" />
+    <link rel="canonical" href="${customCanonical || item.canonical}" />
 
     <!-- OGP (Open Graph Protocol) -->
     <meta property="og:title" content="${item.ogpTitle}" />
     <meta property="og:description" content="${item.ogpDesc}" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="${item.canonical}" />
+    <meta property="og:url" content="${customCanonical || item.canonical}" />
     <meta property="og:image" content="https://smile049.jp/assets/ogp.webp" />
     <meta property="og:site_name" content="${item.title.split('｜')[0]}" />
     <meta property="og:locale" content="ja_JP" />
@@ -391,11 +391,23 @@ ${item.bodyHtml}
   </body>
 </html>`;
 
-  fs.writeFileSync(path.join(targetSubDir, 'index.html'), htmlContent, 'utf8');
+  // ルート用 index.html
+  fs.writeFileSync(path.join(targetSubDir, 'index.html'), buildHtml(item.canonical), 'utf8');
+
+  // lpの場合は /saishin/ 用のサブディレクトリも生成して両対応！
+  if (item.dir === 'lp') {
+    const saishinDir = path.join(targetSubDir, 'saishin');
+    if (!fs.existsSync(saishinDir)) {
+      fs.mkdirSync(saishinDir, { recursive: true });
+    }
+    fs.writeFileSync(path.join(saishinDir, 'index.html'), buildHtml('https://lp.smile049.jp/saishin/'), 'utf8');
+    console.log(`[Success] Generated static HTML for https://lp.smile049.jp/saishin/ in dist/lp/saishin/`);
+  }
 
   // SPAフォールバック用 .htaccess
   const htaccessContent = `RewriteEngine On
 RewriteBase /
+RewriteRule ^saishin/?$ /saishin/index.html [L]
 RewriteRule ^index\\.html$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

@@ -28,7 +28,7 @@ if %ERRORLEVEL% neq 0 (
 echo ==========================================
 echo  Adjusting server permissions & subdomain links...
 echo ==========================================
-ssh -p 10022 -o BatchMode=yes mdo3@mdo3.xsrv.jp "ln -sfn ../assets /home/mdo3/smile049.jp/public_html/lp/assets && ln -sfn ../assets /home/mdo3/smile049.jp/public_html/eie/assets && ln -sfn ../assets /home/mdo3/smile049.jp/public_html/re/assets && rm -f /home/mdo3/smile049.jp/public_html/lp/default_page.png /home/mdo3/smile049.jp/public_html/eie/default_page.png /home/mdo3/smile049.jp/public_html/re/default_page.png && chmod 755 /home/mdo3/smile049.jp/public_html && find /home/mdo3/smile049.jp/public_html -type d -exec chmod 755 {} + && find /home/mdo3/smile049.jp/public_html -type f -exec chmod 644 {} +"
+ssh -p 10022 -o BatchMode=yes mdo3@mdo3.xsrv.jp "ln -sfn ../assets /home/mdo3/smile049.jp/public_html/lp/assets && mkdir -p /home/mdo3/smile049.jp/public_html/lp/saishin && ln -sfn ../../assets /home/mdo3/smile049.jp/public_html/lp/saishin/assets && ln -sfn ../assets /home/mdo3/smile049.jp/public_html/eie/assets && ln -sfn ../assets /home/mdo3/smile049.jp/public_html/re/assets && rm -f /home/mdo3/smile049.jp/public_html/lp/default_page.png /home/mdo3/smile049.jp/public_html/eie/default_page.png /home/mdo3/smile049.jp/public_html/re/default_page.png && chmod 755 /home/mdo3/smile049.jp/public_html && find /home/mdo3/smile049.jp/public_html -type d -exec chmod 755 {} + && find /home/mdo3/smile049.jp/public_html -type f -exec chmod 644 {} +"
 
 echo ==========================================
 echo  Deploy completed successfully!
