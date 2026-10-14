@@ -1029,8 +1029,10 @@ export default function TopPage({ setCurrentRoute }) {
               }}>
                 <img 
                   src="/assets/construction/02/IMG_2560.jpg" 
-                  alt="スマイチ木造自由設計ガレージ 完成全景" 
+                  alt="埼玉県比企郡・川越市 木造自由設計ガレージ完成全景（市街化調整区域・特注寸法W2.73×D6.37 スマイチ実例）" 
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div style={{
                   position: 'absolute',
@@ -1050,13 +1052,13 @@ export default function TopPage({ setCurrentRoute }) {
               {/* ミニ写真3枚 */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
                 <div style={{ height: 70, borderRadius: 6, overflow: 'hidden' }}>
-                  <img src="/assets/construction/02/IMG_2339.jpeg" alt="基礎型枠" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src="/assets/construction/02/IMG_2339.jpeg" alt="木造ガレージ 布基礎配筋・型枠工事の施工現場（埼玉県）" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <div style={{ height: 70, borderRadius: 6, overflow: 'hidden' }}>
-                  <img src="/assets/construction/02/IMG_2556.jpg" alt="シャッター開口" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src="/assets/construction/02/IMG_2556.jpg" alt="大開口ワイドシャッター取付・木造軸組金物緊結（スマイチ実例）" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <div style={{ height: 70, borderRadius: 6, overflow: 'hidden' }}>
-                  <img src="/assets/construction/01/IMG_1840.JPG" alt="境界15cm実例" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src="/assets/construction/01/IMG_1840.JPG" alt="敷地境界15cm限界納まり・軒ゼロ仕様の木造ガレージ完成全景（狭小地・変形地実例）" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
               </div>
             </div>
@@ -1119,7 +1121,9 @@ export default function TopPage({ setCurrentRoute }) {
               <div style={{ position: 'relative', width: '100%', height: 200, overflow: 'hidden' }}>
                 <img
                   src="/assets/plans/plan01.jpg"
-                  alt="Plan 01 愛車・ホビー木造ガレージ"
+                  alt="Plan 01 大人の秘密基地 愛車・大型バイク・ホビー用木造ガレージ完成パース（屋根外壁ガルバリウム×木造梁現し 埼玉県スマイチ）"
+                  loading="lazy"
+                  decoding="async"
                   style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }}
                   onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
                   onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
@@ -1175,7 +1179,9 @@ export default function TopPage({ setCurrentRoute }) {
               <div style={{ position: 'relative', width: '100%', height: 200, overflow: 'hidden' }}>
                 <img
                   src="/assets/plans/plan02.jpg"
-                  alt="Plan 02 狭小・変形地向け木造ストッカー"
+                  alt="Plan 02 狭小地・変形地・敷地境界15cm特注木造ストッカー完成パース（台形フィット・軒ゼロ設計 埼玉県スマイチ）"
+                  loading="lazy"
+                  decoding="async"
                   style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }}
                   onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
                   onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
@@ -1231,7 +1237,9 @@ export default function TopPage({ setCurrentRoute }) {
               <div style={{ position: 'relative', width: '100%', height: 200, overflow: 'hidden' }}>
                 <img
                   src="/assets/plans/plan03.jpg"
-                  alt="Plan 03 農機具・大型倉庫向けアグリシェッド"
+                  alt="Plan 03 大型農機具・トラクター車庫向け木造アグリシェッド完成パース（市街化調整区域・農地転用ワンストップ 埼玉県スマイチ）"
+                  loading="lazy"
+                  decoding="async"
                   style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }}
                   onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
                   onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
@@ -1287,7 +1295,9 @@ export default function TopPage({ setCurrentRoute }) {
               <div style={{ position: 'relative', width: '100%', height: 200, overflow: 'hidden' }}>
                 <img
                   src="/assets/plans/plan04.jpg"
-                  alt="Plan 04 スマイチホール・大空間ワークショップ＆事業用倉庫"
+                  alt="Plan 04 スマイチホール・無柱大空間ワークショップ＆事業用木造大型倉庫完成パース（BtoB倉庫・工場 埼玉県スマイチ）"
+                  loading="lazy"
+                  decoding="async"
                   style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }}
                   onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
                   onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}

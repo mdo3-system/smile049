@@ -783,12 +783,53 @@ ${assetIncludes}
         </h1>
 
         <!-- 導入リード文 -->
-        <div style="font-size: 16px; line-height: 1.85; color: #475569; background: #f8fafc; border-left: 4px solid #b45309; padding: 18px 20px; border-radius: 0 8px 8px 0; margin-bottom: 32px;">
+        <div style="font-size: 16px; line-height: 1.85; color: #475569; background: #f8fafc; border-left: 4px solid #b45309; padding: 18px 20px; border-radius: 0 8px 8px 0; margin-bottom: 28px;">
           ${col.description}
         </div>
 
+        <!-- メインアイキャッチ画像（SEO / AIO 最適化） -->
+        ${col.heroImage ? `
+        <figure style="margin: 0 0 32px 0;">
+          <img 
+            src="${col.heroImage}" 
+            alt="${col.title} - 木造ガレージ・大型倉庫 施工実例・3D完成パース（埼玉県 鶴ヶ島市・川越市・鳩山町・狭山市 株式会社 住ま居る）" 
+            loading="lazy" 
+            decoding="async"
+            style="width: 100%; height: auto; max-height: 460px; object-fit: cover; border-radius: 12px; display: block; box-shadow: 0 4px 12px rgba(0,0,0,0.08);" 
+          />
+          <figcaption style="font-size: 12px; color: #64748b; margin-top: 6px; text-align: center;">
+            ▲ ${col.title} 施工イメージ・完成パース（株式会社 住ま居る）
+          </figcaption>
+        </figure>
+        ` : ''}
+
         <!-- 本文セクション -->
         ${sectionsHtml}
+
+        <!-- 関連現場施工写真・工程ギャラリー（地域名・工法明記） -->
+        ${(col.photos && col.photos.length > 0) ? `
+        <section style="margin: 36px 0; background: #f8fafc; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0;">
+          <h3 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 16px; display: flex; align-items: center; gap: 8px;">
+            <span>📷</span> 関連現場施工写真・施工プロセス（株式会社 住ま居る 実例）
+          </h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
+            ${col.photos.map((p, pIdx) => `
+              <figure style="margin: 0; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.04); border: 1px solid #e2e8f0;">
+                <img 
+                  src="${p}" 
+                  alt="${col.title} 現場施工写真 ${pIdx + 1}（埼玉県比企郡・川越市・鶴ヶ島市 木造自由設計ガレージ・基礎配筋・建て方金物）" 
+                  loading="lazy" 
+                  decoding="async"
+                  style="width: 100%; height: 180px; object-fit: cover; display: block;" 
+                />
+                <figcaption style="padding: 8px 10px; font-size: 11.5px; color: #64748b; text-align: center; background: #f8fafc;">
+                  施工工程記録写真 0${pIdx + 1}
+                </figcaption>
+              </figure>
+            `).join('')}
+          </div>
+        </section>
+        ` : ''}
 
         <!-- 3DシミュレーターCTA -->
         <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 16px; padding: 28px; text-align: center; color: #ffffff; margin: 40px 0;">

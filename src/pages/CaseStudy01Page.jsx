@@ -393,9 +393,10 @@ export default function CaseStudy01Page({ setCurrentRoute }) {
                       <div style={{ position: 'relative', height: 160, overflow: 'hidden', background: '#0f172a' }}>
                         <img 
                           src={photo.src} 
-                          alt={photo.title} 
+                          alt={`${photo.title} - ${photo.caption}（木造ガレージ施工現場写真 埼玉県鶴ヶ島・川越・狭山 株式会社 住ま居る）`} 
                           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                           loading="lazy"
+                          decoding="async"
                         />
                         <div style={{
                           position: 'absolute',

@@ -734,7 +734,9 @@ export default function SaishinLpPage({ onNavigate }) {
                 <div className="bg-[#faf8f5] rounded-xl overflow-hidden border border-stone-200 shadow-sm">
                   <img
                     src="/assets/saishin/features/feat_01_skeleton.jpg"
-                    alt="スケルトン解体・構造金物補強"
+                    alt="埼玉県比企郡鳩山町 再進の家 フルスケルトン解体・高耐震構造金物緊結補強工事（株式会社 住ま居る）"
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-40 object-cover"
                   />
                   <div className="p-3">
@@ -746,7 +748,9 @@ export default function SaishinLpPage({ onNavigate }) {
                 <div className="bg-[#faf8f5] rounded-xl overflow-hidden border border-stone-200 shadow-sm">
                   <img
                     src="/assets/saishin/features/feat_02_ginjiro.jpg"
-                    alt="遮熱通気スペーサー銀次郎"
+                    alt="屋根遮熱通気スペーサー銀次郎・酷暑遮熱対策（再進の家 鳩山町松栄モデル）"
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-40 object-cover"
                   />
                   <div className="p-3">
@@ -758,7 +762,9 @@ export default function SaishinLpPage({ onNavigate }) {
                 <div className="bg-[#faf8f5] rounded-xl overflow-hidden border border-stone-200 shadow-sm">
                   <img
                     src="/assets/saishin/features/feat_03_window.jpg"
-                    alt="YKK APW430高性能トリプルガラス樹脂窓"
+                    alt="YKK APW430 高性能トリプルガラス樹脂サッシ・HEAT20 G2超高断熱仕様（再進の家）"
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-40 object-cover"
                   />
                   <div className="p-3">
@@ -770,7 +776,9 @@ export default function SaishinLpPage({ onNavigate }) {
                 <div className="bg-[#faf8f5] rounded-xl overflow-hidden border border-stone-200 shadow-sm">
                   <img
                     src="/assets/saishin/features/feat_04_plumbing.jpg"
-                    alt="給排水管・電気配線の完全リプレイス"
+                    alt="床下給水給湯管ヘッダー配管・電気配線完全新品交換施工（再進の家 実例）"
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-40 object-cover"
                   />
                   <div className="p-3">
