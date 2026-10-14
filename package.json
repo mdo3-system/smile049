@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build --emptyOutDir false",
+    "build": "vite build --emptyOutDir false && node scripts/generate-subdomains.js",
     "preview": "vite preview",
     "deploy": "cmd /c scripts\\deploy.bat"
   },

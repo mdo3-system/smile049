@@ -3,51 +3,83 @@
   <!-- 主要固定ページ -->
   <url>
     <loc>https://smile049.jp/</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-10-14</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://smile049.jp/simulator</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-10-14</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
   </url>
   <url>
     <loc>https://smile049.jp/cases</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-10-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smile049.jp/stories</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-10-14</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smile049.jp/plan-hobby</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-10-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://smile049.jp/plan-storage</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-10-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://smile049.jp/plan-agri</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-10-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://smile049.jp/plan-workshop</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-10-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
+  </url>
+
+  <!-- サブドメイン特化サイト (再進の家 / EIE不動産 / スマイチリフォーム) -->
+  <url>
+    <loc>https://lp.smile049.jp/</loc>
+    <lastmod>2026-10-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://lp.smile049.jp/technology</loc>
+    <lastmod>2026-10-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://lp.smile049.jp/spec</loc>
+    <lastmod>2026-10-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://eie.smile049.jp/</loc>
+    <lastmod>2026-10-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://re.smile049.jp/</loc>
+    <lastmod>2026-10-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
   </url>
 
   <!-- 悩み解決型 SEOコラム（全15記事） -->
