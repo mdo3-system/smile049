@@ -227,6 +227,86 @@ export default function Footer({ setCurrentRoute }) {
             </ul>
           </div>
 
+          {/* 株式会社 住ま居る グループ事業ネットワーク */}
+          <div>
+            <h4 style={{ fontSize: 15, color: '#fff', marginBottom: 16, borderBottom: '1px solid #334155', paddingBottom: 8 }}>
+              住ま居る グループ事業ネットワーク
+            </h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 13 }}>
+              {/* 再進の家 */}
+              <a
+                href="https://lp.smile049.jp/saishin/"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'block',
+                  background: 'rgba(180, 83, 9, 0.15)',
+                  border: '1px solid rgba(245, 158, 11, 0.3)',
+                  borderRadius: 8,
+                  padding: '10px 12px',
+                  textDecoration: 'none',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span style={{ color: '#fbbf24', fontWeight: 700, fontSize: 13 }}>【再進の家】再生邸宅</span>
+                  <span style={{ fontSize: 10, background: '#b45309', color: '#fff', padding: '2px 6px', borderRadius: 4 }}>50代〜70代</span>
+                </div>
+                <div style={{ fontSize: 11.5, color: '#d6d3d1', lineHeight: 1.5 }}>
+                  埼玉県鳩山町 2,180万円。HEAT20 G2・太陽光8.0kW・光熱費実質ゼロの大人二拠点＆住み替え。
+                </div>
+              </a>
+
+              {/* EIE不動産 */}
+              <a
+                href="https://eie.smile049.jp/"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'block',
+                  background: 'rgba(37, 99, 235, 0.15)',
+                  border: '1px solid rgba(56, 189, 248, 0.3)',
+                  borderRadius: 8,
+                  padding: '10px 12px',
+                  textDecoration: 'none',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span style={{ color: '#38bdf8', fontWeight: 700, fontSize: 13 }}>【EIE不動産】中古＋リノベ</span>
+                  <span style={{ fontSize: 10, background: '#2563eb', color: '#fff', padding: '2px 6px', borderRadius: 4 }}>20代・30代</span>
+                </div>
+                <div style={{ fontSize: 11.5, color: '#cbd5e1', lineHeight: 1.5 }}>
+                  新築4,000万は高すぎる！専門調査(JFD)×二級建築士×低金利一括ローンで賢く再生。
+                </div>
+              </a>
+
+              {/* スマイチリフォーム RE */}
+              <a
+                href="https://re.smile049.jp/"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'block',
+                  background: 'rgba(5, 150, 105, 0.15)',
+                  border: '1px solid rgba(52, 211, 153, 0.3)',
+                  borderRadius: 8,
+                  padding: '10px 12px',
+                  textDecoration: 'none',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span style={{ color: '#34d399', fontWeight: 700, fontSize: 13 }}>【スマイチリフォーム RE】</span>
+                  <span style={{ fontSize: 10, background: '#059669', color: '#fff', padding: '2px 6px', borderRadius: 4 }}>持ち家再生</span>
+                </div>
+                <div style={{ fontSize: 11.5, color: '#d4d4d8', lineHeight: 1.5 }}>
+                  基礎外断熱＋床暖房で冬の朝もスリッパ不要。タカラ最高峰ホーロー設備フルリノベ。
+                </div>
+              </a>
+            </div>
+          </div>
+
           {/* 対応エリア・運営情報 */}
           <div>
             <h4 style={{ fontSize: 15, color: '#fff', marginBottom: 16, borderBottom: '1px solid #334155', paddingBottom: 8 }}>

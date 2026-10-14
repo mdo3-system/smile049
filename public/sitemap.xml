@@ -50,36 +50,12 @@
     <priority>0.85</priority>
   </url>
 
-  <!-- サブドメイン特化サイト (再進の家 / EIE不動産 / スマイチリフォーム) -->
+  <!-- 特集・ガイドページ -->
   <url>
-    <loc>https://lp.smile049.jp/</loc>
-    <lastmod>2026-10-14</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.95</priority>
-  </url>
-  <url>
-    <loc>https://lp.smile049.jp/technology</loc>
+    <loc>https://smile049.jp/saishin-dual-life-guide.html</loc>
     <lastmod>2026-10-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://lp.smile049.jp/spec</loc>
-    <lastmod>2026-10-14</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://eie.smile049.jp/</loc>
-    <lastmod>2026-10-14</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://re.smile049.jp/</loc>
-    <lastmod>2026-10-14</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
   </url>
 
   <!-- 悩み解決型 SEOコラム（全15記事） -->

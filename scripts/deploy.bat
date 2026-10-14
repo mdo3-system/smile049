@@ -3,11 +3,11 @@ setlocal
 chcp 65001 > nul
 
 echo ==========================================
-echo  [1/3] Vite Build (Creating dist/)
+echo  [1/3] Vite Build & Subdomains Generation
 echo ==========================================
-call npx vite build --emptyOutDir false
+call npm run build
 if %ERRORLEVEL% neq 0 (
-    echo [ERROR] Vite build failed.
+    echo [ERROR] Build failed.
     exit /b 1
 )
 
@@ -33,8 +33,8 @@ ssh -p 10022 -o BatchMode=yes mdo3@mdo3.xsrv.jp "ln -sfn ../assets /home/mdo3/sm
 echo ==========================================
 echo  Deploy completed successfully!
 echo  Main:      https://smile049.jp/
-echo  LP (再生): https://lp.smile049.jp/
-echo  EIE(不動産): https://eie.smile049.jp/
-echo  RE (リノベ): https://re.smile049.jp/
+echo  LP (??): https://lp.smile049.jp/saishin/
+echo  EIE(???): https://eie.smile049.jp/
+echo  RE (???): https://re.smile049.jp/
 echo  GitHub:    https://github.com/mdo3-system/smile049
 echo ==========================================
