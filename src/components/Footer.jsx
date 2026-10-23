@@ -277,7 +277,7 @@ export default function Footer({ setCurrentRoute }) {
                   <span style={{ fontSize: 10, background: '#2563eb', color: '#fff', padding: '2px 6px', borderRadius: 4 }}>20代・30代</span>
                 </div>
                 <div style={{ fontSize: 11.5, color: '#cbd5e1', lineHeight: 1.5 }}>
-                  新築4,000万は高すぎる！専門調査(JFD)×二級建築士×低金利一括ローンで賢く再生。
+                  新築4,000万は高すぎる！専門調査(JFD)×専任担当者×低金利一括ローンで賢く再生。
                 </div>
               </a>
 
@@ -345,8 +345,8 @@ export default function Footer({ setCurrentRoute }) {
                 <div>所在地：〒350-2224 埼玉県鶴ヶ島市町屋176番地5</div>
                 <div style={{ color: '#cbd5e1', marginTop: 2 }}>
                   建築士事務所登録：埼玉県知事 第（5）10278号<br />
-                  建設業許可：埼玉県知事 許可（般）第60650号<br />
-                  宅地建物取引業者免許：埼玉県知事 (2) 第22198号
+                  建設業許可：埼玉県知事 許可（般-8）第60650号<br />
+                  宅地建物取引業者免許：埼玉県知事 (3) 第22198号
                 </div>
                 <div style={{ marginTop: 4, color: '#38bdf8', fontSize: 11.5 }}>
                   ※設計データやパース画像を迅速・正確に共有するため、お問合せ・ご相談は専用オンライン相談チャット（24時間受付）にて承っております。

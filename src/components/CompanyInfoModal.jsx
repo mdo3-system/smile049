@@ -138,8 +138,8 @@ export default function CompanyInfoModal({ isOpen, onClose, initialTab = 'compan
                     <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
                       <th style={{ textAlign: 'left', padding: '10px 0', color: '#64748b' }}>許認可・登録</th>
                       <td style={{ padding: '10px 0', color: '#0f172a', lineHeight: 1.6 }}>
-                        建設業許可：埼玉県知事 許可（般）第60650号<br />
-                        宅地建物取引業者免許：埼玉県知事 (2) 第22198号
+                        建設業許可：埼玉県知事 許可（般-8）第60650号<br />
+                        宅地建物取引業者免許：埼玉県知事 (3) 第22198号
                       </td>
                     </tr>
                     <tr style={{ borderBottom: '1px solid #e2e8f0' }}>

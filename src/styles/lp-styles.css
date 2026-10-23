@@ -22,6 +22,10 @@ video.object-cover, img.object-cover {
 .h-72 { height: 18rem; }
 .h-80 { height: 20rem; }
 .h-96 { height: 24rem; }
+.h-\[320px\] { height: 320px; }
+.h-\[440px\] { height: 440px; }
+.h-\[480px\] { height: 480px; }
+.h-\[540px\] { height: 540px; }
 .h-4 { height: 1rem; }
 .w-4 { width: 1rem; }
 .h-5 { height: 1.25rem; }
@@ -223,6 +227,11 @@ video.object-cover, img.object-cover {
 .bg-stone-900\/95 { background-color: rgba(28, 25, 23, 0.95); }
 .bg-stone-950\/80 { background-color: rgba(12, 10, 9, 0.8); }
 .bg-stone-950\/90 { background-color: rgba(12, 10, 9, 0.9); }
+.bg-stone-950\/95 { background-color: rgba(12, 10, 9, 0.95); }
+.bg-emerald-950\/40 { background-color: rgba(6, 78, 59, 0.4); }
+.bg-emerald-950\/50 { background-color: rgba(6, 78, 59, 0.5); }
+.bg-emerald-950\/60 { background-color: rgba(6, 78, 59, 0.6); }
+.bg-emerald-950 { background-color: #064e3b; }
 .bg-black\/50 { background-color: rgba(0, 0, 0, 0.5); }
 .bg-black\/60 { background-color: rgba(0, 0, 0, 0.6); }
 .bg-black\/70 { background-color: rgba(0, 0, 0, 0.7); }

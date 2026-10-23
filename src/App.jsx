@@ -14,6 +14,7 @@ import SaishinSpecPage from './pages/SaishinSpecPage';
 import EieRealEstatePage from './pages/EieRealEstatePage';
 import ReRenovationPage from './pages/ReRenovationPage';
 import ChatRoomModal from './components/ChatRoomModal';
+import ScrollToTopButton from './components/ScrollToTopButton';
 import { MessageSquare } from 'lucide-react';
 import { trackPageView, Analytics } from './utils/analytics';
 
@@ -90,8 +91,8 @@ const getRouteFromPath = (pathname) => {
   }
 
   if (cleanPath === '/saishin' || cleanPath === '/lp/saishin' || cleanPath === '/saishin-no-ie') return 'saishin';
-  if (cleanPath === '/eie' || cleanPath === '/realestate' || cleanPath === '/fudosan') return 'eie';
-  if (cleanPath === '/re' || cleanPath === '/renovation' || cleanPath === '/reform') return 're';
+  if (cleanPath === '/eie' || cleanPath.startsWith('/eie/') || cleanPath === '/realestate' || cleanPath === '/fudosan' || cleanPath === '/subsidies') return 'eie';
+  if (cleanPath === '/re' || cleanPath.startsWith('/re/') || cleanPath === '/renovation' || cleanPath === '/reform') return 're';
   if (cleanPath === '/admin') return 'admin';
   return 'top';
 };
@@ -265,6 +266,9 @@ export default function App() {
           </Suspense>
         )}
       </main>
+
+      {/* 画面右下固定の「TOPへ戻る」ボタン */}
+      <ScrollToTopButton showAboveChat={currentRoute !== 'simulator' && currentRoute !== 'admin' && !isLp} />
 
       {/* シミュレーター画面、管理画面、LP画面以外で共通フッターを表示 */}
       {currentRoute !== 'simulator' && currentRoute !== 'admin' && !isLp && (

@@ -182,12 +182,12 @@ const subdomains = [
   {
     dir: 'eie',
     subdomain: 'eie.smile049.jp',
-    title: 'EIE不動産｜20代・30代からの中古購入＋リノベ正解ルート【専門調査(JFD)×二級建築士×一括住宅ローン】',
-    description: '新築4,000万は高すぎる！20代・30代の賢いマイホーム戦略は「中古住宅を買ってリノベが正解」。提携専門調査機関（JFD）による精密物件調査（測量・行政・法務局調査：約10万円）と二級建築士による法規・確認申請・リノベ一括ローンまでワンストップ対応。埼玉県・関東一円。',
-    keywords: 'EIE不動産,中古住宅 リノベーション 埼玉,中古購入 リノベ 20代 30代,JFD 物件調査,二級建築士 リノベ 埼玉,住宅ローン 一括 リノベ,狭山 川越 不動産',
+    title: 'EIE不動産｜中古購入×リノベ・土地探し×ガレージ【埼玉県西部エリア限定・工務店直営】',
+    description: '新築4,000万は高すぎる！20代・30代の賢いマイホーム戦略は「中古住宅を買ってリノベ」「土地探し×木造ガレージ建築」が正解。販売図面をスマホ撮影してAI 3D化＆Stable Diffusionによるリフォーム後3Dパース即時プレビュー。提携専門調査機関（JFD）による精密物件調査と二級建築士による法規・確認申請・一括住宅ローン対応。鶴ヶ島・坂戸・川越・鳩山・越生・毛呂山・東松山・日高・飯能・所沢・狭山。',
+    keywords: 'EIE不動産,図面 3Dパース AI,リフォーム 3Dパース,中古住宅 リノベーション 埼玉,土地探し ガレージ 埼玉,20代 30代 マイホーム,鶴ヶ島 川越 坂戸 鳩山 不動産,JFD 物件調査,二級建築士 リノベ',
     canonical: 'https://eie.smile049.jp/',
-    ogpTitle: 'EIE不動産｜20代・30代からの中古購入＋リノベ正解ルート',
-    ogpDesc: '新築高騰時代の賢い選択。専門調査機関（JFD）と二級建築士が連携する安心の中古＋リノベーション仲介。',
+    ogpTitle: 'EIE不動産｜中古購入×リノベ・土地探し×ガレージ【図面3DパースAI対応】',
+    ogpDesc: 'ただの不動産屋ではありません。販売図面スマホ撮影でAI 3Dリノベパース作成。工務店直営の中古＋リノベ＆土地＋ガレージ仲介。',
     sitemapUrls: [
       { loc: 'https://eie.smile049.jp/', priority: '1.0', changefreq: 'daily' }
     ],
@@ -198,7 +198,7 @@ const subdomains = [
           "@type": "RealEstateAgent",
           "@id": "https://eie.smile049.jp/#agent",
           "name": "EIE不動産 / 株式会社 住ま居る",
-          "description": "20代・30代向けの中古住宅購入＋フルリノベーション専門ワンストップ不動産仲介。専門調査機関（JFD）による精密物件調査と二級建築士による法規・確認申請・住宅ローン一本化を自社一貫提供。",
+          "description": "埼玉県西部エリア限定（鶴ヶ島・坂戸・川越・鳩山・越生・毛呂山・東松山・日高・飯能・所沢・狭山）。中古購入×リノベセット、土地探し×木造ガレージセットの工務店直営ワンストップ不動産仲介。図面スマホ撮影によるAI 3Dパース作成サービス提供。",
           "url": "https://eie.smile049.jp/",
           "telephone": "+81-49-271-2350",
           "address": {
@@ -223,10 +223,34 @@ const subdomains = [
             },
             {
               "@type": "Question",
+              "name": "図面を撮影するだけでリフォーム後の3Dパースが見られますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "はい。販売図面（マイソク）をスマホで撮影してアップロードいただくだけで、AIが間取りを認識し3D化。さらにStable DiffusionのControlNetと深度マップを駆使して、大空間LDKや対面キッチンなどリフォーム後のフォトリアルな3D完成予想パースを即時プレビューいただけます。"
+              }
+            },
+            {
+              "@type": "Question",
               "name": "物件調査は誰が行うのですか？",
               "acceptedAnswer": {
                 "@type": "Answer",
                 "text": "提携専門調査機関（JFD）に約10万円で委託し、測量・行政協議・法務局調査を実施します。その調査報告をもとに自社の二級建築士が『この壁を抜いて大空間にできるか』『建築基準法上の確認申請が必要か』を正確に判定します。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "中古住宅の購入やリフォームで受給できる補助金はいくらありますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "国の『長期優良住宅化リフォーム推進事業（最大210万円）』や『先進的窓リノベ事業（最大100万円）』『給湯省エネ事業（最大46万円）』に加え、東京都の『省エネ改修促進事業（最大300万円）』や『埼玉県窓断熱リフォーム支援事業（国の交付額の1/2上乗せ）』など、国と自治体の上乗せを併用することで最大200万〜300万円以上の助成を受けることができます。株式会社住ま居るは登録事業者のため申請代行が可能です。"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "補助金を受給する際の注意点は何ですか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "工事請負契約の前、または着工前に交付申請・事前相談を完了させておくことが鉄則です。契約後に遡って申請することは原則できません。また、登録事業者による施工が必須となるため、事前にご相談ください。"
               }
             }
           ]
@@ -237,16 +261,34 @@ const subdomains = [
       <div id="initial-screen" style="min-height: 100vh; background: #0f172a; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 24px;">
         <div style="max-width: 960px; margin: 0 auto;">
           <header style="border-bottom: 1px solid #334155; padding-bottom: 24px; margin-bottom: 32px;">
-            <div style="display: inline-block; padding: 4px 12px; background: #2563eb; color: #fff; border-radius: 9999px; font-size: 13px; font-weight: bold; margin-bottom: 12px;">
-              20代・30代からの賢いマイホーム戦略
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+              <span style="display: inline-block; padding: 4px 12px; background: #2563eb; color: #fff; border-radius: 9999px; font-size: 13px; font-weight: bold;">
+                20代・30代からの賢いマイホーム戦略
+              </span>
+              <span style="display: inline-block; padding: 4px 12px; background: #059669; color: #fff; border-radius: 9999px; font-size: 13px; font-weight: bold;">
+                埼玉県西部エリア限定（鶴ヶ島・坂戸・川越・鳩山・越生・毛呂山・東松山・日高・飯能・所沢・狭山）
+              </span>
             </div>
             <h1 style="font-size: 28px; font-weight: 800; color: #ffffff; line-height: 1.4; margin: 0 0 16px;">
-              新築4,000万は高すぎる！「中古を買ってリノベ」が正解な3つの理由【EIE不動産】
+              ただの不動産屋ではありません。「中古＋リノベ」＆「土地＋ガレージ」工務店直営ワンストップ【EIE不動産】
             </h1>
             <p style="font-size: 16px; color: #94a3b8; line-height: 1.8; margin: 0;">
-              専門調査機関（JFD）による精密調査 ｜ 二級建築士による法規・確認申請 ｜ 物件価格＋リノベ費用を一括住宅ローン化 ｜ 埼玉県・関東一円対応
+              専門調査機関（JFD）精密調査 ｜ 二級建築士による法規・確認申請 ｜ 物件＋リノベ一括住宅ローン ｜ 販売図面スマホ撮影 ➔ AI 3Dリノベパース即時プレビュー
             </p>
           </header>
+
+          {/* 3DパースAI 特集ブロック */}
+          <section style="background: linear-gradient(135deg, #3b0764 0%, #1e1b4b 100%); border: 1px solid #8b5cf6; border-radius: 16px; padding: 24px; margin-bottom: 28px; color: #f3e8ff;">
+            <div style="font-size: 12px; font-weight: bold; color: #c084fc; margin-bottom: 6px;">
+              📸 【画期的サービス】図面をスマホで撮るだけ！
+            </div>
+            <h2 style="font-size: 20px; font-weight: 800; color: #ffffff; margin: 0 0 10px;">
+              AIが間取りを3D化 ➔ Stable Diffusionでリフォーム後フォトリアルパースを即時生成
+            </h2>
+            <p style="font-size: 13px; color: #e9d5ff; line-height: 1.7; margin: 0;">
+              気になった中古物件のマイソク図面をスマホで撮影するだけ。3Dホワイトモデルを自動構築し、ControlNet（深度・エッジ線画）と高精度プロンプトにより、大空間LDKや対面キッチン、無垢フローリング等のリノベ後イメージを実寸スケールで可視化します。
+            </p>
+          </section>
 
           <main style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 32px;">
             <section style="background: #1e293b; padding: 20px; border-radius: 16px; border: 1px solid #334155;">
@@ -278,13 +320,30 @@ const subdomains = [
 
             <section style="background: #1e293b; padding: 20px; border-radius: 16px; border: 1px solid #334155;">
               <h2 style="font-size: 18px; font-weight: 700; color: #38bdf8; margin-top: 0; margin-bottom: 8px;">
-                🚪 死んだ勝手口を境界ストッカーへ
+                🏎️ 自社預かり土地×木造ガレージ建築セット
               </h2>
               <p style="font-size: 14px; color: #cbd5e1; line-height: 1.7;">
-                築20年超の勝手口を活用し境界いっぱいまでパントリー増築。玄関土間拡張と基礎断熱でQOL向上。
+                川越・鶴ヶ島等の自社預かり土地5区画に、幅3.6m〜6mの本格木造ガレージ（スマイチ）を即日シミュレーション配置。
               </p>
             </section>
           </main>
+
+          {/* 補助金・助成金ナビ（静的SEOブロック） */}
+          <section id="subsidies" style="background: #022c22; border: 1px solid #059669; border-radius: 16px; padding: 24px; margin-bottom: 32px; color: #ecfdf5;">
+            <div style="font-size: 13px; font-weight: bold; color: #34d399; margin-bottom: 6px;">
+              【国・都・県・市町村】最新補助金・助成金制度まとめ
+            </div>
+            <h2 style="font-size: 20px; font-weight: 800; color: #ffffff; margin: 0 0 12px;">
+              中古住宅の購入＋リノベで最大200万〜300万円受給！
+            </h2>
+            <p style="font-size: 13px; color: #a7f3d0; line-height: 1.7; margin: 0 0 16px;">
+              国の「長期優良住宅化リフォーム推進事業（最大210万円）」「先進的窓リノベ2026事業（最大100万円）」「給湯省エネ2026事業（最大46万円）」に加え、東京都の省エネ改修促進事業（最大300万円）や埼玉県の窓断熱支援金（国交付額の1/2上乗せ）など、自治体との併用で自己負担を大幅に圧縮できます。
+            </p>
+            <div style="font-size: 12px; background: #064e3b; padding: 12px; border-radius: 8px; border: 1px solid #047857;">
+              <strong>⚠️ 実務上の最重要ルール:</strong><br>
+              多くの補助金・助成金は「工事請負契約の前、着工前の申請」が受給の絶対条件です。契約後の申請はできません。株式会社 住ま居るは国の登録事業者のため、物件調査から申請代行までワンストップで承ります。
+            </div>
+          </section>
 
           <footer style="padding: 20px; background: #1e293b; border-radius: 12px; border: 1px solid #334155; text-align: center; font-size: 13px; color: #94a3b8;">
             <p style="margin: 0 0 6px;">
@@ -305,12 +364,12 @@ const subdomains = [
   {
     dir: 're',
     subdomain: 're.smile049.jp',
-    title: 'スマイチリフォーム RE｜戸建て断熱・耐震・水回りフルリノベーション【埼玉】',
-    description: '冬寒く夏暑い家を、エアコン1台で快適な省エネ住宅へ。基礎外断熱＋床暖房、内窓インプラス、タカラ最高峰ホーロー設備、屋根遮熱銀次郎。二級建築士が耐震と温熱を計算するフルリノベーション。埼玉県全域対応。',
-    keywords: 'スマイチリフォーム,戸建て 断熱リフォーム 埼玉,基礎外断熱 床暖房,耐震補強 リノベーション,タカラスタンダード ホーローリフォーム,窓断熱 内窓 埼玉',
+    title: 'スマイチリフォーム RE｜戸建て断熱・耐震・水回りフルリノベ【埼玉県西部エリア限定】',
+    description: '冬寒く夏暑い家を、エアコン1台で快適な省エネ住宅へ。自宅の図面をスマホ撮影してAI 3D化＆Stable Diffusionによるリフォーム後3Dパース即時生成。基礎外断熱＋床暖房、内窓インプラス、タカラ最高峰ホーロー設備、屋根遮熱銀次郎。二級建築士が耐震と温熱を計算する地域密着フルリノベーション工務店。鶴ヶ島・坂戸・川越・鳩山・越生・毛呂山・東松山・日高・飯能・所沢・狭山。',
+    keywords: 'スマイチリフォーム,図面 3Dパース AI,リフォーム 3Dパース,戸建て 断熱リフォーム 埼玉,埼玉県西部 リフォーム,基礎外断熱 床暖房,耐震補強 リノベーション,タカラスタンダード ホーローリフォーム',
     canonical: 'https://re.smile049.jp/',
-    ogpTitle: 'スマイチリフォーム RE｜戸建て断熱・耐震・水回りフルリノベーション',
-    ogpDesc: '基礎外断熱＋床暖房で冬の朝もスリッパ不要。二級建築士が手がける本物の断熱・耐震リノベーション。',
+    ogpTitle: 'スマイチリフォーム RE｜戸建て断熱・耐震・水回りフルリノベ【図面3DパースAI対応】',
+    ogpDesc: '埼玉県西部エリア限定。自宅図面スマホ撮影でリフォーム後の3DパースをAI即時生成。二級建築士・工務店直営の本物リノベーション。',
     sitemapUrls: [
       { loc: 'https://re.smile049.jp/', priority: '1.0', changefreq: 'daily' }
     ],
@@ -321,13 +380,21 @@ const subdomains = [
           "@type": "GeneralContractor",
           "@id": "https://re.smile049.jp/#contractor",
           "name": "スマイチリフォーム RE / 株式会社 住ま居る",
-          "description": "木造戸建ての断熱・耐震・水回りフルリノベーション専門ブランド。基礎外断熱工法とタカラスタンダード高品位ホーロー設備で快適な住まいを再生。",
+          "description": "埼玉県西部エリア限定（鶴ヶ島・坂戸・川越・鳩山・越生・毛呂山・東松山・日高・飯能・所沢・狭山）。木造戸建ての断熱・耐震・水回りフルリノベーション専門ブランド。自宅図面のAI 3D化およびControlNetフォトリアルパース作成サービス提供。",
           "url": "https://re.smile049.jp/",
           "telephone": "+81-49-271-2350"
         },
         {
           "@type": "FAQPage",
           "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "図面を撮影するだけでリフォーム後の3D完成イメージが分かりますか？",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "はい。ご自宅の平面図や間取り図をスマホで撮影してアップロードいただくだけで、AIが間取りを認識し3D化。さらにStable DiffusionのControlNetと深度マップを駆使して、大空間LDKや対面キッチンなどリフォーム後のフォトリアルな3D完成予想パースを即時プレビューいただけます。"
+              }
+            },
             {
               "@type": "Question",
               "name": "基礎外断熱工法のメリットは何ですか？",
@@ -344,16 +411,34 @@ const subdomains = [
       <div id="initial-screen" style="min-height: 100vh; background: #18181b; color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 24px;">
         <div style="max-width: 960px; margin: 0 auto;">
           <header style="border-bottom: 1px solid #27272a; padding-bottom: 24px; margin-bottom: 32px;">
-            <div style="display: inline-block; padding: 4px 12px; background: #059669; color: #fff; border-radius: 9999px; font-size: 13px; font-weight: bold; margin-bottom: 12px;">
-              戸建て断熱・耐震・水回りフルリノベーション
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+              <span style="display: inline-block; padding: 4px 12px; background: #059669; color: #fff; border-radius: 9999px; font-size: 13px; font-weight: bold;">
+                戸建て断熱・耐震・水回りフルリノベーション
+              </span>
+              <span style="display: inline-block; padding: 4px 12px; background: #2563eb; color: #fff; border-radius: 9999px; font-size: 13px; font-weight: bold;">
+                埼玉県西部エリア限定（鶴ヶ島・坂戸・川越・鳩山・越生・毛呂山・東松山・日高・飯能・所沢・狭山）
+              </span>
             </div>
             <h1 style="font-size: 28px; font-weight: 800; color: #ffffff; line-height: 1.4; margin: 0 0 16px;">
               真冬の朝も、スリッパなしでキッチンへ【スマイチリフォーム RE】
             </h1>
             <p style="font-size: 16px; color: #a1a1aa; line-height: 1.8; margin: 0;">
-              基礎外断熱＋床暖房 ｜ 内窓インプラス ｜ タカラスタンダード高品位ホーロー設備 ｜ 屋根遮熱銀次郎 ｜ 埼玉県全域対応
+              基礎外断熱＋床暖房 ｜ 内窓インプラス ｜ タカラスタンダード高品位ホーロー ｜ 屋根遮熱銀次郎 ｜ 自宅図面スマホ撮影 ➔ AI 3Dリノベパース即時プレビュー
             </p>
           </header>
+
+          {/* 3DパースAI 特集ブロック */}
+          <section style="background: linear-gradient(135deg, #3b0764 0%, #1e1b4b 100%); border: 1px solid #8b5cf6; border-radius: 16px; padding: 24px; margin-bottom: 28px; color: #f3e8ff;">
+            <div style="font-size: 12px; font-weight: bold; color: #c084fc; margin-bottom: 6px;">
+              📸 【無料AIシミュレーター】自宅の図面をスマホで撮るだけ！
+            </div>
+            <h2 style="font-size: 20px; font-weight: 800; color: #ffffff; margin: 0 0 10px;">
+              AIが間取りを3D化 ➔ Stable Diffusionでリフォーム後フォトリアルパースを即時生成
+            </h2>
+            <p style="font-size: 13px; color: #e9d5ff; line-height: 1.7; margin: 0;">
+              「この壁を抜いて大空間LDKにできる？」「アイランドキッチンにしたらどう見える？」をお手元の図面写真から3D化。工務店直営ならではの構造判定と、実寸スケールに基づくフォトリアルなリノベ後パースで、失敗しないリフォーム計画をサポートします。
+            </p>
+          </section>
 
           <main style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 32px;">
             <section style="background: #27272a; padding: 20px; border-radius: 16px; border: 1px solid #3f3f46;">
@@ -392,6 +477,23 @@ const subdomains = [
               </p>
             </section>
           </main>
+
+          {/* 補助金・助成金ナビ（静的SEOブロック） */}
+          <section id="subsidies" style="background: #064e3b; border: 1px solid #10b981; border-radius: 16px; padding: 24px; margin-bottom: 32px; color: #ecfdf5;">
+            <div style="font-size: 13px; font-weight: bold; color: #6ee7b7; margin-bottom: 6px;">
+              【国・都・県・市町村】戸建てリノベーション補助金情報
+            </div>
+            <h2 style="font-size: 20px; font-weight: 800; color: #ffffff; margin: 0 0 12px;">
+              性能向上リノベ・断熱改修・耐震補強で補助金を最大活用
+            </h2>
+            <p style="font-size: 13px; color: #a7f3d0; line-height: 1.7; margin: 0 0 16px;">
+              既存住宅の性能向上リノベーションには、国の「長期優良住宅化リフォーム推進事業（最大210万円）」「先進的窓リノベ2026事業（最大100万円）」、東京都・埼玉県の単独上乗せ補助金、さいたま市・川越市・鶴ヶ島市・坂戸市・鳩山町・越生町等の独自支援が利用可能です。
+            </p>
+            <div style="font-size: 12px; background: #022c22; padding: 12px; border-radius: 8px; border: 1px solid #059669;">
+              <strong>⚠️ 工事請負契約前の事前申請が必須です:</strong><br>
+              株式会社 住ま居るは国交省・環境省・経産省の登録事業者です。二級建築士による耐震診断・インスペクションから補助金の事前交付申請までワンストップで代行します。
+            </div>
+          </section>
 
           <footer style="padding: 20px; background: #27272a; border-radius: 12px; border: 1px solid #3f3f46; text-align: center; font-size: 13px; color: #a1a1aa;">
             <p style="margin: 0 0 6px;">
@@ -527,7 +629,17 @@ Sitemap: https://${item.subdomain}/sitemap.xml
 `;
   fs.writeFileSync(path.join(targetSubDir, 'robots.txt'), robotsTxt, 'utf8');
 
-  console.log(`[Success] Generated static HTML, .htaccess, sitemap.xml & robots.txt for ${item.subdomain}`);
+  // ファビコン・アセットのコピー（不動産・リフォーム・LP全サブドメインで統一）
+  const faviconFiles = ['favicon.svg', 'favicon.ico', 'favicon-32x32.png', 'favicon-16x16.png', 'apple-touch-icon.png', 'favicon.png'];
+  faviconFiles.forEach(file => {
+    const srcPath = path.join(__dirname, '../public', file);
+    const destPath = path.join(targetSubDir, file);
+    if (fs.existsSync(srcPath)) {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  });
+
+  console.log(`[Success] Generated static HTML, .htaccess, sitemap.xml, robots.txt & Unified Favicons for ${item.subdomain}`);
 });
 
 // 4. 親ドメイン用 sitemap-index.xml の生成

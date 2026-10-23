@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build --emptyOutDir false && node scripts/generate-subdomains.js",
+    "crawl:subsidies": "node scripts/crawl-subsidies.js",
     "preview": "vite preview",
     "deploy": "cmd /c scripts\\deploy.bat"
   },

@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { 
   ArrowLeft, BookOpen, Save, FolderOpen, Undo2, Redo2, 
-  Camera, Eye, EyeOff, ZoomIn, HelpCircle, Layers, CheckCircle2, AlertCircle,
+  Camera, Eye, EyeOff, ZoomIn, ZoomOut, RotateCw, HelpCircle, Layers, CheckCircle2, AlertCircle,
   Maximize2, Minimize2, Compass, Move, ChevronRight, Sliders, FileText, Check, MessageSquare, Sparkles, Share2
 } from 'lucide-react';
 import ManualModal from '../components/ManualModal';
@@ -11,6 +11,7 @@ import ParseRequestModal from '../components/ParseRequestModal';
 import ChatRoomModal from '../components/ChatRoomModal';
 import EstimateDetailModal from '../components/EstimateDetailModal';
 import ShareModal from '../components/ShareModal';
+import SitePlanAiModal from '../components/SitePlanAiModal';
 import { decodeDesignFromParam } from '../utils/shareUtils';
 import { APP_VERSION } from '../version.js';
 import { WALL_KEYS, WALL_NAMES_JA, WALL_OUTER_OFFSET, WALL_INNER_OFFSET, isFloorLevelOpening } from '../simulator/constants';
@@ -22,6 +23,9 @@ import { buildShelves3D, buildVehicles3D, buildCornerCutZone3D } from '../simula
 import { buildDimensions3D } from '../simulator/three/dimension3dBuilder';
 import { createSimulatorMaterials } from '../simulator/three/materials';
 import { buildStructure3D } from '../simulator/three/building3dBuilder';
+import { buildSite3D } from '../simulator/three/site3dBuilder';
+import { DEFAULT_SITE_DATA } from '../simulator/constants/defaultSiteData';
+import { getSiteSnapAngles } from '../simulator/geometry/siteGeometry';
 import { Analytics, trackEvent } from '../utils/analytics';
 
 // =========================================================
@@ -95,6 +99,12 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
   const [isEstimateModalOpen, setIsEstimateModalOpen] = useState(false);
   // 設計結果URL共有モーダル
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  // 敷地図・配置図 AI自動解析モーダル
+  const [isSitePlanModalOpen, setIsSitePlanModalOpen] = useState(false);
+  // 敷地・配置図データ（AI読み込み・手動設定）
+  const [siteData, setSiteData] = useState(DEFAULT_SITE_DATA);
+  // 3D敷地境界・母屋表示フラグ
+  const [showSiteIn3d, setShowSiteIn3d] = useState(true);
   // 共有モデル読み込み完了トースト表示
   const [sharedRestoredToast, setSharedRestoredToast] = useState(false);
 
@@ -112,6 +122,9 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
 
   const [isSeeThrough, setIsSeeThrough] = useState(false);
   const [svgZoom, setSvgZoom] = useState(1.0);
+  const [svgPan, setSvgPan] = useState({ x: 0, y: 0 });
+  const isPanningRef = useRef(false);
+  const startPanRef = useRef({ x: 0, y: 0 });
   const [dimFontScale, setDimFontScale] = useState(1.0);
   const [show3dDimensions, setShow3dDimensions] = useState(true);
   const [dim3dFontScale, setDim3dFontScale] = useState(1.0);
@@ -261,6 +274,10 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
     if (s.openings) setOpenings(s.openings);
     if (s.shelfUnits) setShelfUnits(s.shelfUnits);
     if (s.vehicles) setVehicles(s.vehicles);
+    if (s.siteData !== undefined) {
+      setSiteData(s.siteData);
+      setShowSiteIn3d(true);
+    }
     if (s.groundType) setGroundType(s.groundType);
     if (s.skyType) setSkyType(s.skyType);
   };
@@ -357,7 +374,10 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
     const dimGroup = new THREE.Group();
     scene.add(dimGroup);
 
-    threeRef.current = { scene, camera, renderer, controls, buildingGroup, dimGroup, groundMesh, grid, reqId: null };
+    const siteGroup = new THREE.Group();
+    scene.add(siteGroup);
+
+    threeRef.current = { scene, camera, renderer, controls, buildingGroup, dimGroup, siteGroup, groundMesh, grid, reqId: null };
 
     const animate = () => {
       threeRef.current.reqId = requestAnimationFrame(animate);
@@ -434,20 +454,76 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
   // -------------------------------------------------------------
   useEffect(() => {
     updateFullModel();
-  }, [dimensions, openings, shelfUnits, vehicles, isSeeThrough, show3dDimensions, dim3dFontScale]);
+  }, [dimensions, openings, shelfUnits, vehicles, isSeeThrough, show3dDimensions, dim3dFontScale, siteData, showSiteIn3d]);
 
   useEffect(() => {
     if (currentView !== '3d') {
-      renderSvgDrawings({
-        svgElement: svgRef.current,
-        currentView,
-        dimensions,
-        openings,
-        vehicles,
-        dimFontScale
-      });
+      const doRender = () => {
+        try {
+          renderSvgDrawings({
+            svgElement: svgRef.current,
+            currentView,
+            dimensions,
+            openings,
+            vehicles,
+            dimFontScale,
+            siteData
+          });
+        } catch (err) {
+          console.error('[SVG Render Error]:', err);
+        }
+      };
+      doRender();
+      // DOMトランジション直後の再描画保証
+      const raf = requestAnimationFrame(doRender);
+      return () => cancelAnimationFrame(raf);
     }
-  }, [currentView, dimensions, openings, shelfUnits, vehicles, svgZoom, dimFontScale]);
+  }, [currentView, dimensions, openings, shelfUnits, vehicles, svgZoom, dimFontScale, siteData]);
+
+  const [isDraggingSvg, setIsDraggingSvg] = useState(false);
+
+  // 2D図面 マウスドラッグ（パン）ハンドラ
+  const handleSvgMouseDown = (e) => {
+    if (e.button !== 0) return; // 左クリックのみ
+    isPanningRef.current = true;
+    setIsDraggingSvg(true);
+    startPanRef.current = {
+      x: e.clientX - svgPan.x,
+      y: e.clientY - svgPan.y
+    };
+  };
+
+  const handleSvgMouseMove = (e) => {
+    if (!isPanningRef.current) return;
+    setSvgPan({
+      x: e.clientX - startPanRef.current.x,
+      y: e.clientY - startPanRef.current.y
+    });
+  };
+
+  const handleSvgMouseUp = () => {
+    isPanningRef.current = false;
+    setIsDraggingSvg(false);
+  };
+
+  // 2D図面 ホイールズームハンドラ
+  const handleSvgWheel = (e) => {
+    e.preventDefault();
+    const zoomDelta = e.deltaY < 0 ? 0.15 : -0.15;
+    setSvgZoom(prev => Math.min(5.0, Math.max(0.4, Math.round((prev + zoomDelta) * 100) / 100)));
+  };
+
+  // ガレージ近傍へフォーカスズーム
+  const handleFocusGarage = () => {
+    setSvgZoom(2.8);
+    setSvgPan({ x: 0, y: 0 });
+  };
+
+  // 全体表示リセット
+  const handleResetZoomPan = () => {
+    setSvgZoom(1.0);
+    setSvgPan({ x: 0, y: 0 });
+  };
 
   // 全画面モードやビュー切り替え時にThree.jsキャンバスリサイズを自動再実行
   useEffect(() => {
@@ -493,7 +569,7 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
   // 3Dモデル完全生成関数
   // -------------------------------------------------------------
   const updateFullModel = () => {
-    const { buildingGroup, dimGroup, scene } = threeRef.current;
+    const { buildingGroup, dimGroup, siteGroup, scene } = threeRef.current;
     if (!buildingGroup || !dimGroup) return;
 
     // クリーンアップ
@@ -506,6 +582,13 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
       const obj = dimGroup.children[0];
       dimGroup.remove(obj);
       if (obj.geometry) obj.geometry.dispose();
+    }
+    if (siteGroup) {
+      while (siteGroup.children.length > 0) {
+        const obj = siteGroup.children[0];
+        siteGroup.remove(obj);
+        if (obj.geometry) obj.geometry.dispose();
+      }
     }
 
     const wF = parseFloat(dimensions.wFront) || 5400;
@@ -604,6 +687,16 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
       });
     }
 
+    // 10. 敷地図・配置・既存母屋・離隔ライン 3Dモデル (site3dBuilder)
+    if (showSiteIn3d && threeRef.current.siteGroup && siteData) {
+      buildSite3D({
+        siteGroup: threeRef.current.siteGroup,
+        siteData,
+        dimensions,
+        outerPts
+      });
+    }
+
   };
 
 
@@ -621,15 +714,60 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
   // -------------------------------------------------------------
   // JSON保存 / 読込 / 画像保存
   // -------------------------------------------------------------
-  const handleSaveJson = () => {
-    const data = { dimensions, openings, shelfUnits, vehicles, savedAt: new Date().toISOString() };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const handleSaveJson = async () => {
+    const data = { 
+      dimensions, 
+      openings, 
+      shelfUnits, 
+      vehicles, 
+      siteData, 
+      groundType, 
+      skyType, 
+      savedAt: new Date().toISOString() 
+    };
+    const jsonStr = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+    const filename = `garage-project-${dateStr}.json`;
+
+    // 1. File System Access API (ユーザーが指定したフォルダに保存ダイアログ経由で直接保存)
+    if (typeof window !== 'undefined' && 'showSaveFilePicker' in window) {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: filename,
+          types: [{
+            description: 'スマイチ ガレージ設計データ (*.json)',
+            accept: { 'application/json': ['.json'] }
+          }]
+        });
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') {
+          // ユーザーが保存ダイアログで「キャンセル」を押した場合は何もしない
+          return;
+        }
+        console.warn('showSaveFilePicker failed or unsupported, fallback to anchor download:', err);
+      }
+    }
+
+    // 2. フォールバック: aタグによるダウンロード（revokeObjectURLの即時破棄による保存失敗・空振りを完全防止）
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `garage-project-${Date.now()}.json`;
+    a.download = filename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => {
+      if (document.body.contains(a)) {
+        document.body.removeChild(a);
+      }
+      URL.revokeObjectURL(url);
+    }, 4000); // 4秒待ってから安全にURLを破棄
   };
 
   const handleLoadJson = (e) => {
@@ -649,14 +787,47 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
     e.target.value = '';
   };
 
-  const handleDownloadImage = () => {
+  const handleDownloadImage = async () => {
     const { renderer } = threeRef.current;
     if (!renderer) return;
     const dataUrl = renderer.domElement.toDataURL('image/png');
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+    const filename = `garage-3d-${dateStr}.png`;
+
+    // 1. File System Access API
+    if (typeof window !== 'undefined' && 'showSaveFilePicker' in window) {
+      try {
+        const res = await fetch(dataUrl);
+        const blob = await res.blob();
+        const handle = await window.showSaveFilePicker({
+          suggestedName: filename,
+          types: [{
+            description: 'PNG 画像 (*.png)',
+            accept: { 'image/png': ['.png'] }
+          }]
+        });
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+      }
+    }
+
+    // 2. フォールバック
     const a = document.createElement('a');
     a.href = dataUrl;
-    a.download = `archix-garage-3d-${Date.now()}.png`;
+    a.download = filename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
     a.click();
+    setTimeout(() => {
+      if (document.body.contains(a)) {
+        document.body.removeChild(a);
+      }
+    }, 3000);
   };
 
   return (
@@ -706,6 +877,55 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
         designState={{ dimensions, openings, shelfUnits, vehicles, groundType, skyType }}
         floorArea={calculations?.floorVal ? parseFloat(calculations.floorVal) : 0}
         approxCost={calculations?.approxCost || 0}
+      />
+
+      {/* 敷地図・配置図 AI自動解析 ＆ 建築限界ライン作図モーダル */}
+      <SitePlanAiModal
+        isOpen={isSitePlanModalOpen}
+        onClose={() => setIsSitePlanModalOpen(false)}
+        onApplyToSimulator={(data, legacySiteData) => {
+          // data が exportData 単体の場合と、(fitted, siteData) の両方に対応
+          const fitted = data?.fittedGarage || (data?.widthFront ? data : null);
+          const sData = data?.siteParams ? data : (legacySiteData || siteData);
+
+          const newWFront = fitted?.widthFront ? Math.round(fitted.widthFront * 1000) : dimensions.wFront;
+          const newWBack = fitted?.widthBack ? Math.round(fitted.widthBack * 1000) : (fitted?.widthFront ? Math.round(fitted.widthFront * 1000) : dimensions.wBack);
+          const newDLeft = fitted?.depthLeft ? Math.round(fitted.depthLeft * 1000) : dimensions.dLeft;
+          const newDRight = fitted?.depthRight ? Math.round(fitted.depthRight * 1000) : (fitted?.depthLeft ? Math.round(fitted.depthLeft * 1000) : dimensions.dRight);
+
+          const up = {
+            ...dimensions,
+            wFront: newWFront,
+            wBack: newWBack,
+            dLeft: newDLeft,
+            dRight: newDRight,
+            shapeType: fitted?.shapeType || 'regular',
+            skewOffset: Math.round((fitted?.skewOffset || 0) * 1000)
+          };
+          setDimensions(up);
+
+          if (sData) {
+            const updatedSiteData = {
+              ...sData,
+              siteParams: {
+                ...(sData?.siteParams || {}),
+                ...(data?.siteParams || {}),
+                garageSiteX: data?.siteParams?.garageSiteX,
+                garageSiteY: data?.siteParams?.garageSiteY,
+                garageCenterX: data?.siteParams?.garageCenterX,
+                garageCenterY: data?.siteParams?.garageCenterY,
+                garageRotDeg: fitted?.rotationDeg ?? data?.siteParams?.garageRotDeg ?? 0,
+                polygonCoords: data?.siteParams?.polygonCoords || sData?.siteParams?.polygonCoords
+              },
+              fittedGarage: {
+                ...fitted
+              }
+            };
+            setSiteData(updatedSiteData);
+            setShowSiteIn3d(true);
+          }
+          pushHistory(up);
+        }}
       />
 
       {/* 共有モデル読み込み完了トースト */}
@@ -837,6 +1057,33 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
             <Share2 size={13} color="#16a34a" />
             <span className="sim-btn-text-full">URL共有</span>
             <span className="sim-btn-text-short">共有</span>
+          </button>
+
+          {/* 敷地図・配置図AI自動作図ボタン */}
+          <button
+            onClick={() => {
+              trackEvent('siteplan_ai_modal_open', { source: 'simulator_topbar' });
+              setIsSitePlanModalOpen(true);
+            }}
+            className="btn-secondary sim-top-btn"
+            style={{
+              padding: '5px 8px',
+              fontSize: 11.5,
+              borderRadius: 6,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              whiteSpace: 'nowrap',
+              border: '1px solid #0284c7',
+              color: '#0284c7',
+              background: '#f0f9ff',
+              fontWeight: 700
+            }}
+            title="敷地図・配置図を撮影/UPして建築可能ラインとガレージを自動作図"
+          >
+            <Sparkles size={13} color="#0284c7" />
+            <span className="sim-btn-text-full">敷地図AI作図</span>
+            <span className="sim-btn-text-short">敷地図AI</span>
           </button>
 
           <button
@@ -977,6 +1224,7 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
         }}>
           {[
             { id: 'dims', label: '📐 4辺寸法' },
+            { id: 'site', label: '🏡 配置・離れ' },
             { id: 'roof', label: '🏠 屋根・高さ' },
             { id: 'openings', label: '🚪 開口部' },
             { id: 'shelves', label: '📦 内部棚' },
@@ -1063,6 +1311,41 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
                 </span>
               </div>
             )}
+          </div>
+
+          {/* 敷地図・配置図AI自動作図バナーボタン */}
+          <div style={{ marginBottom: 12 }}>
+            <button
+              type="button"
+              onClick={() => {
+                trackEvent('siteplan_ai_modal_open', { source: 'control_panel_button' });
+                setIsSitePlanModalOpen(true);
+              }}
+              style={{
+                width: '100%',
+                background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: 8,
+                padding: '10px 12px',
+                fontSize: 12,
+                fontWeight: 800,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                boxShadow: '0 2px 8px rgba(2, 132, 199, 0.35)',
+                transition: 'all 0.2s'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Sparkles size={16} color="#38bdf8" />
+                <span>✨ 敷地図・配置図からAI自動作図</span>
+              </div>
+              <span style={{ fontSize: 10.5, background: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: 4 }}>
+                写真・PDF可
+              </span>
+            </button>
           </div>
 
           {/* 建物形状・敷地タイプ選択 */}
@@ -2153,6 +2436,330 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
           </div>
         </div>
 
+        {/* 🏡 ガレージ配置計画セクション */}
+        <div className={`control-section ${activeMobileTab === 'site' ? 'mobile-show' : 'mobile-hide'}`} style={{
+          display: activeMobileTab === 'site' ? 'block' : 'none'
+        }}>
+          <div className="section-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 800, fontSize: 13.5 }}>
+              <Compass size={17} color="var(--color-primary)" />
+              ガレージ配置計画（平行配置・離れ寸法）
+            </span>
+            <button
+              type="button"
+              onClick={() => setIsSitePlanModalOpen(true)}
+              style={{
+                fontSize: 11,
+                padding: '3px 8px',
+                borderRadius: 4,
+                background: '#0284c7',
+                color: '#ffffff',
+                border: 'none',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              AI敷地図読込
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {/* ① 境界線との平行配置（ワンクリック・スナップ） */}
+            {(() => {
+              const snapAngles = getSiteSnapAngles(siteData?.siteParams?.polygonCoords || []);
+              const currentRot = siteData?.siteParams?.garageRotDeg ?? 0;
+              return (
+                <div style={{ background: '#f8fafc', padding: 10, borderRadius: 6, border: '1px solid #cbd5e1' }}>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: '#1e293b', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <RotateCw size={14} color="#0284c7" />
+                    境界線との平行配置（スナップ）
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6 }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSiteData(prev => ({
+                          ...prev,
+                          siteParams: { ...prev?.siteParams, garageRotDeg: snapAngles.roadAngle }
+                        }));
+                      }}
+                      style={{
+                        padding: '6px 4px',
+                        fontSize: 10.5,
+                        fontWeight: Math.abs(currentRot - snapAngles.roadAngle) < 0.5 ? 800 : 600,
+                        background: Math.abs(currentRot - snapAngles.roadAngle) < 0.5 ? '#dbeafe' : '#ffffff',
+                        border: Math.abs(currentRot - snapAngles.roadAngle) < 0.5 ? '2px solid #2563eb' : '1px solid #cbd5e1',
+                        color: Math.abs(currentRot - snapAngles.roadAngle) < 0.5 ? '#1d4ed8' : '#334155',
+                        borderRadius: 4,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      🛣️ 前面道路に平行 ({snapAngles.roadAngle}°)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSiteData(prev => ({
+                          ...prev,
+                          siteParams: { ...prev?.siteParams, garageRotDeg: snapAngles.northAngle }
+                        }));
+                      }}
+                      style={{
+                        padding: '6px 4px',
+                        fontSize: 10.5,
+                        fontWeight: Math.abs(currentRot - snapAngles.northAngle) < 0.5 ? 800 : 600,
+                        background: Math.abs(currentRot - snapAngles.northAngle) < 0.5 ? '#dbeafe' : '#ffffff',
+                        border: Math.abs(currentRot - snapAngles.northAngle) < 0.5 ? '2px solid #2563eb' : '1px solid #cbd5e1',
+                        color: Math.abs(currentRot - snapAngles.northAngle) < 0.5 ? '#1d4ed8' : '#334155',
+                        borderRadius: 4,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      🧭 北側境界に平行 ({snapAngles.northAngle}°)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSiteData(prev => ({
+                          ...prev,
+                          siteParams: { ...prev?.siteParams, garageRotDeg: 0 }
+                        }));
+                      }}
+                      style={{
+                        padding: '6px 4px',
+                        fontSize: 10.5,
+                        fontWeight: currentRot === 0 ? 800 : 600,
+                        background: currentRot === 0 ? '#dbeafe' : '#ffffff',
+                        border: currentRot === 0 ? '2px solid #2563eb' : '1px solid #cbd5e1',
+                        color: currentRot === 0 ? '#1d4ed8' : '#334155',
+                        borderRadius: 4,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      🏠 母屋に平行 (0°)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSiteData(prev => ({
+                          ...prev,
+                          siteParams: { ...prev?.siteParams, garageRotDeg: snapAngles.westAngle }
+                        }));
+                      }}
+                      style={{
+                        padding: '6px 4px',
+                        fontSize: 10.5,
+                        fontWeight: Math.abs(currentRot - snapAngles.westAngle) < 0.5 ? 800 : 600,
+                        background: Math.abs(currentRot - snapAngles.westAngle) < 0.5 ? '#dbeafe' : '#ffffff',
+                        border: Math.abs(currentRot - snapAngles.westAngle) < 0.5 ? '2px solid #2563eb' : '1px solid #cbd5e1',
+                        color: Math.abs(currentRot - snapAngles.westAngle) < 0.5 ? '#1d4ed8' : '#334155',
+                        borderRadius: 4,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      📐 西側境界に平行 ({snapAngles.westAngle}°)
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* ② ガレージ回転角度スライダー */}
+            <div style={{ background: '#f8fafc', padding: 10, borderRadius: 6, border: '1px solid #cbd5e1' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 700, color: '#1e293b', marginBottom: 4 }}>
+                <span>ガレージ回転角度:</span>
+                <span style={{ color: '#2563eb', fontSize: 13 }}>{siteData?.siteParams?.garageRotDeg ?? 0}°</span>
+              </div>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input
+                  type="range"
+                  min="-180"
+                  max="180"
+                  step="0.5"
+                  value={siteData?.siteParams?.garageRotDeg ?? 0}
+                  onChange={(e) => {
+                    const val = parseFloat(e.target.value);
+                    setSiteData(prev => ({
+                      ...prev,
+                      siteParams: { ...prev?.siteParams, garageRotDeg: val }
+                    }));
+                  }}
+                  style={{ flex: 1, cursor: 'pointer' }}
+                />
+                <input
+                  type="number"
+                  step="0.5"
+                  value={siteData?.siteParams?.garageRotDeg ?? 0}
+                  onChange={(e) => {
+                    const val = parseFloat(e.target.value);
+                    setSiteData(prev => ({
+                      ...prev,
+                      siteParams: { ...prev?.siteParams, garageRotDeg: val }
+                    }));
+                  }}
+                  style={{ width: 75, padding: '4px 6px', fontSize: 12, border: '1px solid #cbd5e1', borderRadius: 4 }}
+                />
+              </div>
+            </div>
+
+            {/* ③ 母屋との離れ (existingClearance) */}
+            <div style={{ background: '#f8fafc', padding: 10, borderRadius: 6, border: '1px solid #cbd5e1' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 700, color: '#1e293b', marginBottom: 4 }}>
+                <span>母屋との離れ:</span>
+                <span style={{ color: '#059669', fontSize: 13 }}>{(siteData?.clearanceSettings?.existingClearance ?? 60) * 10} mm</span>
+              </div>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input
+                  type="range"
+                  min="200"
+                  max="3000"
+                  step="50"
+                  value={(siteData?.clearanceSettings?.existingClearance ?? 60) * 10}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    setSiteData(prev => ({
+                      ...prev,
+                      clearanceSettings: {
+                        ...prev?.clearanceSettings,
+                        existingClearance: Math.round(val / 10)
+                      }
+                    }));
+                  }}
+                  style={{ flex: 1, cursor: 'pointer' }}
+                />
+                <input
+                  type="number"
+                  step="50"
+                  value={(siteData?.clearanceSettings?.existingClearance ?? 60) * 10}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    setSiteData(prev => ({
+                      ...prev,
+                      clearanceSettings: {
+                        ...prev?.clearanceSettings,
+                        existingClearance: Math.round(val / 10)
+                      }
+                    }));
+                  }}
+                  style={{ width: 75, padding: '4px 6px', fontSize: 12, border: '1px solid #cbd5e1', borderRadius: 4 }}
+                />
+              </div>
+            </div>
+
+            {/* ④ ガレージ前後シフト (道路離れ・北側離れの微調整) */}
+            <div style={{ background: '#f8fafc', padding: 10, borderRadius: 6, border: '1px solid #cbd5e1' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 700, color: '#1e293b', marginBottom: 4 }}>
+                <span>ガレージ前後シフト (北← →南):</span>
+                <span style={{ color: '#2563eb', fontSize: 13 }}>{siteData?.siteParams?.garageShiftYMm ?? 0} mm</span>
+              </div>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input
+                  type="range"
+                  min="-2000"
+                  max="2000"
+                  step="50"
+                  value={siteData?.siteParams?.garageShiftYMm ?? 0}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    setSiteData(prev => ({
+                      ...prev,
+                      siteParams: { ...prev?.siteParams, garageShiftYMm: val }
+                    }));
+                  }}
+                  style={{ flex: 1, cursor: 'pointer' }}
+                />
+                <input
+                  type="number"
+                  step="50"
+                  value={siteData?.siteParams?.garageShiftYMm ?? 0}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    setSiteData(prev => ({
+                      ...prev,
+                      siteParams: { ...prev?.siteParams, garageShiftYMm: val }
+                    }));
+                  }}
+                  style={{ width: 75, padding: '4px 6px', fontSize: 12, border: '1px solid #cbd5e1', borderRadius: 4 }}
+                />
+              </div>
+            </div>
+
+            {/* ⑤ ガレージ左右シフト (西← →東) */}
+            <div style={{ background: '#f8fafc', padding: 10, borderRadius: 6, border: '1px solid #cbd5e1' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 700, color: '#1e293b', marginBottom: 4 }}>
+                <span>ガレージ左右シフト (西← →東):</span>
+                <span style={{ color: '#2563eb', fontSize: 13 }}>{siteData?.siteParams?.garageShiftXMm ?? 0} mm</span>
+              </div>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input
+                  type="range"
+                  min="-2000"
+                  max="2000"
+                  step="50"
+                  value={siteData?.siteParams?.garageShiftXMm ?? 0}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    setSiteData(prev => ({
+                      ...prev,
+                      siteParams: { ...prev?.siteParams, garageShiftXMm: val }
+                    }));
+                  }}
+                  style={{ flex: 1, cursor: 'pointer' }}
+                />
+                <input
+                  type="number"
+                  step="50"
+                  value={siteData?.siteParams?.garageShiftXMm ?? 0}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    setSiteData(prev => ({
+                      ...prev,
+                      siteParams: { ...prev?.siteParams, garageShiftXMm: val }
+                    }));
+                  }}
+                  style={{ width: 75, padding: '4px 6px', fontSize: 12, border: '1px solid #cbd5e1', borderRadius: 4 }}
+                />
+              </div>
+            </div>
+
+            {/* ⑥ 既存母屋の位置情報（FIX・固定）案内カード */}
+            <div style={{ background: '#fefce8', padding: 10, borderRadius: 6, border: '1px solid #fef08a' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 800, color: '#854d0e', marginBottom: 4 }}>
+                <span>🔒 既存母屋の位置（FIX・固定）</span>
+              </div>
+              <div style={{ fontSize: 10.5, color: '#713f12', lineHeight: 1.5 }}>
+                母屋の位置は敷地に対して不変（固定）です。<br/>
+                ・南北基準: <strong>{siteData?.siteParams?.houseYRef === 'south' ? `南側境界離れ ${siteData?.siteParams?.houseSouthClearance ?? 2000}mm` : `北側境界離れ ${siteData?.siteParams?.houseNorthClearance ?? 1500}mm`}</strong><br/>
+                ・東西/端点基準: <strong>{
+                  siteData?.siteParams?.houseXRef === 'west_clearance' ? `西側境界離れ ${siteData?.siteParams?.houseWestClearance ?? 1500}mm` :
+                  siteData?.siteParams?.houseXRef === 'east_clearance' ? `東側境界離れ ${siteData?.siteParams?.houseEastClearance ?? 1500}mm` :
+                  siteData?.siteParams?.houseXRef === 'corner_pt' ? `端点No.${siteData?.siteParams?.houseCornerPtNo ?? 1} (X:${siteData?.siteParams?.houseCornerOffsetX ?? 0} Y:${siteData?.siteParams?.houseCornerOffsetY ?? 0})` :
+                  `西側境界延伸 ${siteData?.siteParams?.houseWestExtend ?? 1500}mm`
+                }</strong><br/>
+                ・外壁寸法: <strong>{(siteData?.siteParams?.mainHouseWidth ?? 8.5)}m × {(siteData?.siteParams?.mainHouseDepth ?? 9.5)}m</strong>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsSitePlanModalOpen(true)}
+                style={{
+                  marginTop: 6,
+                  width: '100%',
+                  padding: '4px',
+                  fontSize: 10,
+                  fontWeight: 700,
+                  background: '#fef08a',
+                  border: '1px solid #ca8a04',
+                  borderRadius: 4,
+                  color: '#713f12',
+                  cursor: 'pointer'
+                }}
+              >
+                母屋の基準位置・寸法を変更する場合はこちら（AI解析）
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* AIパース用画像保存ボタン */}
         <button
 
@@ -2189,6 +2796,7 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
         }}>
           {[
             { id: '3d', label: '🏠 3Dパース' },
+            { id: 'site_plan', label: '🏡 配置図' },
             { id: 'plan', label: '📐 平面図' },
             { id: 'front-elev', label: '🏛 正立面' },
             { id: 'back-elev', label: '🏛 裏立面' },
@@ -2219,6 +2827,50 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 4 }}>
             {currentView === '3d' && (
               <>
+                {/* 敷地・母屋3D表示切替 */}
+                {siteData ? (
+                  <button
+                    onClick={() => setShowSiteIn3d(!showSiteIn3d)}
+                    style={{
+                      background: showSiteIn3d ? '#059669' : '#334155',
+                      color: '#ffffff',
+                      border: 'none',
+                      borderRadius: 4,
+                      padding: '4px 8px',
+                      fontSize: 11,
+                      fontWeight: 700,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      cursor: 'pointer'
+                    }}
+                    title="敷地境界線・母屋・離隔寸法の3D表示切替"
+                  >
+                    <span>🏡 敷地・母屋:{showSiteIn3d ? 'ON' : 'OFF'}</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setIsSitePlanModalOpen(true)}
+                    style={{
+                      background: '#0284c7',
+                      color: '#ffffff',
+                      border: 'none',
+                      borderRadius: 4,
+                      padding: '4px 8px',
+                      fontSize: 11,
+                      fontWeight: 700,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      cursor: 'pointer'
+                    }}
+                    title="敷地図・配置図を読み込んで3D敷地と母屋を表示"
+                  >
+                    <Sparkles size={12} />
+                    <span>敷地図読込</span>
+                  </button>
+                )}
+
                 <button
                   onClick={() => setShow3dDimensions(!show3dDimensions)}
                   style={{
@@ -2355,35 +3007,184 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
 
             {currentView !== '3d' && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#38bdf8', fontSize: 11, fontWeight: 700 }}>
-                <span>縮尺:</span>
-                <input
-                  type="range"
-                  min="0.5"
-                  max="2.5"
-                  step="0.1"
-                  value={svgZoom}
-                  onChange={(e) => setSvgZoom(parseFloat(e.target.value))}
-                  style={{ width: 65, cursor: 'pointer' }}
-                  title="2D図面の縮尺（表示倍率）を拡大・縮小"
-                />
-                <span style={{ minWidth: 36, textAlign: 'right', color: '#f8fafc', fontSize: 10.5 }}>
-                  {Math.round(svgZoom * 100)}%
-                </span>
+                {(currentView === 'plan' || currentView === 'site_plan') && (
+                  siteData ? (
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 5,
+                      background: '#064e3b',
+                      border: '1px solid #059669',
+                      borderRadius: 4,
+                      padding: '2px 8px',
+                      color: '#6ee7b7',
+                      fontSize: 10.5
+                    }}>
+                      <span>🏡 敷地・配置図 反映中</span>
+                      <button
+                        onClick={() => setIsSitePlanModalOpen(true)}
+                        style={{
+                          background: '#047857',
+                          border: 'none',
+                          color: '#ffffff',
+                          borderRadius: 3,
+                          padding: '1px 5px',
+                          fontSize: 10,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        再調整
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setIsSitePlanModalOpen(true)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        background: '#0284c7',
+                        border: 'none',
+                        color: '#ffffff',
+                        borderRadius: 4,
+                        padding: '3px 8px',
+                        fontSize: 10.5,
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                      title="敷地図・配置図を読み込んで平面図に敷地・母屋・離隔を描画"
+                    >
+                      <Sparkles size={11} />
+                      <span>敷地図読込</span>
+                    </button>
+                  )
+                )}
+
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  background: 'rgba(15, 23, 42, 0.45)',
+                  padding: '2px 8px',
+                  borderRadius: 6,
+                  border: '1px solid #334155'
+                }}>
+                  <button
+                    type="button"
+                    onClick={() => setSvgZoom(prev => Math.max(0.4, Math.round((prev - 0.25) * 100) / 100))}
+                    style={{
+                      background: '#334155',
+                      color: '#f8fafc',
+                      border: 'none',
+                      borderRadius: 3,
+                      padding: '2px 6px',
+                      fontSize: 10,
+                      fontWeight: 800,
+                      cursor: 'pointer'
+                    }}
+                    title="縮小 (-25%)"
+                  >
+                    🔍-
+                  </button>
+                  <input
+                    type="range"
+                    min="0.4"
+                    max="5.0"
+                    step="0.1"
+                    value={svgZoom}
+                    onChange={(e) => setSvgZoom(parseFloat(e.target.value))}
+                    style={{ width: 75, cursor: 'pointer' }}
+                    title="2D図面の縮尺（40%〜500% 超拡大まで調整可能）"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setSvgZoom(prev => Math.min(5.0, Math.round((prev + 0.25) * 100) / 100))}
+                    style={{
+                      background: '#334155',
+                      color: '#f8fafc',
+                      border: 'none',
+                      borderRadius: 3,
+                      padding: '2px 6px',
+                      fontSize: 10,
+                      fontWeight: 800,
+                      cursor: 'pointer'
+                    }}
+                    title="拡大 (+25%)"
+                  >
+                    🔍+
+                  </button>
+                  <span style={{ minWidth: 38, textAlign: 'right', color: '#38bdf8', fontSize: 10.5, fontWeight: 800 }}>
+                    {Math.round(svgZoom * 100)}%
+                  </span>
+                </div>
+
+                {/* 眼鏡・クイックプリセットボタン群 */}
                 <button
                   type="button"
-                  onClick={() => setSvgZoom(1.0)}
+                  onClick={() => setSvgZoom(3.0)}
+                  style={{
+                    background: svgZoom === 3.0 ? '#0284c7' : '#1e293b',
+                    color: svgZoom === 3.0 ? '#ffffff' : '#93c5fd',
+                    border: '1px solid #38bdf8',
+                    borderRadius: 4,
+                    padding: '2px 6px',
+                    fontSize: 10,
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                  title="👓 眼鏡ツール: 周り間寸法や境界杭番号が超鮮明に読める300%特大表示"
+                >
+                  👓 300%
+                </button>
+                <button
+                  type="button"
+                  onClick={handleFocusGarage}
+                  style={{
+                    background: '#1e293b',
+                    color: '#e2e8f0',
+                    border: '1px solid #475569',
+                    borderRadius: 4,
+                    padding: '2px 6px',
+                    fontSize: 10,
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                  title="🎯 計画ガレージ周辺を280%ズーム表示"
+                >
+                  🎯 ガレージ
+                </button>
+                <button
+                  type="button"
+                  onClick={handleResetZoomPan}
                   style={{
                     background: '#334155',
                     color: '#cbd5e1',
                     border: '1px solid #475569',
-                    borderRadius: 3,
-                    padding: '2px 5px',
-                    fontSize: 9.5,
+                    borderRadius: 4,
+                    padding: '2px 6px',
+                    fontSize: 10,
                     cursor: 'pointer'
                   }}
-                  title="縮尺を100%（標準）に戻す"
+                  title="⛶ 全体表示（標準100%・パン位置リセット）"
                 >
-                  標準
+                  ⛶ 全体
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDimFontScale(prev => prev >= 1.6 ? 1.0 : Math.round((prev + 0.3) * 10) / 10)}
+                  style={{
+                    background: dimFontScale > 1.0 ? '#047857' : '#1e293b',
+                    color: dimFontScale > 1.0 ? '#6ee7b7' : '#cbd5e1',
+                    border: dimFontScale > 1.0 ? '1px solid #10b981' : '1px solid #475569',
+                    borderRadius: 4,
+                    padding: '2px 6px',
+                    fontSize: 10,
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                  title="寸法・境界文字のサイズ切り替え（1.0x / 1.3x / 1.6x）"
+                >
+                  🔤 文字:{dimFontScale.toFixed(1)}x
                 </button>
               </div>
             )}
@@ -2397,6 +3198,11 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
             style={{ width: '100%', height: '100%', display: currentView === '3d' ? 'block' : 'none' }} 
           />
           <div 
+            onMouseDown={handleSvgMouseDown}
+            onMouseMove={handleSvgMouseMove}
+            onMouseUp={handleSvgMouseUp}
+            onMouseLeave={handleSvgMouseUp}
+            onWheel={handleSvgWheel}
             style={{ 
               width: '100%', 
               height: '100%', 
@@ -2404,27 +3210,30 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
               alignItems: 'center', 
               justifyContent: 'center',
               background: '#ffffff',
-              overflow: 'auto',
-              padding: 20
+              overflow: 'hidden',
+              cursor: isDraggingSvg ? 'grabbing' : 'grab',
+              userSelect: 'none',
+              position: 'relative'
             }}
           >
             <div style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              minWidth: '100%',
-              minHeight: '100%',
-              padding: 20
+              transform: `translate(${svgPan.x}px, ${svgPan.y}px)`,
+              transition: isDraggingSvg ? 'none' : 'transform 0.08s ease-out',
+              willChange: 'transform'
             }}>
               <svg 
                 ref={svgRef} 
                 style={{ 
                   display: 'block', 
                   margin: 'auto',
-                  width: `${Math.round(95 * svgZoom)}%`,
-                  maxWidth: `${Math.round(1400 * svgZoom)}px`,
+                  width: `${Math.round(1100 * svgZoom)}px`,
+                  maxWidth: 'none',
+                  maxHeight: 'none',
                   height: 'auto',
-                  transition: 'width 0.1s ease-out, max-width 0.1s ease-out'
+                  transition: isDraggingSvg ? 'none' : 'width 0.1s ease-out'
                 }} 
               />
             </div>
@@ -2434,14 +3243,20 @@ export default function SimulatorPage({ setCurrentRoute, externalModelData }) {
             position: 'absolute',
             bottom: 10,
             right: 10,
-            background: 'rgba(15, 23, 42, 0.8)',
+            background: 'rgba(15, 23, 42, 0.85)',
             color: '#ffffff',
             padding: '4px 10px',
             borderRadius: 6,
             fontSize: 10.5,
-            pointerEvents: 'none'
+            pointerEvents: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            backdropFilter: 'blur(4px)'
           }}>
-            {currentView === '3d' ? 'ドラッグ: 回転 | ホイール: ズーム' : '2Dベクトル製図モード (縮尺スライダーで自在に拡大縮小)'}
+            {currentView === '3d' 
+              ? 'ドラッグ: 回転 | ホイール: ズーム' 
+              : '🖱️ 左ドラッグ: 図面パン移動 | 🔄 ホイール: 拡大縮小 (40%〜500%) | 👓 眼鏡ツール: 特大表示'}
           </div>
         </div>
       </div>

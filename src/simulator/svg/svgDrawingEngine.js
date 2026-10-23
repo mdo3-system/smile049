@@ -8,8 +8,9 @@
  */
 
 import * as THREE from 'three';
-import { WALL_OUTER_OFFSET, isFloorLevelOpening } from '../constants';
-import { getCorePoints, getOffsetPoints, getGirderHeight } from '../geometry/buildingGeometry';
+import { WALL_OUTER_OFFSET, isFloorLevelOpening } from '../constants.js';
+import { getCorePoints, getOffsetPoints, getGirderHeight } from '../geometry/buildingGeometry.js';
+import { calculateSitePerimeterEdges, calculateMainHouseSiteBounds, calculateGarageSiteBounds } from '../geometry/siteGeometry.js';
 
 /**
  * 2D寸法線のSVG要素文字列を生成
@@ -65,7 +66,8 @@ export function generateSvgDrawingData({
   dimensions,
   openings = [],
   vehicles = [],
-  dimFontScale = 1.0
+  dimFontScale = 1.0,
+  siteData = null
 }) {
   const {
     wFront: wF,
@@ -102,10 +104,265 @@ export function generateSvgDrawingData({
 
   let vbMinX, vbMinY, vbW, vbH;
 
-  if (currentView === 'plan') {
+  // ============================================================
+  // 🏡 敷地図・配置図 (site_plan): 敷地全体・母屋・前面道路・物置ガレージ配置寸法
+  // ============================================================
+  if (currentView === 'site_plan') {
     const toSvg = p => ({ x: p.x, y: p.y });
     const sc0 = toSvg(corePts[0]), sc1 = toSvg(corePts[1]), sc2 = toSvg(corePts[2]), sc3 = toSvg(corePts[3]);
     const so0 = toSvg(outerPts[0]), so1 = toSvg(outerPts[1]), so2 = toSvg(outerPts[2]), so3 = toSvg(outerPts[3]);
+
+    const allPlanX = [so0.x, so1.x, so2.x, so3.x];
+    const allPlanY = [so0.y, so1.y, so2.y, so3.y];
+
+    const frontGarageY = Math.max(so0.y, so1.y);
+    const backGarageY = Math.min(so2.y, so3.y);
+    const minGarageX = Math.min(so0.x, so3.x);
+    const maxGarageX = Math.max(so1.x, so2.x);
+    const garageW = maxGarageX - minGarageX;
+    const garageD = frontGarageY - backGarageY;
+
+    const sData = siteData?.siteParams ? siteData : {
+      siteParams: {
+        hasExistingBuilding: true,
+        mainHouseWidth: 8.5,
+        mainHouseDepth: 9.5,
+        houseEaveOffset: 500,
+        houseNorthClearance: 1500,
+        houseWestExtend: 5969.8,
+        northAngleDeg: 0,
+        garageShiftYMm: 0,
+        polygonCoords: [
+          { no: 1, x: 7.891, y: 19.700, isRoad: false },
+          { no: 2, x: -7.035, y: 19.699, isRoad: false },
+          { no: 3, x: -9.018, y: 19.650, isRoad: false },
+          { no: 4, x: -10.610, y: 2.642, isRoad: false },
+          { no: 5, x: -14.690, y: 1.946, isRoad: false },
+          { no: 6, x: -26.299, y: 3.306, isRoad: true },
+          { no: 7, x: -27.461, y: -3.397, isRoad: true },
+          { no: 8, x: -24.689, y: 0.588, isRoad: false },
+          { no: 9, x: -10.940, y: -1.043, isRoad: false },
+          { no: 10, x: -9.052, y: -0.539, isRoad: false },
+          { no: 11, x: -6.340, y: 1.323, isRoad: false },
+          { no: 12, x: -2.422, y: 3.793, isRoad: false },
+          { no: 13, x: 1.071, y: 5.842, isRoad: false },
+          { no: 14, x: 3.870, y: 7.349, isRoad: false },
+          { no: 15, x: 6.388, y: 8.621, isRoad: false },
+          { no: 16, x: 7.031, y: 9.387, isRoad: false },
+          { no: 17, x: 7.842, y: 12.062, isRoad: false },
+          { no: 18, x: 8.329, y: 14.153, isRoad: false },
+          { no: 19, x: 8.243, y: 16.514, isRoad: false },
+          { no: 20, x: 8.167, y: 18.271, isRoad: false }
+        ]
+      },
+      clearanceSettings: {
+        roadClearance: 20,
+        existingClearance: 60,
+        adjacentClearance: 40
+      }
+    };
+
+    const { siteParams, clearanceSettings } = sData;
+    const coords = siteParams.polygonCoords || [];
+    const hasHouse = Boolean(siteParams.hasExistingBuilding);
+
+    // 幾何学的に厳密な母屋とガレージの敷地座標（メートル）
+    const houseBounds = calculateMainHouseSiteBounds({ siteParams, coords });
+    const garageBounds = calculateGarageSiteBounds({ siteParams, clearanceSettings, dimensions, coords });
+
+    // 敷地基準点（ガレージ敷地位置を基準としたSVG座標変換）
+    const garageOriginX = garageBounds.westX;
+    const garageOriginY = garageBounds.southY;
+
+    const toSvgPt = (pt) => ({
+      x: minGarageX + (pt.x - garageOriginX) * 1000,
+      y: frontGarageY - (pt.y - garageOriginY) * 1000,
+      no: pt.no,
+      isRoad: Boolean(pt.isRoad)
+    });
+
+    const svgPolyPts = coords.map(toSvgPt);
+
+    svgPolyPts.forEach(p => {
+      allPlanX.push(p.x);
+      allPlanY.push(p.y);
+    });
+
+    // 1. 敷地地盤ポリゴン
+    const polyPointsStr = svgPolyPts.map(p => `${p.x},${p.y}`).join(' ');
+    elements.push(`
+      <polygon id="site-polygon-base" points="${polyPointsStr}" fill="#f8fafc" stroke="#cbd5e1" stroke-width="4"/>
+    `);
+
+    // 2. 境界線描画 ＆ 周り間（杭間辺長寸法）
+    const perimeterEdges = calculateSitePerimeterEdges(coords);
+
+    for (let i = 0; i < svgPolyPts.length; i++) {
+      const p1 = svgPolyPts[i];
+      const p2 = svgPolyPts[(i + 1) % svgPolyPts.length];
+      const isRoadEdge = Boolean(p1.isRoad && p2.isRoad);
+      const edgeInfo = perimeterEdges[i];
+
+      if (isRoadEdge) {
+        elements.push(`
+          <line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#2563eb" stroke-width="20" stroke-linecap="round"/>
+          <text x="${(p1.x + p2.x) / 2 - 800}" y="${(p1.y + p2.y) / 2}" font-size="${baseFontSize * 1.0}" font-weight="bold" fill="#2563eb" text-anchor="middle">前面道路境界線 (${edgeInfo?.length || 6.8}m)</text>
+        `);
+      } else {
+        elements.push(`
+          <line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#f59e0b" stroke-width="10" stroke-linecap="round"/>
+        `);
+      }
+
+      // 周り間（境界辺長寸法）ラベル表示（1m以上の辺に明示）
+      if (edgeInfo && edgeInfo.length >= 1.0) {
+        const mx = (p1.x + p2.x) / 2;
+        const my = (p1.y + p2.y) / 2;
+        const dx = p2.x - p1.x;
+        const dy = p2.y - p1.y;
+        const angleDeg = (Math.atan2(dy, dx) * 180 / Math.PI);
+        const textRot = (angleDeg > 90 || angleDeg < -90) ? angleDeg + 180 : angleDeg;
+        const edgeLabel = `${edgeInfo.length.toFixed(2)}m`;
+
+        elements.push(`
+          <g transform="translate(${mx}, ${my}) rotate(${textRot})">
+            <rect x="-350" y="-120" width="700" height="240" rx="40" fill="rgba(255, 255, 255, 0.92)" stroke="#94a3b8" stroke-width="2"/>
+            <text x="0" y="0" font-size="${baseFontSize * 0.7}" font-weight="bold" fill="#334155" text-anchor="middle" dominant-baseline="central">${edgeLabel}</text>
+          </g>
+        `);
+      }
+    }
+
+    // 3. 境界杭標標示
+    svgPolyPts.forEach(pt => {
+      elements.push(`
+        <circle cx="${pt.x}" cy="${pt.y}" r="90" fill="#dc2626" stroke="#ffffff" stroke-width="14"/>
+        <line x1="${pt.x - 70}" y1="${pt.y}" x2="${pt.x + 70}" y2="${pt.y}" stroke="#ffffff" stroke-width="8"/>
+        <line x1="${pt.x}" y1="${pt.y - 70}" x2="${pt.x}" y2="${pt.y + 70}" stroke="#ffffff" stroke-width="8"/>
+        <text x="${pt.x + 110}" y="${pt.y - 70}" font-size="${baseFontSize * 0.75}" font-weight="bold" fill="#b91c1c">No.${pt.no}</text>
+      `);
+    });
+
+    // 4. 既存母屋（外壁実線 ＋ 45度斜線ハッチング ＋ 軒先点線 ＋ 壁芯一点鎖線）
+    // 敷地幾何計算により、北側境界離れ1500mm・西側延伸5969.8mmの位置へ100%正確に配置（はみ出し完全解消）
+    const houseW = houseBounds.houseW * 1000;
+    const houseD = houseBounds.houseD * 1000;
+    const houseMinX = minGarageX + (houseBounds.westX - garageOriginX) * 1000;
+    const houseNorthSvgY = frontGarageY - (houseBounds.northY - garageOriginY) * 1000;
+    const houseSouthSvgY = houseNorthSvgY + houseD;
+
+    if (hasHouse) {
+      const houseCenterX = houseMinX + houseW / 2;
+      const houseCenterY = (houseNorthSvgY + houseSouthSvgY) / 2;
+      const eaveMm = (siteParams.houseEaveOffset ?? 500);
+
+      allPlanX.push(houseMinX - eaveMm, houseMinX + houseW + eaveMm);
+      allPlanY.push(houseNorthSvgY - eaveMm, houseSouthSvgY + eaveMm);
+
+      elements.push(`
+        <g id="existing-main-house">
+          <!-- 軒先・屋根ライン（点線） -->
+          <rect x="${houseMinX - eaveMm}" y="${houseNorthSvgY - eaveMm}" width="${houseW + eaveMm * 2}" height="${houseD + eaveMm * 2}" fill="none" stroke="#94a3b8" stroke-width="6" stroke-dasharray="30 20"/>
+          <text x="${houseMinX - eaveMm + 100}" y="${houseNorthSvgY - eaveMm - 80}" font-size="${baseFontSize * 0.65}" font-weight="bold" fill="#64748b">軒先ライン (軒出 ${eaveMm}mm)</text>
+
+          <!-- 外壁・45度斜線ハッチング（実線） -->
+          <rect x="${houseMinX}" y="${houseNorthSvgY}" width="${houseW}" height="${houseD}" fill="url(#house-hatch)" stroke="#1e293b" stroke-width="12"/>
+
+          <!-- 壁芯・通り芯（一点鎖線） -->
+          <line x1="${houseMinX}" y1="${houseCenterY}" x2="${houseMinX + houseW}" y2="${houseCenterY}" stroke="#0284c7" stroke-width="5" stroke-dasharray="36 14 10 14"/>
+          <line x1="${houseCenterX}" y1="${houseNorthSvgY}" x2="${houseCenterX}" y2="${houseSouthSvgY}" stroke="#0284c7" stroke-width="5" stroke-dasharray="36 14 10 14"/>
+
+          <!-- 母屋タイトルバッジ -->
+          <rect x="${houseCenterX - 1600}" y="${houseCenterY - 260}" width="3200" height="520" rx="30" fill="rgba(15, 23, 42, 0.92)"/>
+          <text x="${houseCenterX}" y="${houseCenterY}" font-size="${baseFontSize * 1.1}" font-weight="bold" fill="#ffffff" text-anchor="middle" dominant-baseline="central">既存母屋 (外壁芯 ${(houseW/1000).toFixed(1)}m × ${(houseD/1000).toFixed(1)}m)</text>
+        </g>
+      `);
+
+      // 母屋離隔寸法線 (ガレージ東壁 〜 母屋西壁)
+      const existingClearanceMm = Math.round((houseBounds.westX - garageBounds.eastX) * 1000);
+      const midY = (frontGarageY + backGarageY) / 2;
+      helperDrawDim(maxGarageX, midY, houseMinX, midY, `母屋離隔: ${existingClearanceMm}mm`, 0);
+
+      // 北側境界線離れ寸法線 (母屋北壁 〜 北側境界線: 1500mm)
+      const northPt1 = svgPolyPts.find(p => p.no === 1);
+      if (northPt1) {
+        helperDrawDim(houseCenterX, northPt1.y, houseCenterX, houseNorthSvgY, `北側境界離れ: ${siteParams.houseNorthClearance || 1500}mm`, -800, true);
+      }
+
+      // 西側境界延伸距離寸法線 (No.3杭 〜 母屋西壁: 5969.8mm)
+      const westPt3 = svgPolyPts.find(p => p.no === 3);
+      if (westPt3) {
+        helperDrawDim(westPt3.x, houseNorthSvgY - 600, houseMinX, houseNorthSvgY - 600, `西境界延伸距離: ${siteParams.houseWestExtend || 5969.8}mm`, -400);
+      }
+    }
+
+    // 5. 計画ガレージ／物置の配置図ハイライト（回転対応）
+    const svgGarageCorners = garageBounds.corners.map(toSvgPt);
+    const garagePointsStr = svgGarageCorners.map(p => `${p.x},${p.y}`).join(' ');
+    const garageCenterX = (svgGarageCorners[0].x + svgGarageCorners[2].x) / 2;
+    const garageCenterY = (svgGarageCorners[0].y + svgGarageCorners[2].y) / 2;
+
+    elements.push(`
+      <g id="planned-garage-site-box">
+        <polygon points="${garagePointsStr}" fill="rgba(56, 189, 248, 0.35)" stroke="#0284c7" stroke-width="12"/>
+        <text x="${garageCenterX}" y="${garageCenterY}" font-size="${baseFontSize * 1.2}" font-weight="bold" fill="#0369a1" text-anchor="middle" dominant-baseline="central">計画ガレージ / 物置${garageBounds.garageRotDeg ? ` (${garageBounds.garageRotDeg}°)` : ''}</text>
+      </g>
+    `);
+
+    // ガレージ配置寸法（間口寸法・奥行寸法）
+    helperDrawDim(svgGarageCorners[3].x, svgGarageCorners[3].y, svgGarageCorners[2].x, svgGarageCorners[2].y, `間口: ${garageW}mm`, 400);
+    helperDrawDim(svgGarageCorners[0].x, svgGarageCorners[0].y, svgGarageCorners[3].x, svgGarageCorners[3].y, `奥行: ${garageD}mm`, -400, true);
+
+    // 西側境界線（No.3-4）とガレージ西壁の隣地離隔寸法線
+    const midGarageY = (frontGarageY + backGarageY) / 2;
+    const westPt3 = svgPolyPts.find(p => p.no === 3);
+    if (westPt3) {
+      const westClearanceMm = Math.round(minGarageX - westPt3.x);
+      helperDrawDim(westPt3.x, midGarageY, minGarageX, midGarageY, `西側隣地離隔: ${westClearanceMm}mm`, 0);
+    }
+
+    // 北側境界線とガレージ北壁の離れ寸法線
+    const northPt2 = svgPolyPts.find(p => p.no === 2);
+    if (northPt2) {
+      const northGarageClearanceMm = Math.round(backGarageY - northPt2.y);
+      helperDrawDim(minGarageX + garageW / 2, northPt2.y, minGarageX + garageW / 2, backGarageY, `ガレージ北離れ: ${northGarageClearanceMm}mm`, 600, true);
+    }
+
+    // 方位マーク（北マーク N ↑ / 真北角度回転対応）
+    const northAngleDeg = siteParams.northAngleDeg || 0;
+    const compassX = Math.max(...allPlanX) - 1000;
+    const compassY = Math.min(...allPlanY) + 1200;
+    elements.push(`
+      <g id="compass-rose" transform="translate(${compassX}, ${compassY}) rotate(${northAngleDeg})">
+        <circle cx="0" cy="0" r="450" fill="#ffffff" stroke="#0f172a" stroke-width="8"/>
+        <polygon points="0,-380 -120,-60 0,-140" fill="#dc2626"/>
+        <polygon points="0,-380 120,-60 0,-140" fill="#991b1b"/>
+        <polygon points="0,380 -120,60 0,140" fill="#64748b"/>
+        <polygon points="0,380 120,60 0,140" fill="#475569"/>
+        <text x="0" y="-420" font-size="280" font-weight="bold" fill="#dc2626" text-anchor="middle">N</text>
+      </g>
+    `);
+
+    // 図面タイトル
+    const titleMinX = Math.min(...allPlanX);
+    const titleMinY = Math.min(...allPlanY) - 1000;
+    elements.push(`
+      <text x="${titleMinX + 500}" y="${titleMinY}" font-size="${baseFontSize * 1.5}" font-weight="bold" fill="#0f172a">敷地図・配置図（敷地周り間・配置寸法図 / 縮尺 1/100 CAD相当）</text>
+    `);
+
+    const pad = 1800;
+    vbMinX = Math.min(...allPlanX) - pad;
+    vbMinY = Math.min(...allPlanY) - pad;
+    vbW = Math.max(...allPlanX) - Math.min(...allPlanX) + pad * 2;
+    vbH = Math.max(...allPlanY) - Math.min(...allPlanY) + pad * 2;
+
+  } else if (currentView === 'plan') {
+    const toSvg = p => ({ x: p.x, y: p.y });
+    const sc0 = toSvg(corePts[0]), sc1 = toSvg(corePts[1]), sc2 = toSvg(corePts[2]), sc3 = toSvg(corePts[3]);
+    const so0 = toSvg(outerPts[0]), so1 = toSvg(outerPts[1]), so2 = toSvg(outerPts[2]), so3 = toSvg(outerPts[3]);
+
+    const allPlanX = [sc0.x, sc1.x, sc2.x, sc3.x, so0.x, so1.x, so2.x, so3.x];
+    const allPlanY = [sc0.y, sc1.y, sc2.y, sc3.y, so0.y, so1.y, so2.y, so3.y];
 
     // 外壁ライン
     elements.push(`<polygon points="${so0.x},${so0.y} ${so1.x},${so1.y} ${so2.x},${so2.y} ${so3.x},${so3.y}" fill="#f8fafc" stroke="#64748b" stroke-width="6"/>`);
@@ -177,17 +434,21 @@ export function generateSvgDrawingData({
     helperDrawDim(sc3.x, sc3.y, sc2.x, sc2.y, `背面 柱芯: ${wB}mm`, -offFront);
     helperDrawDim(sc0.x, sc0.y, sc3.x, sc3.y, `左奥行 柱芯: ${dL}mm`, -offSide, true);
 
-    const titleY = Math.min(-dL, -dR) - offFront - 500;
-    elements.push(`<text x="0" y="${titleY}" font-size="${baseFontSize * 1.3}" font-weight="bold" fill="#0f172a" text-anchor="middle">平面図 (赤破線: 柱芯 / 外側線: 仕上ふかし+100mm)</text>`);
+    const minPlanY = Math.min(...allPlanY);
+    const maxPlanY = Math.max(...allPlanY);
+    const minPlanX = Math.min(...allPlanX);
+    const maxPlanX = Math.max(...allPlanX);
 
-    const allX = [sc0.x, sc1.x, sc2.x, sc3.x, so0.x, so1.x, so2.x, so3.x];
-    const allY = [sc0.y, sc1.y, sc2.y, sc3.y, so0.y, so1.y, so2.y, so3.y];
+    const titleY = minPlanY - offFront - 500;
+    const titleText = 'ガレージ詳細平面図 (赤破線: 柱芯 / 外側線: 仕上ふかし+100mm / 縮尺 1/50 CAD相当)';
+    elements.push(`<text x="${(minPlanX + maxPlanX) / 2}" y="${titleY}" font-size="${baseFontSize * 1.3}" font-weight="bold" fill="#0f172a" text-anchor="middle">${titleText}</text>`);
+
     const padX = offSide + 1500;
     const padY = offFront + 1200;
-    vbMinX = Math.min(...allX) - padX;
-    vbW = Math.max(...allX) + padX - vbMinX;
-    vbMinY = titleY - 300;
-    vbH = Math.max(...allY) + padY - vbMinY;
+    vbMinX = minPlanX - padX;
+    vbW = maxPlanX + padX - vbMinX;
+    vbMinY = titleY - 400;
+    vbH = maxPlanY + padY - vbMinY;
 
   } else if (currentView === 'front-elev' || currentView === 'back-elev') {
     const isFront = currentView === 'front-elev';
@@ -417,7 +678,8 @@ export function renderSvgDrawings({
   dimensions,
   openings = [],
   vehicles = [],
-  dimFontScale = 1.0
+  dimFontScale = 1.0,
+  siteData = null
 }) {
   if (!svgElement) return;
   svgElement.innerHTML = '';
@@ -426,7 +688,8 @@ export function renderSvgDrawings({
     dimensions,
     openings,
     vehicles,
-    dimFontScale
+    dimFontScale,
+    siteData
   });
   svgElement.setAttribute('viewBox', viewBox);
   svgElement.innerHTML = innerHtml;

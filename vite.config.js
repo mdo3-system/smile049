@@ -18,6 +18,9 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
-    open: true
+    open: true,
+    watch: {
+      ignored: ['**/data/**', '**/backup_raw_photos/**', '**/scratch/**', '**/*.pdf']
+    }
   }
 });

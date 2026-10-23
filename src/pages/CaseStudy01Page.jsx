@@ -136,17 +136,20 @@ export default function CaseStudy01Page({ setCurrentRoute }) {
           
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderRadius: 20, background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', fontSize: 13, fontWeight: 700, marginBottom: 20, border: '1px solid rgba(56, 189, 248, 0.3)' }}>
             <FileCheck size={16} />
-            <span>スマイチ施工実例レポート ［第1号棟］</span>
+            <span>スマイチ事業 誕生のきっかけとなった記念すべき［第1号棟］・埼玉県鶴ヶ島市</span>
           </div>
 
           <h1 style={{ fontSize: 'clamp(26px, 4.5vw, 42px)', fontWeight: 800, lineHeight: 1.35, marginBottom: 24, letterSpacing: '-0.02em' }}>
-            敷地境界15cmの限界突破 × 既存アスファルト活用<br />
-            <span style={{ color: '#38bdf8' }}>大手規格品で断られた厳しい敷地条件を、木造自由設計で完全解決。</span>
+            「大手規格品では帯に短したすきに長し」から始まったスマイチの原点。<br />
+            <span style={{ color: '#38bdf8' }}>敷地境界15cmの限界突破 × 既存アスファルト活用 × 中段・枕棚の特注大工造作</span>
           </h1>
 
           <p style={{ fontSize: 16, color: '#cbd5e1', lineHeight: 1.85, maxWidth: 840, marginBottom: 36 }}>
-            「基礎・電気・確認申請は自分で別々に手配して」「規格サイズしかないので敷地に合わない」「既存のアスファルトは全解体が必要」――。<br />
-            大手スチールガレージメーカーで直面した数々の壁を、スマイチの<strong>「建築士ワンストップ対応」</strong>と<strong>「ミリ単位の木造自由設計」</strong>により、相談からわずか3ヶ月で完工したリアルな全記録です。
+            「大手規格品カタログでは帯に短したすきに長しで寸法が合わない」「基礎や確認申請は自分で別業者を手配しろと言われて面倒」「敷地一杯まで使い切りたい」「中に頑丈な中段と枕棚を自由につけたい」――。<br />
+            まさに施主様の切実なご要望をすべて叶えるために生まれた、木造自由設計ガレージ「スマイチ」の原点となる鶴ヶ島市での全施工記録です。<br />
+            <span style={{ fontSize: 13, color: '#94a3b8', display: 'block', marginTop: 8 }}>
+              ※当工務店では、東松山市をはじめ埼玉県近郊で小屋・特注物置の実績は数多く手掛けてまいりました。この「第1号棟」とは、本案件のお客様との出会いとお悩みの完全解決をきっかけに、「規格品に悩むすべての方を救う専門事業」として【スマイチ事業】を本格始動させた記念碑的な1号棟という意味を持っています。
+            </span>
           </p>
 
           {/* 主要スペックバッジ */}
@@ -160,8 +163,8 @@ export default function CaseStudy01Page({ setCurrentRoute }) {
             border: '1px solid rgba(255, 255, 255, 0.12)'
           }}>
             <div>
-              <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>用途・建築種別</div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: '#f8fafc' }}>事業用保管庫・ガレージ</div>
+              <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>建設地・種別</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: '#f8fafc' }}>埼玉県鶴ヶ島市 / 事業用保管庫</div>
             </div>
             <div>
               <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>構造・工法</div>
@@ -173,7 +176,7 @@ export default function CaseStudy01Page({ setCurrentRoute }) {
             </div>
             <div>
               <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>工期（相談〜完工）</div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: '#4ade80' }}>約3ヶ月（確認申請含む）</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: '#4ade80' }}>約3ヶ月（確認申請・中段造作含む）</div>
             </div>
           </div>
 
@@ -188,48 +191,59 @@ export default function CaseStudy01Page({ setCurrentRoute }) {
           <div style={{ textAlign: 'center', marginBottom: 36 }}>
             <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--color-primary)', letterSpacing: '0.1em' }}>BACKGROUND & CHALLENGES</span>
             <h2 style={{ fontSize: 'clamp(22px, 3vw, 32px)', fontWeight: 800, color: '#0f172a', marginTop: 6 }}>
-              なぜ大手規格スチールガレージを諦めたのか？
+              なぜ大手規格品ガレージを諦めたのか？
             </h2>
             <p style={{ fontSize: 15, color: '#64748b', marginTop: 10 }}>
-              長年のお付き合いのある法人オーナー様が直面した「3つの大きな壁」
+              埼玉県鶴ヶ島市の法人オーナー様が直面した「4つの大きな壁」
             </p>
           </div>
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: 24
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: 20
           }}>
             {/* 壁① */}
-            <div style={{ background: '#ffffff', borderRadius: 12, padding: '28px 24px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#ef4444', fontWeight: 800, fontSize: 16, marginBottom: 12 }}>
-                <AlertCircle size={22} />
-                <span>壁 1：手配がバラバラで面倒</span>
+            <div style={{ background: '#ffffff', borderRadius: 12, padding: '24px 20px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#ef4444', fontWeight: 800, fontSize: 15, marginBottom: 10 }}>
+                <AlertCircle size={20} />
+                <span>壁 1：帯に短したすきに長し</span>
               </div>
-              <p style={{ fontSize: 14, color: '#475569', lineHeight: 1.8, margin: 0 }}>
-                大手規格メーカーに相談したところ、<strong>「本体の販売だけで、基礎工事・電気工事・確認申請はご自身で別々の業者を探して手配してください」</strong>と言われました。多忙な経営者にとって、個別の業者手配と日程調整は極めて重い負担でした。
+              <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.75, margin: 0 }}>
+                大手規格品カタログでは、間口・奥行・軒高のサイズが決まっており、敷地2台分のスペースに対して「大きすぎて入らない」か「小さすぎて余白が無駄になる」かの二択でした。
               </p>
             </div>
 
             {/* 壁② */}
-            <div style={{ background: '#ffffff', borderRadius: 12, padding: '28px 24px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#ef4444', fontWeight: 800, fontSize: 16, marginBottom: 12 }}>
-                <AlertCircle size={22} />
-                <span>壁 2：既存アスファルトの全解体</span>
+            <div style={{ background: '#ffffff', borderRadius: 12, padding: '24px 20px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#ef4444', fontWeight: 800, fontSize: 15, marginBottom: 10 }}>
+                <AlertCircle size={20} />
+                <span>壁 2：基礎・確認申請の別手配の手間</span>
               </div>
-              <p style={{ fontSize: 14, color: '#475569', lineHeight: 1.8, margin: 0 }}>
-                現地にはすでに舗装された綺麗なアスファルトと、まだ新しい車止めがありました。しかし規格品では<strong>「アスファルトを全部剥がして基礎を打ち直す必要がある」</strong>とされ、解体・産廃処分費用で全体の建築費が跳ね上がる見積もりでした。
+              <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.75, margin: 0 }}>
+                「本体販売のみなので、基礎工事や確認申請はご自身で別々の業者を探して発注してください」と言われ、多忙な中で別業者の手配・工程調整に頭を抱えていました。
               </p>
             </div>
 
             {/* 壁③ */}
-            <div style={{ background: '#ffffff', borderRadius: 12, padding: '28px 24px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#ef4444', fontWeight: 800, fontSize: 16, marginBottom: 12 }}>
-                <AlertCircle size={22} />
-                <span>壁 3：境界ギリギリに建てられない</span>
+            <div style={{ background: '#ffffff', borderRadius: 12, padding: '24px 20px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#ef4444', fontWeight: 800, fontSize: 15, marginBottom: 10 }}>
+                <AlertCircle size={20} />
+                <span>壁 3：敷地境界ギリギリに寄らない</span>
               </div>
-              <p style={{ fontSize: 14, color: '#475569', lineHeight: 1.8, margin: 0 }}>
-                駐車スペース2台分を最大限有効活用するため、地主様の了解を得た上で「隣地境界ギリギリまで攻めたい」という強いご要望がありました。しかし規格ガレージは決まった寸法しかなく、帯に短したすきに長しでスペースが無駄になってしまいました。
+              <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.75, margin: 0 }}>
+                既存アスファルトを壊さず、隣地境界から実質15cmまで「敷地一杯」に使い切りたいという希望に対し、規格品では軒の出や基礎仕様の制約で1m以上のデッドスペースができてしまう問題がありました。
+              </p>
+            </div>
+
+            {/* 壁④ */}
+            <div style={{ background: '#ffffff', borderRadius: 12, padding: '24px 20px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#ef4444', fontWeight: 800, fontSize: 15, marginBottom: 10 }}>
+                <AlertCircle size={20} />
+                <span>壁 4：中に中段や枕棚を付けられない</span>
+              </div>
+              <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.75, margin: 0 }}>
+                鉄骨プレハブ物置は薄い金属パネルのためビスが効かず、高額な純正オプション棚しか選べません。「使い勝手に合わせて頑丈な中段や枕棚を自由に造作したい」という強いご要望がありました。
               </p>
             </div>
           </div>
@@ -453,7 +467,7 @@ export default function CaseStudy01Page({ setCurrentRoute }) {
 
           <div style={{ background: '#f8fafc', borderRadius: 10, padding: '24px', borderLeft: '4px solid var(--color-primary)', marginBottom: 24 }}>
             <p style={{ fontSize: 15, color: '#334155', lineHeight: 1.85, margin: 0 }}>
-              「最初の相談から見積もり、確認申請、基礎、完成まで3ヶ月でスムーズに進み本当に助かりました。大手メーカーでは既存アスファルトを壊すと言われて諦めかけていましたが、舗装も車止めもそのまま活かしてコストを抑えてくれました。完成したガレージは想像通りの仕上がりで、工事中に追加してもらった頑丈な棚も大活躍しています。」
+              「大手メーカーの既製品カタログでは寸法が帯に短したすきに長しで、敷地に対して無駄な余白ができるか入らないかで本当に困っていました。スマイチさんは敷地境界15cmまで目一杯使い切るミリ単位の図面を引いてくれ、面倒な確認申請から既存アスファルトを活かした布基礎まで全部ワンストップでやってくれたので、施主としての手間がゼロでした。特に工事中にお願いした『頑丈な中段と枕棚』の大工造作が素晴らしく、業務用の備品や長尺物が完璧に整理でき大満足です。」
             </p>
           </div>
 
