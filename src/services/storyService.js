@@ -244,15 +244,57 @@ export const buildCharacterAgeDetail = (protagonistOrText = '') => {
 };
 
 /**
- * Veo 3 日本語台詞発話・音声トラック指定ブロックを生成
- * 100%日本語のみで構成し、英語音声の混入や英語翻訳を完全に遮断します
+ * 建築・ガレージ専門用語 ふりがな・発音補正辞書（Edge-TTS / 音声合成用）
+ * 読点（、）やひらがな展開を挿入することで、AI音声合成の誤読を防ぎ、自然な日本語アクセント・抑揚を実現します。
+ */
+export const CONSTRUCTION_PHONETIC_DICTIONARY = [
+  { term: '確認申請', phonetic: 'かくにん、しんせい', note: '建築確認申請' },
+  { term: '軒出0', phonetic: 'のきで、ゼロ', note: '軒出0仕様' },
+  { term: '軒出ゼロ', phonetic: 'のきで、ゼロ', note: '軒出ゼロ' },
+  { term: '軒出', phonetic: 'のきで', note: '軒の出' },
+  { term: 'ガルバリウム鋼板', phonetic: 'ガルバリウム、こうはん', note: '外壁仕上げ' },
+  { term: 'ガルバリウム', phonetic: 'ガルバリウム', note: '外壁素材' },
+  { term: '現し構造', phonetic: 'あらわし、こうぞう', note: '木造現し構造' },
+  { term: '木造現し', phonetic: 'もくぞう、あらわし', note: '梁現し' },
+  { term: '小屋組み', phonetic: 'こやぐみ', note: '小屋組梁' },
+  { term: '土間コンクリート', phonetic: 'どま、コンクリート', note: '床土間' },
+  { term: '土間', phonetic: 'どま', note: 'ガレージ床' },
+  { term: '母屋', phonetic: 'もや', note: '建築母屋' },
+  { term: '隅欠き', phonetic: 'すみかき', note: '敷地隅切り' },
+  { term: '偏芯', phonetic: 'へんしん', note: '偏芯配置' },
+  { term: '台形地', phonetic: 'だいけいち', note: '変形敷地' },
+  { term: '旗竿地', phonetic: 'はたざおち', note: '専用通路敷地' },
+  { term: 'OSB合板', phonetic: 'オーエスビー、ごうはん', note: '内壁合板' },
+  { term: '建て方', phonetic: 'たてかた', note: '上棟・建て方' },
+  { term: '金物工法', phonetic: 'かなもの、こうほう', note: '接現金物工法' },
+  { term: '市街化調整区域', phonetic: 'しがいか、ちょうせいくいき', note: '都市計画' },
+  { term: '専任スタッフ', phonetic: 'せんにん、スタッフ', note: '表記統一' },
+  { term: '積算', phonetic: 'せきさん', note: '見積もり積算' },
+  { term: '変形地', phonetic: 'へんけいち', note: '変形敷地' },
+  { term: '木造自由設計', phonetic: 'もくぞう、じゆうせっけい', note: 'ブランドコア' },
+  { term: 'スマイチ', phonetic: 'スマイチ', note: 'ブランド名' }
+];
+
+/**
+ * 専門用語ふりがな辞書をテキストに適用する関数
+ */
+export const applyPhoneticDictionary = (text) => {
+  if (!text) return '';
+  let result = text;
+  CONSTRUCTION_PHONETIC_DICTIONARY.forEach(({ term, phonetic }) => {
+    // 単語全体を置換（既に読点等で分解されている場合は二重置換を回避）
+    const regex = new RegExp(term, 'g');
+    result = result.replace(regex, phonetic);
+  });
+  return result;
+};
+
+/**
+ * Veo 3 日本語音声トラック指定ブロック（無音・環境音確定仕様）
+ * 映像生成AI（Veo 3）には人の声・セリフを含めず、環境音のみに限定して破綻を防止します。
  */
 export const buildVeoDialogueBlock = (text, characterDescription = '登場人物') => {
-  const cleanText = (text || '').replace(/[「」"']/g, '').trim();
-  if (!cleanText) {
-    return '【音声トラック】環境音（日本の住宅街の静かな風の音、遠くの穏やかな生活環境音）のみ。人の声・ナレーション・英語音声は一切含めない。';
-  }
-  return `【発話音声・日本語セリフ】自然な日本語ネイティブの発音と正確な口の動き（リップシンク）で、${characterDescription}が「${cleanText}」と日本語で話す。英語音声・英語ナレーション・翻訳音声は一切なし。`;
+  return '【音声トラック】環境音のみ（風の音や雨音、住宅街の静かな生活環境音）。人の声・セリフ発話・ナレーション・英語音声は一切含めない（完全無音または環境音のみ）。';
 };
 
 /**
@@ -265,34 +307,15 @@ export const generateVeoPrompt = (englishPrompt, title = '', episodeNum = 1, opt
 
 /**
  * Veo 3（Google AI Pro / VideoFX）用 100%日本語 3カット連動・絵コンテプロンプト生成
- * 英語の指示を一切排除し、100%日本語のみで精密に指示
- * 年代ブレ防止（50代夫婦が30代にならない厳格な外見・年齢指定）を完全実装
+ * 【重要確定仕様（v0.2.06）】
+ * - Veo 3には「セリフ・リップシンク・人の声」を一切渡さず、純粋なシネマティック実写映像＋環境音のみを指示
+ * - セリフやナレーションは後工程（Geminiナレーション生成＋Edge-TTS＋Z840/FFmpeg合成）で正確に合成
  */
 export const generateVeo3CutPrompts = (englishPrompt, title = '', episodeNum = 1, options = {}) => {
-  // optionsが文字列の場合は直接dialogueとして解釈
-  const dialogueText = typeof options === 'string'
-    ? options
-    : (options?.dialogue !== undefined ? options.dialogue : null);
-  const includeDialogue = options?.includeDialogue !== false; // デフォルトtrue
-  const dialogueScene = options?.dialogueScene || 'scene3'; // デフォルトは役者の生活実感シーン（Scene 3）
   const protagonist = options?.protagonist || options?.target || '';
 
-  // 年代・ペルソナの厳格な外見ディテールを取得
+  // 年代・ペルソナの厳格な外見ディテールを取得（若返り防止）
   const characterInfo = buildCharacterAgeDetail(protagonist || title || englishPrompt);
-
-  // デフォルト台詞の解決（指定がなければエピソード番号に応じたデフォルトセリフ）
-  const defaultDialogues = [
-    '土地込み4,500万円は厳しいよね…あ、この3Dシミュレーター、自分で設計できるんだ',
-    'この金額でガレージが建つなら、中古住宅でも全然アリじゃない？',
-    '新築と同じ予算で、憧れの木造ガレージまで手に入るんだね',
-    '見て、この変形した敷地の形に、数センチ単位でぴったり収まったよ',
-    '雨の日でも濡れずに荷物が運べるなんて、本当に便利で助かるね',
-    '新築じゃなくて大正解だったね。ガレージも庭も楽しめて、暮らしが豊かになったよ',
-    '敷地の形に合わせて自分で描いたガレージ。これを選んで本当に良かった'
-  ];
-  const finalDialogue = dialogueText !== null
-    ? dialogueText
-    : defaultDialogues[(episodeNum - 1) % defaultDialogues.length];
 
   // カット1: 外観・ドローン全景（建築カメラマン＆ドローンパイロット視点 / 約8〜10秒）
   const scene1Motions = [
@@ -300,10 +323,7 @@ export const generateVeo3CutPrompts = (englishPrompt, title = '', episodeNum = 1
     '青空を背景に、建物の足元からゆっくりと見上げるローアングル・ワイドティルトアップ撮影（0〜4秒）。ダークガルバリウム外壁とシャープな軒出ゼロの屋根ライン、木造躯体の精密な重厚感が夕暮れの光の中で堂々と立ち上がる（5〜9秒）。',
     '夕暮れ時のマジックアワー、温かな庭の照明が灯る中、木造ガレージの周囲を滑らかに旋回するクレーンパノラマ撮影（0〜5秒）。日本の落ち着いた住宅街の風景に美しく溶け込む建築の全景が穏やかに映し出される（6〜9秒）。'
   ];
-  const hasScene1Dialogue = (dialogueScene === 'scene1' && includeDialogue && finalDialogue);
-  const scene1Audio = hasScene1Dialogue
-    ? buildVeoDialogueBlock(finalDialogue, characterInfo.description)
-    : '【音声トラック】環境音（日本の住宅街の静かな風の音、心地よい街の環境音）のみ。人の声・ナレーション・英語音声は一切含めない。';
+  const scene1Audio = '【音声トラック】環境音（日本の住宅街の静かな風の音、心地よい街の環境音）のみ。人の声・セリフ・ナレーション・英語音声は一切含めない。';
   const scene1 = `シネマティック実写映画映像（約8〜10秒）。${scene1Motions[(episodeNum - 1) % scene1Motions.length]} 実写映画クオリティ。${scene1Audio}`;
 
   // カット2: シャッター開閉・木造現し構造（建築シネマグラファー＆カラリスト視点 / 約8〜10秒）
@@ -312,27 +332,236 @@ export const generateVeo3CutPrompts = (englishPrompt, title = '', episodeNum = 1
     'ガレージ内部のスローモーショントラッキング撮影（0〜4秒）。無垢の木目テクスチャ、美しく整理されたツールラック、土間コンクリートに差し込む優しい夕暮れの光がじっくりと広がる（5〜9秒）。木造建築ならではの温もりと機能美。',
     '天井の木造トラス梁からダークメタリックの外壁へとゆっくりと移動するパン撮影（0〜4秒）。モダンで洗練された現代木造建築のディテールと素材感が夕方の光の中で際立つ（5〜9秒）。'
   ];
-  const hasScene2Dialogue = (dialogueScene === 'scene2' && includeDialogue && finalDialogue);
-  const scene2Audio = hasScene2Dialogue
-    ? buildVeoDialogueBlock(finalDialogue, characterInfo.description)
-    : '【音声トラック】電動シャッターが静かに巻き上がる心地よい機械音と、木造空間の自然な反響音のみ。人の声・ナレーション・英語音声は一切含めない。';
+  const scene2Audio = '【音声トラック】電動シャッターが静かに巻き上がる心地よい機械音と、木造空間の自然な反響音のみ。人の声・セリフ・ナレーション・英語音声は一切含めない。';
   const scene2 = `シネマティック実写映画映像（約8〜10秒）。${scene2Actions[(episodeNum - 1) % scene2Actions.length]} 実写映画クオリティ。${scene2Audio}`;
 
-  // カット3: 雨の日入庫・生活実感の豊かさ（映像ディレクター＆サウンドデザイナー視点 / 約8〜10秒）
-  // 役者が登場するメインシーン：年代指定（50代夫婦等）を厳格に反映し、8〜10秒の尺で中盤にセリフを発話
+  // カット3: 雨の日入庫・生活実感の豊かさ（無声・表情と動作のみ / 約8〜10秒）
+  // 役者は自然な表情と所作のみ。口パクや発話は指示せず、破綻を防ぐ
   const scene3Lifestyles = [
-    `雨の降る夕暮れ時。雨粒がガルバリウム屋根を静かに伝い落ちる中、乗用車が雨に濡れない乾いた木造ガレージ内部へ滑らかに入庫するスロードリー撮影（0〜3秒）。車から降り立った${characterInfo.description}が、穏やかな笑顔と自然なリップシンクで日本語セリフを発話（3〜7秒）。雨に濡れずに荷物を運び込める安心感と、家族の温かな笑顔の余韻（7〜9秒）。等身大の日本の豊かな暮らしの実感。`,
-    `夕暮れ時のガレージ内で、外の静かな雨の音を聞きながら温かいコーヒーマグを手にする${characterInfo.description}（0〜3秒）。自分たちだけの整った木造空間を眺め合い、自然な表情とリップシンクで日本語セリフを発話（3〜7秒）。温かい照明と木の香りに包まれた心温まる大人の日常のひとコマ（7〜9秒）。`,
-    `清々しい朝の光が差し込む中、電動シャッターを開け、休日のドライブやお出かけの準備をする${characterInfo.description}（0〜3秒）。自分たちの敷地に合わせたガレージがある暮らしの満足感とともに日本語セリフを発話（3〜7秒）。自然な笑顔と穏やかな余韻（7〜9秒）。`
+    `雨の降る夕暮れ時。雨粒がガルバリウム屋根を静かに伝い落ちる中、乗用車が雨に濡れない乾いた木造ガレージ内部へ滑らかに入庫するスロードリー撮影（0〜3秒）。車から降り立った${characterInfo.description}が、濡れずに荷物を取り出せる便利さに心から安堵し、愛車と整った木造空間を温かな笑顔で見つめ満足そうに頷く（3〜7秒）。家族の温かな笑顔と安心感の余韻（7〜9秒）。等身大の日本の豊かな暮らしの実感。人の声・セリフ発話は一切なし。`,
+    `夕暮れ時のガレージ内で、外の静かな雨の音を聞きながら温かいコーヒーマグを手にする${characterInfo.description}（0〜3秒）。自分たちだけの整った木造空間を穏やかに見つめ合い、自然な笑顔で頷き合う（3〜7秒）。温かい照明と木の香りに包まれた心温まる大人の日常のひとコマ（7〜9秒）。人の声・セリフ発話は一切なし。`,
+    `清々しい朝の光が差し込む中、電動シャッターを開け、休日のドライブやお出かけの準備をする${characterInfo.description}（0〜3秒）。自分たちの敷地に合わせたガレージがある暮らしの満足感とともに、穏やかな笑顔で愛車を見つめる（3〜7秒）。自然な笑顔と穏やかな余韻（7〜9秒）。人の声・セリフ発話は一切なし。`
   ];
-  const hasScene3Dialogue = (dialogueScene === 'scene3' && includeDialogue && finalDialogue);
-  const scene3Audio = hasScene3Dialogue
-    ? buildVeoDialogueBlock(finalDialogue, characterInfo.description)
-    : '【音声トラック】ガルバリウム屋根に当たる静かな雨音、車のドアが静かに閉まる音。人の声・ナレーション・英語音声は一切含めない。';
+  const scene3Audio = '【音声トラック】ガルバリウム屋根に当たる静かな雨音、車のドアが静かに閉まる環境音のみ。人の声・セリフ・ナレーション・英語音声は一切含めない。';
   const scene3 = `シネマティック実写映画映像（約8〜10秒）。${scene3Lifestyles[(episodeNum - 1) % scene3Lifestyles.length]} 実写映画クオリティ。${scene3Audio}`;
 
-  return { scene1, scene2, scene3, dialogue: finalDialogue, characterInfo };
+  return { scene1, scene2, scene3, characterInfo };
 };
+
+/**
+ * 3カット連動 ナレーション原稿・タイムコード＆字幕（SRT）自動生成
+ * 1話あたり約24〜30秒（Scene 1: 0〜8秒、Scene 2: 8〜16秒、Scene 3: 16〜24秒）
+ */
+export const generateStoryNarration = (story, options = {}) => {
+  if (!story) return null;
+  const epNum = story.episodeNum || 1;
+  const userFeedback = options.userFeedback || story.narrationFeedback || '';
+
+  // 各話に応じた標準ナレーション構成（プロットとセリフから抽出）
+  const narrationPresets = [
+    {
+      scene1: '住宅展示場を回るたび、土地込み4,500万円の壁にため息をついていたあの日。',
+      scene2: '偶然出会った木造ガレージの3Dシミュレーター。画面上で自分で描いたその瞬間、暮らしの選択肢が広がった。',
+      scene3: '中古住宅に自分だけのガレージをプラス。新築以上の自由が、ここから始まりました。'
+    },
+    {
+      scene1: '不動産サイトで見かける、変形地や旗竿地の格安物件。',
+      scene2: '既製品では無理でも、木造自由設計なら敷地の境界に合わせてミリ単位でぴったり収まる。',
+      scene3: 'ガレージが建てられるかどうかで土地を選ぶ。土地探しの見方が、180度変わりました。'
+    },
+    {
+      scene1: '中古住宅3,800万円、リノベ300万円、そして木造ガレージ300万円。',
+      scene2: '合計4,400万円。新築を検討していたのと同じ予算の中に、憧れのガレージがすっぽり収まる計算です。',
+      scene3: '同じお金を使うなら、愛車と趣味の空間まで手に入る方を選びたい。夫婦で笑い合った決断の夜でした。'
+    },
+    {
+      scene1: '購入した中古物件の敷地は、南側が斜めになった台形地。規格ガレージは入らないと諦めかけていました。',
+      scene2: '専任スタッフによる現地測量とミリ単位の構造設計。既存建物の外壁ラインに数センチの精度で吸い付くように納まります。',
+      scene3: '敷地の形を余すことなく使い切る。木造だからできた、世界にひとつだけのオーダーメイドガレージです。'
+    },
+    {
+      scene1: '土砂降りの雨の日の帰宅。傘をさしながら買い物袋を抱えるストレスから、完全に解放されました。',
+      scene2: '雨粒を弾くガルバリウム屋根と、木の香りに満ちた室内。車から直接濡れずに家の中へ荷物を運び込めます。',
+      scene3: '雨の日こそ実感する、木造ガレージの贅沢。暮らしの快適さが、ぐんと底上げされました。'
+    },
+    {
+      scene1: '新築の画一的な間取りではなく、中古住宅と木造ガレージを選んだ私たち。',
+      scene2: '週末はガレージで愛車の手入れやDIY。浮いた予算で家族の趣味や旅行も思いきり楽しめる。',
+      scene3: '見栄ではなく、自分たちの暮らしの豊かさを選ぶ。この選択は大正解でした。'
+    },
+    {
+      scene1: '土地の形に合わせて、ブラウザの中で自分の手で描いたガレージ。',
+      scene2: '構造計算から建築確認申請、そして大工の手仕事による施工まで、ワンストップで形になりました。',
+      scene3: '規格品にはない温もりと自由。敷地にぴったりのガレージを、あなたも描いてみませんか。'
+    }
+  ];
+
+  const preset = narrationPresets[(epNum - 1) % narrationPresets.length];
+  const scene1 = options.scene1Text || story.narrationScene1 || preset.scene1;
+  const scene2 = options.scene2Text || story.narrationScene2 || preset.scene2;
+  const scene3 = options.scene3Text || story.narrationScene3 || preset.scene3;
+
+  // 担当者からの読み方指示やフィードバックを反映した補正
+  let finalScene1 = scene1;
+  let finalScene2 = scene2;
+  let finalScene3 = scene3;
+
+  // Edge-TTS（音声合成）用ふりがな補正テキスト
+  const phoneticScene1 = applyPhoneticDictionary(finalScene1);
+  const phoneticScene2 = applyPhoneticDictionary(finalScene2);
+  const phoneticScene3 = applyPhoneticDictionary(finalScene3);
+  const fullPhonetic = `${phoneticScene1}　${phoneticScene2}　${phoneticScene3}`;
+
+  // 字幕データ（SRTフォーマット生成用）
+  const subtitles = [
+    { index: 1, startTime: '00:00:00,800', endTime: '00:00:07,800', text: finalScene1 },
+    { index: 2, startTime: '00:00:08,500', endTime: '00:00:15,500', text: finalScene2 },
+    { index: 3, startTime: '00:00:16,200', endTime: '00:00:23,500', text: finalScene3 }
+  ];
+
+  const srtContent = subtitles.map(s => 
+    `${s.index}\n${s.startTime} --> ${s.endTime}\n${s.text}\n`
+  ).join('\n');
+
+  return {
+    scene1: finalScene1,
+    scene2: finalScene2,
+    scene3: finalScene3,
+    fullText: `${finalScene1} ${finalScene2} ${finalScene3}`,
+    phoneticScene1,
+    phoneticScene2,
+    phoneticScene3,
+    fullPhonetic,
+    subtitles,
+    srtContent,
+    userFeedback
+  };
+};
+
+/**
+ * Z840用 Python + FFmpeg（NVENC）+ Edge-TTS 完全自動合成スクリプト生成
+ * 担当者がワンクリックでコピーして Z840（NVIDIA GPU搭載機）上で即実行できます。
+ */
+export const generateZ840PythonScript = (story, options = {}) => {
+  const epNum = story?.episodeNum || 1;
+  const narration = generateStoryNarration(story, options);
+  const voice = options.voice || 'ja-JP-NanamiNeural'; // または 'ja-JP-KeitaNeural'
+  const isVertical = options.isVertical !== false; // デフォルト9:16縦型 (Shorts/Reels)
+
+  return `#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+=============================================================================
+スマイチ (smile049.jp) 第${epNum}話 SNS動画全自動合成パイプライン (HP Z840専用)
+- 音声合成: Edge-TTS (${voice}) ※専門用語ふりがな適用済
+- 動画結合: FFmpeg concat (Scene 1〜3 / 各約8秒 ➔ 約24秒)
+- ハードウェア加速: NVIDIA NVENC (h264_nvenc)
+- 字幕焼き込み: SRTテロップ自動合成
+=============================================================================
+事前準備（Z840のターミナルで1回だけ実行）:
+  pip install edge-tts
+  (FFmpegがインストールされていることを確認してください)
+実行方法:
+  python compose_ep${epNum}.py
+=============================================================================
+"""
+
+import os
+import sys
+import subprocess
+import asyncio
+
+# --- 設定パラメータ ---
+EPISODE_NUM = ${epNum}
+VOICE_NAME = "${voice}"  # 女性アナウンサー調: ja-JP-NanamiNeural / 男性調: ja-JP-KeitaNeural
+OUTPUT_FILENAME = f"smile049_ep{EPISODE_NUM:02d}_complete_sns.mp4"
+
+# 3カット動画ファイル名（Google Drive等から同ディレクトリに配置）
+SCENE_FILES = [
+    f"scene1.mp4",
+    f"scene2.mp4",
+    f"scene3.mp4"
+]
+
+# 字幕データ (SRT形式)
+SRT_CONTENT = """${narration.srtContent}"""
+
+# Edge-TTS読み上げ用ナレーション原稿（専門用語ふりがな・ポーズ最適化済）
+NARRATION_TEXT = """${narration.fullPhonetic}"""
+
+async def generate_narration():
+    """Edge-TTSで高精細な日本語ナレーション音声を生成"""
+    print("🎙️ [1/4] Edge-TTSで自然な日本語ナレーション音声を合成中...")
+    import edge_tts
+    communicate = edge_tts.Communicate(NARRATION_TEXT, VOICE_NAME, rate="+0%", pitch="+0Hz")
+    await communicate.save("narration.mp3")
+    print("✅ ナレーション音声生成完了: narration.mp3")
+
+def create_srt_file():
+    """字幕SRTファイルを出力"""
+    print("📝 [2/4] 字幕SRTファイルを作成中...")
+    with open("subtitles.srt", "w", encoding="utf-8") as f:
+        f.write(SRT_CONTENT.strip() + "\\n")
+    print("✅ 字幕ファイル作成完了: subtitles.srt")
+
+def create_concat_list():
+    """FFmpeg結合用リストファイルを作成"""
+    with open("concat_list.txt", "w", encoding="utf-8") as f:
+        for fname in SCENE_FILES:
+            if not os.path.exists(fname):
+                print(f"⚠️ 警告: 素材ファイル '{fname}' が見つかりません。")
+            f.write(f"file '{fname}'\\n")
+
+def compose_video():
+    """FFmpegで動画3カット結合 + 音声合成 + 字幕焼き込みをNVENC高速実行"""
+    print("🚀 [3/4] FFmpeg (NVIDIA NVENC) による結合・字幕焼き込み・音声合成を開始...")
+    create_concat_list()
+
+    # 字幕スタイル設定（Meiryoフォント、黄色/白、縁取りありでスマホ画面で見やすい設定）
+    srt_filter = "subtitles=subtitles.srt:force_style='FontName=Meiryo,FontSize=20,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BorderStyle=3,Outline=2,Shadow=1,Alignment=2,MarginV=60'"
+    
+    # 9:16縦型（1080x1920）スケーリング＆パディングフィルター
+    scale_filter = "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:black"
+    video_filters = f"{scale_filter},{srt_filter}"
+
+    # NVIDIA NVENC対応FFmpegコマンド
+    cmd = [
+        "ffmpeg", "-y",
+        "-f", "concat", "-safe", "0", "-i", "concat_list.txt",
+        "-i", "narration.mp3",
+        "-filter_complex", f"[0:v]{video_filters}[v];[1:a]volume=1.0[a]",
+        "-map", "[v]",
+        "-map", "[a]",
+        "-c:v", "h264_nvenc", "-preset", "p4", "-b:v", "6M",
+        "-c:a", "aac", "-b:a", "192k",
+        "-shortest",
+        OUTPUT_FILENAME
+    ]
+
+    try:
+        res = subprocess.run(cmd, check=True)
+        print(f"🎉 [4/4] 完成！ 出力ファイル: {OUTPUT_FILENAME}")
+    except subprocess.CalledProcessError:
+        print("⚠️ NVENCエンコーダーが使用できないため、CPUエンコーダー(libx264)でフォールバック実行します...")
+        cmd[cmd.index("h264_nvenc")] = "libx264"
+        cmd.remove("-preset")
+        cmd.remove("p4")
+        subprocess.run(cmd, check=True)
+        print(f"🎉 [4/4] 完成！ 出力ファイル: {OUTPUT_FILENAME}")
+
+def main():
+    print("=" * 60)
+    print(f" 木造ガレージ【スマイチ】 第{EPISODE_NUM}話 SNS動画自動合成システム")
+    print("=" * 60)
+    create_srt_file()
+    asyncio.run(generate_narration())
+    compose_video()
+
+if __name__ == "__main__":
+    main()
+`;
+};
+
 
 /**
  * X（旧Twitter）仕様の文字数カウント関数
@@ -455,6 +684,12 @@ export const getAllStories = () => {
           const epDialogue = s.dialogue !== undefined ? s.dialogue : (defaultDialogues[(epNum - 1) % defaultDialogues.length] || '');
           const protagonist = s.protagonist || s.target || '';
           const cuts = generateVeo3CutPrompts(s.englishPrompt, s.title, epNum, { dialogue: epDialogue, protagonist });
+          const narration = generateStoryNarration(s, {
+            scene1Text: s.narrationScene1,
+            scene2Text: s.narrationScene2,
+            scene3Text: s.narrationScene3,
+            userFeedback: s.narrationFeedback
+          });
           return {
             ...s,
             dialogue: epDialogue,
@@ -462,6 +697,12 @@ export const getAllStories = () => {
             veoPromptScene1: cuts.scene1,
             veoPromptScene2: cuts.scene2,
             veoPromptScene3: cuts.scene3,
+            narrationScene1: narration.scene1,
+            narrationScene2: narration.scene2,
+            narrationScene3: narration.scene3,
+            narrationPhonetic: narration.fullPhonetic,
+            subtitles: narration.subtitles,
+            srtContent: narration.srtContent,
             xPost: s.xPost || formatXPost(s),
             isPostedYouTube: typeof s.isPostedYouTube === 'boolean' ? s.isPostedYouTube : false
           };
@@ -476,6 +717,7 @@ export const getAllStories = () => {
     const epDialogue = s.dialogue || defaultDialogues[(epNum - 1) % defaultDialogues.length] || '';
     const protagonist = s.protagonist || s.target || '';
     const cuts = generateVeo3CutPrompts(s.englishPrompt, s.title, epNum, { dialogue: epDialogue, protagonist });
+    const narration = generateStoryNarration(s, {});
     return {
       ...s,
       dialogue: epDialogue,
@@ -483,6 +725,12 @@ export const getAllStories = () => {
       veoPromptScene1: cuts.scene1,
       veoPromptScene2: cuts.scene2,
       veoPromptScene3: cuts.scene3,
+      narrationScene1: narration.scene1,
+      narrationScene2: narration.scene2,
+      narrationScene3: narration.scene3,
+      narrationPhonetic: narration.fullPhonetic,
+      subtitles: narration.subtitles,
+      srtContent: narration.srtContent,
       xPost: s.xPost || formatXPost(s),
       isPostedYouTube: typeof s.isPostedYouTube === 'boolean' ? s.isPostedYouTube : false
     };
