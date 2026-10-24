@@ -152,8 +152,8 @@ def generate_ass(scene1: str, scene2: str, scene3: str, output_path: str, is_ver
     """透明背景・白文字黒縁取り・1行厳守のASS字幕ファイルを生成"""
     play_x = 1080 if is_vertical else 1920
     play_y = 1920 if is_vertical else 1080
-    font_size = 40 if is_vertical else 42
-    margin_v = 160 if is_vertical else 80
+    font_size = 52 if is_vertical else 54
+    margin_v = 180 if is_vertical else 90
 
     ass_text = f"""[Script Info]
 ScriptType: v4.00+
@@ -163,7 +163,7 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,Meiryo,{font_size},&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,3.5,1.0,2,30,30,{margin_v},1
+Style: Default,Meiryo,{font_size},&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,4.0,1.0,2,24,24,{margin_v},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
