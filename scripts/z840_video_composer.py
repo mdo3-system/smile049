@@ -152,9 +152,9 @@ def compose_with_ffmpeg(scene_files, audio_file, srt_file, output_file, is_verti
             abs_p = os.path.abspath(fpath).replace("\\", "/")
             f.write(f"file '{abs_p}'\n")
 
-    # 字幕フィルター（Meiryoフォント、黄色・白、黒縁取り）
     abs_srt = os.path.abspath(srt_file).replace("\\", "/").replace(":", "\\:")
-    srt_filter = f"subtitles='{abs_srt}':force_style='FontName=Meiryo,FontSize=20,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BorderStyle=3,Outline=2,Shadow=1,Alignment=2,MarginV=70'"
+    # 字幕スタイル設定（Meiryoフォント、黄色/白、縁取りありでスマホ画面で見やすい設定）
+    srt_filter = f"subtitles='{abs_srt}':force_style='FontName=Meiryo,FontSize=16,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BorderStyle=3,Outline=2,Shadow=1,Alignment=2,MarginV=90'"
 
     if is_vertical:
         # 9:16縦型リサイズ（1080x1920）
