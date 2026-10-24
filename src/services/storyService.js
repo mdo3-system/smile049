@@ -423,7 +423,7 @@ export const generateStoryNarration = (story, options = {}) => {
     `${s.index}\n${s.startTime} --> ${s.endTime}\n${s.text}\n`
   ).join('\n');
 
-  // 高度字幕データ（ASSフォーマット：黒帯座布団完全排除、透明背景＋白文字黒縁取り、1行厳守、SNS視認性最適化52px）
+  // 高度字幕データ（ASSフォーマット：黒帯座布団完全排除、透明背景＋白文字黒縁取り、1行厳守、SNS視認性最適化62px）
   const assContent = `[Script Info]
 ScriptType: v4.00+
 PlayResX: 1080
@@ -432,7 +432,7 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,Meiryo,52,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,4.0,1.0,2,24,24,180,1
+Style: Default,Meiryo,62,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,4.5,1.0,2,24,24,180,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -474,7 +474,7 @@ export const generateZ840PythonScript = (story, options = {}) => {
 スマイチ (smile049.jp) 第${epNum}話 SNS動画全自動合成パイプライン (HP Z840専用)
 - 音声合成: Edge-TTS (${voice}) ※専門用語ふりがな適用・各カット完全同期
 - 動画結合: FFmpeg concat (Scene 1〜3 / 各8秒 ➔ 計24秒)
-- 字幕焼き込み: ASSテロップ（黒背景排除・白文字黒縁取り・SNS視認性最適化52px・1行表示）
+- 字幕焼き込み: ASSテロップ（黒背景排除・白文字黒縁取り・SNS視認性最適化62px・1行表示）
 - ハードウェア加速: NVIDIA NVENC (h264_nvenc) または CPU高速エンコード
 =============================================================================
 """
@@ -557,10 +557,10 @@ async def generate_audio_parts():
     print("✅ ナレーション音声作成完了（24秒完全同期）: synced_narration.mp3")
 
 def create_ass_file():
-    print("📝 [2/4] 字幕ASSファイルを作成中（透明背景・SNS視認性最適化52px・1行テロップ）...")
+    print("📝 [2/4] 字幕ASSファイルを作成中（透明背景・SNS視認性最適化62px・1行テロップ）...")
     play_x = 1080 if IS_VERTICAL else 1920
     play_y = 1920 if IS_VERTICAL else 1080
-    font_size = 52 if IS_VERTICAL else 54
+    font_size = 62 if IS_VERTICAL else 58
     margin_v = 180 if IS_VERTICAL else 90
 
     ass_text = f"""[Script Info]
@@ -571,7 +571,7 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,Meiryo,{font_size},&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,4.0,1.0,2,24,24,{margin_v},1
+Style: Default,Meiryo,{font_size},&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,4.5,1.0,2,24,24,{margin_v},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
