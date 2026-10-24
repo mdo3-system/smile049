@@ -1,4 +1,4 @@
 /**
  * アプリケーション バージョン管理 (public直下)
  */
-window.APP_VERSION = '0.2.06';
+window.APP_VERSION = '0.2.07';

@@ -357,42 +357,42 @@ export const generateStoryNarration = (story, options = {}) => {
   const epNum = story.episodeNum || 1;
   const userFeedback = options.userFeedback || story.narrationFeedback || '';
 
-  // 各話に応じた標準ナレーション構成（プロットとセリフから抽出）
+  // 各話に応じた標準ナレーション構成（スマホSNSで1行に美しく収まる約18〜24文字の簡潔テロップ）
   const narrationPresets = [
     {
-      scene1: '住宅展示場を回るたび、土地込み4,500万円の壁にため息をついていたあの日。',
-      scene2: '偶然出会った木造ガレージの3Dシミュレーター。画面上で自分で描いたその瞬間、暮らしの選択肢が広がった。',
-      scene3: '中古住宅に自分だけのガレージをプラス。新築以上の自由が、ここから始まりました。'
+      scene1: '土地込み4500万。新築の壁に悩んでいたあの日。',
+      scene2: '画面で描く木造ガレージで、選択肢が広がった。',
+      scene3: '中古＋ガレージ。新築以上の自由がここから。'
     },
     {
-      scene1: '不動産サイトで見かける、変形地や旗竿地の格安物件。',
-      scene2: '既製品では無理でも、木造自由設計なら敷地の境界に合わせてミリ単位でぴったり収まる。',
-      scene3: 'ガレージが建てられるかどうかで土地を選ぶ。土地探しの見方が、180度変わりました。'
+      scene1: '不動産サイトで見かける、変形地の格安物件。',
+      scene2: '木造自由設計なら、敷地境界にミリ単位で収まる。',
+      scene3: '土地探しの見方が、180度変わりました。'
     },
     {
-      scene1: '中古住宅3,800万円、リノベ300万円、そして木造ガレージ300万円。',
-      scene2: '合計4,400万円。新築を検討していたのと同じ予算の中に、憧れのガレージがすっぽり収まる計算です。',
-      scene3: '同じお金を使うなら、愛車と趣味の空間まで手に入る方を選びたい。夫婦で笑い合った決断の夜でした。'
+      scene1: '中古3800万、リノベ300万、木造ガレージ300万。',
+      scene2: '総額4400万、新築予算で憧れの愛車空間が完成。',
+      scene3: '暮らしも趣味も手に入る、夫婦笑顔の決断でした。'
     },
     {
-      scene1: '購入した中古物件の敷地は、南側が斜めになった台形地。規格ガレージは入らないと諦めかけていました。',
-      scene2: '専任スタッフによる現地測量とミリ単位の構造設計。既存建物の外壁ラインに数センチの精度で吸い付くように納まります。',
-      scene3: '敷地の形を余すことなく使い切る。木造だからできた、世界にひとつだけのオーダーメイドガレージです。'
+      scene1: '南側が斜めの台形地。規格品は入らないと諦めていた。',
+      scene2: 'ミリ単位の自由設計で、敷地ぴったりに美しく納まる。',
+      scene3: '敷地を使い切る、世界にひとつの木造ガレージ。'
     },
     {
-      scene1: '土砂降りの雨の日の帰宅。傘をさしながら買い物袋を抱えるストレスから、完全に解放されました。',
-      scene2: '雨粒を弾くガルバリウム屋根と、木の香りに満ちた室内。車から直接濡れずに家の中へ荷物を運び込めます。',
-      scene3: '雨の日こそ実感する、木造ガレージの贅沢。暮らしの快適さが、ぐんと底上げされました。'
+      scene1: '土砂降りの日。濡れずに荷物を運べる日常の贅沢。',
+      scene2: 'ガルバリウム屋根と、木の香りに満ちた室内空間。',
+      scene3: '雨の日こそ実感する、暮らしの確かな豊かさ。'
     },
     {
-      scene1: '新築の画一的な間取りではなく、中古住宅と木造ガレージを選んだ私たち。',
-      scene2: '週末はガレージで愛車の手入れやDIY。浮いた予算で家族の趣味や旅行も思いきり楽しめる。',
-      scene3: '見栄ではなく、自分たちの暮らしの豊かさを選ぶ。この選択は大正解でした。'
+      scene1: '新築の画一的な間取りより、自分たちの理想を選んだ。',
+      scene2: '週末は愛車の手入れやDIY。趣味を思いきり楽しむ。',
+      scene3: '見栄ではなく暮らしの豊かさを。大正解の選択でした。'
     },
     {
-      scene1: '土地の形に合わせて、ブラウザの中で自分の手で描いたガレージ。',
-      scene2: '構造計算から建築確認申請、そして大工の手仕事による施工まで、ワンストップで形になりました。',
-      scene3: '規格品にはない温もりと自由。敷地にぴったりのガレージを、あなたも描いてみませんか。'
+      scene1: '敷地に合わせて、ブラウザの中で自分で描いたガレージ。',
+      scene2: '構造計算から確認申請、大工の手仕事でワンストップ完工。',
+      scene3: '規格品にはない自由。あなたも理想を描いてみませんか。'
     }
   ];
 
@@ -412,16 +412,34 @@ export const generateStoryNarration = (story, options = {}) => {
   const phoneticScene3 = applyPhoneticDictionary(finalScene3);
   const fullPhonetic = `${phoneticScene1}　${phoneticScene2}　${phoneticScene3}`;
 
-  // 字幕データ（SRTフォーマット生成用）
+  // 字幕データ（SRTフォーマット：黒背景なし・1行表示用）
   const subtitles = [
-    { index: 1, startTime: '00:00:00,800', endTime: '00:00:07,800', text: finalScene1 },
-    { index: 2, startTime: '00:00:08,500', endTime: '00:00:15,500', text: finalScene2 },
-    { index: 3, startTime: '00:00:16,200', endTime: '00:00:23,500', text: finalScene3 }
+    { index: 1, startTime: '00:00:00,600', endTime: '00:00:06,500', text: finalScene1 },
+    { index: 2, startTime: '00:00:08,500', endTime: '00:00:14,500', text: finalScene2 },
+    { index: 3, startTime: '00:00:16,500', endTime: '00:00:22,500', text: finalScene3 }
   ];
 
   const srtContent = subtitles.map(s => 
     `${s.index}\n${s.startTime} --> ${s.endTime}\n${s.text}\n`
   ).join('\n');
+
+  // 高度字幕データ（ASSフォーマット：黒帯座布団完全排除、透明背景＋白文字黒縁取り、1行厳守）
+  const assContent = `[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Meiryo,40,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,3.5,1.0,2,30,30,160,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.60,0:00:06.50,Default,,0,0,0,,${finalScene1}
+Dialogue: 0,0:00:08.50,0:00:14.50,Default,,0,0,0,,${finalScene2}
+Dialogue: 0,0:00:16.50,0:00:22.50,Default,,0,0,0,,${finalScene3}
+`;
 
   return {
     scene1: finalScene1,
@@ -434,6 +452,7 @@ export const generateStoryNarration = (story, options = {}) => {
     fullPhonetic,
     subtitles,
     srtContent,
+    assContent,
     userFeedback
   };
 };
@@ -445,24 +464,18 @@ export const generateStoryNarration = (story, options = {}) => {
 export const generateZ840PythonScript = (story, options = {}) => {
   const epNum = story?.episodeNum || 1;
   const narration = generateStoryNarration(story, options);
-  const voice = options.voice || 'ja-JP-NanamiNeural'; // または 'ja-JP-KeitaNeural'
-  const isVertical = options.isVertical !== false; // デフォルト9:16縦型 (Shorts/Reels)
+  const voice = options.voice || 'ja-JP-NanamiNeural';
+  const isVertical = options.isVertical !== false;
 
   return `#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 =============================================================================
 スマイチ (smile049.jp) 第${epNum}話 SNS動画全自動合成パイプライン (HP Z840専用)
-- 音声合成: Edge-TTS (${voice}) ※専門用語ふりがな適用済
-- 動画結合: FFmpeg concat (Scene 1〜3 / 各約8秒 ➔ 約24秒)
-- ハードウェア加速: NVIDIA NVENC (h264_nvenc)
-- 字幕焼き込み: SRTテロップ自動合成
-=============================================================================
-事前準備（Z840のターミナルで1回だけ実行）:
-  pip install edge-tts
-  (FFmpegがインストールされていることを確認してください)
-実行方法:
-  python compose_ep${epNum}.py
+- 音声合成: Edge-TTS (${voice}) ※専門用語ふりがな適用・各カット完全同期
+- 動画結合: FFmpeg concat (Scene 1〜3 / 各8秒 ➔ 計24秒)
+- 字幕焼き込み: ASSテロップ（黒背景排除・白文字黒縁取り・1行表示）
+- ハードウェア加速: NVIDIA NVENC (h264_nvenc) または CPU高速エンコード
 =============================================================================
 """
 
@@ -471,90 +484,157 @@ import sys
 import subprocess
 import asyncio
 
-# --- 設定パラメータ ---
-EPISODE_NUM = ${epNum}
-VOICE_NAME = "${voice}"  # 女性アナウンサー調: ja-JP-NanamiNeural / 男性調: ja-JP-KeitaNeural
-OUTPUT_FILENAME = f"smile049_ep{EPISODE_NUM:02d}_complete_sns.mp4"
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
 
-# 3カット動画ファイル名（Google Drive等から同ディレクトリに配置）
-SCENE_FILES = [
-    f"scene1.mp4",
-    f"scene2.mp4",
-    f"scene3.mp4"
+EPISODE_NUM = ${epNum}
+VOICE_NAME = "${voice}"
+IS_VERTICAL = ${isVertical ? 'True' : 'False'}
+OUTPUT_FILENAME = f"smile049_ep{EPISODE_NUM:02d}_complete_{'sns' if IS_VERTICAL else 'horizontal'}.mp4"
+
+SCENE_FILES = ["scene1.mp4", "scene2.mp4", "scene3.mp4"]
+
+SCENES_DATA = [
+    {
+        "sub": """${narration.scene1}""",
+        "voice": """${narration.phoneticScene1}""",
+        "delay_ms": 600,
+        "start": "0:00:00.60",
+        "end": "0:00:06.50"
+    },
+    {
+        "sub": """${narration.scene2}""",
+        "voice": """${narration.phoneticScene2}""",
+        "delay_ms": 8500,
+        "start": "0:00:08.50",
+        "end": "0:00:14.50"
+    },
+    {
+        "sub": """${narration.scene3}""",
+        "voice": """${narration.phoneticScene3}""",
+        "delay_ms": 16500,
+        "start": "0:00:16.50",
+        "end": "0:00:22.50"
+    }
 ]
 
-# 字幕データ (SRT形式)
-SRT_CONTENT = """${narration.srtContent}"""
-
-# Edge-TTS読み上げ用ナレーション原稿（専門用語ふりがな・ポーズ最適化済）
-NARRATION_TEXT = """${narration.fullPhonetic}"""
-
-async def generate_narration():
-    """Edge-TTSで高精細な日本語ナレーション音声を生成"""
-    print("🎙️ [1/4] Edge-TTSで自然な日本語ナレーション音声を合成中...")
+async def generate_audio_parts():
+    print("🎙️ [1/4] Edge-TTSで各カット同期ナレーション音声を合成中...")
     import edge_tts
-    communicate = edge_tts.Communicate(NARRATION_TEXT, VOICE_NAME, rate="+0%", pitch="+0Hz")
-    await communicate.save("narration.mp3")
-    print("✅ ナレーション音声生成完了: narration.mp3")
+    parts = []
+    for i, sc in enumerate(SCENES_DATA):
+        p = f"temp_part_{i+1}.mp3"
+        comm = edge_tts.Communicate(sc["voice"], VOICE_NAME, rate="+10%")
+        await comm.save(p)
+        parts.append(p)
 
-def create_srt_file():
-    """字幕SRTファイルを出力"""
-    print("📝 [2/4] 字幕SRTファイルを作成中...")
-    with open("subtitles.srt", "w", encoding="utf-8") as f:
-        f.write(SRT_CONTENT.strip() + "\\n")
-    print("✅ 字幕ファイル作成完了: subtitles.srt")
+    # 各カットの開始位置に正確にオフセットして合成
+    filter_adelay = (
+        f"[0:a]adelay={SCENES_DATA[0]['delay_ms']}|{SCENES_DATA[0]['delay_ms']}[a0];"
+        f"[1:a]adelay={SCENES_DATA[1]['delay_ms']}|{SCENES_DATA[1]['delay_ms']}[a1];"
+        f"[2:a]adelay={SCENES_DATA[2]['delay_ms']}|{SCENES_DATA[2]['delay_ms']}[a2];"
+        f"[a0][a1][a2]amix=inputs=3:dropout_transition=0:normalize=0[outa]"
+    )
+    cmd = [
+        "ffmpeg", "-y",
+        "-i", parts[0], "-i", parts[1], "-i", parts[2],
+        "-filter_complex", filter_adelay,
+        "-map", "[outa]",
+        "-t", "24.0",
+        "synced_narration.mp3"
+    ]
+    subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    for p in parts:
+        try:
+            if os.path.exists(p):
+                os.remove(p)
+        except OSError:
+            pass
+    print("✅ ナレーション音声作成完了（24秒完全同期）: synced_narration.mp3")
 
-def create_concat_list():
-    """FFmpeg結合用リストファイルを作成"""
+def create_ass_file():
+    print("📝 [2/4] 字幕ASSファイルを作成中（透明背景・1行テロップ）...")
+    play_x = 1080 if IS_VERTICAL else 1920
+    play_y = 1920 if IS_VERTICAL else 1080
+    font_size = 40 if IS_VERTICAL else 42
+    margin_v = 160 if IS_VERTICAL else 80
+
+    ass_text = f"""[Script Info]
+ScriptType: v4.00+
+PlayResX: {play_x}
+PlayResY: {play_y}
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Meiryo,{font_size},&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,3.5,1.0,2,30,30,{margin_v},1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,{SCENES_DATA[0]['start']},{SCENES_DATA[0]['end']},Default,,0,0,0,,{SCENES_DATA[0]['sub']}
+Dialogue: 0,{SCENES_DATA[1]['start']},{SCENES_DATA[1]['end']},Default,,0,0,0,,{SCENES_DATA[1]['sub']}
+Dialogue: 0,{SCENES_DATA[2]['start']},{SCENES_DATA[2]['end']},Default,,0,0,0,,{SCENES_DATA[2]['sub']}
+"""
+    with open("subtitles.ass", "w", encoding="utf-8") as f:
+        f.write(ass_text.strip() + "\\n")
+    print("✅ 字幕ASS作成完了: subtitles.ass")
+
+def compose_video():
+    print("🚀 [3/4] FFmpeg による結合・字幕焼き込み・音声合成を開始...")
     with open("concat_list.txt", "w", encoding="utf-8") as f:
         for fname in SCENE_FILES:
             if not os.path.exists(fname):
                 print(f"⚠️ 警告: 素材ファイル '{fname}' が見つかりません。")
-            f.write(f"file '{fname}'\\n")
+            abs_p = os.path.abspath(fname).replace("\\\\", "/")
+            f.write(f"file '{abs_p}'\\n")
 
-def compose_video():
-    """FFmpegで動画3カット結合 + 音声合成 + 字幕焼き込みをNVENC高速実行"""
-    print("🚀 [3/4] FFmpeg (NVIDIA NVENC) による結合・字幕焼き込み・音声合成を開始...")
-    create_concat_list()
+    abs_ass = os.path.abspath("subtitles.ass").replace("\\\\", "/").replace(":", "\\\\:")
 
-    # 字幕スタイル設定（Meiryoフォント、黄色/白、縁取りありでスマホ画面で見やすい設定）
-    srt_filter = "subtitles=subtitles.srt:force_style='FontName=Meiryo,FontSize=20,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BorderStyle=3,Outline=2,Shadow=1,Alignment=2,MarginV=60'"
-    
-    # 9:16縦型（1080x1920）スケーリング＆パディングフィルター
-    scale_filter = "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:black"
-    video_filters = f"{scale_filter},{srt_filter}"
+    if IS_VERTICAL:
+        # フルスクリーン 9:16 クロップ（黒帯を完全排除してスマホ全画面表示）
+        scale_filter = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920"
+    else:
+        # 16:9 横型
+        scale_filter = "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:black"
 
-    # NVIDIA NVENC対応FFmpegコマンド
+    video_filters = f"{scale_filter},subtitles='{abs_ass}'"
+
     cmd = [
         "ffmpeg", "-y",
         "-f", "concat", "-safe", "0", "-i", "concat_list.txt",
-        "-i", "narration.mp3",
+        "-i", "synced_narration.mp3",
         "-filter_complex", f"[0:v]{video_filters}[v];[1:a]volume=1.0[a]",
         "-map", "[v]",
         "-map", "[a]",
-        "-c:v", "h264_nvenc", "-preset", "p4", "-b:v", "6M",
+        "-c:v", "h264_nvenc", "-preset", "p4", "-b:v", "7M",
         "-c:a", "aac", "-b:a", "192k",
-        "-shortest",
+        "-t", "24.0",
         OUTPUT_FILENAME
     ]
 
     try:
-        res = subprocess.run(cmd, check=True)
+        subprocess.run(cmd, check=True)
         print(f"🎉 [4/4] 完成！ 出力ファイル: {OUTPUT_FILENAME}")
-    except subprocess.CalledProcessError:
+    except (subprocess.CalledProcessError, FileNotFoundError):
         print("⚠️ NVENCエンコーダーが使用できないため、CPUエンコーダー(libx264)でフォールバック実行します...")
         cmd[cmd.index("h264_nvenc")] = "libx264"
-        cmd.remove("-preset")
-        cmd.remove("p4")
+        if "-preset" in cmd:
+            p_idx = cmd.index("-preset")
+            del cmd[p_idx:p_idx+2]
+        cmd.extend(["-crf", "19"])
         subprocess.run(cmd, check=True)
         print(f"🎉 [4/4] 完成！ 出力ファイル: {OUTPUT_FILENAME}")
 
 def main():
     print("=" * 60)
-    print(f" 木造ガレージ【スマイチ】 第{EPISODE_NUM}話 SNS動画自動合成システム")
+    print(f" 木造ガレージ【スマイチ】 第{EPISODE_NUM}話 SNS動画全自動合成システム")
     print("=" * 60)
-    create_srt_file()
-    asyncio.run(generate_narration())
+    create_ass_file()
+    asyncio.run(generate_audio_parts())
     compose_video()
 
 if __name__ == "__main__":
