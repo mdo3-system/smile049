@@ -44,39 +44,102 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
   } = estimate;
 
   const handlePrint = () => {
-    const styleId = 'smile049-print-style';
-    let existing = document.getElementById(styleId);
-    if (!existing) {
-      const style = document.createElement('style');
-      style.id = styleId;
-      style.innerHTML = `
-        @media print {
-          @page { size: A4 portrait; margin: 10mm 12mm 12mm 12mm; }
-          body > * { display: none !important; }
-          body { background: #fff !important; }
-          #estimate-print-area {
-            display: block !important;
-            position: static !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            overflow: visible !important;
-            background: #fff !important;
-            box-shadow: none !important;
-            border: none !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            font-size: 10pt;
-            font-family: 'Noto Sans JP', sans-serif;
-            color: #000 !important;
-          }
-          #estimate-print-area table { page-break-inside: auto; }
-          #estimate-print-area tr { page-break-inside: avoid; }
-          .no-print { display: none !important; }
-        }
-      `;
-      document.head.appendChild(style);
+    const printArea = document.getElementById('estimate-print-area');
+    if (!printArea) {
+      window.print();
+      return;
     }
-    window.print();
+
+    // 既存の古いiframeがあれば削除
+    const oldIframe = document.getElementById('estimate-print-iframe');
+    if (oldIframe) {
+      oldIframe.remove();
+    }
+
+    // 独立した印刷専用の隠しiframeを生成（親アプリのCSS干渉・白紙化を100%防止）
+    const iframe = document.createElement('iframe');
+    iframe.id = 'estimate-print-iframe';
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    iframe.style.visibility = 'hidden';
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(`
+      <!DOCTYPE html>
+      <html lang="ja">
+      <head>
+        <meta charset="utf-8">
+        <title>概算建築御見積書 - スマイチ</title>
+        <style>
+          @charset "utf-8";
+          @page {
+            size: A4 portrait;
+            margin: 10mm 12mm 12mm 12mm;
+          }
+          * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+          body {
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "BIZ UDPGothic", Meiryo, sans-serif;
+            font-size: 9.5pt;
+            line-height: 1.5;
+            color: #0f172a;
+            margin: 0;
+            padding: 0;
+            background: #ffffff;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            page-break-inside: auto;
+            margin-bottom: 8px;
+          }
+          tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+          }
+          th, td {
+            border: 1px solid #cbd5e1;
+            padding: 5px 8px;
+            font-size: 8.5pt;
+            vertical-align: top;
+          }
+          th {
+            background: #f1f5f9;
+            font-weight: 700;
+          }
+          .no-print {
+            display: none !important;
+          }
+        </style>
+      </head>
+      <body>
+        <div style="padding: 10px 0;">
+          ${printArea.innerHTML}
+        </div>
+      </body>
+      </html>
+    `);
+    doc.close();
+
+    // ドキュメント描画完了後に印刷ダイアログを起動
+    setTimeout(() => {
+      try {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+      } catch (err) {
+        console.error('Print iframe error:', err);
+        window.print();
+      }
+    }, 250);
   };
 
   return (
