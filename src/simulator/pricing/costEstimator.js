@@ -149,10 +149,32 @@ export const generate7CategoriesEstimate = (quantities, dimensions, openings = [
   // 【A. 本体工事 原価計算 (Cost)】
   // =========================================================================
 
-  // ① 木工事：17㎡で42万円、36㎡で62万円の按分
-  // 傾き = 200,000 / 19 ≒ 10,526円/㎡
-  const woodSlope = (620000 - 420000) / (36 - 17);
-  const costWood = Math.max(260000, Math.round(420000 + (floorAreaM2 - 17) * woodSlope));
+  // ① 木工事 (木部材料原価 ＋ 大工施工費)
+  // 石井様邸(17㎡): 43.9万円、三愛メモリアル様(36㎡): 62.0万円の按分
+  const woodMaterialSlope = (620000 - 439000) / (36 - 17); // ≒ 9,526.32円/㎡
+  const costWoodMaterial = Math.max(280000, Math.round(439000 + (floorAreaM2 - 17) * woodMaterialSlope));
+
+  // 木工事施工費（大工手間）床面積4段階ステップ制
+  let costWoodLabor = 0;
+  let woodLaborLabel = '';
+  let isCustomQuoteRequired = false;
+
+  if (floorAreaM2 <= 50) {
+    costWoodLabor = 120000;
+    woodLaborLabel = '50㎡以下施工費: 12万円';
+  } else if (floorAreaM2 <= 100) {
+    costWoodLabor = 160000;
+    woodLaborLabel = '50㎡超〜100㎡施工費: 16万円';
+  } else if (floorAreaM2 <= 150) {
+    costWoodLabor = 200000;
+    woodLaborLabel = '100㎡超〜150㎡施工費: 20万円';
+  } else {
+    costWoodLabor = 200000;
+    woodLaborLabel = '150㎡超: 別途お見積り（特注設計）';
+    isCustomQuoteRequired = true;
+  }
+
+  const costWood = costWoodMaterial + costWoodLabor;
 
   // ② 開口部・サッシ工事 (三和シャッター & LIXILカタログ定価マスタ)
   let costOpenings = 0;
@@ -245,10 +267,20 @@ export const generate7CategoriesEstimate = (quantities, dimensions, openings = [
   // ⑤ 基礎工事：＠1.2万円/ｍ
   const costFoundation = Math.max(120000, Math.round(totalFoundM * 12000));
 
-  // ⑥ 建材工事：17㎡で6万円、36㎡で17万円の按分
-  // 傾き = 110,000 / 19 ≒ 5,789円/㎡
-  const materialSlope = (170000 - 60000) / (36 - 17);
-  const costBuildingMaterial = Math.max(40000, Math.round(60000 + (floorAreaM2 - 17) * materialSlope));
+  // ⑥ 建材工事（ベース建材費はそのままで天井の有無で加算）
+  // ベース建材：石井様(17㎡)で5.8万、三愛様(36㎡)で17万の按分ロジックをそのまま維持
+  const baseMaterialSlope = (170000 - 58000) / (36 - 17); // ≒ 5,894.74円/㎡
+  const costBuildingMaterialBase = Math.max(40000, Math.round(58000 + (floorAreaM2 - 17) * baseMaterialSlope));
+
+  // 天井オプション（天井を張る / 張らない）
+  const hasCeiling = dimensions?.hasCeiling || false;
+  const ceilingAreaM2 = floorAreaM2; // 天井面積（＝床面積相当）
+  // 石井様の追加になった金額（8.2万 - 5.8万 = 2.4万円）を天井面積(17㎡)で割った平米単価 ≒ 1,411.76円/㎡
+  const ceilingUnitCost = 24000 / 17;
+  const costCeiling = hasCeiling ? Math.round(ceilingAreaM2 * ceilingUnitCost) : 0;
+
+  // 建材工事原価（ベース ＋ 天井張り加算）
+  const costBuildingMaterial = costBuildingMaterialBase + costCeiling;
 
   // ⑦ 申請手続き費用 (確認申請費：100㎡未満は7万円、市街化調整区域は＋2万円)
   const isAdjustArea = dimensions?.isAdjustArea || false;
@@ -282,10 +314,13 @@ export const generate7CategoriesEstimate = (quantities, dimensions, openings = [
       id: 1,
       num: '①',
       name: '木工事',
-      spec: `床面積 ${floorAreaM2.toFixed(1)}㎡ (土台・柱・梁・筋交い・構造金物一式)`,
-      calcBasis: '床面積按分（17㎡:42万 / 36㎡:62万基準）',
+      spec: `床面積 ${floorAreaM2.toFixed(1)}㎡ (構造材一式 ＋ 大工施工費)`,
+      calcBasis: `木部材按分(17㎡:43.9万/36㎡:62万) ＋ ${woodLaborLabel}`,
       cost: costWood,
       price: priceWood,
+      costWoodMaterial,
+      costWoodLabor,
+      woodLaborLabel,
       isCore: true
     },
     {
@@ -333,10 +368,13 @@ export const generate7CategoriesEstimate = (quantities, dimensions, openings = [
       id: 6,
       num: '⑥',
       name: '建材工事',
-      spec: `床面積 ${floorAreaM2.toFixed(1)}㎡ (下地合板・耐水ボード・留付副資材一式)`,
-      calcBasis: '床面積按分（17㎡:6万 / 36㎡:17万基準）',
+      spec: `床面積 ${floorAreaM2.toFixed(1)}㎡ (下地ボード副資材一式${hasCeiling ? ` ＋ 天井張り施工 ${ceilingAreaM2.toFixed(1)}㎡` : ' / 天井なし'})`,
+      calcBasis: `ベース建材按分(17㎡:5.8万/36㎡:17万)${hasCeiling ? ` ＋ 天井張り加算(@1,412円/㎡ × ${ceilingAreaM2.toFixed(1)}㎡)` : ''}`,
       cost: costBuildingMaterial,
       price: priceBuildingMaterial,
+      hasCeiling,
+      costBuildingMaterialBase,
+      costCeiling,
       isCore: true
     },
     {
@@ -418,6 +456,11 @@ export const generate7CategoriesEstimate = (quantities, dimensions, openings = [
     profitRate,
     taxAmount,
     mainWorksTotalPriceWithTax,
+    hasCeiling,
+    ceilingAreaM2,
+    costCeiling,
+    priceCeiling: Math.round(costCeiling * MARKUP_RATE),
+    isCustomQuoteRequired,
     additionalWorksItems
   };
 };

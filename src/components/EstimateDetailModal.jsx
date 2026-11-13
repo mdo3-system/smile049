@@ -21,10 +21,11 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
   });
 
   const [isAdjustArea, setIsAdjustArea] = useState(false);
+  const [hasCeiling, setHasCeiling] = useState(false); // 天井を張る / 張らない
 
   if (!isOpen) return null;
 
-  const estimate = generate7CategoriesEstimate(quantities, { ...dimensions, isAdjustArea }, openings);
+  const estimate = generate7CategoriesEstimate(quantities, { ...dimensions, isAdjustArea, hasCeiling }, openings);
 
   const {
     mainWorksItems,
@@ -34,6 +35,11 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
     profitRate,
     taxAmount,
     mainWorksTotalPriceWithTax,
+    hasCeiling: isCeilingActive,
+    ceilingAreaM2,
+    costCeiling,
+    priceCeiling,
+    isCustomQuoteRequired,
     additionalWorksItems
   } = estimate;
 
@@ -119,7 +125,54 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            {/* 🏠 天井施工オプション切替（張る / 張らない） */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              background: hasCeiling ? 'rgba(34, 197, 94, 0.2)' : 'rgba(255,255,255,0.08)',
+              border: hasCeiling ? '1px solid #22c55e' : '1px solid rgba(255,255,255,0.2)',
+              borderRadius: 6,
+              padding: '3px 8px',
+              gap: 6
+            }}>
+              <span style={{ fontSize: 11.5, color: hasCeiling ? '#86efac' : '#cbd5e1', fontWeight: 700 }}>
+                天井施工:
+              </span>
+              <button
+                type="button"
+                onClick={() => setHasCeiling(false)}
+                style={{
+                  background: !hasCeiling ? '#0f172a' : 'transparent',
+                  color: !hasCeiling ? '#ffffff' : '#94a3b8',
+                  border: !hasCeiling ? '1px solid #475569' : 'none',
+                  borderRadius: 4,
+                  padding: '2px 8px',
+                  fontSize: 11,
+                  fontWeight: !hasCeiling ? 800 : 500,
+                  cursor: 'pointer'
+                }}
+              >
+                なし（現し）
+              </button>
+              <button
+                type="button"
+                onClick={() => setHasCeiling(true)}
+                style={{
+                  background: hasCeiling ? '#16a34a' : 'transparent',
+                  color: '#ffffff',
+                  border: hasCeiling ? '1px solid #22c55e' : 'none',
+                  borderRadius: 4,
+                  padding: '2px 8px',
+                  fontSize: 11,
+                  fontWeight: hasCeiling ? 800 : 500,
+                  cursor: 'pointer'
+                }}
+              >
+                張る (+{priceCeiling?.toLocaleString() || 0}円)
+              </button>
+            </div>
+
             {/* 管理者モード切替スイッチ（一般ユーザーには完全非表示：URLに?admin=1または/adminページ時のみ表示） */}
             {(typeof window !== 'undefined' && (window.location.search.includes('admin') || window.location.pathname.includes('admin'))) && (
               <button
@@ -345,8 +398,36 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
                 <span style={{ color: '#64748b' }}>純外壁面積: </span>
                 <strong>{quantities?.totalNetWallM2?.toFixed(2) || '48.00'} ㎡</strong>
               </div>
+              <div style={{ gridColumn: 'span 2', borderTop: '1px solid #f1f5f9', paddingTop: 4 }}>
+                <span style={{ color: '#64748b' }}>天井仕様: </span>
+                <strong style={{ color: isCeilingActive ? '#15803d' : '#475569' }}>
+                  {isCeilingActive ? `天井張り施工あり（面積 ${ceilingAreaM2?.toFixed(1)}㎡ / @1,412円原価換算 / 見積 +${priceCeiling?.toLocaleString()}円）` : '天井なし（梁現し・オープンスペース仕様）'}
+                </strong>
+              </div>
             </div>
           </div>
+
+          {/* 150㎡超の特注アラートバッジ */}
+          {isCustomQuoteRequired && (
+            <div style={{
+              background: '#fef3c7',
+              border: '1.5px solid #f59e0b',
+              borderRadius: 8,
+              padding: '10px 16px',
+              marginBottom: 16,
+              fontSize: 12.5,
+              color: '#92400e',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              fontWeight: 700
+            }}>
+              <AlertCircle size={16} color="#d97706" />
+              <span>
+                【150㎡超・特注大空間建築】本建築規模は150㎡を超える大スパン設計のため、大断面集成材・特殊トラス構造の構造計算（許容応力度計算）を伴う【別途お見積り・特注設計】となります。上記概算金額は参考基準値としてご参照ください。
+              </span>
+            </div>
+          )}
 
           {/* 用途地域・申請区分オプション */}
           <div className="no-print" style={{
