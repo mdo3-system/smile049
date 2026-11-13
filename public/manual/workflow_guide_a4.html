@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>スマイチ DX業務フロー＆オペレーションマニュアル (A4印刷用)</title>
+  <style>
+    @charset "utf-8";
+
+    /* A4縦 印刷設定 */
+    @page {
+      size: A4 portrait;
+      margin: 12mm 15mm 15mm 15mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    body {
+      font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "BIZ UDPGothic", Meiryo, sans-serif;
+      font-size: 9.5pt;
+      line-height: 1.5;
+      color: #1e293b;
+      background-color: #f1f5f9;
+      margin: 0;
+      padding: 20px 0;
+    }
+
+    /* 印刷用紙プレビュー（画面上） */
+    .sheet {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto 20px auto;
+      padding: 16mm 18mm;
+      background: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      position: relative;
+    }
+
+    @media print {
+      body {
+        background: transparent;
+        padding: 0;
+      }
+      .sheet {
+        box-shadow: none;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        min-height: auto;
+        page-break-after: always;
+        break-after: page;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+
+    /* ヘッダー */
+    .header {
+      border-bottom: 2.5px solid #0f766e;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .header-left h1 {
+      font-size: 15pt;
+      margin: 0 0 4px 0;
+      color: #0f766e;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .header-left p {
+      font-size: 8.5pt;
+      color: #475569;
+      margin: 0;
+    }
+    .header-right {
+      text-align: right;
+      font-size: 7.5pt;
+      color: #64748b;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 7px;
+      background: #0f766e;
+      color: white;
+      border-radius: 4px;
+      font-size: 7.5pt;
+      font-weight: bold;
+      margin-bottom: 3px;
+    }
+
+    /* 概要アラートボックス */
+    .alert-box {
+      background: #f0fdfa;
+      border: 1px solid #99f6e4;
+      border-left: 4px solid #0f766e;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 8.5pt;
+      margin-bottom: 12px;
+    }
+    .alert-box strong {
+      color: #0f766e;
+    }
+
+    /* セクションタイトル */
+    .section-title {
+      font-size: 11pt;
+      color: #0f172a;
+      font-weight: 700;
+      margin: 12px 0 8px 0;
+      padding-left: 8px;
+      border-left: 3.5px solid #0f766e;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* テーブルデザイン */
+    table.flow-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 10px;
+      font-size: 8.2pt;
+    }
+    table.flow-table th {
+      background: #0f766e;
+      color: white;
+      text-align: left;
+      padding: 5px 7px;
+      font-weight: 600;
+      border: 1px solid #0f766e;
+    }
+    table.flow-table td {
+      padding: 5px 7px;
+      border: 1px solid #cbd5e1;
+      vertical-align: top;
+    }
+    table.flow-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    .step-num {
+      background: #e0f2fe;
+      color: #0369a1;
+      font-weight: bold;
+      padding: 1px 5px;
+      border-radius: 3px;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .tag-customer {
+      background: #fef3c7;
+      color: #92400e;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 7pt;
+      font-weight: bold;
+    }
+    .tag-staff {
+      background: #dbeafe;
+      color: #1e40af;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 7pt;
+      font-weight: bold;
+    }
+
+    /* フローチャート可視化ブロック */
+    .flow-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .flow-row {
+      display: grid;
+      grid-template-columns: 85px 1fr 1fr;
+      gap: 8px;
+      align-items: stretch;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      padding: 5px 8px;
+    }
+    .flow-row.highlight {
+      border-left: 3.5px solid #0f766e;
+      background: #fcfefe;
+    }
+    .flow-step-name {
+      font-weight: bold;
+      color: #0f766e;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      font-size: 8.5pt;
+    }
+    .flow-col-box {
+      font-size: 7.8pt;
+      line-height: 1.35;
+      padding: 3px 6px;
+      background: #f8fafc;
+      border-radius: 3px;
+      border: 1px solid #f1f5f9;
+    }
+
+    /* 担当別マトリクス */
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .role-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 7px;
+      background: #fff;
+    }
+    .role-card h4 {
+      margin: 0 0 4px 0;
+      font-size: 8.5pt;
+      color: #0f766e;
+      border-bottom: 1.5px solid #e2e8f0;
+      padding-bottom: 2px;
+    }
+    .role-card ul {
+      margin: 0;
+      padding-left: 14px;
+      font-size: 7.5pt;
+      color: #334155;
+    }
+    .role-card li {
+      margin-bottom: 2px;
+    }
+
+    /* フッター */
+    .footer {
+      border-top: 1px solid #cbd5e1;
+      padding-top: 6px;
+      margin-top: 10px;
+      font-size: 7.5pt;
+      color: #64748b;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* 印刷ボタンバー（Web閲覧時） */
+    .print-bar {
+      width: 210mm;
+      margin: 0 auto 12px auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0f172a;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 6px;
+    }
+    .btn-print {
+      background: #0d9488;
+      color: white;
+      border: none;
+      padding: 7px 18px;
+      font-size: 10pt;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-print:hover {
+      background: #0f766e;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Web閲覧時用コントロールバー -->
+  <div class="print-bar no-print">
+    <div>
+      <strong>📄 スマイチ DX業務フロー＆社内運用マニュアル（A4縦・2ページ構成）</strong>
+      <span style="font-size:8pt; margin-left:12px; color:#94a3b8;">※ ブラウザの印刷メニューまたは右のボタンからA4縦で印刷できます</span>
+    </div>
+    <button class="btn-print" onclick="window.print()">🖨️ A4で印刷 / PDF保存</button>
+  </div>
+
+  <!-- ==================== PAGE 1 ==================== -->
+  <div class="sheet">
+    <div class="header">
+      <div class="header-left">
+        <span class="badge">スマイチ公式 社内オペレーションマニュアル</span>
+        <h1>木造自由設計ガレージ DX業務フローガイド</h1>
+        <p>3Dシミュレーター・Webチャットから電子契約・着工・完成引渡しまでの全工程標準仕様</p>
+      </div>
+      <div class="header-right">
+        <div><strong>株式会社 住ま居る</strong></div>
+        <div>初版発行: 2026年11月13日</div>
+        <div>Ver 1.0 (全2ページ - 1/2)</div>
+      </div>
+    </div>
+
+    <div class="alert-box">
+      <strong>【基本原則】顧客との対話・図面写真はすべて「Webチャット」に一元化</strong><br>
+      担当者個人のLINE使用は顧客管理・情報漏洩の観点から禁止です。公式LINE（<code>https://line.ee/8fdyyGu</code>）は「パース完成・新着通知専用」として運用し、見積・図面・会話ログはすべて本システム（管理ポータル）で一元管理します。
+    </div>
+
+    <div class="section-title">
+      <span>1. 全体業務プロセス（全10ステップ一覧）</span>
+      <span style="font-size:8pt; font-weight:normal; color:#64748b;">※問合せから最短3〜4週間で着工可能</span>
+    </div>
+
+    <table class="flow-table">
+      <thead>
+        <tr>
+          <th style="width: 14%;">ステップ</th>
+          <th style="width: 22%;">フェーズ名</th>
+          <th style="width: 32%;">お客様のアクション (Webポータル)</th>
+          <th style="width: 32%;">社内スタッフのアクション (管理画面/現場)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="step-num">STEP 1</span></td>
+          <td><strong>3Dシミュレーション</strong></td>
+          <td><span class="tag-customer">顧客</span> 間口・奥行・開口部・外壁・愛車を3D上で自由に設計。リアルタイム概算金額を確認。</td>
+          <td><span class="tag-staff">営業/設計</span> シミュレータアクセスログの監視。未問合せの大型・事業用プランの傾向分析。</td>
+        </tr>
+        <tr>
+          <td><span class="step-num">STEP 2</span></td>
+          <td><strong>チャット相談・パース依頼</strong></td>
+          <td><span class="tag-customer">顧客</span> 要望送信、敷地図面(.dxf/PDF)や現地写真を重要図書スロットへ添付提出。</td>
+          <td><span class="tag-staff">全社即時</span> 社内メール(3宛先)へ通知着信。管理画面で顧客カードを開きStable DiffusionでAIパース作成・返信。</td>
+        </tr>
+        <tr>
+          <td><span class="step-num">STEP 3</span></td>
+          <td><strong>概算見積提示・ヒアリング</strong></td>
+          <td><span class="tag-customer">顧客</span> AIパースと概算仕様書の確認。予算感や追加要望（電気配線・土間仕様等）の相談。</td>
+          <td><span class="tag-staff">営業</span> チャット内で概算見積書を提示。現地調査の日程打診（土日・平日希望ヒアリング）。</td>
+        </tr>
+        <tr>
+          <td><span class="step-num">STEP 4</span></td>
+          <td><strong>現地調査 (境界・現況確認)</strong></td>
+          <td><span class="tag-customer">顧客</span> 現地立ち会い（不在調査承諾も可）。隣地境界や障害物等の現場確認。</td>
+          <td><span class="tag-staff">工務/設計</span> 境界杭・接道幅員・高低差・水道電気引込・地盤目視。スマホで現況写真カルテを作成。</td>
+        </tr>
+        <tr>
+          <td><span class="step-num">STEP 5</span></td>
+          <td><strong>確定設計・本見積 (再見積)</strong></td>
+          <td><span class="tag-customer">顧客</span> 現地寸法を反映した確定配置図・実施設計パース・本見積書の確認・承諾。</td>
+          <td><span class="tag-staff">設計/工務</span> 正式CAD図面作成、プレカット積算、基礎・土間・サッシ明細を含む確定本見積書発行。</td>
+        </tr>
+        <tr>
+          <td><span class="step-num">STEP 6</span></td>
+          <td><strong>電子契約 (工事請負契約)</strong></td>
+          <td><span class="tag-customer">顧客</span> チャット内で重要事項説明・約款を確認し、電子署名（または認証同意）を完了。</td>
+          <td><span class="tag-staff">事務/経理</span> 電子契約締結書の相互保管、契約番号発番、契約金請求書の発行と着金確認。</td>
+        </tr>
+        <tr>
+          <td><span class="step-num">STEP 7</span></td>
+          <td><strong>建築確認申請・法規許認可</strong></td>
+          <td><span class="tag-customer">顧客</span> 確認申請委任状への同意、印鑑証明等の必要公的書類のアップロード。</td>
+          <td><span class="tag-staff">設計</span> 指定確認検査機関への建築確認申請提出、市街化調整区域の開発許可（60条証明等）手続き。</td>
+        </tr>
+        <tr>
+          <td><span class="step-num">STEP 8</span></td>
+          <td><strong>着工前準備・工程表共有</strong></td>
+          <td><span class="tag-customer">顧客</span> チャットで共有された工程表の確認、地鎮祭日程調整、近隣挨拶の確認。</td>
+          <td><span class="tag-staff">工務</span> 木材プレカット発注、職人（基礎・建方・屋根・電気）手配、近隣挨拶状の投函。</td>
+        </tr>
+        <tr>
+          <td><span class="step-num">STEP 9</span></td>
+          <td><strong>着工・施工管理 (基礎〜建方)</strong></td>
+          <td><span class="tag-customer">顧客</span> ポータル上で「配筋完了」「上棟」「外装施工」の現場写真をタイムラインで確認。</td>
+          <td><span class="tag-staff">工務</span> 基礎配筋検査、上棟、構造金物検査、透湿防水シート・外装・シャッター施工と写真登録。</td>
+        </tr>
+        <tr>
+          <td><span class="step-num">STEP 10</span></td>
+          <td><strong>完了検査・施主検査・引渡し</strong></td>
+          <td><span class="tag-customer">顧客</span> 現場での最終仕上がり検査、設備機器取説受領、残金清算、鍵受領。</td>
+          <td><span class="tag-staff">営業/工務</span> 確認検査機関の完了検査済証受領、保証書交付、鍵引き渡し、アフター点検登録。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">
+      <span>2. 組織・担当者別アクションマトリクス</span>
+    </div>
+
+    <div class="role-grid">
+      <div class="role-card">
+        <h4>① 営業担当 (セールス)</h4>
+        <ul>
+          <li>新規チャットへの一次返信（目標15分以内）</li>
+          <li>概算見積・オプションヒアリング</li>
+          <li>現地調査日程の確定調整</li>
+          <li>電子契約のご案内と締結促進</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <h4>② 設計担当 (アーキテクト)</h4>
+        <ul>
+          <li>Stable DiffusionでのAIパース作成</li>
+          <li>提出された公図・CADの法令チェック</li>
+          <li>敷地配置図・確定CAD図面作成</li>
+          <li>建築確認申請・調整区域行政協議</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <h4>③ 工務担当 (ディレクター)</h4>
+        <ul>
+          <li>現地調査（道路幅員・境界・地盤・設備）</li>
+          <li>プレカット工場・協力業者発注手配</li>
+          <li>施工管理・配筋/上棟現場写真の撮影</li>
+          <li>役所完了検査立会い・施主引渡し</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <h4>④ 事務・経理 (バックオフィス)</h4>
+        <ul>
+          <li>チャット通知メールの着信監視</li>
+          <li>契約番号・案件IDの発番と台帳記録</li>
+          <li>契約金・着工金・完了金の入出金管理</li>
+          <li>保証書・重要図書の電子保管</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div>スマイチ（smile049.jp）社内限定マニュアル - 無断転載・社外持ち出し禁止</div>
+      <div>1 / 2 ページ</div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 2 ==================== -->
+  <div class="sheet">
+    <div class="header">
+      <div class="header-left">
+        <span class="badge">スマイチ公式 社内オペレーションマニュアル</span>
+        <h1>電子契約・管理画面操作・通知体系ガイド</h1>
+        <p>スタッフ管理ポータルの操作手順および電子契約締結の実務プロトコル</p>
+      </div>
+      <div class="header-right">
+        <div><strong>株式会社 住ま居る</strong></div>
+        <div>初版発行: 2026年11月13日</div>
+        <div>Ver 1.0 (全2ページ - 2/2)</div>
+      </div>
+    </div>
+
+    <div class="section-title">
+      <span>3. 電子契約（工事請負契約）の締結プロトコル</span>
+      <span style="font-size:8pt; font-weight:normal; color:#64748b;">※印紙代ゼロ・即日締結対応</span>
+    </div>
+
+    <div class="flow-diagram">
+      <div class="flow-row highlight">
+        <div class="flow-step-name">
+          <span>STEP A</span>
+          <span style="font-size:7pt; color:#64748b;">書類作成</span>
+        </div>
+        <div class="flow-col-box">
+          <strong>社内側：契約書ドラフトの生成</strong><br>
+          管理画面の「契約書発行」機能から、確定した設計仕様（間口・奥行・サッシ・外壁）と本見積金額、工期（着工日・引渡日）を反映した【民間(旧四会)連合協定に準拠した工事請負契約書】PDFを生成。
+        </div>
+        <div class="flow-col-box">
+          <strong>チェック項目</strong><br>
+          ・支払条件（契約時30% / 着工時40% / 完了時30% 等）<br>
+          ・確認申請費用、地盤改良費用（該当時）の明記<br>
+          ・確定仕様図面、仕様書の添付確認
+        </div>
+      </div>
+
+      <div class="flow-row">
+        <div class="flow-step-name">
+          <span>STEP B</span>
+          <span style="font-size:7pt; color:#64748b;">開示と説明</span>
+        </div>
+        <div class="flow-col-box">
+          <strong>顧客側：契約ポータルでの確認</strong><br>
+          チャット内の「重要図書スロット」に契約書ドラフトを格納し、顧客へ通知。顧客はスマホ・PCから重要事項説明書および契約約款を閲覧。
+        </div>
+        <div class="flow-col-box">
+          <strong>重要事項説明（オンライン）</strong><br>
+          ・チャットまたはZoom/電話で特約事項・工期を説明<br>
+          ・お客様の疑問点（追加工事の扱い等）を完全解消
+        </div>
+      </div>
+
+      <div class="flow-row highlight">
+        <div class="flow-step-name">
+          <span>STEP C</span>
+          <span style="font-size:7pt; color:#64748b;">電子署名</span>
+        </div>
+        <div class="flow-col-box">
+          <strong>顧客側：合意ボタン押下 ＆ 署名</strong><br>
+          SMSまたは登録メール宛に発行された認証ワンタイムコードを入力し、「契約約款に同意して契約を締結する」を実行。
+        </div>
+        <div class="flow-col-box">
+          <strong>法的効力・タイムスタンプ</strong><br>
+          ・電子署名法第3条準拠の電子認証ログ記録<br>
+          ・IPアドレス、タイムスタンプ、氏名情報の確定
+        </div>
+      </div>
+
+      <div class="flow-row">
+        <div class="flow-step-name">
+          <span>STEP D</span>
+          <span style="font-size:7pt; color:#64748b;">締結・保管</span>
+        </div>
+        <div class="flow-col-box">
+          <strong>双方合意済みPDFの自動確定</strong><br>
+          電子署名済み契約書PDFが自動生成され、顧客ポータルおよび社内管理サーバーに暗号化保管。社内メールへ「契約締結完了」が即時通知。
+        </div>
+        <div class="flow-col-box">
+          <strong>事務アクション</strong><br>
+          ・経理へ契約金請求書の発行依頼<br>
+          ・設計へ建築確認申請の手続き指示
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">
+      <span>4. スタッフ管理画面の操作方法 ＆ 緊急時体制</span>
+    </div>
+
+    <table class="flow-table">
+      <thead>
+        <tr>
+          <th style="width: 25%;">項目</th>
+          <th style="width: 45%;">操作手順・仕様</th>
+          <th style="width: 30%;">留意点・ルール</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>管理画面ログイン</strong></td>
+          <td>
+            URL: <code>https://smile049.jp/#staff-admin</code><br>
+            共通パスコード: <code>smile049</code>
+          </td>
+          <td>共有PC利用時は離席時に必ず「ログアウト」を押下すること。</td>
+        </tr>
+        <tr>
+          <td><strong>顧客カードの選択</strong></td>
+          <td>
+            左ペインに問い合わせ順（最新順）に顧客カードが並びます。ステータス（相談受付中 / パース作成中 / 提案済 / 見積中 / 契約済）が一目で確認できます。
+          </td>
+          <td>未返信のカードは背景がハイライトされます。放置を防止してください。</td>
+        </tr>
+        <tr>
+          <td><strong>重要図書スロットの活用</strong></td>
+          <td>
+            顧客が送付した「敷地CAD図面」「公図」「現地写真」はスロットに自動仕分けされます。社内側からも「AIパース」「見積書」「工程表」を格納できます。
+          </td>
+          <td>大容量ファイル（CADや動画）もチャット内で直接プレビュー・ダウンロード可能です。</td>
+        </tr>
+        <tr>
+          <td><strong>AIフォトリアルパース生成</strong></td>
+          <td>
+            顧客の3Dシミュレーションデータ（間口・外壁・バイク等）をもとに、社内Stable Diffusion PCで生成した高解像度パースをワンクリックで返信。
+          </td>
+          <td>外壁ガルバリウムやシャッター開口の忠実再現を確認してから送付すること。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">
+      <span>5. 社内通知先・連絡窓口一覧</span>
+    </div>
+
+    <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:4px; padding:8px 12px; font-size:8.2pt; line-height:1.6;">
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+        <div>
+          <strong>📧 自動メール通知先（チャット問合せ・パース依頼時に即時一斉同報）：</strong><br>
+          1. <code>help@t-smile.co.jp</code>（サポート・現場統括窓口）<br>
+          2. <code>keiri@t-smile.co.jp</code>（経理・契約管理窓口）<br>
+          3. <code>sato@t-smile.co.jp</code>（代表・経営窓口）
+        </div>
+        <div>
+          <strong>📱 公式LINEアカウント（更新通知専用）：</strong><br>
+          URL: <a href="https://line.ee/8fdyyGu" target="_blank" style="color:#0f766e; font-weight:bold;">https://line.ee/8fdyyGu</a><br>
+          ※顧客の友達追加用。個別トークは原則行わず「パース完成」「新着メッセージ」のPush通知専用窓口として案内します。
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div>スマイチ（smile049.jp）社内限定マニュアル - 株式会社 住ま居る</div>
+      <div>2 / 2 ページ</div>
+    </div>
+  </div>
+
+</body>
+</html>
+
