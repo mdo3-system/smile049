@@ -1,15 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Users, MessageSquare, Send, Paperclip, Sparkles, CheckCircle, 
-  ArrowUpRight, ArrowLeft, RefreshCw, Download, Database, ShieldCheck, 
+import {
+  Users, MessageSquare, Send, Paperclip, Sparkles, CheckCircle,
+  ArrowUpRight, ArrowLeft, RefreshCw, Download, Database, ShieldCheck,
   ExternalLink, Calendar, Mail, FileText, Image as ImageIcon, Box,
-  Layers, Maximize2, X
+  Layers, Maximize2, X, Compass, ChevronRight, PenTool
 } from 'lucide-react';
 import DocumentSlotPanel from '../components/DocumentSlotPanel';
 import StoryStudioPanel from '../components/StoryStudioPanel';
 import SaishinAdsPortalPanel from '../components/SaishinAdsPortalPanel';
 import { Lock, KeyRound, Target } from 'lucide-react';
-import { getChatRooms, sendMessageToRoom, updateRoomStatus } from '../services/chatService';
+import {
+  getChatRooms, sendMessageToRoom, updateRoomStatus,
+  fetchRoomsFromServer, sendStaffModelProposal
+} from '../services/chatService';
 import { APP_VERSION } from '../version.js';
 
 const STAFF_PASSCODE = 'smile049';
@@ -70,15 +73,152 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
   };
 
 
+  const [isSyncingRooms, setIsSyncingRooms] = useState(false);
+  const [isModelProposalModalOpen, setIsModelProposalModalOpen] = useState(false);
+  const [newMsgToast, setNewMsgToast] = useState(null);
+  const prevMessagesCountRef = useRef({});
+
+  // チャット着信時の通知チャイム（Web Audio API）
+  const playNotificationSound = () => {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(659.25, ctx.currentTime); // ミ
+      osc.frequency.setValueAtTime(880.00, ctx.currentTime + 0.12); // ラ
+
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.45);
+    } catch (e) {
+      // ignore
+    }
+  };
+
+  const handleRefreshRooms = async () => {
+    setIsSyncingRooms(true);
+    await fetchRoomsFromServer();
+    setIsSyncingRooms(false);
+  };
+
+  useEffect(() => {
+    // 画面表示時にサーバーと同期
+    fetchRoomsFromServer();
+
+    // 3.5秒ごとのリアルタイム高速ポーリング同期
+    const timer = setInterval(() => {
+      fetchRoomsFromServer();
+    }, 3500);
+
+    // 別タブから戻ってきた瞬間（focus / visible）に即座に最新同期
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        fetchRoomsFromServer();
+      }
+    };
+    const handleFocus = () => fetchRoomsFromServer();
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [isAuthenticated]);
+
   useEffect(() => {
     const handleUpdate = () => {
-      setRooms(getChatRooms());
+      const fresh = getChatRooms();
+      
+      // 新着メッセージ検知（顧客からの新しいメッセージがあるかチェック）
+      let hasNewCustomerMsg = false;
+      let newSenderName = '';
+
+      fresh.forEach(r => {
+        const prevCount = prevMessagesCountRef.current[r.roomId] || 0;
+        const currentCount = r.messages?.length || 0;
+        if (currentCount > prevCount) {
+          const lastMsg = r.messages?.[r.messages.length - 1];
+          if (lastMsg && lastMsg.sender === 'customer') {
+            hasNewCustomerMsg = true;
+            newSenderName = r.customerName || 'お客様';
+          }
+        }
+        prevMessagesCountRef.current[r.roomId] = currentCount;
+      });
+
+      if (hasNewCustomerMsg) {
+        playNotificationSound();
+        setNewMsgToast(`🔔 ${newSenderName}から新着メッセージが届きました！`);
+        setTimeout(() => setNewMsgToast(null), 4000);
+      }
+
+      setRooms(fresh);
+      if (!selectedRoomId && fresh.length > 0) {
+        setSelectedRoomId(fresh[0].roomId);
+      }
     };
+
     window.addEventListener('chat_rooms_updated', handleUpdate);
     return () => window.removeEventListener('chat_rooms_updated', handleUpdate);
-  }, []);
+  }, [selectedRoomId]);
 
   const activeRoom = rooms.find(r => r.roomId === selectedRoomId) || rooms[0];
+
+  // 専任スタッフによる3Dモデル・概算見積もりの代理作成＆チャット送付
+  const handleProposePresetModel = (presetKey) => {
+    if (!activeRoom) return;
+
+    let modelData = null;
+    let summaryText = '';
+
+    if (presetKey === 'plan01') {
+      modelData = {
+        name: 'Plan 01: 愛車・ホビーガレージ',
+        dimensions: { wFront: 4550, dSide: 5460, depth: 5460, height: 2700 },
+        openings: [{ type: 'shutter', wall: 'front', width: 3000, height: 2400 }],
+        exterior: { wallMaterial: 'galvalume_spandrel', roofType: 'single_pitch' },
+        vehicles: [{ type: 'bike', name: '大型バイク' }],
+        pricing: { total: 2850000, structure: 1950000, exterior: 550000, interior: 350000 }
+      };
+      summaryText = '間口4,550mm × 奥行5,460mm（愛車・ホビー1台用 / ガルバリウム鋼板角波外壁・電動シャッター / 概算 約285万円）';
+    } else if (presetKey === 'plan02') {
+      modelData = {
+        name: 'Plan 02: 大型2台用ガレージ（SUV＋セダン）',
+        dimensions: { wFront: 6370, dSide: 6370, depth: 6370, height: 3000 },
+        openings: [{ type: 'shutter', wall: 'front', width: 5200, height: 2400 }],
+        exterior: { wallMaterial: 'galvalume_spandrel', roofType: 'single_pitch' },
+        vehicles: [{ type: 'car', name: 'SUV' }, { type: 'car', name: '普通車' }],
+        pricing: { total: 4200000, structure: 2800000, exterior: 850000, interior: 550000 }
+      };
+      summaryText = '間口6,370mm × 奥行6,370mm（大型2台用ワイドシャッター / 断熱仕様 / 概算 約420万円）';
+    } else if (presetKey === 'plan03') {
+      modelData = {
+        name: 'Plan 03: 農機具・大型アグリシェッド',
+        dimensions: { wFront: 7280, dSide: 9100, depth: 9100, height: 3600 },
+        openings: [{ type: 'shutter', wall: 'front', width: 6000, height: 3200 }],
+        exterior: { wallMaterial: 'galvalume_wave', roofType: 'single_pitch' },
+        vehicles: [{ type: 'tractor', name: '大型トラクター' }],
+        pricing: { total: 5800000, structure: 3900000, exterior: 1200000, interior: 700000 }
+      };
+      summaryText = '間口7,280mm × 奥行9,100mm × 天高3,600mm（大スパン農業倉庫・重機格納 / 概算 約580万円）';
+    }
+
+    if (modelData) {
+      sendStaffModelProposal(activeRoom.roomId, modelData, summaryText);
+      setIsModelProposalModalOpen(false);
+    }
+  };
 
   const handleSendReply = (e) => {
     e?.preventDefault();
@@ -331,11 +471,13 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <button
-            onClick={() => setRooms(getChatRooms())}
-            style={{ color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12 }}
+            onClick={handleRefreshRooms}
+            disabled={isSyncingRooms}
+            style={{ color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, cursor: 'pointer', background: 'transparent', border: 'none' }}
+            title="エックスサーバー上の最新新着チャットを同期"
           >
-            <RefreshCw size={14} />
-            <span>データ更新</span>
+            <RefreshCw size={14} style={{ animation: isSyncingRooms ? 'spin 1s linear infinite' : 'none' }} />
+            <span>{isSyncingRooms ? '同期中...' : 'サーバー最新同期'}</span>
           </button>
 
           <button
@@ -358,6 +500,25 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
           </button>
         </div>
       </div>
+
+      {/* 🔔 新着チャット着信通知バナー */}
+      {newMsgToast && (
+        <div style={{
+          background: 'linear-gradient(135deg, #15803d 0%, #166534 100%)',
+          color: '#ffffff',
+          padding: '10px 24px',
+          fontWeight: 800,
+          fontSize: 14,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 10,
+          boxShadow: '0 4px 12px rgba(22, 101, 52, 0.4)',
+          animation: 'pulse 1.5s infinite'
+        }}>
+          <span>{newMsgToast}</span>
+        </div>
+      )}
 
       {/* 管理画面メイン切り替えナビゲーションバー */}
       <div style={{
@@ -469,77 +630,7 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
           gridTemplateColumns: '360px 1fr',
           gap: 20
         }}>
-        {/* 左: 依頼・顧客リスト */}
-        <div style={{
-          background: '#ffffff',
-          borderRadius: 12,
-          border: '1px solid #e2e8f0',
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-          boxShadow: 'var(--shadow-sm)'
-        }}>
-          <div style={{
-            padding: '14px 18px',
-            borderBottom: '1px solid #e2e8f0',
-            background: '#f8fafc',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between'
-          }}>
-            <h3 style={{ fontSize: 14, color: '#1e293b', fontWeight: 700, margin: 0 }}>
-              パース依頼・問い合わせ一覧 ({rooms.length}件)
-            </h3>
-          </div>
-
-          <div style={{ flex: 1, overflowY: 'auto' }}>
-            {rooms.map((room) => {
-              const isSelected = room.roomId === selectedRoomId;
-              return (
-                <div
-                  key={room.roomId}
-                  onClick={() => setSelectedRoomId(room.roomId)}
-                  style={{
-                    padding: '14px 18px',
-                    borderBottom: '1px solid #f1f5f9',
-                    background: isSelected ? 'var(--color-primary-soft)' : '#ffffff',
-                    borderLeft: isSelected ? '4px solid var(--color-primary)' : '4px solid transparent',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: '#1e293b' }}>
-                      {room.customerName}
-                    </span>
-                    <span style={{
-                      fontSize: 10.5,
-                      padding: '2px 8px',
-                      borderRadius: 12,
-                      fontWeight: 700,
-                      background: room.crmTransferred ? '#dcfce7' : '#e0f2fe',
-                      color: room.crmTransferred ? '#15803d' : '#0369a1'
-                    }}>
-                      {room.status}
-                    </span>
-                  </div>
-
-                  <div style={{ fontSize: 12, color: '#64748b', marginBottom: 6 }}>
-                    {room.planType}
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11, color: '#94a3b8' }}>
-                    <span>{room.createdAt}</span>
-                    <span>{room.messages.length}件のやり取り</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* 右: 個別チャット対応 ＆ アクションパネル */}
-        {activeRoom ? (
+          {/* 左: 依頼・顧客リスト */}
           <div style={{
             background: '#ffffff',
             borderRadius: 12,
@@ -549,329 +640,422 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
             flexDirection: 'column',
             boxShadow: 'var(--shadow-sm)'
           }}>
-            {/* 顧客サマリー＆アクションバー */}
             <div style={{
-              padding: '16px 20px',
+              padding: '14px 18px',
               borderBottom: '1px solid #e2e8f0',
               background: '#f8fafc',
               display: 'flex',
-              flexWrap: 'wrap',
               alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 12
+              justifyContent: 'space-between'
             }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <h3 style={{ fontSize: 17, color: '#0f172a', margin: 0, fontWeight: 800 }}>
-                    {activeRoom.customerName}
-                  </h3>
-                  <span style={{ fontSize: 12, color: '#64748b' }}>({activeRoom.email})</span>
-                  {activeRoom.crmTransferred && (
-                    <span style={{ fontSize: 11, background: '#dcfce7', color: '#166534', padding: '3px 8px', borderRadius: 4, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <CheckCircle size={12} /> CRM移管完了
-                    </span>
-                  )}
-                </div>
-                <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>
-                  プラン種別：<strong>{activeRoom.planType}</strong>
-                </div>
-              </div>
-
-              {/* スタッフ専用アクションボタン群 */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {/* 3Dモデルで開く */}
-                <button
-                  onClick={handleOpenCustomer3D}
-                  className="btn-secondary"
-                  style={{ padding: '7px 12px', fontSize: 12, borderRadius: 6 }}
-                >
-                  <Box size={14} />
-                  <span>3Dで開いて確認</span>
-                </button>
-
-                {/* AIパース作成・送付 */}
-                <button
-                  onClick={handleSendAiRender}
-                  className="btn-accent"
-                  disabled={isAiGenerating}
-                  style={{ padding: '7px 14px', fontSize: 12, borderRadius: 6 }}
-                >
-                  <Sparkles size={14} />
-                  <span>{isAiGenerating ? 'AIパース生成中...' : '✨ AIパースを生成して送付'}</span>
-                </button>
-
-                {/* CRMへ移管 */}
-                <button
-                  onClick={handleCrmTransfer}
-                  style={{
-                    padding: '7px 14px',
-                    fontSize: 12,
-                    borderRadius: 6,
-                    background: activeRoom.crmTransferred ? '#e2e8f0' : '#1e293b',
-                    color: activeRoom.crmTransferred ? '#64748b' : '#ffffff',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    fontWeight: 700
-                  }}
-                  disabled={activeRoom.crmTransferred}
-                >
-                  <Database size={14} />
-                  <span>{activeRoom.crmTransferred ? 'CRM登録済' : '自社CRMへ登録・移管'}</span>
-                </button>
-              </div>
+              <h3 style={{ fontSize: 14, color: '#1e293b', fontWeight: 700, margin: 0 }}>
+                パース依頼・問い合わせ一覧 ({rooms.length}件)
+              </h3>
             </div>
 
-            {/* チャットタイムライン ＆ 重要図書スロット 切り替えサブタブ */}
+            <div style={{ flex: 1, overflowY: 'auto' }}>
+              {rooms.map((room) => {
+                const isSelected = room.roomId === selectedRoomId;
+                return (
+                  <div
+                    key={room.roomId}
+                    onClick={() => setSelectedRoomId(room.roomId)}
+                    style={{
+                      padding: '14px 18px',
+                      borderBottom: '1px solid #f1f5f9',
+                      background: isSelected ? 'var(--color-primary-soft)' : '#ffffff',
+                      borderLeft: isSelected ? '4px solid var(--color-primary)' : '4px solid transparent',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: '#1e293b' }}>
+                        {room.customerName}
+                      </span>
+                      <span style={{
+                        fontSize: 10.5,
+                        padding: '2px 8px',
+                        borderRadius: 12,
+                        fontWeight: 700,
+                        background: room.crmTransferred ? '#dcfce7' : '#e0f2fe',
+                        color: room.crmTransferred ? '#15803d' : '#0369a1'
+                      }}>
+                        {room.status}
+                      </span>
+                    </div>
+
+                    <div style={{ fontSize: 12, color: '#64748b', marginBottom: 6 }}>
+                      {room.planType}
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11, color: '#94a3b8' }}>
+                      <span>{room.createdAt}</span>
+                      <span>{room.messages.length}件のやり取り</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 右: 個別チャット対応 ＆ アクションパネル */}
+          {activeRoom ? (
             <div style={{
+              background: '#ffffff',
+              borderRadius: 12,
+              border: '1px solid #e2e8f0',
+              overflow: 'hidden',
               display: 'flex',
-              background: '#f1f5f9',
-              borderBottom: '1px solid #e2e8f0',
-              padding: '0 20px'
+              flexDirection: 'column',
+              boxShadow: 'var(--shadow-sm)'
             }}>
-              <button
-                type="button"
-                onClick={() => setAdminActiveTab('chat')}
-                style={{
-                  padding: '12px 18px',
-                  fontSize: 13,
-                  fontWeight: adminActiveTab === 'chat' ? 700 : 500,
-                  color: adminActiveTab === 'chat' ? 'var(--color-primary-dark)' : '#64748b',
-                  borderBottom: adminActiveTab === 'chat' ? '3px solid var(--color-primary)' : '3px solid transparent',
-                  background: 'none',
-                  borderTop: 'none',
-                  borderLeft: 'none',
-                  borderRight: 'none',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6
-                }}
-              >
-                <MessageSquare size={15} />
-                <span>💬 トークタイムライン ({activeRoom.messages.length})</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setAdminActiveTab('documents')}
-                style={{
-                  padding: '12px 18px',
-                  fontSize: 13,
-                  fontWeight: adminActiveTab === 'documents' ? 700 : 500,
-                  color: adminActiveTab === 'documents' ? 'var(--color-primary-dark)' : '#64748b',
-                  borderBottom: adminActiveTab === 'documents' ? '3px solid var(--color-primary)' : '3px solid transparent',
-                  background: 'none',
-                  borderTop: 'none',
-                  borderLeft: 'none',
-                  borderRight: 'none',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6
-                }}
-              >
-                <Layers size={15} />
-                <span>📂 重要ドキュメント・図書スロット ({
-                  (activeRoom.documents?.perspectives?.length || 0) +
-                  (activeRoom.documents?.sitePlans?.length || 0) +
-                  (activeRoom.documents?.sitePhotos?.length || 0)
-                })</span>
-              </button>
-            </div>
+              {/* 顧客サマリー＆アクションバー */}
+              <div style={{
+                padding: '16px 20px',
+                borderBottom: '1px solid #e2e8f0',
+                background: '#f8fafc',
+                display: 'flex',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 12
+              }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <h3 style={{ fontSize: 17, color: '#0f172a', margin: 0, fontWeight: 800 }}>
+                      {activeRoom.customerName}
+                    </h3>
+                    <span style={{ fontSize: 12, color: '#64748b' }}>({activeRoom.email})</span>
+                    {activeRoom.crmTransferred && (
+                      <span style={{ fontSize: 11, background: '#dcfce7', color: '#166534', padding: '3px 8px', borderRadius: 4, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <CheckCircle size={12} /> CRM移管完了
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>
+                    プラン種別：<strong>{activeRoom.planType}</strong>
+                  </div>
+                </div>
 
-            {adminActiveTab === 'documents' ? (
-              <div style={{ padding: '20px', flex: 1, overflowY: 'auto' }}>
-                <DocumentSlotPanel 
-                  room={activeRoom} 
-                  isStaff={true} 
-                  onPreviewImage={(url) => setPreviewImage(url)} 
-                />
+                {/* スタッフ専用アクションボタン群 */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {/* 3Dモデル代理作成・提案ボタン */}
+                  <button
+                    onClick={() => setIsModelProposalModalOpen(true)}
+                    style={{
+                      padding: '7px 14px',
+                      fontSize: 12,
+                      borderRadius: 6,
+                      background: 'linear-gradient(135deg, #15803d 0%, #166534 100%)',
+                      color: '#ffffff',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      fontWeight: 700,
+                      border: 'none',
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 4px rgba(21, 128, 61, 0.3)'
+                    }}
+                    title="3D操作がわからないお客様へ、スタッフが仕様・見積もりを代理作成して送付"
+                  >
+                    <Compass size={14} />
+                    <span>📐 3Dモデルを代理作成して提案</span>
+                  </button>
+
+                  {/* 3Dモデルで開く */}
+                  <button
+                    onClick={handleOpenCustomer3D}
+                    className="btn-secondary"
+                    style={{ padding: '7px 12px', fontSize: 12, borderRadius: 6 }}
+                  >
+                    <Box size={14} />
+                    <span>3Dで開いて確認</span>
+                  </button>
+
+                  {/* AIパース作成・送付 */}
+                  <button
+                    onClick={handleSendAiRender}
+                    className="btn-accent"
+                    disabled={isAiGenerating}
+                    style={{ padding: '7px 14px', fontSize: 12, borderRadius: 6 }}
+                  >
+                    <Sparkles size={14} />
+                    <span>{isAiGenerating ? 'AIパース生成中...' : '✨ AIパースを生成して送付'}</span>
+                  </button>
+
+                  {/* CRMへ移管 */}
+                  <button
+                    onClick={handleCrmTransfer}
+                    style={{
+                      padding: '7px 14px',
+                      fontSize: 12,
+                      borderRadius: 6,
+                      background: activeRoom.crmTransferred ? '#e2e8f0' : '#1e293b',
+                      color: activeRoom.crmTransferred ? '#64748b' : '#ffffff',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      fontWeight: 700
+                    }}
+                    disabled={activeRoom.crmTransferred}
+                  >
+                    <Database size={14} />
+                    <span>{activeRoom.crmTransferred ? 'CRM登録済' : '自社CRMへ登録・移管'}</span>
+                  </button>
+                </div>
               </div>
-            ) : (
-              <>
-                {/* チャットタイムライン */}
-                <div style={{
-                  flex: 1,
-                  padding: '20px',
-                  overflowY: 'auto',
-                  background: '#f8fafc',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 14,
-                  maxHeight: '480px'
-                }}>
-                  {activeRoom.messages.map((msg) => {
-                    const isStaff = msg.sender === 'staff';
-                    const isSystem = msg.sender === 'system';
 
-                    if (isSystem) {
+              {/* チャットタイムライン ＆ 重要図書スロット 切り替えサブタブ */}
+              <div style={{
+                display: 'flex',
+                background: '#f1f5f9',
+                borderBottom: '1px solid #e2e8f0',
+                padding: '0 20px'
+              }}>
+                <button
+                  type="button"
+                  onClick={() => setAdminActiveTab('chat')}
+                  style={{
+                    padding: '12px 18px',
+                    fontSize: 13,
+                    fontWeight: adminActiveTab === 'chat' ? 700 : 500,
+                    color: adminActiveTab === 'chat' ? 'var(--color-primary-dark)' : '#64748b',
+                    borderBottom: adminActiveTab === 'chat' ? '3px solid var(--color-primary)' : '3px solid transparent',
+                    background: 'none',
+                    borderTop: 'none',
+                    borderLeft: 'none',
+                    borderRight: 'none',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6
+                  }}
+                >
+                  <MessageSquare size={15} />
+                  <span>💬 トークタイムライン ({activeRoom.messages.length})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAdminActiveTab('documents')}
+                  style={{
+                    padding: '12px 18px',
+                    fontSize: 13,
+                    fontWeight: adminActiveTab === 'documents' ? 700 : 500,
+                    color: adminActiveTab === 'documents' ? 'var(--color-primary-dark)' : '#64748b',
+                    borderBottom: adminActiveTab === 'documents' ? '3px solid var(--color-primary)' : '3px solid transparent',
+                    background: 'none',
+                    borderTop: 'none',
+                    borderLeft: 'none',
+                    borderRight: 'none',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6
+                  }}
+                >
+                  <Layers size={15} />
+                  <span>📂 重要ドキュメント・図書スロット ({
+                    (activeRoom.documents?.perspectives?.length || 0) +
+                    (activeRoom.documents?.sitePlans?.length || 0) +
+                    (activeRoom.documents?.sitePhotos?.length || 0)
+                  })</span>
+                </button>
+              </div>
+
+              {adminActiveTab === 'documents' ? (
+                <div style={{ padding: '20px', flex: 1, overflowY: 'auto' }}>
+                  <DocumentSlotPanel
+                    room={activeRoom}
+                    isStaff={true}
+                    onPreviewImage={(url) => setPreviewImage(url)}
+                  />
+                </div>
+              ) : (
+                <>
+                  {/* チャットタイムライン */}
+                  <div style={{
+                    flex: 1,
+                    padding: '20px',
+                    overflowY: 'auto',
+                    background: '#f8fafc',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 14,
+                    maxHeight: '480px'
+                  }}>
+                    {activeRoom.messages.map((msg) => {
+                      const isStaff = msg.sender === 'staff';
+                      const isSystem = msg.sender === 'system';
+
+                      if (isSystem) {
+                        return (
+                          <div key={msg.id} style={{
+                            background: '#f1f5f9',
+                            border: '1px dashed #cbd5e1',
+                            borderRadius: 8,
+                            padding: '8px 12px',
+                            fontSize: 12,
+                            color: '#475569',
+                            textAlign: 'center'
+                          }}>
+                            {msg.text}
+                          </div>
+                        );
+                      }
+
                       return (
-                        <div key={msg.id} style={{
-                          background: '#f1f5f9',
-                          border: '1px dashed #cbd5e1',
-                          borderRadius: 8,
-                          padding: '8px 12px',
-                          fontSize: 12,
-                          color: '#475569',
-                          textAlign: 'center'
-                        }}>
-                          {msg.text}
+                        <div
+                          key={msg.id}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: isStaff ? 'flex-end' : 'flex-start',
+                            maxWidth: '80%',
+                            alignSelf: isStaff ? 'flex-end' : 'flex-start'
+                          }}
+                        >
+                          <div style={{ fontSize: 11, color: '#64748b', marginBottom: 2 }}>
+                            {isStaff ? '専任スタッフ' : activeRoom.customerName} • {msg.time}
+                          </div>
+
+                          <div style={{
+                            background: isStaff ? 'var(--color-primary)' : '#ffffff',
+                            color: isStaff ? '#ffffff' : '#1e293b',
+                            padding: '12px 16px',
+                            borderRadius: 12,
+                            border: isStaff ? 'none' : '1px solid #e2e8f0',
+                            fontSize: 13.5,
+                            lineHeight: 1.6,
+                            boxShadow: 'var(--shadow-sm)'
+                          }}>
+                            {msg.text}
+
+                            {/* 添付ファイル（画像はサムネイルカード＋拡大表示） */}
+                            {msg.attachments && msg.attachments.length > 0 && (
+                              <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                {msg.attachments.map((att, aIdx) => {
+                                  const isImg = att.type === 'image' || att.isAiRender;
+                                  return (
+                                    <div key={aIdx} style={{
+                                      background: isStaff ? 'rgba(255,255,255,0.18)' : '#f1f5f9',
+                                      borderRadius: 8,
+                                      overflow: 'hidden',
+                                      border: isStaff ? '1px solid rgba(255,255,255,0.25)' : '1px solid #e2e8f0'
+                                    }}>
+                                      {/* 画像インラインサムネイルカード */}
+                                      {isImg && att.url && (
+                                        <div
+                                          onClick={() => setPreviewImage(att.url)}
+                                          style={{
+                                            cursor: 'pointer',
+                                            position: 'relative',
+                                            maxHeight: 180,
+                                            overflow: 'hidden',
+                                            background: '#0f172a'
+                                          }}
+                                        >
+                                          <img
+                                            src={att.url}
+                                            alt={att.name}
+                                            style={{
+                                              width: '100%',
+                                              height: 'auto',
+                                              display: 'block',
+                                              objectFit: 'cover'
+                                            }}
+                                          />
+                                          <div style={{
+                                            position: 'absolute',
+                                            bottom: 6,
+                                            right: 6,
+                                            background: 'rgba(15, 23, 42, 0.75)',
+                                            color: '#ffffff',
+                                            padding: '2px 8px',
+                                            borderRadius: 4,
+                                            fontSize: 11,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 4
+                                          }}>
+                                            <Maximize2 size={11} />
+                                            <span>拡大表示</span>
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      <div style={{
+                                        padding: '6px 10px',
+                                        fontSize: 12,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        gap: 10
+                                      }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
+                                          {isImg ? <ImageIcon size={14} /> : <FileText size={14} />}
+                                          <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                                            {att.name}
+                                          </span>
+                                        </div>
+                                        {att.url && (
+                                          <a href={att.url} download={att.name} style={{ color: isStaff ? '#a7f3d0' : 'var(--color-primary)', fontWeight: 700, fontSize: 11, whiteSpace: 'nowrap' }}>
+                                            ダウンロード
+                                          </a>
+                                        )}
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       );
-                    }
+                    })}
+                  </div>
 
-                    return (
-                      <div
-                        key={msg.id}
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: isStaff ? 'flex-end' : 'flex-start',
-                          maxWidth: '80%',
-                          alignSelf: isStaff ? 'flex-end' : 'flex-start'
-                        }}
-                      >
-                        <div style={{ fontSize: 11, color: '#64748b', marginBottom: 2 }}>
-                          {isStaff ? '専任スタッフ' : activeRoom.customerName} • {msg.time}
-                        </div>
-
-                        <div style={{
-                          background: isStaff ? 'var(--color-primary)' : '#ffffff',
-                          color: isStaff ? '#ffffff' : '#1e293b',
-                          padding: '12px 16px',
-                          borderRadius: 12,
-                          border: isStaff ? 'none' : '1px solid #e2e8f0',
-                          fontSize: 13.5,
-                          lineHeight: 1.6,
-                          boxShadow: 'var(--shadow-sm)'
-                        }}>
-                          {msg.text}
-
-                          {/* 添付ファイル（画像はサムネイルカード＋拡大表示） */}
-                          {msg.attachments && msg.attachments.length > 0 && (
-                            <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                              {msg.attachments.map((att, aIdx) => {
-                                const isImg = att.type === 'image' || att.isAiRender;
-                                return (
-                                  <div key={aIdx} style={{
-                                    background: isStaff ? 'rgba(255,255,255,0.18)' : '#f1f5f9',
-                                    borderRadius: 8,
-                                    overflow: 'hidden',
-                                    border: isStaff ? '1px solid rgba(255,255,255,0.25)' : '1px solid #e2e8f0'
-                                  }}>
-                                    {/* 画像インラインサムネイルカード */}
-                                    {isImg && att.url && (
-                                      <div
-                                        onClick={() => setPreviewImage(att.url)}
-                                        style={{
-                                          cursor: 'pointer',
-                                          position: 'relative',
-                                          maxHeight: 180,
-                                          overflow: 'hidden',
-                                          background: '#0f172a'
-                                        }}
-                                      >
-                                        <img
-                                          src={att.url}
-                                          alt={att.name}
-                                          style={{
-                                            width: '100%',
-                                            height: 'auto',
-                                            display: 'block',
-                                            objectFit: 'cover'
-                                          }}
-                                        />
-                                        <div style={{
-                                          position: 'absolute',
-                                          bottom: 6,
-                                          right: 6,
-                                          background: 'rgba(15, 23, 42, 0.75)',
-                                          color: '#ffffff',
-                                          padding: '2px 8px',
-                                          borderRadius: 4,
-                                          fontSize: 11,
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          gap: 4
-                                        }}>
-                                          <Maximize2 size={11} />
-                                          <span>拡大表示</span>
-                                        </div>
-                                      </div>
-                                    )}
-
-                                    <div style={{
-                                      padding: '6px 10px',
-                                      fontSize: 12,
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'space-between',
-                                      gap: 10
-                                    }}>
-                                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
-                                        {isImg ? <ImageIcon size={14} /> : <FileText size={14} />}
-                                        <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                                          {att.name}
-                                        </span>
-                                      </div>
-                                      {att.url && (
-                                        <a href={att.url} download={att.name} style={{ color: isStaff ? '#a7f3d0' : 'var(--color-primary)', fontWeight: 700, fontSize: 11, whiteSpace: 'nowrap' }}>
-                                          ダウンロード
-                                        </a>
-                                      )}
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* 返信入力フォーム */}
-                <form onSubmit={handleSendReply} style={{
-                  padding: '14px 20px',
-                  borderTop: '1px solid #e2e8f0',
-                  background: '#ffffff',
-                  display: 'flex',
-                  gap: 10,
-                  alignItems: 'center'
-                }}>
-                  <input
-                    type="text"
-                    placeholder={`${activeRoom.customerName} へ返信メッセージを入力...`}
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                    style={{
-                      flex: 1,
-                      padding: '10px 14px',
-                      borderRadius: 8,
-                      border: '1px solid #cbd5e1',
-                      fontSize: 14,
-                      outline: 'none'
-                    }}
-                  />
-                  <button
-                    type="submit"
-                    className="btn-primary"
-                    style={{ padding: '10px 20px', fontSize: 14, borderRadius: 8 }}
-                  >
-                    <Send size={15} />
-                    <span>返信する</span>
-                  </button>
-                </form>
-              </>
-            )}
-          </div>
-        ) : (
-          <div style={{ background: '#fff', borderRadius: 12, padding: 40, textAlign: 'center', color: '#94a3b8' }}>
-            顧客を選択してください。
-          </div>
-        )}
-      </div>
+                  {/* 返信入力フォーム */}
+                  <form onSubmit={handleSendReply} style={{
+                    padding: '14px 20px',
+                    borderTop: '1px solid #e2e8f0',
+                    background: '#ffffff',
+                    display: 'flex',
+                    gap: 10,
+                    alignItems: 'center'
+                  }}>
+                    <input
+                      type="text"
+                      placeholder={`${activeRoom.customerName} へ返信メッセージを入力...`}
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                      style={{
+                        flex: 1,
+                        padding: '10px 14px',
+                        borderRadius: 8,
+                        border: '1px solid #cbd5e1',
+                        fontSize: 14,
+                        outline: 'none'
+                      }}
+                    />
+                    <button
+                      type="submit"
+                      className="btn-primary"
+                      style={{ padding: '10px 20px', fontSize: 14, borderRadius: 8 }}
+                    >
+                      <Send size={15} />
+                      <span>返信する</span>
+                    </button>
+                  </form>
+                </>
+              )}
+            </div>
+          ) : (
+            <div style={{ background: '#fff', borderRadius: 12, padding: 40, textAlign: 'center', color: '#94a3b8' }}>
+              顧客を選択してください。
+            </div>
+          )}
+        </div>
       )}
 
       {/* タブ2: ガレージ連載・Story Studio (Instagram / note) */}
@@ -900,7 +1084,7 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
 
       {/* 全画面画像プレビューモーダル */}
       {previewImage && (
-        <div 
+        <div
           onClick={() => setPreviewImage(null)}
           style={{
             position: 'fixed',
@@ -914,7 +1098,7 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
             padding: 20
           }}
         >
-          <div 
+          <div
             onClick={(e) => e.stopPropagation()}
             style={{
               position: 'relative',
@@ -976,6 +1160,204 @@ export default function StaffAdminPage({ setCurrentRoute, onLoadCustomerModel })
                   objectFit: 'contain'
                 }}
               />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 📐 3Dモデル代理作成・提案モーダル */}
+      {isModelProposalModalOpen && activeRoom && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'rgba(15, 23, 42, 0.75)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1100,
+          padding: 20
+        }} onClick={() => setIsModelProposalModalOpen(false)}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: 16,
+            maxWidth: 580,
+            width: '100%',
+            overflow: 'hidden',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4)'
+          }} onClick={(e) => e.stopPropagation()}>
+            {/* ヘッダー */}
+            <div style={{
+              background: 'linear-gradient(135deg, #15803d 0%, #166534 100%)',
+              color: '#ffffff',
+              padding: '16px 20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <Compass size={20} color="#a7f3d0" />
+                <div>
+                  <h3 style={{ fontSize: 16, margin: 0, fontWeight: 800 }}>
+                    {activeRoom.customerName}様へ3Dモデルを代理作成・提案
+                  </h3>
+                  <div style={{ fontSize: 11, color: '#dcfce7', marginTop: 2 }}>
+                    3D操作が苦手なお客様へ、仕様と概算見積もりをセットでチャットへ届けます
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsModelProposalModalOpen(false)}
+                style={{ background: 'none', border: 'none', color: '#ffffff', cursor: 'pointer', padding: 4 }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* 本文 */}
+            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ fontSize: 13, color: '#334155', lineHeight: 1.5 }}>
+                以下のプリセットを選ぶと、ワンクリックで3D設計データと概算見積もりを該当チャットへ送信できます。お客様側では<strong>「3Dシミュレーターで見る」ボタンを押すだけで自動展開</strong>されます。
+              </div>
+
+              {/* プリセット選択肢 */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {/* プラン1 */}
+                <div
+                  onClick={() => handleProposePresetModel('plan01')}
+                  style={{
+                    border: '1.5px solid #cbd5e1',
+                    borderRadius: 10,
+                    padding: '12px 16px',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    background: '#f8fafc',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#15803d'; e.currentTarget.style.background = '#f0fdf4'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.background = '#f8fafc'; }}
+                >
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: '#0f172a' }}>
+                      🏍️ Plan 01: 愛車・ホビーガレージ（1台用）
+                    </div>
+                    <div style={{ fontSize: 12, color: '#64748b', marginTop: 3 }}>
+                      間口4,550 × 奥行5,460mm / 電動シャッター / ガルバ角波外壁
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: '#15803d' }}>
+                      約 285 万円
+                    </div>
+                    <span style={{ fontSize: 11, color: '#64748b' }}>送付 ➔</span>
+                  </div>
+                </div>
+
+                {/* プラン2 */}
+                <div
+                  onClick={() => handleProposePresetModel('plan02')}
+                  style={{
+                    border: '1.5px solid #cbd5e1',
+                    borderRadius: 10,
+                    padding: '12px 16px',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    background: '#f8fafc',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#15803d'; e.currentTarget.style.background = '#f0fdf4'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.background = '#f8fafc'; }}
+                >
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: '#0f172a' }}>
+                      🚗🚗 Plan 02: 大型2台用ワイドガレージ（SUV＋セダン）
+                    </div>
+                    <div style={{ fontSize: 12, color: '#64748b', marginTop: 3 }}>
+                      間口6,370 × 奥行6,370mm / 2台ワイドシャッター / 断熱仕様
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: '#15803d' }}>
+                      約 420 万円
+                    </div>
+                    <span style={{ fontSize: 11, color: '#64748b' }}>送付 ➔</span>
+                  </div>
+                </div>
+
+                {/* プラン3 */}
+                <div
+                  onClick={() => handleProposePresetModel('plan03')}
+                  style={{
+                    border: '1.5px solid #cbd5e1',
+                    borderRadius: 10,
+                    padding: '12px 16px',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    background: '#f8fafc',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#15803d'; e.currentTarget.style.background = '#f0fdf4'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.background = '#f8fafc'; }}
+                >
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: '#0f172a' }}>
+                      🚜 Plan 03: 農機具・大型アグリシェッド（大スパン倉庫）
+                    </div>
+                    <div style={{ fontSize: 12, color: '#64748b', marginTop: 3 }}>
+                      間口7,280 × 奥行9,100 × 天高3,600mm / トラクター・重機格納
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: '#15803d' }}>
+                      約 580 万円
+                    </div>
+                    <span style={{ fontSize: 11, color: '#64748b' }}>送付 ➔</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* シミュレーターで自由作成して送付する導線 */}
+              <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: 14, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 12, color: '#64748b' }}>
+                  ミリ単位で特注設計したい場合:
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsModelProposalModalOpen(false);
+                    if (onLoadCustomerModel) {
+                      onLoadCustomerModel(activeRoom.modelData || null);
+                    } else {
+                      setCurrentRoute('simulator');
+                    }
+                  }}
+                  style={{
+                    background: '#0f172a',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: 8,
+                    padding: '8px 16px',
+                    fontSize: 12,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6
+                  }}
+                >
+                  <PenTool size={14} />
+                  <span>3Dシミュレーターを開いて作成</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

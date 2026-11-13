@@ -4,7 +4,7 @@ import {
   Sparkles, Download, ArrowLeft, ArrowRight, User, Shield, Info, Maximize2, Layers, ExternalLink,
   Mail, Bell, Check, ChevronDown, ChevronUp, Box, Compass
 } from 'lucide-react';
-import { getChatRooms, sendMessageToRoom, getCurrentUserRoomId, OFFICIAL_LINE_URL, updateRoomEmail } from '../services/chatService';
+import { getChatRooms, sendMessageToRoom, getCurrentUserRoomId, OFFICIAL_LINE_URL, updateRoomEmail, fetchRoomFromServer } from '../services/chatService';
 import { LineIcon } from './SnsIcons';
 import DocumentSlotPanel from './DocumentSlotPanel';
 
@@ -25,6 +25,18 @@ export default function ChatRoomModal({ isOpen, onClose, initialRoomId, onOpenSi
   useEffect(() => {
     if (initialRoomId) setRoomId(initialRoomId);
   }, [initialRoomId]);
+
+  // モーダルが開いている間、3.5秒ごとにサーバー最新を自動同期（スタッフの返信を即座に受信）
+  useEffect(() => {
+    if (!isOpen || !roomId) return;
+    fetchRoomFromServer(roomId);
+
+    const timer = setInterval(() => {
+      fetchRoomFromServer(roomId);
+    }, 3500);
+
+    return () => clearInterval(timer);
+  }, [isOpen, roomId]);
 
   useEffect(() => {
     const handleUpdate = () => {

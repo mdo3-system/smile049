@@ -56,6 +56,76 @@ export const sendChatNotificationEmail = async ({
 const STORAGE_KEY_ROOMS = 'wood_garage_chat_rooms';
 const STORAGE_KEY_CURRENT_USER = 'wood_garage_current_user_room';
 
+// サーバー同期フラグ＆最終同期日時
+let lastSyncTimestamp = 0;
+
+/**
+ * サーバーから全チャットルームをフェッチして同期（キャッシュバスター付与）
+ */
+export const fetchRoomsFromServer = async () => {
+  const now = Date.now();
+  if (now - lastSyncTimestamp < 1500) {
+    // 1.5秒以内の過剰連続リクエストのみ間引く
+    return null;
+  }
+  lastSyncTimestamp = now;
+
+  try {
+    const res = await fetch(`/api/chat-rooms.php?_t=${Date.now()}`, {
+      method: 'GET',
+      headers: { 
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache'
+      }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success && Array.isArray(data.rooms)) {
+        localStorage.setItem(STORAGE_KEY_ROOMS, JSON.stringify(data.rooms));
+        window.dispatchEvent(new Event('chat_rooms_updated'));
+        return data.rooms;
+      }
+    }
+  } catch (err) {
+    console.info('Server chat rooms sync fallback to local:', err.message);
+  }
+  return null;
+};
+
+/**
+ * 特定ルームをサーバーから最新取得（キャッシュバスター付与）
+ */
+export const fetchRoomFromServer = async (roomId) => {
+  if (!roomId) return null;
+  try {
+    const res = await fetch(`/api/chat-rooms.php?roomId=${encodeURIComponent(roomId)}&_t=${Date.now()}`, {
+      method: 'GET',
+      headers: { 
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache'
+      }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success && data.room) {
+        const rooms = getChatRooms();
+        const idx = rooms.findIndex(r => r.roomId === roomId);
+        if (idx >= 0) {
+          rooms[idx] = data.room;
+        } else {
+          rooms.unshift(data.room);
+        }
+        localStorage.setItem(STORAGE_KEY_ROOMS, JSON.stringify(rooms));
+        window.dispatchEvent(new Event('chat_rooms_updated'));
+        return data.room;
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+  return null;
+};
+
 // 初期モックデータ
 const INITIAL_ROOMS = [
   {
@@ -347,6 +417,16 @@ export const createParseRequest = ({ customerName, email, phone = '', planType, 
   saveChatRooms(rooms);
   setCurrentUserRoomId(roomId);
 
+  // サーバーへルームを即座に登録
+  fetch('/api/chat-rooms.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'create_or_update_room',
+      room: newRoom
+    })
+  }).catch(() => {});
+
   // 1.5秒後に自動的にAIフォトリアルパースをチャットおよび重要ドキュメントスロットに納品！
   setTimeout(() => {
     const freshRooms = getChatRooms();
@@ -399,12 +479,11 @@ export const createParseRequest = ({ customerName, email, phone = '', planType, 
   return newRoom;
 };
 
-// メッセージ送信
-export const sendMessageToRoom = (roomId, { sender, text, attachments = [] }) => {
+// メッセージ送信（サーバーAPI同期＋ローカル保存）
+export const sendMessageToRoom = (roomId, { sender, text, attachments = [], modelData = null, isStaffModelProposal = false }) => {
   const rooms = getChatRooms();
-  const room = rooms.find(r => r.roomId === roomId);
-  if (!room) return null;
-
+  let room = rooms.find(r => r.roomId === roomId);
+  
   const now = new Date();
   const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
@@ -413,14 +492,54 @@ export const sendMessageToRoom = (roomId, { sender, text, attachments = [] }) =>
     sender, // 'customer' | 'staff'
     text,
     time: timeStr,
-    attachments
+    attachments,
+    isStaffModelProposal,
+    modelData
   };
 
-  room.messages.push(msg);
-  saveChatRooms(rooms);
+  if (room) {
+    if (isStaffModelProposal && modelData) {
+      room.modelData = modelData;
+      room.status = '提案済';
+    }
+    room.messages.push(msg);
+    saveChatRooms(rooms);
+  }
+
+  // サーバーへ非同期送信
+  fetch('/api/chat-rooms.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'send_message',
+      roomId,
+      sender,
+      text,
+      attachments,
+      modelData,
+      isStaffModelProposal,
+      customerName: room?.customerName || 'お客様（無料相談）',
+      email: room?.email || '',
+      phone: room?.phone || '',
+      planType: room?.planType || '木造自由設計ガレージ'
+    })
+  }).then(res => res.json()).then(result => {
+    if (result && result.success && result.room) {
+      // サーバー側の最新状態をマージ
+      const currentRooms = getChatRooms();
+      const idx = currentRooms.findIndex(r => r.roomId === roomId);
+      if (idx >= 0) {
+        currentRooms[idx] = result.room;
+        localStorage.setItem(STORAGE_KEY_ROOMS, JSON.stringify(currentRooms));
+        window.dispatchEvent(new Event('chat_rooms_updated'));
+      }
+    }
+  }).catch(e => {
+    console.info('Server message sync fallback to local:', e.message);
+  });
 
   // お客さんからの発信であれば、社内メール（help, keiri, sato @t-smile.co.jp）へ即時通知
-  if (sender === 'customer') {
+  if (sender === 'customer' && room) {
     let attachmentNames = '';
     if (attachments && attachments.length > 0) {
       attachmentNames = `\n【添付ファイル】: ` + attachments.map(a => a.name).join(', ');
@@ -436,7 +555,7 @@ export const sendMessageToRoom = (roomId, { sender, text, attachments = [] }) =>
       source: 'Webチャット相談'
     });
 
-    // お客さんに安心感を与える自動受付返信（1秒後）
+    // お客さんに安心感を与える自動受付返信（1回目のみ）
     const customerMsgCount = room.messages.filter(m => m.sender === 'customer').length;
     if (customerMsgCount === 1) {
       setTimeout(() => {
@@ -470,6 +589,18 @@ export const updateRoomEmail = (roomId, email) => {
   if (!room) return false;
   room.email = email;
   saveChatRooms(rooms);
+
+  // サーバーへ送信
+  fetch('/api/chat-rooms.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'update_email',
+      roomId,
+      email
+    })
+  }).catch(() => {});
+
   return true;
 };
 
@@ -483,6 +614,38 @@ export const updateRoomStatus = (roomId, status) => {
     room.crmTransferred = true;
   }
   saveChatRooms(rooms);
+
+  fetch('/api/chat-rooms.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'update_status',
+      roomId,
+      status
+    })
+  }).catch(() => {});
+};
+
+// スタッフによる3Dモデル・概算見積もりの代理作成＆顧客チャット送付
+export const sendStaffModelProposal = (roomId, modelData, summaryText = '') => {
+  const summary = summaryText || `間口 ${modelData?.dimensions?.wFront || 5400}mm × 奥行 ${modelData?.dimensions?.dSide || 5400}mm / ガルバリウム鋼板仕様`;
+  
+  const text = `【専任スタッフ作成】ご要望・ご相談内容をもとに、木造自由設計ガレージの【3D設計モデル】および【概算お見積もり】を作成いたしました！\n\n仕様概要: ${summary}\n\n以下の「3Dシミュレーターで見る」ボタンを押していただくと、お客様の画面上でそのまま3Dモデルが展開され、視点を自由に動かして内観・外観・概算見積をご確認いただけます。`;
+
+  return sendMessageToRoom(roomId, {
+    sender: 'staff',
+    text,
+    attachments: [
+      {
+        name: `staff-proposal-model-${Date.now().toString(36)}.json`,
+        type: 'json',
+        size: '34KB',
+        isModelProposal: true
+      }
+    ],
+    modelData,
+    isStaffModelProposal: true
+  });
 };
 
 // 重要ドキュメントスロットへのファイル追加・更新
