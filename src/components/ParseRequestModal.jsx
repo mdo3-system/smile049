@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { X, Sparkles, Send, CheckCircle2, QrCode, FileText, Lock, MessageSquare, ArrowRight } from 'lucide-react';
-import { createParseRequest } from '../services/chatService';
+import { X, Sparkles, Send, CheckCircle2, QrCode, FileText, Lock, MessageSquare, ArrowRight, ExternalLink } from 'lucide-react';
+import { createParseRequest, OFFICIAL_LINE_URL } from '../services/chatService';
+import { LineIcon } from './SnsIcons';
 import { Analytics } from '../utils/analytics';
 
 export default function ParseRequestModal({ isOpen, onClose, currentModelData, onOpenChat }) {
@@ -163,6 +164,49 @@ export default function ParseRequestModal({ isOpen, onClose, currentModelData, o
                 このQRコードをカメラで読み取ると、外出先でもチャット・パース確認が可能です。
               </div>
             </div>
+
+            {/* LINE公式アカウント連携ボタン */}
+            <a
+              href={OFFICIAL_LINE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                width: '100%',
+                maxWidth: 440,
+                padding: '12px 18px',
+                borderRadius: 12,
+                background: 'linear-gradient(135deg, #06C755 0%, #05a847 100%)',
+                color: '#ffffff',
+                textDecoration: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                boxShadow: '0 4px 12px rgba(6, 199, 85, 0.25)',
+                fontWeight: 700,
+                fontSize: 14,
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: '50%',
+                  background: '#ffffff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <LineIcon size={18} color="#06C755" />
+                </div>
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontWeight: 800 }}>公式LINEでパース完成通知を受け取る</div>
+                  <div style={{ fontSize: 11, opacity: 0.9, fontWeight: 500 }}>更新通知専用 ｜ チャット内のパース完成・更新をLINEでお知らせ</div>
+                </div>
+              </div>
+              <ExternalLink size={16} />
+            </a>
 
             <button
               onClick={handleGoToChat}

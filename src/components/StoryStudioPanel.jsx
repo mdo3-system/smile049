@@ -9,6 +9,7 @@ import {
 import { InstagramIcon, YoutubeIcon, NoteIcon, XIcon } from './SnsIcons';
 import { 
   getAllStories, saveAllStories, isStoryPublished, generateVeoPrompt, 
+  generateVeo15sPrompt, generateVeo30sPrompts,
   generateVeo3CutPrompts, buildVeoDialogueBlock, STORY_STORAGE_KEY, GOOGLE_MASTER_INFO,
   extractGoogleDriveFileId, isGoogleDriveUrl, getGoogleDrivePreviewUrl, getGoogleDriveDownloadUrl,
   generateAssetFileName, getAutoDetectedAssetInfo, generateGoogleAppsScriptForFolders, getGoogleDriveSearchUrl,
@@ -372,7 +373,8 @@ export default function StoryStudioPanel() {
   const [copiedKey, setCopiedKey] = useState(null);
   const [activeStoryTab, setActiveStoryTab] = useState('instagram'); // 'instagram' | 'youtube' | 'note' | 'x'
   const [promptType, setPromptType] = useState('veo'); // 'veo' | 'nano'
-  const [selectedVeoCut, setSelectedVeoCut] = useState('scene1'); // 'scene1' | 'scene2' | 'scene3' | 'all'
+  const [videoMode, setVideoMode] = useState('15s'); // '15s' (最推奨・1カット完結) | '30s' (2カット) | '24s' (3カット / 従来型)
+  const [selectedVeoCut, setSelectedVeoCut] = useState('scene1'); // 'scene1' | 'scene2' | 'scene3' | 'all' | 'cut1' | 'cut2'
   const [showDialogueTips, setShowDialogueTips] = useState(false); // Veo 3 日本語台詞英語化防止Tips表示トグル
   const [showPhoneticDict, setShowPhoneticDict] = useState(false); // 建築専門用語ふりがな辞書モーダル表示トグル
   const [activeNarrationTab, setActiveNarrationTab] = useState('narration'); // 'narration' | 'subtitles' | 'z840'
@@ -564,25 +566,32 @@ export default function StoryStudioPanel() {
     setStories(updated);
   };
 
-  // ナレーション原稿（Scene 1〜3）更新
-  const handleUpdateNarration = (storyIndex, sceneKey, newText) => {
+  // ナレーション原稿更新（15秒 / 30秒 / 24秒連動）
+  const handleUpdateNarration = (storyIndex, fieldKey, newText) => {
     const updated = [...stories];
     const story = updated[storyIndex];
     const updatedStory = {
       ...story,
-      [sceneKey]: newText
+      [fieldKey]: newText
     };
     const narration = generateStoryNarration(updatedStory, {
-      scene1Text: sceneKey === 'narrationScene1' ? newText : updatedStory.narrationScene1,
-      scene2Text: sceneKey === 'narrationScene2' ? newText : updatedStory.narrationScene2,
-      scene3Text: sceneKey === 'narrationScene3' ? newText : updatedStory.narrationScene3,
+      mode: videoMode,
+      text15s: fieldKey === 'narration15s' ? newText : updatedStory.narration15s,
+      cut1Text: fieldKey === 'narration30sCut1' ? newText : updatedStory.narration30sCut1,
+      cut2Text: fieldKey === 'narration30sCut2' ? newText : updatedStory.narration30sCut2,
+      scene1Text: fieldKey === 'narrationScene1' ? newText : updatedStory.narrationScene1,
+      scene2Text: fieldKey === 'narrationScene2' ? newText : updatedStory.narrationScene2,
+      scene3Text: fieldKey === 'narrationScene3' ? newText : updatedStory.narrationScene3,
       userFeedback: updatedStory.narrationFeedback
     });
     updated[storyIndex] = {
       ...updatedStory,
-      narrationScene1: narration.scene1,
-      narrationScene2: narration.scene2,
-      narrationScene3: narration.scene3,
+      narration15s: narration.text15s || updatedStory.narration15s,
+      narration30sCut1: narration.cut1 || updatedStory.narration30sCut1,
+      narration30sCut2: narration.cut2 || updatedStory.narration30sCut2,
+      narrationScene1: narration.scene1 || updatedStory.narrationScene1,
+      narrationScene2: narration.scene2 || updatedStory.narrationScene2,
+      narrationScene3: narration.scene3 || updatedStory.narrationScene3,
       narrationPhonetic: narration.fullPhonetic,
       subtitles: narration.subtitles,
       srtContent: narration.srtContent
@@ -594,7 +603,7 @@ export default function StoryStudioPanel() {
   const handleApplyPhonetics = (storyIndex) => {
     const updated = [...stories];
     const story = updated[storyIndex];
-    const narration = generateStoryNarration(story, {});
+    const narration = generateStoryNarration(story, { mode: videoMode });
     updated[storyIndex] = {
       ...story,
       narrationPhonetic: narration.fullPhonetic
@@ -604,12 +613,12 @@ export default function StoryStudioPanel() {
 
   // Z840用Pythonスクリプトのダウンロード
   const handleDownloadZ840Script = (story) => {
-    const script = generateZ840PythonScript(story);
+    const script = generateZ840PythonScript(story, { mode: videoMode });
     const blob = new Blob([script], { type: 'text/x-python;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `compose_ep${story.episodeNum || 1}.py`;
+    a.download = `compose_ep${story.episodeNum || 1}_${videoMode}.py`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -2191,18 +2200,30 @@ export default function StoryStudioPanel() {
 
                     {/* コピーボタン */}
                     {(() => {
-                      const cuts = generateVeo3CutPrompts(story.englishPrompt, story.title, story.episodeNum, { dialogue: story.dialogue, protagonist: story.protagonist || customProtagonist });
-                      const targetText = promptType === 'nano'
-                        ? story.englishPrompt
-                        : selectedVeoCut === 'scene1'
-                        ? (story.veoPromptScene1 || cuts.scene1)
-                        : selectedVeoCut === 'scene2'
-                        ? (story.veoPromptScene2 || cuts.scene2)
-                        : selectedVeoCut === 'scene3'
-                        ? (story.veoPromptScene3 || cuts.scene3)
-                        : `【Scene 1: 外観・ドローン全景】\n${story.veoPromptScene1 || cuts.scene1}\n\n【Scene 2: シャッター・木造現し構造】\n${story.veoPromptScene2 || cuts.scene2}\n\n【Scene 3: 雨の日入庫・生活実感（セリフ）】\n${story.veoPromptScene3 || cuts.scene3}`;
+                      let targetText = '';
+                      if (promptType === 'nano') {
+                        targetText = story.englishPrompt;
+                      } else if (videoMode === '15s') {
+                        targetText = generateVeo15sPrompt(story.englishPrompt, story.title, story.episodeNum, { dialogue: story.dialogue, protagonist: story.protagonist || customProtagonist });
+                      } else if (videoMode === '30s') {
+                        const cuts30 = generateVeo30sPrompts(story.englishPrompt, story.title, story.episodeNum, { dialogue: story.dialogue, protagonist: story.protagonist || customProtagonist });
+                        targetText = selectedVeoCut === 'cut2'
+                          ? cuts30.cut2
+                          : selectedVeoCut === 'all'
+                          ? `【Cut 1: 課題・外観全景（15秒）】\n${cuts30.cut1}\n\n【Cut 2: 内部・シャッター・暮らし（15秒）】\n${cuts30.cut2}`
+                          : cuts30.cut1;
+                      } else {
+                        const cuts = generateVeo3CutPrompts(story.englishPrompt, story.title, story.episodeNum, { dialogue: story.dialogue, protagonist: story.protagonist || customProtagonist });
+                        targetText = selectedVeoCut === 'scene1'
+                          ? (story.veoPromptScene1 || cuts.scene1)
+                          : selectedVeoCut === 'scene2'
+                          ? (story.veoPromptScene2 || cuts.scene2)
+                          : selectedVeoCut === 'scene3'
+                          ? (story.veoPromptScene3 || cuts.scene3)
+                          : `【Scene 1: 外観・ドローン全景】\n${story.veoPromptScene1 || cuts.scene1}\n\n【Scene 2: シャッター・木造現し構造】\n${story.veoPromptScene2 || cuts.scene2}\n\n【Scene 3: 雨の日入庫・生活実感（セリフ）】\n${story.veoPromptScene3 || cuts.scene3}`;
+                      }
 
-                      const copyKeyId = `prompt_${story.id}_${promptType}_${selectedVeoCut}`;
+                      const copyKeyId = `prompt_${story.id}_${promptType}_${videoMode}_${selectedVeoCut}`;
 
                       return (
                         <button
@@ -2226,7 +2247,11 @@ export default function StoryStudioPanel() {
                             {copiedKey === copyKeyId 
                               ? 'コピー完了' 
                               : (promptType === 'veo' 
-                                  ? (selectedVeoCut === 'all' ? '全3カット一括コピー（100%日本語）' : `${selectedVeoCut.toUpperCase()}をコピー（100%日本語）`)
+                                  ? (videoMode === '15s' 
+                                      ? '⚡ 15秒プロンプトをコピー（生成1回）' 
+                                      : videoMode === '30s'
+                                      ? (selectedVeoCut === 'all' ? '30秒（2カット）一括コピー' : `${selectedVeoCut.toUpperCase()}をコピー`)
+                                      : (selectedVeoCut === 'all' ? '全3カット一括コピー' : `${selectedVeoCut.toUpperCase()}をコピー`))
                                   : '作画プロンプトをコピー')}
                           </span>
                         </button>
@@ -2234,10 +2259,58 @@ export default function StoryStudioPanel() {
                     })()}
                   </div>
 
-                  {/* Veo 3 選択時の絵コンテ 3カット切り替えセレクター ＆ 無音・環境音仕様案内 */}
+                  {/* Veo 動画生成モード切り替えセレクター ＆ 仕様案内 */}
                   {promptType === 'veo' && (
                     <div style={{ marginBottom: 8 }}>
-                      {/* 🔇 Veo 3 無音・環境音確定仕様案内バナー */}
+                      {/* モード選択ボタン群 */}
+                      <div style={{ display: 'flex', gap: 6, marginBottom: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: '#1e293b' }}>
+                          🎬 動画尺モード:
+                        </span>
+                        {[
+                          { key: '15s', label: '⚡ 15秒 1カット完結（新世代・生成1回・完走率MAX）', badge: '最推奨' },
+                          { key: '30s', label: '🎬 30秒 2カットストーリー（15秒×2）', badge: '長尺' },
+                          { key: '24s', label: '📼 24秒 3カット（8秒×3 / 従来型）', badge: '従来' }
+                        ].map(m => (
+                          <button
+                            key={m.key}
+                            type="button"
+                            onClick={() => {
+                              setVideoMode(m.key);
+                              if (m.key === '30s') setSelectedVeoCut('cut1');
+                              else if (m.key === '24s') setSelectedVeoCut('scene1');
+                              else setSelectedVeoCut('15s');
+                            }}
+                            style={{
+                              padding: '3px 8px',
+                              borderRadius: 5,
+                              fontSize: 10.5,
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              border: videoMode === m.key ? '2px solid #2563eb' : '1px solid #cbd5e1',
+                              background: videoMode === m.key ? '#eff6ff' : '#ffffff',
+                              color: videoMode === m.key ? '#1d4ed8' : '#64748b',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 4
+                            }}
+                          >
+                            <span>{m.label}</span>
+                            <span style={{
+                              fontSize: 9,
+                              padding: '1px 4px',
+                              borderRadius: 3,
+                              background: videoMode === m.key ? '#2563eb' : '#f1f5f9',
+                              color: videoMode === m.key ? '#fff' : '#64748b',
+                              fontWeight: 700
+                            }}>
+                              {m.badge}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* 🔇 Veo 無音・環境音確定仕様案内バナー */}
                       <div style={{
                         background: '#f8fafc',
                         border: '1px solid #cbd5e1',
@@ -2259,10 +2332,12 @@ export default function StoryStudioPanel() {
                             color: '#15803d',
                             fontWeight: 700
                           }}>
-                            🔇 Veo 3 無音・環境音モード（破綻ゼロ）
+                            🔇 音声分離仕様
                           </span>
                           <span style={{ fontSize: 11, color: '#475569' }}>
-                            ※ナレーション・会話音声はVeo3から分離し、下の「ナレーション・Z840合成」で結合します
+                            {videoMode === '15s' 
+                              ? 'Google Veo / Gemini Omni Flashで15秒動画を1本生成。下のZ840でナレーション＋字幕を結合なしで瞬時に焼き込みます。'
+                              : 'AI動画は環境音のみで生成し、ナレーション・テロップは下のZ840合成で正確に合成します。'}
                           </span>
                         </div>
                         <button
@@ -2298,47 +2373,81 @@ export default function StoryStudioPanel() {
                           lineHeight: 1.5
                         }}>
                           <div style={{ fontWeight: 700, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
-                            <span>💡 なぜVeo 3に声を出させず、分離合成するのか？</span>
+                            <span>💡 なぜVeoに声を出させず、分離合成するのか？</span>
                           </div>
                           <ul style={{ margin: 0, paddingLeft: 16 }}>
-                            <li><strong>破綻の完全防止</strong>: 海外製動画AI（Veo 3等）に日本語セリフを含めると、不自然なアクセントや英語なまり、口パク破綻が多発します。</li>
-                            <li><strong>建築専門用語の正確な発音</strong>: 「確認申請（かくにん、しんせい）」「軒出0」「ガルバリウム鋼板」など専門用語は、下の「Edge-TTS」でふりがな辞書を適用することで100%正確な日本語発音になります。</li>
-                            <li><strong>Z840（NVIDIA GPU）による爆速合成</strong>: ローカルのZ840でPython＋FFmpeg（NVENC）を実行し、無音動画3カット＋高音質ナレーション＋字幕テロップを一瞬で合成・出力します。</li>
+                            <li><strong>破綻の完全防止</strong>: 海外製動画AIに日本語セリフを含めると、不自然なアクセントや英語なまり、口パク破綻が多発します。</li>
+                            <li><strong>建築専門用語の正確な発音</strong>: 「確認申請」「軒出0」「ガルバリウム鋼板」など専門用語は、下の「Edge-TTS」でふりがな辞書を適用することで100%正確な日本語発音になります。</li>
+                            <li><strong>15秒モードなら結合処理も不要</strong>: 15秒動画1本に対してEdge-TTS音声とASSテロップを重ねるだけで、わずか数秒で完成動画が出力されます！</li>
                           </ul>
                         </div>
                       )}
 
-                      {/* カット切り替えタブ */}
-                      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                        {[
-                          { key: 'scene1', label: 'Scene 1: 外観・ドローン全景（無音・環境音）', role: '建築カメラマン/ドローン' },
-                          { key: 'scene2', label: 'Scene 2: シャッター・木造現し（無音・環境音）', role: 'シネマグラファー/カラリスト' },
-                          { key: 'scene3', label: 'Scene 3: 雨の日入庫・生活実感（無声・頷き）', role: '表情・所作のみ（セリフなし）' },
-                          { key: 'all', label: '📋 全3カット一括コピー', role: '結合マスター' }
-                        ].map(tab => (
-                          <button
-                            key={tab.key}
-                            type="button"
-                            onClick={() => setSelectedVeoCut(tab.key)}
-                            style={{
-                              padding: '3px 8px',
-                              borderRadius: 4,
-                              fontSize: 10.5,
-                              fontWeight: 700,
-                              border: 'none',
-                              cursor: 'pointer',
-                              background: selectedVeoCut === tab.key ? '#2563eb' : '#e0e7ff',
-                              color: selectedVeoCut === tab.key ? '#fff' : '#3730a3',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: 4
-                            }}
-                            title={tab.role}
-                          >
-                            <span>{tab.label}</span>
-                          </button>
-                        ))}
-                      </div>
+                      {/* カット切り替えタブ（30秒モード / 24秒モード時のみ表示） */}
+                      {videoMode === '30s' && (
+                        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                          {[
+                            { key: 'cut1', label: 'Cut 1: 課題・外観全景（15秒）', role: 'ドローン・建築美' },
+                            { key: 'cut2', label: 'Cut 2: シャッター・内部・暮らし（15秒）', role: 'シャッター開閉・生活実感' },
+                            { key: 'all', label: '📋 全2カット一括コピー', role: '結合マスター' }
+                          ].map(tab => (
+                            <button
+                              key={tab.key}
+                              type="button"
+                              onClick={() => setSelectedVeoCut(tab.key)}
+                              style={{
+                                padding: '3px 8px',
+                                borderRadius: 4,
+                                fontSize: 10.5,
+                                fontWeight: 700,
+                                border: 'none',
+                                cursor: 'pointer',
+                                background: selectedVeoCut === tab.key ? '#7c3aed' : '#ede9fe',
+                                color: selectedVeoCut === tab.key ? '#fff' : '#5b21b6',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 4
+                              }}
+                              title={tab.role}
+                            >
+                              <span>{tab.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {videoMode === '24s' && (
+                        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                          {[
+                            { key: 'scene1', label: 'Scene 1: 外観・ドローン全景（8秒）', role: '建築カメラマン/ドローン' },
+                            { key: 'scene2', label: 'Scene 2: シャッター・木造現し（8秒）', role: 'シネマグラファー/カラリスト' },
+                            { key: 'scene3', label: 'Scene 3: 雨の日入庫・生活実感（8秒）', role: '表情・所作のみ（セリフなし）' },
+                            { key: 'all', label: '📋 全3カット一括コピー', role: '結合マスター' }
+                          ].map(tab => (
+                            <button
+                              key={tab.key}
+                              type="button"
+                              onClick={() => setSelectedVeoCut(tab.key)}
+                              style={{
+                                padding: '3px 8px',
+                                borderRadius: 4,
+                                fontSize: 10.5,
+                                fontWeight: 700,
+                                border: 'none',
+                                cursor: 'pointer',
+                                background: selectedVeoCut === tab.key ? '#2563eb' : '#e0e7ff',
+                                color: selectedVeoCut === tab.key ? '#fff' : '#3730a3',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 4
+                              }}
+                              title={tab.role}
+                            >
+                              <span>{tab.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -2353,11 +2462,20 @@ export default function StoryStudioPanel() {
                     lineHeight: 1.6,
                     fontFamily: 'monospace',
                     marginBottom: 8,
-                    maxHeight: 110,
+                    maxHeight: 120,
                     overflowY: 'auto'
                   }}>
                     {(() => {
                       if (promptType === 'nano') return story.englishPrompt;
+                      if (videoMode === '15s') {
+                        return `【⚡ 15秒 1カット完結プロンプト（生成回数1回）】\n${generateVeo15sPrompt(story.englishPrompt, story.title, story.episodeNum, { dialogue: story.dialogue, protagonist: story.protagonist || customProtagonist })}`;
+                      }
+                      if (videoMode === '30s') {
+                        const cuts30 = generateVeo30sPrompts(story.englishPrompt, story.title, story.episodeNum, { dialogue: story.dialogue, protagonist: story.protagonist || customProtagonist });
+                        if (selectedVeoCut === 'cut1') return `【Cut 1 / 課題・外観全景（15秒）】\n${cuts30.cut1}`;
+                        if (selectedVeoCut === 'cut2') return `【Cut 2 / 内部・暮らしの実感（15秒）】\n${cuts30.cut2}`;
+                        return `【Cut 1 (15秒)】\n${cuts30.cut1}\n\n【Cut 2 (15秒)】\n${cuts30.cut2}`;
+                      }
                       const cuts = generateVeo3CutPrompts(story.englishPrompt, story.title, story.episodeNum, { dialogue: story.dialogue, protagonist: story.protagonist || customProtagonist });
                       if (selectedVeoCut === 'scene1') return `【Scene 1 / 建築全景】${story.veoPromptScene1 || cuts.scene1}`;
                       if (selectedVeoCut === 'scene2') return `【Scene 2 / 木造美】${story.veoPromptScene2 || cuts.scene2}`;
@@ -2366,11 +2484,15 @@ export default function StoryStudioPanel() {
                     })()}
                   </div>
 
-                  {/* Veo 3 制作連携ガイダンス */}
+                  {/* Veo 制作連携ガイダンス */}
                   {promptType === 'veo' && (
                     <div style={{ fontSize: 10.5, color: '#3b82f6', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 4 }}>
                       <span>🎬</span>
-                      <span>Google Gemini / Veo 3 にこのまま日本語で入力できます。音は含めず純粋な映像・環境音のみ（3カット各約8秒）を生成します。</span>
+                      <span>
+                        {videoMode === '15s' 
+                          ? 'Google Veo / Gemini Omni Flash (15秒対応) にこのまま日本語で入力できます。1回の生成で外観〜室内まで繋がった完成映像が得られます。' 
+                          : 'Google Veo にこのまま日本語で入力できます。音は含めず純粋な映像・環境音のみを生成します。'}
+                      </span>
                     </div>
                   )}
 
@@ -2392,7 +2514,7 @@ export default function StoryStudioPanel() {
                             🎙️ ナレーション・字幕 ＆ Z840動画合成スタジオ
                           </span>
                           <span style={{ fontSize: 9.5, background: '#eff6ff', color: '#1d4ed8', padding: '1px 5px', borderRadius: 4, fontWeight: 600 }}>
-                            約24〜30秒尺同期
+                            {videoMode === '15s' ? '⚡ 15.0秒 黄金尺同期（結合不要）' : (videoMode === '30s' ? '🎬 30.0秒 2カット同期' : '📼 24.0秒 3カット同期')}
                           </span>
                         </div>
 
@@ -2427,119 +2549,182 @@ export default function StoryStudioPanel() {
                       {/* TAB 1: ナレーション原稿 */}
                       {activeNarrationTab === 'narration' && (
                         <div>
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 5, marginBottom: 8 }}>
-                            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                              <span style={{ fontSize: 10, fontWeight: 700, background: '#e0e7ff', color: '#3730a3', padding: '2px 6px', borderRadius: 4, whiteSpace: 'nowrap' }}>
-                                Scene 1 (0〜8秒)
-                              </span>
-                              <input
-                                type="text"
-                                value={story.narrationScene1 || ''}
-                                onChange={(e) => handleUpdateNarration(idx, 'narrationScene1', e.target.value)}
-                                placeholder="Scene 1 ナレーション原稿"
-                                style={{ flex: 1, padding: '4px 8px', fontSize: 11, borderRadius: 4, border: '1px solid #cbd5e1' }}
-                              />
+                          {/* 15秒モード */}
+                          {videoMode === '15s' && (
+                            <div style={{ marginBottom: 8 }}>
+                              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                                <span style={{ fontSize: 10, fontWeight: 700, background: '#dbeafe', color: '#1e40af', padding: '3px 8px', borderRadius: 4, whiteSpace: 'nowrap' }}>
+                                  ⚡ 15秒 1カット完結（約40〜48文字）
+                                </span>
+                                <input
+                                  type="text"
+                                  value={story.narration15s || ''}
+                                  onChange={(e) => handleUpdateNarration(idx, 'narration15s', e.target.value)}
+                                  placeholder="15秒ナレーション原稿（例: 新築4500万に悩んでいたあの日...）"
+                                  style={{ flex: 1, padding: '5px 8px', fontSize: 11, borderRadius: 4, border: '1px solid #93c5fd' }}
+                                />
+                              </div>
                             </div>
-                            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                              <span style={{ fontSize: 10, fontWeight: 700, background: '#e0e7ff', color: '#3730a3', padding: '2px 6px', borderRadius: 4, whiteSpace: 'nowrap' }}>
-                                Scene 2 (8〜16秒)
-                              </span>
-                              <input
-                                type="text"
-                                value={story.narrationScene2 || ''}
-                                onChange={(e) => handleUpdateNarration(idx, 'narrationScene2', e.target.value)}
-                                placeholder="Scene 2 ナレーション原稿"
-                                style={{ flex: 1, padding: '4px 8px', fontSize: 11, borderRadius: 4, border: '1px solid #cbd5e1' }}
-                              />
+                          )}
+
+                          {/* 30秒モード */}
+                          {videoMode === '30s' && (
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 5, marginBottom: 8 }}>
+                              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                                <span style={{ fontSize: 10, fontWeight: 700, background: '#ede9fe', color: '#6d28d9', padding: '2px 6px', borderRadius: 4, whiteSpace: 'nowrap' }}>
+                                  Cut 1 (0〜15秒)
+                                </span>
+                                <input
+                                  type="text"
+                                  value={story.narration30sCut1 || ''}
+                                  onChange={(e) => handleUpdateNarration(idx, 'narration30sCut1', e.target.value)}
+                                  placeholder="Cut 1 課題・共感ナレーション原稿"
+                                  style={{ flex: 1, padding: '4px 8px', fontSize: 11, borderRadius: 4, border: '1px solid #cbd5e1' }}
+                                />
+                              </div>
+                              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                                <span style={{ fontSize: 10, fontWeight: 700, background: '#ede9fe', color: '#6d28d9', padding: '2px 6px', borderRadius: 4, whiteSpace: 'nowrap' }}>
+                                  Cut 2 (15〜30秒)
+                                </span>
+                                <input
+                                  type="text"
+                                  value={story.narration30sCut2 || ''}
+                                  onChange={(e) => handleUpdateNarration(idx, 'narration30sCut2', e.target.value)}
+                                  placeholder="Cut 2 解決・暮らし実感ナレーション原稿"
+                                  style={{ flex: 1, padding: '4px 8px', fontSize: 11, borderRadius: 4, border: '1px solid #cbd5e1' }}
+                                />
+                              </div>
                             </div>
-                            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                              <span style={{ fontSize: 10, fontWeight: 700, background: '#e0e7ff', color: '#3730a3', padding: '2px 6px', borderRadius: 4, whiteSpace: 'nowrap' }}>
-                                Scene 3 (16〜24秒)
-                              </span>
-                              <input
-                                type="text"
-                                value={story.narrationScene3 || ''}
-                                onChange={(e) => handleUpdateNarration(idx, 'narrationScene3', e.target.value)}
-                                placeholder="Scene 3 ナレーション原稿"
-                                style={{ flex: 1, padding: '4px 8px', fontSize: 11, borderRadius: 4, border: '1px solid #cbd5e1' }}
-                              />
+                          )}
+
+                          {/* 24秒モード */}
+                          {videoMode === '24s' && (
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 5, marginBottom: 8 }}>
+                              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                                <span style={{ fontSize: 10, fontWeight: 700, background: '#e0e7ff', color: '#3730a3', padding: '2px 6px', borderRadius: 4, whiteSpace: 'nowrap' }}>
+                                  Scene 1 (0〜8秒)
+                                </span>
+                                <input
+                                  type="text"
+                                  value={story.narrationScene1 || ''}
+                                  onChange={(e) => handleUpdateNarration(idx, 'narrationScene1', e.target.value)}
+                                  placeholder="Scene 1 ナレーション原稿"
+                                  style={{ flex: 1, padding: '4px 8px', fontSize: 11, borderRadius: 4, border: '1px solid #cbd5e1' }}
+                                />
+                              </div>
+                              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                                <span style={{ fontSize: 10, fontWeight: 700, background: '#e0e7ff', color: '#3730a3', padding: '2px 6px', borderRadius: 4, whiteSpace: 'nowrap' }}>
+                                  Scene 2 (8〜16秒)
+                                </span>
+                                <input
+                                  type="text"
+                                  value={story.narrationScene2 || ''}
+                                  onChange={(e) => handleUpdateNarration(idx, 'narrationScene2', e.target.value)}
+                                  placeholder="Scene 2 ナレーション原稿"
+                                  style={{ flex: 1, padding: '4px 8px', fontSize: 11, borderRadius: 4, border: '1px solid #cbd5e1' }}
+                                />
+                              </div>
+                              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                                <span style={{ fontSize: 10, fontWeight: 700, background: '#e0e7ff', color: '#3730a3', padding: '2px 6px', borderRadius: 4, whiteSpace: 'nowrap' }}>
+                                  Scene 3 (16〜24秒)
+                                </span>
+                                <input
+                                  type="text"
+                                  value={story.narrationScene3 || ''}
+                                  onChange={(e) => handleUpdateNarration(idx, 'narrationScene3', e.target.value)}
+                                  placeholder="Scene 3 ナレーション原稿"
+                                  style={{ flex: 1, padding: '4px 8px', fontSize: 11, borderRadius: 4, border: '1px solid #cbd5e1' }}
+                                />
+                              </div>
                             </div>
-                          </div>
+                          )}
 
                           {/* ふりがな適用＆Edge-TTSプレビュー */}
-                          <div style={{
-                            background: '#f8fafc',
-                            border: '1px dashed #cbd5e1',
-                            borderRadius: 6,
-                            padding: '6px 10px',
-                            fontSize: 10.5,
-                            color: '#334155'
-                          }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-                              <span style={{ fontWeight: 700, color: '#0f172a' }}>
-                                📖 Edge-TTS用 発音補正テキスト（ふりがな・ポーズ適用済）:
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() => handleApplyPhonetics(idx)}
-                                style={{
-                                  fontSize: 10,
-                                  padding: '2px 6px',
-                                  background: '#eff6ff',
-                                  color: '#2563eb',
-                                  border: '1px solid #bfdbfe',
-                                  borderRadius: 4,
-                                  cursor: 'pointer'
-                                }}
-                              >
-                                辞書を再適用
-                              </button>
-                            </div>
-                            <div style={{ fontFamily: 'monospace', color: '#1e40af', lineHeight: 1.5 }}>
-                              {story.narrationPhonetic || applyPhoneticDictionary(`${story.narrationScene1 || ''} ${story.narrationScene2 || ''} ${story.narrationScene3 || ''}`)}
-                            </div>
-                          </div>
+                          {(() => {
+                            const narration = generateStoryNarration(story, { mode: videoMode });
+                            return (
+                              <div style={{
+                                background: '#f8fafc',
+                                border: '1px dashed #cbd5e1',
+                                borderRadius: 6,
+                                padding: '6px 10px',
+                                fontSize: 10.5,
+                                color: '#334155'
+                              }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                                  <span style={{ fontWeight: 700, color: '#0f172a' }}>
+                                    📖 Edge-TTS用 発音補正テキスト（ふりがな辞書適用済）:
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleApplyPhonetics(idx)}
+                                    style={{
+                                      fontSize: 10,
+                                      padding: '2px 6px',
+                                      background: '#eff6ff',
+                                      color: '#2563eb',
+                                      border: '1px solid #bfdbfe',
+                                      borderRadius: 4,
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    辞書を再適用
+                                  </button>
+                                </div>
+                                <div style={{ fontFamily: 'monospace', color: '#1e40af', lineHeight: 1.5 }}>
+                                  {narration?.fullPhonetic || applyPhoneticDictionary(narration?.fullText || '')}
+                                </div>
+                              </div>
+                            );
+                          })()}
                         </div>
                       )}
 
                       {/* TAB 2: 字幕 (SRT) */}
                       {activeNarrationTab === 'subtitles' && (
                         <div>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-                            <span style={{ fontSize: 11, fontWeight: 700, color: '#334155' }}>
-                              📝 焼き込みテロップ用 SRT字幕プレビュー（動画3カット同期）
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => copyToClipboard(story.srtContent || '', `srt_${story.id}`)}
-                              style={{
-                                padding: '2px 8px',
-                                fontSize: 10,
-                                background: '#f1f5f9',
-                                border: '1px solid #cbd5e1',
-                                borderRadius: 4,
-                                cursor: 'pointer',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: 3
-                              }}
-                            >
-                              {copiedKey === `srt_${story.id}` ? <Check size={11} color="#16a34a" /> : <Copy size={11} />}
-                              <span>{copiedKey === `srt_${story.id}` ? 'コピー完了' : 'SRTをコピー'}</span>
-                            </button>
-                          </div>
-                          <pre style={{
-                            background: '#0f172a',
-                            color: '#38bdf8',
-                            padding: '8px 10px',
-                            borderRadius: 6,
-                            fontSize: 10.5,
-                            margin: 0,
-                            maxHeight: 90,
-                            overflowY: 'auto'
-                          }}>
-                            {story.srtContent}
-                          </pre>
+                          {(() => {
+                            const narration = generateStoryNarration(story, { mode: videoMode });
+                            return (
+                              <>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                                  <span style={{ fontSize: 11, fontWeight: 700, color: '#334155' }}>
+                                    📝 焼き込みテロップ用 SRT字幕プレビュー（{videoMode.toUpperCase()}同期）
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => copyToClipboard(narration?.srtContent || '', `srt_${story.id}_${videoMode}`)}
+                                    style={{
+                                      padding: '2px 8px',
+                                      fontSize: 10,
+                                      background: '#f1f5f9',
+                                      border: '1px solid #cbd5e1',
+                                      borderRadius: 4,
+                                      cursor: 'pointer',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: 3
+                                    }}
+                                  >
+                                    {copiedKey === `srt_${story.id}_${videoMode}` ? <Check size={11} color="#16a34a" /> : <Copy size={11} />}
+                                    <span>{copiedKey === `srt_${story.id}_${videoMode}` ? 'コピー完了' : 'SRTをコピー'}</span>
+                                  </button>
+                                </div>
+                                <pre style={{
+                                  background: '#0f172a',
+                                  color: '#38bdf8',
+                                  padding: '8px 10px',
+                                  borderRadius: 6,
+                                  fontSize: 10.5,
+                                  margin: 0,
+                                  maxHeight: 90,
+                                  overflowY: 'auto'
+                                }}>
+                                  {narration?.srtContent}
+                                </pre>
+                              </>
+                            );
+                          })()}
                         </div>
                       )}
 
@@ -2548,7 +2733,7 @@ export default function StoryStudioPanel() {
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6, flexWrap: 'wrap', gap: 4 }}>
                             <span style={{ fontSize: 11, fontWeight: 700, color: '#15803d' }}>
-                              🐍 HP Z840 (NVIDIA NVENC) 専用 Python合成スクリプト
+                              🐍 HP Z840 (NVIDIA NVENC) 専用 Python合成スクリプト【{videoMode.toUpperCase()}対応】
                             </span>
                             <div style={{ display: 'flex', gap: 6 }}>
                               <button
@@ -2569,11 +2754,11 @@ export default function StoryStudioPanel() {
                                 }}
                               >
                                 <Download size={11} />
-                                <span>compose_ep{story.episodeNum || 1}.py を保存</span>
+                                <span>compose_ep{story.episodeNum || 1}_{videoMode}.py を保存</span>
                               </button>
                               <button
                                 type="button"
-                                onClick={() => copyToClipboard(generateZ840PythonScript(story), `z840_${story.id}`)}
+                                onClick={() => copyToClipboard(generateZ840PythonScript(story, { mode: videoMode }), `z840_${story.id}_${videoMode}`)}
                                 style={{
                                   padding: '3px 8px',
                                   fontSize: 10.5,
@@ -2587,7 +2772,7 @@ export default function StoryStudioPanel() {
                                   gap: 4
                                 }}
                               >
-                                {copiedKey === `z840_${story.id}` ? <Check size={11} color="#16a34a" /> : <Copy size={11} />}
+                                {copiedKey === `z840_${story.id}_${videoMode}` ? <Check size={11} color="#16a34a" /> : <Copy size={11} />}
                                 <span>コードをコピー</span>
                               </button>
                             </div>
@@ -2603,9 +2788,25 @@ export default function StoryStudioPanel() {
                           }}>
                             <strong>実行手順:</strong>
                             <ol style={{ margin: '3px 0 0', paddingLeft: 16 }}>
-                              <li>Veo 3で生成した3本の動画を <code>scene1.mp4</code>, <code>scene2.mp4</code>, <code>scene3.mp4</code> としてZ840の作業フォルダに配置。</li>
-                              <li>ターミナルで <code>python compose_ep{story.episodeNum || 1}.py</code> を実行。</li>
-                              <li>Edge-TTS高音質ナレーション ＋ 字幕テロップ焼き込み ＋ NVENC高速結合されたSNS完成動画が自動出力されます！</li>
+                              {videoMode === '15s' ? (
+                                <>
+                                  <li>Veoで生成した15秒動画を <code>video_15s.mp4</code>（または <code>scene1.mp4</code>）として配置。</li>
+                                  <li>ターミナルで <code>python compose_ep{story.episodeNum || 1}_15s.py</code>（または <code>python scripts/z840_video_composer.py --ep {story.episodeNum || 1}</code>）を実行。</li>
+                                  <li><strong>結合処理なし！</strong> Edge-TTSナレーション ＋ 透明背景ASS字幕焼き込みが数秒で完了し、即座に完成動画が出力されます！</li>
+                                </>
+                              ) : videoMode === '30s' ? (
+                                <>
+                                  <li>2本の15秒動画を <code>scene1.mp4</code>, <code>scene2.mp4</code> として配置。</li>
+                                  <li>ターミナルで <code>python compose_ep{story.episodeNum || 1}_30s.py</code> を実行。</li>
+                                  <li>2カット結合＋ナレーション同期＋字幕焼き込みされた30秒完成動画が出力されます。</li>
+                                </>
+                              ) : (
+                                <>
+                                  <li>Veoで生成した3本の動画を <code>scene1.mp4</code>, <code>scene2.mp4</code>, <code>scene3.mp4</code> として配置。</li>
+                                  <li>ターミナルで <code>python compose_ep{story.episodeNum || 1}.py</code> を実行。</li>
+                                  <li>従来通り3カット結合された24秒完成動画が出力されます。</li>
+                                </>
+                              )}
                             </ol>
                           </div>
                         </div>

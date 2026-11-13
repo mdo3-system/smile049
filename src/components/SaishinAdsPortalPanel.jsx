@@ -932,6 +932,61 @@ export default function SaishinAdsPortalPanel() {
                   <span>{copiedKey === 'prompt_2' ? 'コピー完了' : 'プロンプトをコピー'}</span>
                 </button>
               </div>
+
+              {/* 【新世代】15秒ワンカット完結プロンプト（Veo後継 / Gemini Omni Flash 15秒対応） */}
+              <div className="bg-stone-950 p-6 rounded-3xl border border-purple-500/40 space-y-3 relative overflow-hidden shadow-2xl">
+                <div className="absolute top-0 right-0 bg-gradient-to-l from-purple-600 to-indigo-600 text-white text-[10px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-wider">
+                  ⚡ 15秒 1カット完結（新世代・生成1回）
+                </div>
+                <div className="flex items-center justify-between pb-2 border-b border-stone-800">
+                  <span className="font-bold text-amber-300 text-sm">PROMPT 03: 【15秒完結】角地外観〜玄関〜日だまりの吹き抜けLDK（ショート動画特化）</span>
+                  <span className="text-xs text-stone-500">YouTube Shorts / Reels 完走率最大化</span>
+                </div>
+                <div className="p-4 bg-stone-900 rounded-xl text-stone-200 text-xs font-mono leading-relaxed whitespace-pre-wrap">
+{`【参照画像】: 再進の家 外観写真 ＋ LDK写真
+【プロンプト】:
+シネマティック実写映画映像（15秒）。
+青空が広がる鳩山ニュータウン。上空からドローンが南東角地の美しい片流れ屋根リノベ住宅へと滑らかに下降しながら接近する（0〜5秒）。
+そのままアイレベルで玄関アプローチを通過し、室内へスムーズにドリーイン（5〜8秒）。
+杉板木目天井が広がる開放的な吹き抜けLDKと、高窓から柔らかな太陽光が差し込む無垢調の温かいリビング全体が滑らかなパノラマで美しく映し出される（8〜15秒）。
+参照画像の内装・天井・ファンの構造を100%維持。歪みのない精密な実写建築クオリティ。
+【音声トラック】静かな風の音と心地よい住宅街の環境音のみ。人の声・セリフ・テキストは一切含めない。`}
+                </div>
+                <button
+                  onClick={() => handleCopy(`シネマティック実写映画映像（15秒）。\n青空が広がる鳩山ニュータウン。上空からドローンが南東角地の美しい片流れ屋根リノベ住宅へと滑らかに下降しながら接近する（0〜5秒）。\nそのままアイレベルで玄関アプローチを通過し、室内へスムーズにドリーイン（5〜8秒）。\n杉板木目天井が広がる開放的な吹き抜けLDKと、高窓から柔らかな太陽光が差し込む無垢調の温かいリビング全体が滑らかなパノラマで美しく映し出される（8〜15秒）。\n参照画像の内装・天井・ファンの構造を100%維持。歪みのない精密な実写建築クオリティ。\n【音声トラック】静かな風の音と心地よい住宅街の環境音のみ。人の声・セリフ・テキストは一切含めない。`, 'prompt_3')}
+                  className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold flex items-center gap-1.5 transition shadow-lg"
+                >
+                  {copiedKey === 'prompt_3' ? <Check className="w-3.5 h-3.5 text-emerald-300" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copiedKey === 'prompt_3' ? 'コピー完了' : '⚡ 15秒プロンプトをコピー'}</span>
+                </button>
+              </div>
+
+              <div className="bg-stone-950 p-6 rounded-3xl border border-purple-500/40 space-y-3 relative overflow-hidden shadow-2xl">
+                <div className="absolute top-0 right-0 bg-gradient-to-l from-emerald-600 to-teal-600 text-white text-[10px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-wider">
+                  ⚡ 15秒 週末別邸モデル
+                </div>
+                <div className="flex items-center justify-between pb-2 border-b border-stone-800">
+                  <span className="font-bold text-emerald-300 text-sm">PROMPT 04: 【15秒完結】都心1時間の澄んだ週末別邸・テラスと青空</span>
+                  <span className="text-xs text-stone-500">都心シニア向け二拠点生活</span>
+                </div>
+                <div className="p-4 bg-stone-900 rounded-xl text-stone-200 text-xs font-mono leading-relaxed whitespace-pre-wrap">
+{`【参照画像】: 再進の家 テラス側外観写真 ＋ LDK写真
+【プロンプト】:
+シネマティック実写映画映像（15秒）。
+澄み切った朝の光。木々の緑と澄んだ空気が漂う72坪の広い角地敷地。
+テラスから庭の木漏れ日を捉えたスロードリー撮影からスタート（0〜5秒）。
+ゆっくりとリビングの窓辺へと視点が移動し、エアコン1台で家中が暖められた居心地の良い木の温もりに満ちた平屋ライクな室内空間へとシームレスに繋がる（5〜12秒）。
+澄んだ大人の休日を思わせる穏やかで上質な空気感の余韻（12〜15秒）。
+【音声トラック】朝の小鳥のさえずりと澄んだ風の音のみ。人の声・セリフ・テキストは一切含めない。`}
+                </div>
+                <button
+                  onClick={() => handleCopy(`シネマティック実写映画映像（15秒）。\n澄み切った朝の光。木々の緑と澄んだ空気が漂う72坪の広い角地敷地。\nテラスから庭の木漏れ日を捉えたスロードリー撮影からスタート（0〜5秒）。\nゆっくりとリビングの窓辺へと視点が移動し、エアコン1台で家中が暖められた居心地の良い木の温もりに満ちた平屋ライクな室内空間へとシームレスに繋がる（5〜12秒）。\n澄んだ大人の休日を思わせる穏やかで上質な空気感の余韻（12〜15秒）。\n【音声トラック】朝の小鳥のさえずりと澄んだ風の音のみ。人の声・セリフ・テキストは一切含めない。`, 'prompt_4')}
+                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 transition shadow-lg"
+                >
+                  {copiedKey === 'prompt_4' ? <Check className="w-3.5 h-3.5 text-emerald-300" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copiedKey === 'prompt_4' ? 'コピー完了' : '⚡ 15秒別邸プロンプトをコピー'}</span>
+                </button>
+              </div>
             </div>
           </div>
         )}

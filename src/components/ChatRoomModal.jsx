@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   X, Send, Paperclip, Image as ImageIcon, FileText, CheckCheck, 
-  Sparkles, Download, ArrowLeft, User, Shield, Info, Maximize2, Layers 
+  Sparkles, Download, ArrowLeft, ArrowRight, User, Shield, Info, Maximize2, Layers, ExternalLink 
 } from 'lucide-react';
-import { getChatRooms, sendMessageToRoom, getCurrentUserRoomId } from '../services/chatService';
+import { getChatRooms, sendMessageToRoom, getCurrentUserRoomId, OFFICIAL_LINE_URL } from '../services/chatService';
+import { LineIcon } from './SnsIcons';
 import DocumentSlotPanel from './DocumentSlotPanel';
 
 export default function ChatRoomModal({ isOpen, onClose, initialRoomId }) {
@@ -162,9 +163,65 @@ export default function ChatRoomModal({ isOpen, onClose, initialRoomId }) {
             <Shield size={14} color="var(--color-primary)" />
             <span>プラン: <strong>{currentRoom.planType}</strong></span>
           </div>
-          <div style={{ fontSize: 11, color: 'var(--color-wood)', fontWeight: 700 }}>
-            ワンタップ・マジックリンク接続中
+          <div style={{ fontSize: 11, color: '#16a34a', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span>●</span>
+            <span>社内メール通知連携中</span>
           </div>
+        </div>
+
+        {/* 📱 LINE公式アカウント更新通知バナー（通知専用） */}
+        <div style={{
+          background: 'linear-gradient(135deg, #06C755 0%, #05a847 100%)',
+          color: '#ffffff',
+          padding: '8px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 10,
+          boxShadow: 'inset 0 -1px 0 rgba(0,0,0,0.08)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 700 }}>
+            <div style={{
+              width: 24,
+              height: 24,
+              borderRadius: '50%',
+              background: '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}>
+              <LineIcon size={16} color="#06C755" />
+            </div>
+            <div>
+              <span>パース完成やスタッフ返信の通知をLINEで受け取る</span>
+              <div style={{ fontSize: 10, opacity: 0.9, fontWeight: 500 }}>
+                チャット更新通知専用 ｜ やり取り・図面提出はすべて本チャット内で完結します
+              </div>
+            </div>
+          </div>
+          <a
+            href={OFFICIAL_LINE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              background: '#ffffff',
+              color: '#06C755',
+              padding: '5px 12px',
+              borderRadius: 20,
+              fontSize: 11.5,
+              fontWeight: 800,
+              textDecoration: 'none',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+              whiteSpace: 'nowrap',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4
+            }}
+          >
+            <span>通知を受け取る</span>
+            <ExternalLink size={12} />
+          </a>
         </div>
 
         {/* タイムライン vs 重要図書スロット タブ切替 */}

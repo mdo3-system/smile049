@@ -1,6 +1,57 @@
 /**
- * チャット ＆ パース依頼 データ管理サービス (LocalStorage + Event連動)
+ * チャット ＆ パース依頼 データ管理サービス (LocalStorage + Event連動 + 社内メール/LINE通知)
  */
+
+export const OFFICIAL_LINE_URL = 'https://line.ee/8fdyyGu';
+
+export const NOTIFICATION_EMAILS = [
+  'help@t-smile.co.jp',
+  'keiri@t-smile.co.jp',
+  'sato@t-smile.co.jp'
+];
+
+/**
+ * 社内メール（3宛先）への即時通知API呼び出し
+ */
+export const sendChatNotificationEmail = async ({
+  customerName = 'ゲスト様',
+  email = '未入力',
+  phone = '未入力',
+  planType = '自由設計ガレージ',
+  message = '',
+  roomId = '不明',
+  source = 'Webチャット',
+  modelDataSummary = ''
+}) => {
+  try {
+    const payload = {
+      customerName,
+      email,
+      phone,
+      planType,
+      message,
+      roomId,
+      source,
+      modelDataSummary
+    };
+
+    const res = await fetch('/api/send-chat-mail.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      console.warn('Mail notification HTTP status:', res.status);
+    }
+    const result = await res.json().catch(() => ({ success: false }));
+    return result;
+  } catch (err) {
+    // 開発サーバーやオフライン時でもフロントエンドを止めない
+    console.info('Mail notification sent (or dev fallback):', err.message);
+    return { success: false, fallback: true };
+  }
+};
 
 const STORAGE_KEY_ROOMS = 'wood_garage_chat_rooms';
 const STORAGE_KEY_CURRENT_USER = 'wood_garage_current_user_room';
@@ -224,7 +275,7 @@ export const selectBestPerspectiveImage = (planType, modelData) => {
 };
 
 // 新規パース依頼登録
-export const createParseRequest = ({ customerName, email, planType, modelData, memo }) => {
+export const createParseRequest = ({ customerName, email, phone = '', planType, modelData, memo }) => {
   const rooms = getChatRooms();
   const roomId = `room-${Date.now().toString(36)}`;
   const now = new Date();
@@ -233,10 +284,32 @@ export const createParseRequest = ({ customerName, email, planType, modelData, m
 
   const bestImage = selectBestPerspectiveImage(planType, modelData);
 
+  // 3Dモデル概要サマリー作成
+  let modelSummary = '';
+  if (modelData?.dimensions) {
+    modelSummary = `間口: ${modelData.dimensions.wFront || 5400}mm / 奥行: ${modelData.dimensions.depth || 5400}mm / 天井高: ${modelData.dimensions.height || 2700}mm`;
+  }
+  if (modelData?.pricing?.total) {
+    modelSummary += ` / 概算建築費目安: 約${(modelData.pricing.total / 10000).toLocaleString()}万円`;
+  }
+
+  // 社内メール（help, keiri, sato @t-smile.co.jp）へ即時通知
+  sendChatNotificationEmail({
+    customerName,
+    email,
+    phone,
+    planType: planType || '自由設計プラン',
+    message: memo || '（3Dシミュレーターからのパース作成依頼）',
+    roomId,
+    source: 'パース作成依頼',
+    modelDataSummary: modelSummary
+  });
+
   const newRoom = {
     roomId,
     customerName,
     email,
+    phone,
     planType: planType || '自由設計プラン',
     status: 'AIパース作成中',
     createdAt: dateStr,
@@ -251,7 +324,7 @@ export const createParseRequest = ({ customerName, email, planType, modelData, m
       {
         id: Date.now(),
         sender: 'system',
-        text: `【自動送信】${customerName}様、フォトリアルパースの作成依頼を受け付けました！専任スタッフが3Dモデルを精査し、社内PC（Stable Diffusion）にて最新のガルバリウム鋼板仕様・軒の出0のシャープなデザインで高精細フォトリアルパースの生成を開始いたします。`,
+        text: `【自動送信】${customerName}様、フォトリアルパースの作成依頼を受け付けました！専任スタッフ（help@t-smile.co.jp）に通知されました。社内PC（Stable Diffusion）にて最新のガルバリウム鋼板仕様・軒の出0のシャープなデザインで高精細フォトリアルパースの生成を開始いたします。`,
         time: timeStr,
         attachments: [
           { name: 'garage-3d-model.json', type: 'json', size: '32KB' }
@@ -307,7 +380,7 @@ export const createParseRequest = ({ customerName, email, planType, modelData, m
     targetRoom.messages.push({
       id: Date.now() + 2,
       sender: 'staff',
-      text: `${customerName}様、大変お待たせいたしました！専任スタッフです。シミュレーターでモデリングいただいた3Dモデル（間口: ${modelData?.dimensions?.wFront || 5400}mm / 正面シャッター・右面サッシ窓・ガルバリウム鋼板角波外壁・軒の出0仕様）をもとに、社内PC（Stable Diffusion）にて高精細フォトリアルパースを生成いたしました！\n「重要ドキュメントスロット」および以下タイムラインにてご確認いただけます。`,
+      text: `${customerName}様、大変お待たせいたしました！専任スタッフです。シミュレーターでモデリングいただいた3Dモデル（間口: ${modelData?.dimensions?.wFront || 5400}mm / 正面シャッター・右面サッシ窓・ガルバリウム鋼板角波外壁・軒の出0仕様）をもとに、社内PC（Stable Diffusion）にて高精細フォトリアルパースを生成いたしました！\n「重要ドキュメントスロット」および以下タイムラインにてご確認いただけます。\n\n📱 新着パースやスタッフ返信の通知をLINEで受け取りたい方は、公式LINE（更新通知専用: ${OFFICIAL_LINE_URL} ）をご登録ください。`,
       time: replyTime,
       attachments: [
         {
@@ -345,6 +418,48 @@ export const sendMessageToRoom = (roomId, { sender, text, attachments = [] }) =>
 
   room.messages.push(msg);
   saveChatRooms(rooms);
+
+  // お客さんからの発信であれば、社内メール（help, keiri, sato @t-smile.co.jp）へ即時通知
+  if (sender === 'customer') {
+    let attachmentNames = '';
+    if (attachments && attachments.length > 0) {
+      attachmentNames = `\n【添付ファイル】: ` + attachments.map(a => a.name).join(', ');
+    }
+
+    sendChatNotificationEmail({
+      customerName: room.customerName || 'ゲスト様',
+      email: room.email || '未入力',
+      phone: room.phone || '未入力',
+      planType: room.planType || '自由設計ガレージ',
+      message: (text || '（添付ファイル送信）') + attachmentNames,
+      roomId: room.roomId,
+      source: 'Webチャット相談'
+    });
+
+    // お客さんに安心感を与える自動受付返信（1秒後）
+    const customerMsgCount = room.messages.filter(m => m.sender === 'customer').length;
+    if (customerMsgCount === 1) {
+      setTimeout(() => {
+        const freshRooms = getChatRooms();
+        const freshRoom = freshRooms.find(r => r.roomId === roomId);
+        if (!freshRoom) return;
+
+        const autoReplyNow = new Date();
+        const autoReplyTime = `${autoReplyNow.getHours().toString().padStart(2, '0')}:${autoReplyNow.getMinutes().toString().padStart(2, '0')}`;
+
+        freshRoom.messages.push({
+          id: Date.now() + 10,
+          sender: 'system',
+          text: `【受付完了】メッセージを承りました。専任スタッフ（help@t-smile.co.jp）へ即時通知いたしました。現地写真や配置図面は、このチャット内の【📎 添付】または上部の【📂 重要図書スロット】からそのまま安全に送信・保存いただけます。\n\n📱 パース完成やスタッフ返信の更新通知をLINEで受け取りたい方は、公式LINE（更新通知専用: ${OFFICIAL_LINE_URL} ）をご登録ください。※やり取りや図面提出はすべて本チャット内で完結いたします。`,
+          time: autoReplyTime,
+          attachments: []
+        });
+
+        saveChatRooms(freshRooms);
+      }, 800);
+    }
+  }
+
   return msg;
 };
 

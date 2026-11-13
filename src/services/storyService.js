@@ -298,11 +298,49 @@ export const buildVeoDialogueBlock = (text, characterDescription = '登場人物
 };
 
 /**
- * Veo 3（Google AI Pro / VideoFX）用 100%日本語動画生成プロンプト（単一・メインカット）
+ * Veo 3 / Gemini Omni Flash（Google AI Pro / Flow）用 100%日本語動画生成プロンプト（単一・メインカット）
  */
 export const generateVeoPrompt = (englishPrompt, title = '', episodeNum = 1, options = {}) => {
+  const mode = options?.mode || '15s';
+  if (mode === '15s') {
+    return generateVeo15sPrompt(englishPrompt, title, episodeNum, options);
+  }
   const cuts = generateVeo3CutPrompts(englishPrompt, title, episodeNum, options);
   return cuts.scene3 || cuts.scene1;
+};
+
+/**
+ * 【新世代・最推奨】Veo後継 / Gemini Omni Flash用 15秒 1カット完結プロンプト生成
+ * - ワンパスで15秒のシネマティック映像を1回で生成（作業工数が1/3に激減）
+ * - 0〜7秒: ドローン接近・外観・境界へのジャストフィット
+ * - 8〜15秒: シャッターオープン＆木造小屋組み現し梁・温白色LED・愛車・雨宿りの生活実感
+ * - 音声トラック: 環境音のみ（人の声・ナレーション・英語音声は一切含めない）
+ */
+export const generateVeo15sPrompt = (englishPrompt, title = '', episodeNum = 1, options = {}) => {
+  const protagonist = options?.protagonist || options?.target || '';
+  const characterInfo = buildCharacterAgeDetail(protagonist || title || englishPrompt);
+
+  const scene15sMotions = [
+    `日本の閑静な住宅街。上空からドローンが滑らかに下降しながらガレージへと接近するプッシュイン撮影（0〜5秒）。ダークチャコール色のガルバリウム鋼板外壁とシャープな軒出ゼロ屋根の木造ガレージへ視点が定まり、変形敷地にミリ単位で収まった美しい建築構図を捉える（5〜8秒）。正面へ到達すると電動シャッターが静かに巻き上がり、温かみのある木造小屋組み梁（木造現し構造）とOSB合板の壁面、磨かれた土間コンクリートに佇む愛車が温白色LEDに照らされ、室内で穏やかに微笑む${characterInfo.description}が映し出される（8〜15秒）。歪みのない精密な建築美とリアルな物理挙動。実写映画クオリティ。【音声トラック】環境音（日本の住宅街の静かな風の音、シャッターが滑らかに巻き上がる心地よい機械音）のみ。人の声・セリフ・ナレーション・英語音声は一切含めない。`,
+    `青空と夕暮れのマジックアワー。建物の足元から見上げるローアングルからゆっくりと旋回しながらガレージ全体を捉えるクレーン撮影（0〜6秒）。ダークガルバリウム外壁と木造躯体の重厚感が夕光に照らされる中、正面の電動シャッターがスムーズに開き、室内の温かな無垢木目テクスチャと愛車、整理されたワークスペースが広がる（6〜11秒）。雨上がりの澄んだ空気の中、愛車を穏やかな笑顔で見つめる${characterInfo.description}の満足げな表情が温かな照明とともに映し出される（11〜15秒）。実写映画クオリティ。【音声トラック】環境音（静かな風の音、シャッター音、雨上がりの街の環境音）のみ。人の声・セリフ・発話は一切なし。`,
+    `日本の落ち着いた住宅街。雨の降る夕暮れ時、雨粒がガルバリウム屋根を伝う中、木造ガレージの全景から正面へと滑らかにドリー前進するシネマティック撮影（0〜6秒）。開口した木造ガレージの乾いた土間コンクリートへ乗用車がゆっくりと滑り込み、雨に濡れずに降り立った${characterInfo.description}が、整然とした木の温もりある空間と愛車に心から安堵し、穏やかな笑顔で頷く（6〜12秒）。温かなLED光と木の香りが満ちる贅沢な日常の余韻（12〜15秒）。実写映画クオリティ。【音声トラック】ガルバリウム屋根に当たる静かな雨音、車のドアが静かに閉まる環境音のみ。人の声・セリフ・発話は一切なし。`
+  ];
+
+  return scene15sMotions[(episodeNum - 1) % scene15sMotions.length];
+};
+
+/**
+ * 【長尺】30秒 2カットストーリープロンプト生成（15秒 × 2カット）
+ */
+export const generateVeo30sPrompts = (englishPrompt, title = '', episodeNum = 1, options = {}) => {
+  const protagonist = options?.protagonist || options?.target || '';
+  const characterInfo = buildCharacterAgeDetail(protagonist || title || englishPrompt);
+
+  const cut1 = `シネマティック実写映画映像（約15秒）。日本の閑静な住宅街。上空からドローンが滑らかに下降しながらガレージへと接近し、周囲を緩やかに旋回するパノラマ撮影（0〜8秒）。リノベーションされた日本家屋に隣接するダークチャコールのガルバリウム鋼板外壁とシャープな軒出ゼロ屋根、変形した敷地境界にミリ単位でジャストフィットした精密な木造建築の全景が夕暮れの美しい自然光の中に堂々と立ち上がる（8〜15秒）。歪みのない精密な建築美。実写映画クオリティ。【音声トラック】環境音（日本の住宅街の静かな風の音、街の遠景音）のみ。人の声・セリフ・発話は一切なし。`;
+  
+  const cut2 = `シネマティック実写映画映像（約15秒）。ガレージ正面からのアイレベル・ドリー前進撮影。電動シャッターが静かに巻き上がり、温かみのある木造小屋組み梁（木造現し構造）とOSB合板の壁面、磨かれた土間コンクリート床が温白色LED照明に照らし出される（0〜7秒）。愛車のそばで、自分たちだけの整った木造空間に満足そうに微笑み頷き合う${characterInfo.description}の自然な仕草と豊かな日常の実感が温かく広がる（7〜15秒）。実写映画クオリティ。【音声トラック】シャッターが巻き上がる心地よい機械音と木造空間の自然な反響音のみ。人の声・セリフ・発話は一切なし。`;
+
+  return { cut1, cut2, characterInfo };
 };
 
 /**
@@ -348,16 +386,144 @@ export const generateVeo3CutPrompts = (englishPrompt, title = '', episodeNum = 1
   return { scene1, scene2, scene3, characterInfo };
 };
 
+// 各話に応じた15秒 1カット完結ナレーションプリセット（約40〜48文字・ワンメッセージで心に刺さる構成）
+export const NARRATION_15S_PRESETS = [
+  '新築4500万に悩んでいたあの日。中古住宅と木造自由設計ガレージで、同じ予算で新築以上の理想の暮らしが完成しました。',
+  '不動産サイトの変形地や格安物件。ミリ単位で土地に合わせる木造自由設計なら、土地探しの選択肢が180度広がります。',
+  '中古3800万、リノベ300万、ガレージ300万。新築と同じ予算で憧れの愛車空間が手に入った、夫婦笑顔の決断でした。',
+  '南側が斜めの台形変形地。既製品は無理と言われた場所に、数センチ単位でジャストフィットする木造の奇跡。',
+  '土砂降りの雨でも濡れずに玄関へ。ガルバリウム屋根と木の香りに包まれる、雨の日こそ実感する日常の贅沢。',
+  '画一的な新築建売より、自分たちの理想を選んだ。見栄ではなく日々の豊かな暮らしを手に入れた、大正解の選択。',
+  '敷地に合わせてスマホで自分で描いたガレージ。構造計算から確認申請、大工の手仕事で理想がカタチになりました。'
+];
+
+// 各話に応じた30秒 2カットストーリーナレーションプリセット（前半15秒・後半15秒）
+export const NARRATION_30S_PRESETS = [
+  {
+    cut1: '週末のたび住宅展示場を回り、土地込み4500万の壁に悩んでいたあの日。本当に新築しかないのか疑問でした。',
+    cut2: '中古住宅に木造自由設計ガレージをプラス。同じ予算で新築以上の自由と憧れの愛車空間が完成しました。'
+  },
+  {
+    cut1: '不動産サイトで見かける、斜めの台形地や格安物件。既製品の物置やガレージは入らないと諦めていませんか？',
+    cut2: 'スマイチの木造自由設計なら、敷地境界にミリ単位でジャストフィット。土地探しの見方が180度変わります。'
+  },
+  {
+    cut1: '新築4500万と、中古3800万＋リノベ300万＋ガレージ300万。夜更けに計算した総額はほぼ同じ4400万円でした。',
+    cut2: '同じ予算をかけるなら、憧れのガレージまで手に入る選択を。暮らしも趣味も手に入った夫婦笑顔の決断です。'
+  },
+  {
+    cut1: '南側が斜めに変形した台形敷地。どのメーカーにも「規格品は絶対に入りません」と断られていた場所でした。',
+    cut2: '既存建物のラインに合わせ、ミリ単位で設計された木造ガレージ。敷地を隅々まで使い切る奇跡の納まりが完成。'
+  },
+  {
+    cut1: '土砂降りの大雨の日。買い出し帰りの重い荷物を抱えて、傘を差しながら濡れて走るストレスを感じていませんか？',
+    cut2: 'ガレージから濡れずに玄関へ。静かな雨音と木の香りに包まれる空間で、雨の日こそ暮らしの豊かさを実感します。'
+  },
+  {
+    cut1: 'ハウスメーカーの画一的な間取りで新築を建てるより、自分たち家族が本当にワクワクする日常を選びました。',
+    cut2: '週末は愛車の手入れやDIY。見栄ではなく毎日の心豊かな暮らしを手に入れた、大正解のマイホーム計画でした。'
+  },
+  {
+    cut1: '敷地の形に合わせて、スマホの3Dシミュレーターで自分で描いた木造ガレージ。リアルタイムで積算も確認できます。',
+    cut2: '構造計算から確認申請、熟練大工の手仕事まで完全ワンストップ施工。規格品にはない自由をあなたも体験しませんか。'
+  }
+];
+
 /**
- * 3カット連動 ナレーション原稿・タイムコード＆字幕（SRT）自動生成
- * 1話あたり約24〜30秒（Scene 1: 0〜8秒、Scene 2: 8〜16秒、Scene 3: 16〜24秒）
+ * 連動ナレーション原稿・タイムコード＆字幕（SRT / ASS）自動生成
+ * options.mode: '15s' (1カット完結 / 推奨) | '30s' (2カット) | '24s' (3カット / 従来型)
  */
 export const generateStoryNarration = (story, options = {}) => {
   if (!story) return null;
   const epNum = story.episodeNum || 1;
   const userFeedback = options.userFeedback || story.narrationFeedback || '';
+  const mode = options.mode || '15s';
 
-  // 各話に応じた標準ナレーション構成（スマホSNSで1行に美しく収まる約18〜24文字の簡潔テロップ）
+  // --- 【モード1: 15秒 1カット完結モード】（最推奨・工数1/3・完走率MAX） ---
+  if (mode === '15s') {
+    const default15s = NARRATION_15S_PRESETS[(epNum - 1) % NARRATION_15S_PRESETS.length];
+    const text15s = options.text15s || story.narration15s || default15s;
+    const phonetic15s = applyPhoneticDictionary(text15s);
+
+    const subtitles = [
+      { index: 1, startTime: '00:00:00,600', endTime: '00:00:13,800', text: text15s }
+    ];
+    const srtContent = `1\n00:00:00,600 --> 00:00:13,800\n${text15s}\n`;
+    const assContent = `[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Meiryo,60,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,4.5,1.0,2,24,24,180,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.60,0:00:13.80,Default,,0,0,0,,${text15s}
+`;
+
+    return {
+      mode: '15s',
+      duration: 15.0,
+      text15s,
+      phonetic15s,
+      fullText: text15s,
+      fullPhonetic: phonetic15s,
+      subtitles,
+      srtContent,
+      assContent,
+      userFeedback
+    };
+  }
+
+  // --- 【モード2: 30秒 2カットストーリーモード】（15秒 × 2） ---
+  if (mode === '30s') {
+    const default30s = NARRATION_30S_PRESETS[(epNum - 1) % NARRATION_30S_PRESETS.length];
+    const cut1 = options.cut1Text || story.narration30sCut1 || default30s.cut1;
+    const cut2 = options.cut2Text || story.narration30sCut2 || default30s.cut2;
+    const phoneticCut1 = applyPhoneticDictionary(cut1);
+    const phoneticCut2 = applyPhoneticDictionary(cut2);
+
+    const subtitles = [
+      { index: 1, startTime: '00:00:00,600', endTime: '00:00:13,800', text: cut1 },
+      { index: 2, startTime: '00:00:15,600', endTime: '00:00:28,800', text: cut2 }
+    ];
+    const srtContent = subtitles.map(s => `${s.index}\n${s.startTime} --> ${s.endTime}\n${s.text}\n`).join('\n');
+    const assContent = `[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Meiryo,60,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,4.5,1.0,2,24,24,180,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.60,0:00:13.80,Default,,0,0,0,,${cut1}
+Dialogue: 0,0:00:15.60,0:00:28.80,Default,,0,0,0,,${cut2}
+`;
+
+    return {
+      mode: '30s',
+      duration: 30.0,
+      cut1,
+      cut2,
+      phoneticCut1,
+      phoneticCut2,
+      fullText: `${cut1} ${cut2}`,
+      fullPhonetic: `${phoneticCut1}　${phoneticCut2}`,
+      subtitles,
+      srtContent,
+      assContent,
+      userFeedback
+    };
+  }
+
+  // --- 【モード3: 従来型 24秒 3カットモード】（8秒 × 3） ---
   const narrationPresets = [
     {
       scene1: '土地込み4500万。新築の壁に悩んでいたあの日。',
@@ -401,29 +567,18 @@ export const generateStoryNarration = (story, options = {}) => {
   const scene2 = options.scene2Text || story.narrationScene2 || preset.scene2;
   const scene3 = options.scene3Text || story.narrationScene3 || preset.scene3;
 
-  // 担当者からの読み方指示やフィードバックを反映した補正
-  let finalScene1 = scene1;
-  let finalScene2 = scene2;
-  let finalScene3 = scene3;
-
-  // Edge-TTS（音声合成）用ふりがな補正テキスト
-  const phoneticScene1 = applyPhoneticDictionary(finalScene1);
-  const phoneticScene2 = applyPhoneticDictionary(finalScene2);
-  const phoneticScene3 = applyPhoneticDictionary(finalScene3);
+  const phoneticScene1 = applyPhoneticDictionary(scene1);
+  const phoneticScene2 = applyPhoneticDictionary(scene2);
+  const phoneticScene3 = applyPhoneticDictionary(scene3);
   const fullPhonetic = `${phoneticScene1}　${phoneticScene2}　${phoneticScene3}`;
 
-  // 字幕データ（SRTフォーマット：黒背景なし・1行表示用）
   const subtitles = [
-    { index: 1, startTime: '00:00:00,600', endTime: '00:00:06,500', text: finalScene1 },
-    { index: 2, startTime: '00:00:08,500', endTime: '00:00:14,500', text: finalScene2 },
-    { index: 3, startTime: '00:00:16,500', endTime: '00:00:22,500', text: finalScene3 }
+    { index: 1, startTime: '00:00:00,600', endTime: '00:00:06,500', text: scene1 },
+    { index: 2, startTime: '00:00:08,500', endTime: '00:00:14,500', text: scene2 },
+    { index: 3, startTime: '00:00:16,500', endTime: '00:00:22,500', text: scene3 }
   ];
 
-  const srtContent = subtitles.map(s => 
-    `${s.index}\n${s.startTime} --> ${s.endTime}\n${s.text}\n`
-  ).join('\n');
-
-  // 高度字幕データ（ASSフォーマット：黒帯座布団完全排除、透明背景＋白文字黒縁取り、1行厳守、SNS視認性最適化62px）
+  const srtContent = subtitles.map(s => `${s.index}\n${s.startTime} --> ${s.endTime}\n${s.text}\n`).join('\n');
   const assContent = `[Script Info]
 ScriptType: v4.00+
 PlayResX: 1080
@@ -436,16 +591,18 @@ Style: Default,Meiryo,62,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,10
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-Dialogue: 0,0:00:00.60,0:00:06.50,Default,,0,0,0,,${finalScene1}
-Dialogue: 0,0:00:08.50,0:00:14.50,Default,,0,0,0,,${finalScene2}
-Dialogue: 0,0:00:16.50,0:00:22.50,Default,,0,0,0,,${finalScene3}
+Dialogue: 0,0:00:00.60,0:00:06.50,Default,,0,0,0,,${scene1}
+Dialogue: 0,0:00:08.50,0:00:14.50,Default,,0,0,0,,${scene2}
+Dialogue: 0,0:00:16.50,0:00:22.50,Default,,0,0,0,,${scene3}
 `;
 
   return {
-    scene1: finalScene1,
-    scene2: finalScene2,
-    scene3: finalScene3,
-    fullText: `${finalScene1} ${finalScene2} ${finalScene3}`,
+    mode: '24s',
+    duration: 24.0,
+    scene1,
+    scene2,
+    scene3,
+    fullText: `${scene1} ${scene2} ${scene3}`,
     phoneticScene1,
     phoneticScene2,
     phoneticScene3,
@@ -459,19 +616,300 @@ Dialogue: 0,0:00:16.50,0:00:22.50,Default,,0,0,0,,${finalScene3}
 
 /**
  * Z840用 Python + FFmpeg（NVENC）+ Edge-TTS 完全自動合成スクリプト生成
- * 担当者がワンクリックでコピーして Z840（NVIDIA GPU搭載機）上で即実行できます。
+ * options.mode: '15s' (1カット完結 / 最速・推奨) | '30s' (2カット) | '24s' (3カット / 従来型)
  */
 export const generateZ840PythonScript = (story, options = {}) => {
   const epNum = story?.episodeNum || 1;
-  const narration = generateStoryNarration(story, options);
+  const mode = options.mode || '15s';
+  const narration = generateStoryNarration(story, { ...options, mode });
   const voice = options.voice || 'ja-JP-NanamiNeural';
   const isVertical = options.isVertical !== false;
 
+  // --- 【15秒 1カット完結モード用スクリプト】（結合なし・最速・工数1/3） ---
+  if (mode === '15s') {
+    return `#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+=============================================================================
+スマイチ (smile049.jp) 第${epNum}話 【15秒1カット完結】SNS動画全自動合成 (HP Z840専用)
+- 尺: 15.0秒（YouTube Shorts / Instagramリール / TikTok 完全完走率最大化）
+- 素材: Veo / Gemini Omni Flashで生成した 15秒動画1本（結合処理不要！）
+- 音声合成: Edge-TTS (${voice}) 専門用語ふりがな補正済み
+- 字幕焼き込み: ASSテロップ（透明背景・白文字黒縁取り・SNS視認性最適化60px）
+- ハードウェア加速: NVIDIA NVENC (h264_nvenc) または CPU高速エンコード
+=============================================================================
+"""
+
+import os
+import sys
+import subprocess
+import asyncio
+
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
+EPISODE_NUM = ${epNum}
+VOICE_NAME = "${voice}"
+IS_VERTICAL = ${isVertical ? 'True' : 'False'}
+OUTPUT_FILENAME = f"smile049_ep{EPISODE_NUM:02d}_15s_{'sns' if IS_VERTICAL else 'horizontal'}.mp4"
+
+TEXT_SUBTITLE = """${narration.text15s}"""
+TEXT_VOICE = """${narration.phonetic15s}"""
+
+async def generate_narration_audio():
+    print("🎙️ [1/3] Edge-TTSで15秒ナレーション音声を合成中...")
+    import edge_tts
+    comm = edge_tts.Communicate(TEXT_VOICE, VOICE_NAME, rate="+10%")
+    await comm.save("temp_narration_15s.mp3")
+
+    filter_adelay = "[0:a]adelay=600|600[a0];[a0]amix=inputs=1[outa]"
+    cmd = [
+        "ffmpeg", "-y",
+        "-i", "temp_narration_15s.mp3",
+        "-filter_complex", filter_adelay,
+        "-map", "[outa]",
+        "-t", "15.0",
+        "synced_narration.mp3"
+    ]
+    subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    if os.path.exists("temp_narration_15s.mp3"):
+        os.remove("temp_narration_15s.mp3")
+    print("✅ 15秒ナレーション音声作成完了: synced_narration.mp3")
+
+def create_ass_file():
+    print("📝 [2/3] 字幕ASSファイルを作成中（透明背景・1行テロップ）...")
+    play_x = 1080 if IS_VERTICAL else 1920
+    play_y = 1920 if IS_VERTICAL else 1080
+    font_size = 60 if IS_VERTICAL else 56
+    margin_v = 180 if IS_VERTICAL else 90
+
+    ass_text = f"""[Script Info]
+ScriptType: v4.00+
+PlayResX: {play_x}
+PlayResY: {play_y}
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Meiryo,{font_size},&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,4.5,1.0,2,24,24,{margin_v},1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.60,0:00:13.80,Default,,0,0,0,,{TEXT_SUBTITLE}
+"""
+    with open("subtitles.ass", "w", encoding="utf-8") as f:
+        f.write(ass_text.strip() + "\\n")
+    print("✅ 字幕ASS作成完了: subtitles.ass")
+
+def compose_video():
+    print("🚀 [3/3] FFmpeg による字幕焼き込み・音声合成を開始（結合なし・爆速完了）...")
+    candidate_files = ["video_15s.mp4", "scene1.mp4", "input.mp4"]
+    input_video = None
+    for cf in candidate_files:
+        if os.path.exists(cf):
+            input_video = cf
+            break
+
+    if not input_video:
+        print(f"⚠️ エラー: 15秒動画素材が見つかりません。")
+        print(f"👉 Veoで生成した15秒動画を 'video_15s.mp4' または 'scene1.mp4' として同じフォルダに置いてください。")
+        return
+
+    print(f"🎬 使用する素材動画: {input_video}")
+    abs_ass = os.path.abspath("subtitles.ass").replace("\\\\", "/").replace(":", "\\\\:")
+
+    if IS_VERTICAL:
+        scale_filter = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920"
+    else:
+        scale_filter = "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:black"
+
+    video_filters = f"{scale_filter},subtitles='{abs_ass}'"
+
+    cmd = [
+        "ffmpeg", "-y",
+        "-i", input_video,
+        "-i", "synced_narration.mp3",
+        "-filter_complex", f"[0:v]{video_filters}[v];[1:a]volume=1.0[a]",
+        "-map", "[v]",
+        "-map", "[a]",
+        "-c:v", "h264_nvenc", "-preset", "p4", "-b:v", "7M",
+        "-c:a", "aac", "-b:a", "192k",
+        "-t", "15.0",
+        OUTPUT_FILENAME
+    ]
+
+    try:
+        subprocess.run(cmd, check=True)
+        print(f"🎉 成功！ 15秒完成動画が出力されました: {OUTPUT_FILENAME}")
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print("⚠️ NVIDIA NVENCが利用できないため、CPUエンコード (libx264) に切り替えます...")
+        cmd[cmd.index("h264_nvenc")] = "libx264"
+        if "-preset" in cmd:
+            p_idx = cmd.index("-preset")
+            del cmd[p_idx:p_idx+2]
+        cmd.extend(["-crf", "19"])
+        subprocess.run(cmd, check=True)
+        print(f"🎉 成功！ 15秒完成動画が出力されました: {OUTPUT_FILENAME}")
+
+if __name__ == "__main__":
+    asyncio.run(generate_narration_audio())
+    create_ass_file()
+    compose_video()
+`;
+  }
+
+  // --- 【30秒 2カットストーリーモード用スクリプト】（15秒 × 2） ---
+  if (mode === '30s') {
+    return `#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+=============================================================================
+スマイチ (smile049.jp) 第${epNum}話 【30秒2カット】SNS動画全自動合成 (HP Z840専用)
+- 尺: 30.0秒（Scene 1: 15秒 ＋ Scene 2: 15秒）
+- 音声合成: Edge-TTS (${voice})
+- 字幕焼き込み: ASSテロップ（透明背景・白文字黒縁取り）
+- ハードウェア加速: NVIDIA NVENC (h264_nvenc)
+=============================================================================
+"""
+
+import os
+import sys
+import subprocess
+import asyncio
+
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
+EPISODE_NUM = ${epNum}
+VOICE_NAME = "${voice}"
+IS_VERTICAL = ${isVertical ? 'True' : 'False'}
+OUTPUT_FILENAME = f"smile049_ep{EPISODE_NUM:02d}_30s_{'sns' if IS_VERTICAL else 'horizontal'}.mp4"
+
+SCENE_FILES = ["scene1.mp4", "scene2.mp4"]
+SCENES_DATA = [
+    { "sub": """${narration.cut1}""", "voice": """${narration.phoneticCut1}""", "delay_ms": 600, "start": "0:00:00.60", "end": "0:00:13.80" },
+    { "sub": """${narration.cut2}""", "voice": """${narration.phoneticCut2}""", "delay_ms": 15600, "start": "0:00:15.60", "end": "0:00:28.80" }
+]
+
+async def generate_narration_audio():
+    print("🎙️ [1/4] Edge-TTSで2カットナレーション音声を合成中...")
+    import edge_tts
+    parts = []
+    for i, sc in enumerate(SCENES_DATA):
+        p = f"temp_part_{i+1}.mp3"
+        comm = edge_tts.Communicate(sc["voice"], VOICE_NAME, rate="+10%")
+        await comm.save(p)
+        parts.append(p)
+
+    filter_adelay = (
+        f"[0:a]adelay={SCENES_DATA[0]['delay_ms']}|{SCENES_DATA[0]['delay_ms']}[a0];"
+        f"[1:a]adelay={SCENES_DATA[1]['delay_ms']}|{SCENES_DATA[1]['delay_ms']}[a1];"
+        f"[a0][a1]amix=inputs=2:dropout_transition=0:normalize=0[outa]"
+    )
+    cmd = [
+        "ffmpeg", "-y",
+        "-i", parts[0], "-i", parts[1],
+        "-filter_complex", filter_adelay,
+        "-map", "[outa]",
+        "-t", "30.0",
+        "synced_narration.mp3"
+    ]
+    subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    for p in parts:
+        if os.path.exists(p):
+            os.remove(p)
+    print("✅ 30秒ナレーション音声作成完了: synced_narration.mp3")
+
+def create_ass_file():
+    print("📝 [2/4] 字幕ASSファイルを作成中...")
+    play_x = 1080 if IS_VERTICAL else 1920
+    play_y = 1920 if IS_VERTICAL else 1080
+    font_size = 60 if IS_VERTICAL else 56
+    margin_v = 180 if IS_VERTICAL else 90
+
+    ass_text = f"""[Script Info]
+ScriptType: v4.00+
+PlayResX: {play_x}
+PlayResY: {play_y}
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Meiryo,{font_size},&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,4.5,1.0,2,24,24,{margin_v},1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,{SCENES_DATA[0]['start']},{SCENES_DATA[0]['end']},Default,,0,0,0,,{SCENES_DATA[0]['sub']}
+Dialogue: 0,{SCENES_DATA[1]['start']},{SCENES_DATA[1]['end']},Default,,0,0,0,,{SCENES_DATA[1]['sub']}
+"""
+    with open("subtitles.ass", "w", encoding="utf-8") as f:
+        f.write(ass_text.strip() + "\\n")
+    print("✅ 字幕ASS作成完了: subtitles.ass")
+
+def compose_video():
+    print("🚀 [3/4] FFmpeg による2カット結合・字幕焼き込み・音声合成を開始...")
+    with open("concat_list.txt", "w", encoding="utf-8") as f:
+        for fname in SCENE_FILES:
+            if not os.path.exists(fname):
+                print(f"⚠️ 警告: 素材ファイル '{fname}' が見つかりません。")
+            abs_p = os.path.abspath(fname).replace("\\\\", "/")
+            f.write(f"file '{abs_p}'\\n")
+
+    abs_ass = os.path.abspath("subtitles.ass").replace("\\\\", "/").replace(":", "\\\\:")
+    if IS_VERTICAL:
+        scale_filter = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920"
+    else:
+        scale_filter = "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:black"
+
+    video_filters = f"{scale_filter},subtitles='{abs_ass}'"
+    cmd = [
+        "ffmpeg", "-y",
+        "-f", "concat", "-safe", "0", "-i", "concat_list.txt",
+        "-i", "synced_narration.mp3",
+        "-filter_complex", f"[0:v]{video_filters}[v];[1:a]volume=1.0[a]",
+        "-map", "[v]",
+        "-map", "[a]",
+        "-c:v", "h264_nvenc", "-preset", "p4", "-b:v", "7M",
+        "-c:a", "aac", "-b:a", "192k",
+        "-t", "30.0",
+        OUTPUT_FILENAME
+    ]
+    try:
+        subprocess.run(cmd, check=True)
+        print(f"🎉 成功！ 30秒完成動画が出力されました: {OUTPUT_FILENAME}")
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        cmd[cmd.index("h264_nvenc")] = "libx264"
+        if "-preset" in cmd:
+            p_idx = cmd.index("-preset")
+            del cmd[p_idx:p_idx+2]
+        cmd.extend(["-crf", "19"])
+        subprocess.run(cmd, check=True)
+        print(f"🎉 成功！ 30秒完成動画が出力されました: {OUTPUT_FILENAME}")
+    finally:
+        if os.path.exists("concat_list.txt"):
+            os.remove("concat_list.txt")
+
+if __name__ == "__main__":
+    asyncio.run(generate_narration_audio())
+    create_ass_file()
+    compose_video()
+`;
+  }
+
+  // --- 【従来型 24秒 3カットモード用スクリプト】（8秒 × 3） ---
   return `#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 =============================================================================
-スマイチ (smile049.jp) 第${epNum}話 SNS動画全自動合成パイプライン (HP Z840専用)
+スマイチ (smile049.jp) 第${epNum}話 【24秒3カット】SNS動画全自動合成パイプライン (HP Z840専用)
 - 音声合成: Edge-TTS (${voice}) ※専門用語ふりがな適用・各カット完全同期
 - 動画結合: FFmpeg concat (Scene 1〜3 / 各8秒 ➔ 計24秒)
 - 字幕焼き込み: ASSテロップ（黒背景排除・白文字黒縁取り・SNS視認性最適化62px・1行表示）
@@ -532,7 +970,6 @@ async def generate_audio_parts():
         await comm.save(p)
         parts.append(p)
 
-    # 各カットの開始位置に正確にオフセットして合成
     filter_adelay = (
         f"[0:a]adelay={SCENES_DATA[0]['delay_ms']}|{SCENES_DATA[0]['delay_ms']}[a0];"
         f"[1:a]adelay={SCENES_DATA[1]['delay_ms']}|{SCENES_DATA[1]['delay_ms']}[a1];"
