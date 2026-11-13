@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   X, Send, Paperclip, Image as ImageIcon, FileText, CheckCheck, 
   Sparkles, Download, ArrowLeft, ArrowRight, User, Shield, Info, Maximize2, Layers, ExternalLink,
-  Mail, Bell, Check, ChevronDown, ChevronUp
+  Mail, Bell, Check, ChevronDown, ChevronUp, Box, Compass
 } from 'lucide-react';
 import { getChatRooms, sendMessageToRoom, getCurrentUserRoomId, OFFICIAL_LINE_URL, updateRoomEmail } from '../services/chatService';
 import { LineIcon } from './SnsIcons';
 import DocumentSlotPanel from './DocumentSlotPanel';
 
-export default function ChatRoomModal({ isOpen, onClose, initialRoomId }) {
+export default function ChatRoomModal({ isOpen, onClose, initialRoomId, onOpenSimulatorWithModel }) {
   const [roomId, setRoomId] = useState(initialRoomId || getCurrentUserRoomId());
   const [rooms, setRooms] = useState(getChatRooms());
   const [inputText, setInputText] = useState('');
@@ -456,6 +456,57 @@ export default function ChatRoomModal({ isOpen, onClose, initialRoomId }) {
                   }}>
                     {msg.text}
 
+                    {/* 専任スタッフが代理作成した3Dモデル提案バッジ＆3Dシミュレーター起動ボタン */}
+                    {(msg.isStaffModelProposal || msg.modelData) && (
+                      <div style={{
+                        marginTop: 10,
+                        background: '#f0fdf4',
+                        border: '1.5px solid #22c55e',
+                        borderRadius: 10,
+                        padding: '10px 12px'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, fontSize: 12.5, color: '#15803d', marginBottom: 4 }}>
+                          <Box size={16} color="#15803d" />
+                          <span>専任スタッフ作成 3D設計モデル ＆ 概算見積もり</span>
+                        </div>
+                        <div style={{ fontSize: 11.5, color: '#334155', marginBottom: 8, lineHeight: 1.4 }}>
+                          スタッフが代理設計した寸法・外壁・愛車配置がそのまま反映されています。
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (onOpenSimulatorWithModel) {
+                              onOpenSimulatorWithModel(msg.modelData);
+                            } else {
+                              localStorage.setItem('wood_garage_loaded_customer_model', JSON.stringify(msg.modelData));
+                              onClose();
+                              window.location.hash = '#simulator';
+                              window.location.reload();
+                            }
+                          }}
+                          style={{
+                            width: '100%',
+                            background: 'linear-gradient(135deg, #15803d 0%, #166534 100%)',
+                            color: '#ffffff',
+                            border: 'none',
+                            borderRadius: 8,
+                            padding: '9px 14px',
+                            fontSize: 12.5,
+                            fontWeight: 800,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: 6,
+                            boxShadow: '0 2px 6px rgba(22, 101, 52, 0.3)'
+                          }}
+                        >
+                          <Compass size={15} />
+                          <span>📐 3Dシミュレーターでこのモデルを見る（概算見積もり確認）</span>
+                        </button>
+                      </div>
+                    )}
+
                     {/* 添付ファイル */}
                     {msg.attachments && msg.attachments.length > 0 && (
                       <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -586,6 +637,65 @@ export default function ChatRoomModal({ isOpen, onClose, initialRoomId }) {
             </button>
           </div>
         )}
+
+        {/* 💡 ワンタップ相談チップ（3D操作が苦手な方の代理作図依頼等） */}
+        <div style={{
+          background: '#f8fafc',
+          padding: '6px 12px',
+          borderTop: '1px solid #e2e8f0',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          overflowX: 'auto',
+          whiteSpace: 'nowrap'
+        }}>
+          <span style={{ fontSize: 10.5, color: '#64748b', fontWeight: 700, flexShrink: 0 }}>
+            ワンタップ相談:
+          </span>
+          <button
+            type="button"
+            onClick={() => setInputText('3Dシミュレーションの操作がよくわからないので、希望サイズに合わせて代理で作図・概算見積もりを作成してもらえますか？')}
+            style={{
+              background: '#e0f2fe',
+              color: '#0369a1',
+              border: '1px solid #bae6fd',
+              borderRadius: 14,
+              padding: '3px 10px',
+              fontSize: 11,
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              flexShrink: 0
+            }}
+            title="スタッフに代理で3Dモデルと概算見積もりを作成してもらう"
+          >
+            <Compass size={12} />
+            <span>📐 3Dシミュレーションの代理作図を依頼</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setInputText('敷地の写真や手書き間取り図を送りますので、建てられるガレージのサイズと概算費用を教えてください。')}
+            style={{
+              background: '#f0fdf4',
+              color: '#15803d',
+              border: '1px solid #bbf7d0',
+              borderRadius: 14,
+              padding: '3px 10px',
+              fontSize: 11,
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              flexShrink: 0
+            }}
+          >
+            <Paperclip size={12} />
+            <span>📸 図面・写真を見てもらって相談</span>
+          </button>
+        </div>
 
         {/* 入力エリア（スマホ下部セーフエリア対応） */}
         <form onSubmit={handleSend} style={{

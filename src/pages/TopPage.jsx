@@ -124,8 +124,8 @@ export default function TopPage({ setCurrentRoute }) {
                 <span>専任スタッフにプロ相談する（Q&A・個別相談）</span>
               </button>
             </div>
-            <div style={{ fontSize: 12, color: '#8c7e72', marginTop: 10 }}>
-              ※「ちょっと試してみる」だけでも大歓迎です。登録や個人情報は不要です。
+            <div style={{ fontSize: 12, color: '#8c7e72', marginTop: 10, lineHeight: 1.5 }}>
+              ※ 登録や個人情報は不要です。3D操作が苦手な方は、チャットから専任スタッフへ<strong>【無料の代理作図・概算見積もり作成】</strong>もお気軽にお申し付けください。
             </div>
           </div>
 
@@ -617,6 +617,56 @@ export default function TopPage({ setCurrentRoute }) {
           </button>
           <div style={{ fontSize: 12.5, color: 'var(--text-muted)', marginTop: 10 }}>
             ※ 会員登録や個人情報の入力なしで、今すぐブラウザで自由に動かせます。
+          </div>
+
+          {/* 💡 3D操作が苦手・不安な方への無料代理作図アナウンスカード */}
+          <div style={{
+            background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%)',
+            border: '1.5px solid #86efac',
+            borderRadius: 14,
+            padding: '20px 24px',
+            maxWidth: 820,
+            margin: '28px auto 0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 16,
+            flexWrap: 'wrap',
+            textAlign: 'left',
+            boxShadow: '0 4px 14px rgba(22, 101, 52, 0.08)'
+          }}>
+            <div style={{ flex: 1, minWidth: 280 }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#16a34a', color: '#ffffff', fontSize: 11, fontWeight: 800, padding: '2px 9px', borderRadius: 4, marginBottom: 8 }}>
+                <span>📐 3D操作が難しそう…という方も安心！</span>
+                <span>無料・専任スタッフ代理作図</span>
+              </div>
+              <h4 style={{ fontSize: 16.5, fontWeight: 800, color: '#0f291e', margin: '0 0 6px 0' }}>
+                「操作がよくわからない」時は、専任スタッフが代理で作図します
+              </h4>
+              <p style={{ fontSize: 13, color: '#334155', lineHeight: 1.6, margin: 0 }}>
+                敷地の広さや「車2台と大型バイクを置きたい」「工具棚が欲しい」などのご希望をチャットで送っていただくだけでOK！専任スタッフがご要望に合わせた<strong>【3D設計モデル＆概算見積もり】を代理作成</strong>いたします。<br />
+                完成したデータはチャットから<strong>ワンタップで読み込むだけで、お客様のスマホ・PC上でそのまま3D空間見学＆見積もり確認</strong>が可能です。
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigateTo('chat')}
+              className="btn-accent"
+              style={{
+                padding: '12px 22px',
+                fontSize: 13.5,
+                fontWeight: 800,
+                whiteSpace: 'nowrap',
+                background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                boxShadow: '0 4px 12px rgba(5, 150, 105, 0.35)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6
+              }}
+            >
+              <MessageSquare size={16} />
+              <span>チャットで代理作図を依頼する（無料）</span>
+            </button>
           </div>
         </div>
       </section>
