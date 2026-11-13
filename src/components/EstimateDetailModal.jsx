@@ -1,13 +1,41 @@
 import React, { useRef, useState } from 'react';
-import { 
-  X, Printer, ShieldCheck, FileText, User, 
+import {
+  X, Printer, ShieldCheck, FileText, User,
   Lock, Eye, AlertCircle, Wrench, CheckCircle2, ChevronDown, ChevronUp
 } from 'lucide-react';
 import { generate7CategoriesEstimate, MARKUP_RATE } from '../simulator/pricing/costEstimator';
 
+// 法人・団体キーワード判定正規表現
+const CORP_KEYWORDS_REGEX = /(株式会社|有限会社|合同会社|合名会社|合資会社|\(株\)|（株\)|\(有\)|（有\)|\(同\)|（同\)|一般社団法人|公益社団法人|一般財団法人|公益財団法人|NPO法人|特定非営利活動法人|医療法人|学校法人|社会福祉法人|宗教法人|弁護士法人|税理士法人|司法書士法人|監査法人|企業組合|協同組合|農業協同組合|生協|商事|工業|産業|建設|工務店|製作所|製造|興業|総業|開発|商会|商店|事務所|オフィス|ファーム|スタジオ|銀行|信金|信用金庫|クリニック|医院|病院|学園|大学|高校|学校|研究所|センター|支店|営業所|本部|グループ)/i;
+
+/**
+ * 宛名文字列から敬称（様 / 御中）を判定
+ */
+function resolveCustomerHonorific(rawName, mode = 'auto') {
+  if (!rawName || !rawName.trim()) {
+    return { cleanName: '', honorific: '様', isCorp: false };
+  }
+  // 末尾の既存の「様」「御中」「殿」を除去
+  let clean = rawName.trim().replace(/[\s　]*(様|御中|殿)+$/g, '').trim();
+  if (!clean) clean = rawName.trim();
+
+  const isCorp = CORP_KEYWORDS_REGEX.test(clean);
+  let honorific = '様';
+  if (mode === 'onchu') {
+    honorific = '御中';
+  } else if (mode === 'sama') {
+    honorific = '様';
+  } else {
+    honorific = isCorp ? '御中' : '様';
+  }
+
+  return { cleanName: clean, honorific, isCorp };
+}
+
 export default function EstimateDetailModal({ isOpen, onClose, quantities, dimensions, openings, onOpenParseRequest }) {
   const printRef = useRef(null);
   const [customerName, setCustomerName] = useState('');
+  const [honorificMode, setHonorificMode] = useState('auto'); // 'auto' | 'sama' | 'onchu'
   const [isAdminMode, setIsAdminMode] = useState(false);
   const [showCatalogDetails, setShowCatalogDetails] = useState(true);
 
@@ -141,6 +169,8 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
       }
     }, 250);
   };
+
+  const resolvedCustomer = resolveCustomerHonorific(customerName, honorificMode);
 
   return (
     <div style={{
@@ -334,14 +364,15 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
                 <User size={13} />
                 <span>宛先（お客様名）<span style={{ color: '#94a3b8', fontWeight: 400, marginLeft: 4 }}>※ 印刷前に入力可能</span></span>
               </div>
-              <div className="no-print" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div className="no-print" style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                 <input
                   type="text"
-                  placeholder="例：山田 太郎　様"
+                  placeholder="例：山田 太郎 / 株式会社〇〇"
                   value={customerName}
                   onChange={e => setCustomerName(e.target.value)}
                   style={{
                     flex: 1,
+                    minWidth: 160,
                     padding: '8px 12px',
                     borderRadius: 6,
                     border: '1.5px solid #cbd5e1',
@@ -352,17 +383,86 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
                     outline: 'none'
                   }}
                 />
-                <span style={{ fontSize: 14, fontWeight: 800, color: '#0f172a' }}>御中 / 様</span>
+                {/* 敬称（自動判定 / 様 / 御中）切り替えスイッチ */}
+                <div style={{
+                  display: 'inline-flex',
+                  background: '#f1f5f9',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: 6,
+                  padding: 2,
+                  gap: 2
+                }}>
+                  <button
+                    type="button"
+                    onClick={() => setHonorificMode('auto')}
+                    style={{
+                      padding: '4px 8px',
+                      borderRadius: 4,
+                      border: 'none',
+                      background: honorificMode === 'auto' ? '#0f172a' : 'transparent',
+                      color: honorificMode === 'auto' ? '#ffffff' : '#64748b',
+                      fontSize: 11,
+                      fontWeight: honorificMode === 'auto' ? 800 : 600,
+                      cursor: 'pointer'
+                    }}
+                    title="会社・法人名キーワードが含まれる場合は『御中』、個人名は『様』を自動判別します"
+                  >
+                    自動 ({resolvedCustomer.honorific})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setHonorificMode('sama')}
+                    style={{
+                      padding: '4px 8px',
+                      borderRadius: 4,
+                      border: 'none',
+                      background: honorificMode === 'sama' ? '#0f172a' : 'transparent',
+                      color: honorificMode === 'sama' ? '#ffffff' : '#64748b',
+                      fontSize: 11,
+                      fontWeight: honorificMode === 'sama' ? 800 : 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    様 (個人)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setHonorificMode('onchu')}
+                    style={{
+                      padding: '4px 8px',
+                      borderRadius: 4,
+                      border: 'none',
+                      background: honorificMode === 'onchu' ? '#0f172a' : 'transparent',
+                      color: honorificMode === 'onchu' ? '#ffffff' : '#64748b',
+                      fontSize: 11,
+                      fontWeight: honorificMode === 'onchu' ? 800 : 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    御中 (法人)
+                  </button>
+                </div>
               </div>
-              {customerName ? (
-                <div style={{ marginTop: 6, fontSize: 16, fontWeight: 800, color: '#0f172a', borderBottom: '2px solid #0f172a', paddingBottom: 4 }}>
-                  {customerName}　御中 / 様
-                </div>
-              ) : (
-                <div style={{ marginTop: 6, fontSize: 16, fontWeight: 800, color: '#0f172a', borderBottom: '2px solid #0f172a', paddingBottom: 4 }}>
-                  お客様　御中 / 様
-                </div>
-              )}
+              <div style={{
+                marginTop: 8,
+                fontSize: 18,
+                fontWeight: 800,
+                color: '#0f172a',
+                borderBottom: '2.5px solid #0f172a',
+                paddingBottom: 4,
+                display: 'flex',
+                alignItems: 'baseline',
+                gap: 8
+              }}>
+                {customerName.trim() ? (
+                  <>
+                    <span>{resolvedCustomer.cleanName}</span>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: '#0f172a' }}>{resolvedCustomer.honorific}</span>
+                  </>
+                ) : (
+                  <span>お客様</span>
+                )}
+              </div>
             </div>
 
             <div style={{ textAlign: 'right', fontSize: 12, color: '#475569', lineHeight: 1.8 }}>
@@ -371,7 +471,7 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
               <div><span style={{ fontWeight: 700 }}>有効期限：</span>発行日より30日間</div>
               <div style={{ marginTop: 4, fontWeight: 700, color: '#0f172a' }}>株式会社 住ま居る</div>
               <div style={{ fontSize: 11 }}>〒350-2224 埼玉県鶴ヶ島市町屋176番地5</div>
-              <div style={{ fontSize: 11 }}>建築士事務所：埼玉県知事 第(5)10278号 ／ 建設業：埼玉県知事 (般-8)第66822号</div>
+              <div style={{ fontSize: 11 }}>建築士事務所：埼玉県知事 第(5)10278号 ／ 建設業許可：埼玉県知事 許可（般-8）第60650号</div>
             </div>
           </div>
 
@@ -394,7 +494,7 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
                 <strong>【社内閲覧中】管理者モード（乗率 1.33 / 想定粗利率 約{profitRate}%）</strong>
               </div>
               <div>
-                原価合計: <strong>¥{mainWorksTotalCost.toLocaleString()}</strong> ➔ 
+                原価合計: <strong>¥{mainWorksTotalCost.toLocaleString()}</strong> ➔
                 粗利額: <strong style={{ color: '#dc2626' }}>¥{profitAmount.toLocaleString()}</strong>
               </div>
             </div>
@@ -508,10 +608,10 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
               敷地の用途地域（建築確認申請 区分）：
             </span>
             <label style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', fontWeight: 700, color: isAdjustArea ? '#b45309' : '#1e293b' }}>
-              <input 
-                type="checkbox" 
-                checked={isAdjustArea} 
-                onChange={e => setIsAdjustArea(e.target.checked)} 
+              <input
+                type="checkbox"
+                checked={isAdjustArea}
+                onChange={e => setIsAdjustArea(e.target.checked)}
                 style={{ width: 16, height: 16, cursor: 'pointer' }}
               />
               <span>市街化調整区域（適合協議 ＋2万円加算）</span>
@@ -734,7 +834,7 @@ export default function EstimateDetailModal({ isOpen, onClose, quantities, dimen
               </thead>
               <tbody>
                 {additionalWorksItems.map((item, idx) => (
-                  <tr 
+                  <tr
                     key={item.id}
                     style={{
                       borderBottom: idx < additionalWorksItems.length - 1 ? '1px solid #ffedd5' : 'none',

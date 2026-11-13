@@ -5,18 +5,18 @@ import MortgageFinderSection from '../components/MortgageFinderSection';
 import RenoveBeforeAfterSlider from '../components/RenoveBeforeAfterSlider';
 import Plan3dAiModal from '../components/Plan3dAiModal';
 import EmotionalMangaViewer from '../components/EmotionalMangaViewer';
-import { 
-  Hammer, 
-  Flame, 
-  Sun, 
-  ShieldCheck, 
-  Layers, 
-  ArrowRight, 
-  CheckCircle2, 
-  Phone, 
-  Calendar, 
-  FileText, 
-  Home, 
+import {
+  Hammer,
+  Flame,
+  Sun,
+  ShieldCheck,
+  Layers,
+  ArrowRight,
+  CheckCircle2,
+  Phone,
+  Calendar,
+  FileText,
+  Home,
   Wrench,
   Coins,
   Sparkles,
@@ -48,7 +48,7 @@ export default function ReRenovationPage({ onNavigate }) {
   return (
     <div className="min-h-screen bg-stone-50 text-stone-800 font-sans antialiased selection:bg-emerald-500 selection:text-white">
       {/* Header (Clean Emerald & Forest Tone) */}
-      <header 
+      <header
         style={{ backgroundColor: 'rgba(6, 78, 59, 0.98)' }}
         className="sticky top-0 z-50 backdrop-blur border-b border-emerald-600 text-white shadow-md"
       >
@@ -172,8 +172,8 @@ export default function ReRenovationPage({ onNavigate }) {
           </div>
 
           {/* ② 3D生成から見積もり・面談・完成までのワクワクストーリー漫画 */}
-          <EmotionalMangaViewer 
-            onOpenModal={() => setIsPlan3dModalOpen(true)} 
+          <EmotionalMangaViewer
+            onOpenModal={() => setIsPlan3dModalOpen(true)}
             defaultTab="reformFun"
           />
 
@@ -244,17 +244,17 @@ export default function ReRenovationPage({ onNavigate }) {
                 {/* ビフォーアフター画像サムネイル */}
                 <div className="grid grid-cols-2 gap-2 mb-3 bg-emerald-950/80 p-2 rounded-2xl border border-emerald-700/60">
                   <div className="relative rounded-xl overflow-hidden aspect-[4/3] bg-stone-800">
-                    <img 
-                      src="/assets/renovation/bath_before.jpg" 
-                      alt="お風呂リフォーム前" 
+                    <img
+                      src="/assets/renovation/bath_before.jpg"
+                      alt="お風呂リフォーム前"
                       className="w-full h-full object-cover"
                     />
                     <span className="absolute top-1 left-1 bg-stone-900/90 text-stone-200 text-[9px] font-black px-1.5 py-0.5 rounded">Before: 在来タイル</span>
                   </div>
                   <div className="relative rounded-xl overflow-hidden aspect-[4/3] bg-stone-800">
-                    <img 
-                      src="/assets/renovation/bath_after_aligned.jpg" 
-                      alt="お風呂リフォーム後" 
+                    <img
+                      src="/assets/renovation/bath_after_aligned.jpg"
+                      alt="お風呂リフォーム後"
                       className="w-full h-full object-cover"
                     />
                     <span className="absolute top-1 left-1 bg-emerald-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded shadow">After: ほっカラリUB</span>
@@ -285,17 +285,17 @@ export default function ReRenovationPage({ onNavigate }) {
                 {/* ビフォーアフター画像サムネイル */}
                 <div className="grid grid-cols-2 gap-2 mb-3 bg-emerald-950/80 p-2 rounded-2xl border border-emerald-700/60">
                   <div className="relative rounded-xl overflow-hidden aspect-[4/3] bg-stone-800">
-                    <img 
-                      src="/assets/renovation/kitchen_before.jpg" 
-                      alt="キッチンリフォーム前" 
+                    <img
+                      src="/assets/renovation/kitchen_before.jpg"
+                      alt="キッチンリフォーム前"
                       className="w-full h-full object-cover"
                     />
                     <span className="absolute top-1 left-1 bg-stone-900/90 text-stone-200 text-[9px] font-black px-1.5 py-0.5 rounded">Before: 目地タイル</span>
                   </div>
                   <div className="relative rounded-xl overflow-hidden aspect-[4/3] bg-stone-800">
-                    <img 
-                      src="/assets/renovation/kitchen_after.jpg" 
-                      alt="キッチンリフォーム後" 
+                    <img
+                      src="/assets/renovation/kitchen_after.jpg"
+                      alt="キッチンリフォーム後"
                       className="w-full h-full object-cover"
                     />
                     <span className="absolute top-1 left-1 bg-emerald-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded shadow">After: キッチンボード</span>
@@ -326,17 +326,17 @@ export default function ReRenovationPage({ onNavigate }) {
                 {/* ビフォーアフター画像サムネイル */}
                 <div className="grid grid-cols-2 gap-2 mb-3 bg-emerald-950/80 p-2 rounded-2xl border border-emerald-700/60">
                   <div className="relative rounded-xl overflow-hidden aspect-[4/3] bg-stone-800">
-                    <img 
-                      src="/assets/renovation/toilet_before.jpg" 
-                      alt="トイレビフォー" 
+                    <img
+                      src="/assets/renovation/toilet_before.jpg"
+                      alt="トイレビフォー"
                       className="w-full h-full object-cover"
                     />
                     <span className="absolute top-1 left-1 bg-stone-900/90 text-stone-200 text-[9px] font-black px-1.5 py-0.5 rounded">Before: 旧型13L</span>
                   </div>
                   <div className="relative rounded-xl overflow-hidden aspect-[4/3] bg-stone-800">
-                    <img 
-                      src="/assets/renovation/toilet_after.jpg" 
-                      alt="トイレアフター" 
+                    <img
+                      src="/assets/renovation/toilet_after.jpg"
+                      alt="トイレアフター"
                       className="w-full h-full object-cover"
                     />
                     <span className="absolute top-1 left-1 bg-amber-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded shadow">After: エコカラット壁</span>
@@ -367,17 +367,17 @@ export default function ReRenovationPage({ onNavigate }) {
                 {/* ビフォーアフター画像サムネイル */}
                 <div className="grid grid-cols-2 gap-2 mb-3 bg-emerald-950/80 p-2 rounded-2xl border border-emerald-700/60">
                   <div className="relative rounded-xl overflow-hidden aspect-[4/3] bg-stone-800">
-                    <img 
-                      src="/assets/renovation/washroom_before_single.jpg" 
-                      alt="洗面化粧台ビフォー" 
+                    <img
+                      src="/assets/renovation/washroom_before_single.jpg"
+                      alt="洗面化粧台ビフォー"
                       className="w-full h-full object-cover"
                     />
                     <span className="absolute top-1 left-1 bg-stone-900/90 text-stone-200 text-[9px] font-black px-1.5 py-0.5 rounded">Before: プラ洗面台</span>
                   </div>
                   <div className="relative rounded-xl overflow-hidden aspect-[4/3] bg-stone-800">
-                    <img 
-                      src="/assets/renovation/washroom_after_aligned.jpg" 
-                      alt="洗面化粧台アフター" 
+                    <img
+                      src="/assets/renovation/washroom_after_aligned.jpg"
+                      alt="洗面化粧台アフター"
                       className="w-full h-full object-cover"
                     />
                     <span className="absolute top-1 left-1 bg-teal-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded shadow">After: 三面鏡LED</span>
@@ -408,17 +408,17 @@ export default function ReRenovationPage({ onNavigate }) {
                 {/* ビフォーアフター画像サムネイル */}
                 <div className="grid grid-cols-2 gap-2 mb-3 bg-emerald-950/80 p-2 rounded-2xl border border-emerald-700/60">
                   <div className="relative rounded-xl overflow-hidden aspect-[4/3] bg-stone-800">
-                    <img 
-                      src="/assets/renovation/window_before.jpg" 
-                      alt="窓ビフォー" 
+                    <img
+                      src="/assets/renovation/window_before.jpg"
+                      alt="窓ビフォー"
                       className="w-full h-full object-cover"
                     />
                     <span className="absolute top-1 left-1 bg-stone-900/90 text-stone-200 text-[9px] font-black px-1.5 py-0.5 rounded">Before: 単板ガラス</span>
                   </div>
                   <div className="relative rounded-xl overflow-hidden aspect-[4/3] bg-stone-800">
-                    <img 
-                      src="/assets/renovation/window_after.jpg" 
-                      alt="窓アフター" 
+                    <img
+                      src="/assets/renovation/window_after.jpg"
+                      alt="窓アフター"
                       className="w-full h-full object-cover"
                     />
                     <span className="absolute top-1 left-1 bg-cyan-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded shadow">After: LIXIL内窓</span>
@@ -788,7 +788,7 @@ export default function ReRenovationPage({ onNavigate }) {
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                   <span>確かな技術の裏付け ＆ 公的エビデンス</span>
                 </div>
-                
+
                 <h3 className="text-xl sm:text-2xl font-black text-stone-900 leading-snug mb-3">
                   中古住宅での「長期優良住宅認定（増改築）」を取得した実績。<br className="hidden sm:inline" />
                   技術集団だからこそできる本物の性能向上再生。
@@ -823,8 +823,8 @@ export default function ReRenovationPage({ onNavigate }) {
       </section>
 
       {/* 市町村別 リフォーム補助金・助成金ナビ＆シミュレーター */}
-      <SubsidyFinderSection 
-        defaultCity="鶴ヶ島市" 
+      <SubsidyFinderSection
+        defaultCity="鶴ヶ島市"
         onInquiryClick={(subsidyName) => {
           const el = document.getElementById('contact-form');
           if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -832,7 +832,7 @@ export default function ReRenovationPage({ onNavigate }) {
       />
 
       {/* ④ リフォームローン ＆ 住宅ローン借り換え一体型セクション */}
-      <ReformMortgageSection 
+      <ReformMortgageSection
         onInquiryClick={() => {
           const el = document.getElementById('contact-form');
           if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -841,7 +841,7 @@ export default function ReRenovationPage({ onNavigate }) {
 
       {/* ⑤ リフォームAIローンボット ＆ 最適金融機関マッチング */}
       <div id="mortgage-bot-section">
-        <MortgageFinderSection 
+        <MortgageFinderSection
           onInquiryClick={(bank) => {
             const el = document.getElementById('contact-form');
             if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -920,7 +920,7 @@ export default function ReRenovationPage({ onNavigate }) {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-3">
           <div className="font-bold text-stone-200">株式会社 住ま居る リフォーム事業部 (RE)</div>
           <p className="text-stone-500">
-            埼玉県鶴ヶ島市町屋176番地5 ｜ 建設業許可：埼玉県知事(般-8)第66822号 ｜ 建築士事務所登録：埼玉県知事 第(5)10278号
+            埼玉県鶴ヶ島市町屋176番地5 ｜ 建設業許可：埼玉県知事 許可（般-8）第60650号 ｜ 建築士事務所登録：埼玉県知事 第(5)10278号
           </p>
           <div className="text-stone-600">© 2026 SMILE Co., Ltd. / RE Renovation. All Rights Reserved.</div>
         </div>

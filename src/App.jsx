@@ -214,7 +214,12 @@ export default function App() {
       {/* 共通チャットモーダル */}
       <ChatRoomModal 
         isOpen={isChatModalOpen} 
-        onClose={() => setIsChatModalOpen(false)} 
+        onClose={() => setIsChatModalOpen(false)}
+        onOpenSimulatorWithModel={(model) => {
+          setCustomerModelData(model);
+          setIsChatModalOpen(false);
+          handleRouteNavigation('simulator');
+        }}
       />
 
       {/* 共通ヘッダー（シミュレーター画面およびLP特設画面時は非表示） */}

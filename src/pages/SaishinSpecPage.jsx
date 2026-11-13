@@ -343,7 +343,7 @@ export default function SaishinSpecPage({ onNavigate }) {
           </div>
           <p className="text-stone-400 max-w-xl mx-auto leading-relaxed">
             〒350-2224 埼玉県鶴ヶ島市町屋176番地5<br />
-            建設業許可：埼玉県知事(般-8)第66822号 / 宅地建物取引業：埼玉県知事(3)第23725号<br />
+            建設業許可：埼玉県知事 許可（般-8）第60650号 / 宅地建物取引業：埼玉県知事(3)第23725号<br />
             建築士事務所登録：埼玉県知事 第(5)10278号
           </p>
           <div className="text-stone-500 text-[11px] pt-4 border-t border-stone-800">
