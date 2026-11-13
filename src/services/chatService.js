@@ -228,7 +228,7 @@ export const getCurrentUserRoomId = () => {
       {
         id: Date.now(),
         sender: 'staff',
-        text: 'スマイチ 専任スタッフ・設計サポート窓口へようこそ！\n\nガレージや倉庫の設計、土地の法規制（市街化調整区域・境界離隔）、工期スケジュール、ご予算、事業用大スパン空間のご相談など、何でもお気軽にお尋ねください。\n\n左下のクリップマークから、敷地の写真やCAD図面、手書きのメモなども直接送信いただけます。専任スタッフが丁寧にお答えいたします。',
+        text: 'スマイチ 専任スタッフ・設計サポート窓口へようこそ！\n\nガレージや倉庫の設計、土地の法規制（市街化調整区域・境界離隔）、工期スケジュール、ご予算、事業用大スパン空間のご相談など、何でもお気軽にお尋ねください。\n\n【安心の運用設計】\n・やり取りや図面・現地写真の提出は、すべて本チャット内で安全に完結いたします（左下のクリップマーク📎から送信可能）。\n・スタッフからの返信やAIパース完成にすぐ気づきたい場合は、上部の【公式LINE連携】または【メールアドレス通知】をご利用いただくと、新着通知がプッシュ送信されます。',
         time: timeStr,
         attachments: []
       }
@@ -380,7 +380,7 @@ export const createParseRequest = ({ customerName, email, phone = '', planType, 
     targetRoom.messages.push({
       id: Date.now() + 2,
       sender: 'staff',
-      text: `${customerName}様、大変お待たせいたしました！専任スタッフです。シミュレーターでモデリングいただいた3Dモデル（間口: ${modelData?.dimensions?.wFront || 5400}mm / 正面シャッター・右面サッシ窓・ガルバリウム鋼板角波外壁・軒の出0仕様）をもとに、社内PC（Stable Diffusion）にて高精細フォトリアルパースを生成いたしました！\n「重要ドキュメントスロット」および以下タイムラインにてご確認いただけます。\n\n📱 新着パースやスタッフ返信の通知をLINEで受け取りたい方は、公式LINE（更新通知専用: ${OFFICIAL_LINE_URL} ）をご登録ください。`,
+      text: `${customerName}様、大変お待たせいたしました！専任スタッフです。シミュレーターでモデリングいただいた3Dモデル（間口: ${modelData?.dimensions?.wFront || 5400}mm / 正面シャッター・右面サッシ窓・ガルバリウム鋼板角波外壁・軒の出0仕様）をもとに、社内PC（Stable Diffusion）にて高精細フォトリアルパースを生成いたしました！\n「重要ドキュメントスロット」および以下タイムラインにてご確認いただけます。\n\n【更新通知のご案内】\nやり取りや図面提出はすべて本チャット内で完結いたします。今後のスタッフ返信や追加パースの通知にすぐ気づきたい場合は、上部の【公式LINE連携】または【メールアドレス通知】をご利用ください。`,
       time: replyTime,
       attachments: [
         {
@@ -450,7 +450,7 @@ export const sendMessageToRoom = (roomId, { sender, text, attachments = [] }) =>
         freshRoom.messages.push({
           id: Date.now() + 10,
           sender: 'system',
-          text: `【受付完了】メッセージを承りました。専任スタッフ（help@t-smile.co.jp）へ即時通知いたしました。現地写真や配置図面は、このチャット内の【📎 添付】または上部の【📂 重要図書スロット】からそのまま安全に送信・保存いただけます。\n\n📱 パース完成やスタッフ返信の更新通知をLINEで受け取りたい方は、公式LINE（更新通知専用: ${OFFICIAL_LINE_URL} ）をご登録ください。※やり取りや図面提出はすべて本チャット内で完結いたします。`,
+          text: `【受付完了】メッセージを承りました。専任スタッフ（help@t-smile.co.jp）へ即時通知いたしました。現地写真や配置図面は、このチャット内の【📎 添付】または上部の【📂 重要図書スロット】からそのまま安全に送信・保存いただけます。\n\n💡【返信通知のご案内】\nやり取りや図面提出はすべて本チャット内で完結いたします。スタッフ返信にすぐ気づきたい場合は、上部の【公式LINE連携（更新通知専用: ${OFFICIAL_LINE_URL} ）】または【メールアドレス通知】をご利用ください。`,
           time: autoReplyTime,
           attachments: []
         });
@@ -461,6 +461,16 @@ export const sendMessageToRoom = (roomId, { sender, text, attachments = [] }) =>
   }
 
   return msg;
+};
+
+// ユーザーのメール通知用メールアドレスの更新・登録
+export const updateRoomEmail = (roomId, email) => {
+  const rooms = getChatRooms();
+  const room = rooms.find(r => r.roomId === roomId);
+  if (!room) return false;
+  room.email = email;
+  saveChatRooms(rooms);
+  return true;
 };
 
 // ステータス更新 & CRM移管

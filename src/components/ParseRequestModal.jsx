@@ -165,7 +165,7 @@ export default function ParseRequestModal({ isOpen, onClose, currentModelData, o
               </div>
             </div>
 
-            {/* LINE公式アカウント連携ボタン */}
+            {/* LINE公式アカウント連携ボタン（通知専用） */}
             <a
               href={OFFICIAL_LINE_URL}
               target="_blank"
@@ -202,11 +202,15 @@ export default function ParseRequestModal({ isOpen, onClose, currentModelData, o
                 </div>
                 <div style={{ textAlign: 'left' }}>
                   <div style={{ fontWeight: 800 }}>公式LINEでパース完成通知を受け取る</div>
-                  <div style={{ fontSize: 11, opacity: 0.9, fontWeight: 500 }}>更新通知専用 ｜ チャット内のパース完成・更新をLINEでお知らせ</div>
+                  <div style={{ fontSize: 11, opacity: 0.9, fontWeight: 500 }}>更新通知専用 ｜ パース完成・スタッフ返信をLINEへお届け</div>
                 </div>
               </div>
               <ExternalLink size={16} />
             </a>
+
+            <div style={{ fontSize: 11.5, color: '#475569', textAlign: 'center', lineHeight: 1.5, maxWidth: 440 }}>
+              ※ やり取りや図面・写真の提出は<strong>すべてWebチャット内で完結</strong>します。返信にすぐ気づきたい場合は公式LINEまたは登録メール通知をご利用ください。
+            </div>
 
             <button
               onClick={handleGoToChat}

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   X, Send, Paperclip, Image as ImageIcon, FileText, CheckCheck, 
-  Sparkles, Download, ArrowLeft, ArrowRight, User, Shield, Info, Maximize2, Layers, ExternalLink 
+  Sparkles, Download, ArrowLeft, ArrowRight, User, Shield, Info, Maximize2, Layers, ExternalLink,
+  Mail, Bell, Check, ChevronDown, ChevronUp
 } from 'lucide-react';
-import { getChatRooms, sendMessageToRoom, getCurrentUserRoomId, OFFICIAL_LINE_URL } from '../services/chatService';
+import { getChatRooms, sendMessageToRoom, getCurrentUserRoomId, OFFICIAL_LINE_URL, updateRoomEmail } from '../services/chatService';
 import { LineIcon } from './SnsIcons';
 import DocumentSlotPanel from './DocumentSlotPanel';
 
@@ -14,6 +15,9 @@ export default function ChatRoomModal({ isOpen, onClose, initialRoomId }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [activeViewTab, setActiveViewTab] = useState('chat'); // 'chat' | 'documents'
+  const [isEmailNotifyOpen, setIsEmailNotifyOpen] = useState(false);
+  const [notifyEmailInput, setNotifyEmailInput] = useState('');
+  const [isEmailSaved, setIsEmailSaved] = useState(false);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -33,12 +37,31 @@ export default function ChatRoomModal({ isOpen, onClose, initialRoomId }) {
   const currentRoom = rooms.find(r => r.roomId === roomId) || rooms[0];
 
   useEffect(() => {
+    if (currentRoom?.email) {
+      setNotifyEmailInput(currentRoom.email);
+    }
+  }, [currentRoom?.email]);
+
+  useEffect(() => {
     if (isOpen) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [isOpen, currentRoom?.messages]);
 
   if (!isOpen || !currentRoom) return null;
+
+  const handleSaveEmail = (e) => {
+    e?.preventDefault();
+    if (!notifyEmailInput.trim()) return;
+    const ok = updateRoomEmail(currentRoom.roomId, notifyEmailInput.trim());
+    if (ok) {
+      setIsEmailSaved(true);
+      setTimeout(() => {
+        setIsEmailSaved(false);
+        setIsEmailNotifyOpen(false);
+      }, 1500);
+    }
+  };
 
   const handleSend = (e) => {
     e?.preventDefault();
@@ -87,6 +110,7 @@ export default function ChatRoomModal({ isOpen, onClose, initialRoomId }) {
       padding: '0'
     }} onClick={onClose}>
       <div 
+        className="chat-modal-window"
         style={{
           backgroundColor: '#ebeef1',
           width: '100%',
@@ -169,59 +193,127 @@ export default function ChatRoomModal({ isOpen, onClose, initialRoomId }) {
           </div>
         </div>
 
-        {/* 📱 LINE公式アカウント更新通知バナー（通知専用） */}
+        {/* 🔔 通知受け取り案内バナー（運用ベストプラクティス：やり取りはチャット完結＋通知はLINE/メール） */}
         <div style={{
-          background: 'linear-gradient(135deg, #06C755 0%, #05a847 100%)',
-          color: '#ffffff',
-          padding: '8px 16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 10,
-          boxShadow: 'inset 0 -1px 0 rgba(0,0,0,0.08)'
+          background: '#f0fdf4',
+          borderBottom: '1px solid #bbf7d0',
+          padding: '8px 14px',
+          fontSize: 11.5,
+          color: '#166534',
+          boxShadow: 'inset 0 -1px 0 rgba(0,0,0,0.03)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 700 }}>
-            <div style={{
-              width: 24,
-              height: 24,
-              borderRadius: '50%',
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700 }}>
+              <Bell size={14} color="#15803d" />
+              <span>パース完成やスタッフ返信の通知設定</span>
+            </div>
+            <span style={{ fontSize: 10, color: '#15803d', background: '#dcfce7', padding: '1px 6px', borderRadius: 4, fontWeight: 600 }}>
+              更新通知専用
+            </span>
+          </div>
+          
+          <div style={{ fontSize: 11, color: '#334155', lineHeight: 1.4, marginBottom: 6 }}>
+            やり取りや図面・写真の提出は<strong>すべて本チャット内で完結</strong>します。返信にすぐ気づきたい場合は、<strong>公式LINE</strong>または<strong>メール通知</strong>をご利用ください。
+          </div>
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6 }}>
+            {/* 公式LINE通知ボタン */}
+            <a
+              href={OFFICIAL_LINE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                background: '#06C755',
+                color: '#ffffff',
+                padding: '4px 10px',
+                borderRadius: 16,
+                fontSize: 11,
+                fontWeight: 700,
+                textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                boxShadow: '0 1px 3px rgba(6, 199, 85, 0.3)'
+              }}
+              title="公式LINEを友だち追加して新着通知を受け取る"
+            >
+              <LineIcon size={13} color="#ffffff" />
+              <span>公式LINEで通知を受け取る</span>
+              <ExternalLink size={10} />
+            </a>
+
+            {/* メール通知設定ボタン / トグル */}
+            <button
+              type="button"
+              onClick={() => setIsEmailNotifyOpen(!isEmailNotifyOpen)}
+              style={{
+                background: currentRoom?.email ? '#e0f2fe' : '#ffffff',
+                color: currentRoom?.email ? '#0369a1' : '#334155',
+                border: '1px solid #cbd5e1',
+                padding: '4px 10px',
+                borderRadius: 16,
+                fontSize: 11,
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5
+              }}
+            >
+              <Mail size={13} color={currentRoom?.email ? '#0369a1' : '#64748b'} />
+              <span>{currentRoom?.email ? `通知メール登録済 (${currentRoom.email.slice(0, 12)}...)` : 'メールで通知を受け取る'}</span>
+              {isEmailNotifyOpen ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+            </button>
+          </div>
+
+          {/* メールアドレス入力ドロップダウン */}
+          {isEmailNotifyOpen && (
+            <form onSubmit={handleSaveEmail} style={{
+              marginTop: 6,
               background: '#ffffff',
+              padding: '6px 10px',
+              borderRadius: 8,
+              border: '1px solid #94a3b8',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0
+              gap: 6
             }}>
-              <LineIcon size={16} color="#06C755" />
-            </div>
-            <div>
-              <span>パース完成やスタッフ返信の通知をLINEで受け取る</span>
-              <div style={{ fontSize: 10, opacity: 0.9, fontWeight: 500 }}>
-                チャット更新通知専用 ｜ やり取り・図面提出はすべて本チャット内で完結します
-              </div>
-            </div>
-          </div>
-          <a
-            href={OFFICIAL_LINE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              background: '#ffffff',
-              color: '#06C755',
-              padding: '5px 12px',
-              borderRadius: 20,
-              fontSize: 11.5,
-              fontWeight: 800,
-              textDecoration: 'none',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
-              whiteSpace: 'nowrap',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4
-            }}
-          >
-            <span>通知を受け取る</span>
-            <ExternalLink size={12} />
-          </a>
+              <input
+                type="email"
+                required
+                placeholder="返信通知用メールアドレス"
+                value={notifyEmailInput}
+                onChange={(e) => setNotifyEmailInput(e.target.value)}
+                style={{
+                  flex: 1,
+                  padding: '5px 8px',
+                  borderRadius: 6,
+                  border: '1px solid #cbd5e1',
+                  fontSize: 11.5,
+                  outline: 'none'
+                }}
+              />
+              <button
+                type="submit"
+                style={{
+                  background: isEmailSaved ? '#16a34a' : 'var(--color-primary)',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: 6,
+                  padding: '5px 12px',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                {isEmailSaved ? <><Check size={12} /><span>登録完了</span></> : <span>通知先として保存</span>}
+              </button>
+            </form>
+          )}
         </div>
 
         {/* タイムライン vs 重要図書スロット タブ切替 */}
@@ -495,10 +587,13 @@ export default function ChatRoomModal({ isOpen, onClose, initialRoomId }) {
           </div>
         )}
 
-        {/* 入力エリア */}
+        {/* 入力エリア（スマホ下部セーフエリア対応） */}
         <form onSubmit={handleSend} style={{
           background: '#ffffff',
-          padding: '10px 14px',
+          paddingTop: 10,
+          paddingLeft: 14,
+          paddingRight: 14,
+          paddingBottom: 'calc(10px + env(safe-area-inset-bottom, 0px))',
           borderTop: '1px solid #cbd5e1',
           display: 'flex',
           alignItems: 'center',

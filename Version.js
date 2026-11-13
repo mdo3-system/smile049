@@ -1,4 +1,4 @@
 /**
  * アプリケーション バージョン管理 (ルート直下)
  */
-window.APP_VERSION = '0.2.10';
+window.APP_VERSION = '0.2.11';

@@ -268,31 +268,32 @@ export default function App() {
       </main>
 
       {/* 画面右下固定の「TOPへ戻る」ボタン */}
-      <ScrollToTopButton showAboveChat={currentRoute !== 'simulator' && currentRoute !== 'admin' && !isLp} />
+      <ScrollToTopButton showAboveChat={currentRoute !== 'simulator' && currentRoute !== 'admin'} />
 
       {/* シミュレーター画面、管理画面、LP画面以外で共通フッターを表示 */}
       {currentRoute !== 'simulator' && currentRoute !== 'admin' && !isLp && (
         <Footer setCurrentRoute={handleRouteNavigation} />
       )}
 
-      {/* 画面右下固定の「💬 無料相談チャット」フローティングボタン */}
-      {currentRoute !== 'simulator' && currentRoute !== 'admin' && !isLp && (
+      {/* 画面右下固定の「💬 無料相談チャット」フローティングボタン（全ページ対応・スマホ最適化） */}
+      {currentRoute !== 'simulator' && currentRoute !== 'admin' && (
         <button
           onClick={() => {
             Analytics.trackChatOpen('floating_button');
             setIsChatModalOpen(true);
           }}
+          className="floating-chat-trigger"
           style={{
             position: 'fixed',
-            bottom: 24,
-            right: 24,
-            zIndex: 90,
-            background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+            bottom: 'calc(20px + env(safe-area-inset-bottom, 0px))',
+            right: 'max(16px, env(safe-area-inset-right, 16px))',
+            zIndex: 900,
+            background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
             color: '#ffffff',
-            border: 'none',
-            borderRadius: 'var(--radius-full)',
-            padding: '12px 20px',
-            boxShadow: '0 8px 24px rgba(37, 99, 235, 0.4)',
+            border: '2px solid rgba(255, 255, 255, 0.4)',
+            borderRadius: 9999,
+            padding: '12px 18px',
+            boxShadow: '0 8px 24px rgba(5, 150, 105, 0.45)',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -303,10 +304,10 @@ export default function App() {
           }}
           onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'}
           onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-          title="質問・相談チャットを開く"
+          title="質問・相談チャットを開く（図面・写真も送信可能）"
         >
           <MessageSquare size={18} />
-          <span>無料相談チャット</span>
+          <span className="floating-chat-label">無料相談チャット</span>
         </button>
       )}
     </div>
