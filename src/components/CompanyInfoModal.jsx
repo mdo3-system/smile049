@@ -136,6 +136,12 @@ export default function CompanyInfoModal({ isOpen, onClose, initialTab = 'compan
                       </td>
                     </tr>
                     <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                      <th style={{ textAlign: 'left', padding: '10px 0', color: '#64748b' }}>営業時間</th>
+                      <td style={{ padding: '10px 0', color: '#0f172a' }}>
+                        9:00 〜 18:00（定休日：水曜日・日曜日・祝日）
+                      </td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
                       <th style={{ textAlign: 'left', padding: '10px 0', color: '#64748b' }}>許認可・登録</th>
                       <td style={{ padding: '10px 0', color: '#0f172a', lineHeight: 1.6 }}>
                         建設業許可：埼玉県知事 許可（般-8）第60650号<br />

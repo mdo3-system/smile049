@@ -4,4 +4,11 @@ Disallow: /admin
 Disallow: /staff-portal
 Disallow: /secrets/
 
+# Sitemaps
 Sitemap: https://smile049.jp/sitemap.xml
+Sitemap: https://smile049.jp/sitemap-index.xml
+
+# LLM / AI Search Indexing
+# Documentation for AI search engines (SearchGPT, Claude, Perplexity, Gemini)
+# See: https://smile049.jp/llms.txt
+# Full documentation: https://smile049.jp/llms-full.txt

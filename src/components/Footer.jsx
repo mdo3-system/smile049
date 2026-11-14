@@ -343,6 +343,7 @@ export default function Footer({ setCurrentRoute }) {
               }}>
                 <div style={{ color: '#f1f5f9', fontWeight: 700, fontSize: 13.5 }}>運営事業者：株式会社 住ま居る</div>
                 <div>所在地：〒350-2224 埼玉県鶴ヶ島市町屋176番地5</div>
+                <div>電話番号：<a href="tel:049-271-2350" style={{ color: '#38bdf8', textDecoration: 'none' }}>049-271-2350</a> ｜ 営業時間：9:00〜18:00 (水・日・祝定休)</div>
                 <div style={{ color: '#cbd5e1', marginTop: 2 }}>
                   建築士事務所登録：埼玉県知事 第（5）10278号<br />
                   建設業許可：埼玉県知事 許可（般-8）第60650号<br />

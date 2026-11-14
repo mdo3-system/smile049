@@ -635,7 +635,14 @@ Sitemap: https://${item.subdomain}/sitemap.xml
     const srcPath = path.join(__dirname, '../public', file);
     const destPath = path.join(targetSubDir, file);
     if (fs.existsSync(srcPath)) {
-      fs.copyFileSync(srcPath, destPath);
+      try {
+        fs.copyFileSync(srcPath, destPath);
+      } catch (err) {
+        // Dropboxなどのファイルロック時にもビルドを停止させない安全対策
+        if (!fs.existsSync(destPath)) {
+          console.warn(`[Warning] Could not copy ${file}:`, err.message);
+        }
+      }
     }
   });
 
@@ -684,12 +691,12 @@ DEFAULT_COLUMNS.forEach((col) => {
   const jsonLdGraph = [
     {
       "@type": "Article",
-      "@id": `https://smile049.jp/column/${col.slug}#article`,
+      "@id": `https://smile049.jp/column/${col.slug}/#article`,
       "headline": col.title,
       "description": col.description,
       "datePublished": col.publishedDate || "2026-10-09",
       "dateModified": "2026-10-14",
-      "mainEntityOfPage": `https://smile049.jp/column/${col.slug}`,
+      "mainEntityOfPage": `https://smile049.jp/column/${col.slug}/`,
       "image": col.heroImage ? `https://smile049.jp${col.heroImage}` : "https://smile049.jp/assets/ogp.webp",
       "author": {
         "@type": "Organization",
@@ -724,7 +731,7 @@ DEFAULT_COLUMNS.forEach((col) => {
           "@type": "ListItem",
           "position": 3,
           "name": col.title,
-          "item": `https://smile049.jp/column/${col.slug}`
+          "item": `https://smile049.jp/column/${col.slug}/`
         }
       ]
     }
@@ -825,13 +832,13 @@ DEFAULT_COLUMNS.forEach((col) => {
     <title>${col.title}｜木造ガレージ・倉庫 スマイチ公式</title>
     <meta name="description" content="${col.description}" />
     <meta name="keywords" content="${(col.tags || []).join(',')},木造ガレージ,スマイチ,住ま居る" />
-    <link rel="canonical" href="https://smile049.jp/column/${col.slug}" />
+    <link rel="canonical" href="https://smile049.jp/column/${col.slug}/" />
 
     <!-- OGP (Open Graph Protocol) -->
     <meta property="og:title" content="${col.title}｜木造ガレージ・倉庫 スマイチ" />
     <meta property="og:description" content="${col.description}" />
     <meta property="og:type" content="article" />
-    <meta property="og:url" content="https://smile049.jp/column/${col.slug}" />
+    <meta property="og:url" content="https://smile049.jp/column/${col.slug}/" />
     <meta property="og:image" content="${col.heroImage ? `https://smile049.jp${col.heroImage}` : 'https://smile049.jp/assets/ogp.webp'}" />
     <meta property="og:site_name" content="木造ガレージ・倉庫 スマイチ" />
     <meta property="og:locale" content="ja_JP" />
@@ -995,4 +1002,489 @@ ${assetIncludes}
 });
 
 console.log(`[Success] Successfully pre-rendered all ${DEFAULT_COLUMNS.length} SEO Column articles to static HTML.`);
+
+// =========================================================================
+// 6. 親ドメイン主要固定ページの完全静的HTML (SSG/プリレンダリング) 生成
+//    （「SPAの殻」打破：クローラー・AI向け固有title/meta/canonical/長文本文化）
+// =========================================================================
+console.log('[Building] Pre-rendering primary fixed pages (simulator, cases, stories, company, contact, plans)...');
+
+const fixedPages = [
+  {
+    path: 'simulator',
+    title: '3Dガレージシミュレーター＆即時自動見積もり｜木造自由設計ガレージ・倉庫 スマイチ',
+    description: '会員登録不要・完全無料の木造ガレージ3Dシミュレーター。敷地寸法・変形地に合わせてミリ単位で間口・奥行き・高さを自由に変更可能。シャッターや窓、ドアの配置とリアルタイム積算見積もりが即座に出力できます。',
+    keywords: '3Dガレージシミュレーター,木造ガレージ 見積もり,ガレージ 自動積算,ガレージ 自由設計,ガレージ 3D設計',
+    canonical: 'https://smile049.jp/simulator/',
+    h1: '登録不要・ミリ単位で描く 3Dガレージシミュレーター＆リアルタイム積算見積もり',
+    bodyContent: `
+      <section style="margin-bottom: 32px;">
+        <h2 style="font-size: 22px; font-weight: 700; color: #1e293b; border-left: 4px solid #2d6a4f; padding-left: 12px; margin-bottom: 16px;">
+          自由設計木造ガレージの寸法・開口部・概算費用を3Dで可視化
+        </h2>
+        <p style="font-size: 15px; line-height: 1.85; color: #334155; margin-bottom: 16px;">
+          スマイチの「3Dガレージシミュレーター」は、アプリのインストールや会員登録をすることなく、Webブラウザ（PC・スマートフォン・タブレット）上で直接操作できる対話型3D建築設計ツールです。
+          一般的な既製品スチールガレージでは「間口3.0m・奥行き5.5m」など固定規格しか選べませんが、スマイチならミリ単位で間口・奥行き・柱高さを自由にアジャスト可能。敷地境界15cmの狭小地や、台形地・三角地などの変形地にもジャストフィットする形状を即座にシミュレーションできます。
+        </p>
+      </section>
+
+      <section style="margin-bottom: 32px;">
+        <h2 style="font-size: 20px; font-weight: 700; color: #1e293b; border-left: 4px solid #2d6a4f; padding-left: 12px; margin-bottom: 16px;">
+          3Dシミュレーターの主な機能
+        </h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px;">
+            <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0 0 8px;">📐 ミリ単位の寸法・屋根勾配調整</h3>
+            <p style="font-size: 13.5px; color: #475569; line-height: 1.7; margin: 0;">間口・奥行き・軒高をミリ単位で変更可能。屋根勾配（寸勾配）も調整でき、母屋の屋根と調和させたり斜線制限をクリアする勾配を検証できます。</p>
+          </div>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px;">
+            <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0 0 8px;">🚪 シャッター・ドア・サッシの自由配置</h3>
+            <p style="font-size: 13.5px; color: #475569; line-height: 1.7; margin: 0;">三和シャッター製の手動・電動軽量シャッター、LIXIL製のアルミ框ドアや引違い窓、高所採光窓を4面の壁に自由に配置・サイズ変更できます。</p>
+          </div>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px;">
+            <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0 0 8px;">💰 リアルタイム7項目積算エンジン</h3>
+            <p style="font-size: 13.5px; color: #475569; line-height: 1.7; margin: 0;">木工事（材料＋大工手間）、サッシ、屋根、外壁、基礎、建材（天井有無）、確認申請の7大項目をリアルタイムに自動積算。A4印刷・PDF出力に対応。</p>
+          </div>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px;">
+            <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0 0 8px;">🤝 無料の代理作図サポート</h3>
+            <p style="font-size: 13.5px; color: #475569; line-height: 1.7; margin: 0;">「操作が難しい」「図面から作ってほしい」というお客様向けに、専任建築士が3Dモデルを代理作成。完成データをワンクリックで読み込めます。</p>
+          </div>
+        </div>
+      </section>
+
+      <section style="margin-bottom: 32px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 20px;">
+        <h3 style="font-size: 17px; font-weight: 700; color: #166534; margin: 0 0 10px;">
+          🛠️ 3Dシミュレーターのご利用案内
+        </h3>
+        <p style="font-size: 14px; color: #15803d; line-height: 1.7; margin: 0 0 16px;">
+          画面内の3Dビューアはマウスドラッグや指のタッチで360度回転・拡大縮小・ウォークスルーが可能です。作成したプランはブラウザに自動保存されるほか、プロジェクトファイル（JSON）として書き出し・読み込みが可能です。
+        </p>
+        <a href="/simulator/" style="display: inline-block; background: #16a34a; color: #ffffff; font-weight: 700; font-size: 14px; padding: 10px 24px; border-radius: 8px; text-decoration: none;">
+          ▶ 3Dシミュレーターを開く
+        </a>
+      </section>
+    `
+  },
+  {
+    path: 'cases',
+    title: '施工事例集・建築実績｜木造自由設計ガレージ・大型倉庫 スマイチ',
+    description: '木造自由設計ガレージ・倉庫スマイチの施工実績一覧。狭小変形地ストッカー、農機具アグリシェッド、ホビーバイクガレージ、15mトラス無柱ワークショップの写真、工法スペック、価格内訳を公開中。',
+    keywords: '木造ガレージ 施工事例,木造倉庫 実績,ガレージ 建築実例,ガレージ 価格 実績,変形地 ガレージ 実例',
+    canonical: 'https://smile049.jp/cases/',
+    h1: '木造自由設計ガレージ・倉庫 施工事例・建築実績アーカイブ',
+    bodyContent: `
+      <section style="margin-bottom: 32px;">
+        <h2 style="font-size: 22px; font-weight: 700; color: #1e293b; border-left: 4px solid #2d6a4f; padding-left: 12px; margin-bottom: 16px;">
+          敷地と目的にジャストフィットした木造ガレージ・倉庫の実例
+        </h2>
+        <p style="font-size: 15px; line-height: 1.85; color: #334155; margin-bottom: 24px;">
+          スマイチが手がけた木造自由設計ガレージ・倉庫の施工実績をご紹介します。既製品では収まらなかった狭小地・変形地、市街化調整区域での農機具倉庫、大空間ワークショップなど、多彩な建築実例をご覧いただけます。
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+          <article style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
+            <div style="display: inline-block; padding: 3px 8px; background: #e0f2fe; color: #0369a1; border-radius: 4px; font-size: 12px; font-weight: 700; margin-bottom: 8px;">Plan 01</div>
+            <h3 style="font-size: 17px; font-weight: 700; color: #0f172a; margin: 0 0 10px;">大人の秘密基地【愛車・ホビーガレージ】</h3>
+            <p style="font-size: 13.5px; color: #475569; line-height: 1.7; margin: 0 0 12px;">埼玉県鶴ヶ島市。車1台＋大型バイク＋工具棚＋中二階ロフトスペース。木造ならではの温もりのある内装と、結露知らずの快適な室内空間を実現。</p>
+            <div style="font-size: 12px; color: #64748b; border-top: 1px solid #f1f5f9; padding-top: 8px;">構造: 在来木造軸組工法 ｜ 床面積: 約22㎡ ｜ 外壁: ガルバリウム鋼板角波</div>
+          </article>
+
+          <article style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
+            <div style="display: inline-block; padding: 3px 8px; background: #fef3c7; color: #92400e; border-radius: 4px; font-size: 12px; font-weight: 700; margin-bottom: 8px;">Plan 02</div>
+            <h3 style="font-size: 17px; font-weight: 700; color: #0f172a; margin: 0 0 10px;">隙間・変形地活用【特注ストッカー倉庫】</h3>
+            <p style="font-size: 13.5px; color: #475569; line-height: 1.7; margin: 0 0 12px;">埼玉県川越市。敷地境界15cmまで攻めた軒ゼロ特注設計。道路が斜めの台形敷地に合わせて外壁を斜めに配置し、デッドスペースをゼロに。</p>
+            <div style="font-size: 12px; color: #64748b; border-top: 1px solid #f1f5f9; padding-top: 8px;">構造: 軒ゼロ耐火木造 ｜ 床面積: 約17㎡ ｜ 外壁: 高耐候サイディング</div>
+          </article>
+
+          <article style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
+            <div style="display: inline-block; padding: 3px 8px; background: #dcfce7; color: #166534; border-radius: 4px; font-size: 12px; font-weight: 700; margin-bottom: 8px;">Plan 03</div>
+            <h3 style="font-size: 17px; font-weight: 700; color: #0f172a; margin: 0 0 10px;">農機具大型格納庫【アグリシェッド】</h3>
+            <p style="font-size: 13.5px; color: #475569; line-height: 1.7; margin: 0 0 12px;">埼玉県坂戸市。市街化調整区域・農地転用（農地法4条・5条）許可取得。大型トラクター・コンバインの動線に合わせたW5.0m特注ワイドシャッター仕様。</p>
+            <div style="font-size: 12px; color: #64748b; border-top: 1px solid #f1f5f9; padding-top: 8px;">構造: 高耐力木造軸組 ｜ 床面積: 約60㎡ ｜ 許認可: 農業用倉庫建築許可</div>
+          </article>
+
+          <article style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
+            <div style="display: inline-block; padding: 3px 8px; background: #fae8ff; color: #86198f; border-radius: 4px; font-size: 12px; font-weight: 700; margin-bottom: 8px;">Plan 04</div>
+            <h3 style="font-size: 17px; font-weight: 700; color: #0f172a; margin: 0 0 10px;">BtoB無柱大空間【スマイチワークショップ】</h3>
+            <p style="font-size: 13.5px; color: #475569; line-height: 1.7; margin: 0 0 12px;">埼玉県東松山市。15m無柱木造トラス工法による配送デポ兼作業場。鉄骨造と比べて基礎工事費と固定資産税を大幅に圧縮し、事業融資を活用して建設。</p>
+            <div style="font-size: 12px; color: #64748b; border-top: 1px solid #f1f5f9; padding-top: 8px;">構造: 15m無柱木造トラス ｜ 床面積: 約120㎡ ｜ 用途: 事業用大型倉庫</div>
+          </article>
+        </div>
+      </section>
+    `
+  },
+  {
+    path: 'stories',
+    title: 'お客様の声・建築コラム一覧｜木造自由設計ガレージ スマイチ',
+    description: 'スマイチで木造ガレージ・倉庫を建てられた施主様のインタビューと、一級・二級建築士が執筆する専門ノウハウコラム一覧。確認申請、市街化調整区域、固定資産税、鉄骨比較など役立つ情報満載。',
+    keywords: '木造ガレージ 評判,ガレージ 口コミ,ガレージ コラム,木造ガレージ ブログ,ガレージ 建築士 ノウハウ',
+    canonical: 'https://smile049.jp/stories/',
+    h1: 'お客様の声（施主様インタビュー）＆ 建築士コラム一覧',
+    bodyContent: `
+      <section style="margin-bottom: 32px;">
+        <h2 style="font-size: 22px; font-weight: 700; color: #1e293b; border-left: 4px solid #2d6a4f; padding-left: 12px; margin-bottom: 16px;">
+          施主様インタビュー・お客様の声
+        </h2>
+        <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px;">
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px;">
+            <div style="font-size: 12px; color: #64748b; margin-bottom: 6px;">埼玉県鶴ヶ島市 ｜ K様邸（ホビーガレージ 15坪）</div>
+            <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0 0 8px;">「既製品では諦めていた斜めの境界線に、ぴったり合わせて建てられました」</h3>
+            <p style="font-size: 14px; color: #334155; line-height: 1.8; margin: 0;">大手メーカーの物置カタログを見ていましたが、境界線が斜めになっており30cm以上の無駄な隙間ができてしまうのが悩みでした。スマイチさんに相談したところ、敷地ピッタリに斜め壁で設計していただき、さらに冬場でも車に結露がつかないのが最高です。</p>
+          </div>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px;">
+            <div style="font-size: 12px; color: #64748b; margin-bottom: 6px;">埼玉県坂戸市 ｜ S様（農機具アグリシェッド 20坪）</div>
+            <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0 0 8px;">「市街化調整区域の許可と農地転用まで全部代行してくれたので安心でした」</h3>
+            <p style="font-size: 14px; color: #334155; line-height: 1.8; margin: 0;">トラクターの買い替えに伴い倉庫の新設を検討していましたが、土地が市街化調整区域で他社には断られていました。スマイチさんは建築士事務所でもあるため、農業用倉庫としての適法手続きや構造計算を一括で進めてくださり、無事に完了検査まで取得できました。</p>
+          </div>
+        </div>
+
+        <h2 style="font-size: 22px; font-weight: 700; color: #1e293b; border-left: 4px solid #2d6a4f; padding-left: 12px; margin-bottom: 16px;">
+          建築士が解説する 専門ノウハウコラム（全16記事）
+        </h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
+          ${DEFAULT_COLUMNS.map(col => `
+            <a href="/column/${col.slug}/" style="display: block; padding: 14px 16px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; text-decoration: none; transition: border-color 0.2s;">
+              <div style="font-size: 11px; color: #b45309; font-weight: 700; margin-bottom: 4px;">${col.category || 'コラム'}</div>
+              <div style="font-size: 14px; font-weight: 700; color: #0f172a; line-height: 1.5; margin-bottom: 6px;">${col.title}</div>
+              <div style="font-size: 12px; color: #64748b; line-height: 1.6;">${(col.description || '').slice(0, 75)}...</div>
+            </a>
+          `).join('')}
+        </div>
+      </section>
+    `
+  },
+  {
+    path: 'company',
+    title: '会社概要・店舗アクセス・許認可情報｜株式会社 住ま居る スマイチ',
+    description: '木造自由設計ガレージ・倉庫スマイチを運営する株式会社 住ま居るの会社概要。埼玉県鶴ヶ島市。代表挨拶、一級・二級建築士事務所登録、建設業許可（埼玉県知事 許可（般-8）第60650号）、宅建業免許、営業時間、アクセス地図。',
+    keywords: '株式会社 住ま居る,住ま居る 鶴ヶ島,住ま居る 会社概要,住ま居る 建設業許可,スマイチ 運営会社',
+    canonical: 'https://smile049.jp/company/',
+    h1: '運営会社情報・許認可・店舗アクセス案内',
+    bodyContent: `
+      <section style="margin-bottom: 32px;">
+        <h2 style="font-size: 22px; font-weight: 700; color: #1e293b; border-left: 4px solid #2d6a4f; padding-left: 12px; margin-bottom: 16px;">
+          会社概要 (Company Profile)
+        </h2>
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px; color: #334155; margin-bottom: 24px; border: 1px solid #cbd5e1;">
+          <tbody>
+            <tr style="border-bottom: 1px solid #e2e8f0; background: #f8fafc;"><th style="padding: 12px 16px; text-align: left; width: 25%; font-weight: 700; color: #0f172a;">会社名</th><td style="padding: 12px 16px;">株式会社 住ま居る（すまいる）</td></tr>
+            <tr style="border-bottom: 1px solid #e2e8f0;"><th style="padding: 12px 16px; text-align: left; font-weight: 700; color: #0f172a;">プロジェクト名</th><td style="padding: 12px 16px;">木造自由設計ガレージ・倉庫 スマイチ (smile049.jp)</td></tr>
+            <tr style="border-bottom: 1px solid #e2e8f0; background: #f8fafc;"><th style="padding: 12px 16px; text-align: left; font-weight: 700; color: #0f172a;">代表者</th><td style="padding: 12px 16px;">代表取締役 石井 孝</td></tr>
+            <tr style="border-bottom: 1px solid #e2e8f0;"><th style="padding: 12px 16px; text-align: left; font-weight: 700; color: #0f172a;">所在地</th><td style="padding: 12px 16px;">〒350-2224 埼玉県鶴ヶ島市町屋176番地5</td></tr>
+            <tr style="border-bottom: 1px solid #e2e8f0; background: #f8fafc;"><th style="padding: 12px 16px; text-align: left; font-weight: 700; color: #0f172a;">電話番号 / FAX</th><td style="padding: 12px 16px;">TEL: 049-271-2350 ｜ FAX: 049-271-2351</td></tr>
+            <tr style="border-bottom: 1px solid #e2e8f0;"><th style="padding: 12px 16px; text-align: left; font-weight: 700; color: #0f172a;">営業時間 / 定休日</th><td style="padding: 12px 16px;">9:00 〜 18:00（定休日：水曜日・日曜日・祝日）</td></tr>
+            <tr style="border-bottom: 1px solid #e2e8f0; background: #f8fafc;"><th style="padding: 12px 16px; text-align: left; font-weight: 700; color: #0f172a;">許認可・免許番号</th><td style="padding: 12px 16px; line-height: 1.8;">
+              ・建設業許可：埼玉県知事 許可（般-8）第60650号<br>
+              ・建築士事務所登録：埼玉県知事 第(5)10278号<br>
+              ・宅地建物取引業者免許：埼玉県知事 (3)第23725号
+            </td></tr>
+            <tr style="border-bottom: 1px solid #e2e8f0;"><th style="padding: 12px 16px; text-align: left; font-weight: 700; color: #0f172a;">保有資格</th><td style="padding: 12px 16px; line-height: 1.8;">一級建築士、二級建築士、宅地建物取引士、1級建築施工管理技士、2級建築施工管理技士、既存住宅状況調査技術者</td></tr>
+            <tr style="background: #f8fafc;"><th style="padding: 12px 16px; text-align: left; font-weight: 700; color: #0f172a;">対応エリア</th><td style="padding: 12px 16px;">埼玉県全域（鶴ヶ島・川越・坂戸・東松山・さいたま・所沢・熊谷等）、東京都、群馬県、栃木県、茨城県、千葉県</td></tr>
+          </tbody>
+        </table>
+
+        <h2 style="font-size: 20px; font-weight: 700; color: #1e293b; border-left: 4px solid #2d6a4f; padding-left: 12px; margin-bottom: 16px;">
+          アクセスマップ
+        </h2>
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; margin-bottom: 24px;">
+          <p style="font-size: 14px; color: #334155; margin: 0 0 10px;">
+            関越自動車道「鶴ヶ島IC」より車で約8分。東武東上線「若葉駅」「一本松駅」よりアクセス可能です。
+          </p>
+          <a href="https://maps.google.com/?q=埼玉県鶴ヶ島市町屋176番地5" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #2563eb; color: #ffffff; padding: 8px 18px; border-radius: 6px; font-size: 13px; font-weight: 700; text-decoration: none;">
+            📍 Google Mapsでルートを確認する
+          </a>
+        </div>
+      </section>
+    `
+  },
+  {
+    path: 'contact',
+    title: '無料ご相談・無料代理作図依頼｜木造自由設計ガレージ スマイチ',
+    description: '木造ガレージ・倉庫スマイチのお問い合わせ窓口。敷地図面や写真をお送りいただくだけで、専任建築士が3Dモデルと詳細見積書を無料で作成・お渡しいたします。Webチャット・公式LINE・お電話対応。',
+    keywords: '木造ガレージ 問い合わせ,ガレージ 相談,ガレージ 代理作図,ガレージ 見積もり 依頼,スマイチ 問い合わせ',
+    canonical: 'https://smile049.jp/contact/',
+    h1: '無料ご相談・お見積り・無料3D代理作図窓口',
+    bodyContent: `
+      <section style="margin-bottom: 32px;">
+        <h2 style="font-size: 22px; font-weight: 700; color: #1e293b; border-left: 4px solid #2d6a4f; padding-left: 12px; margin-bottom: 16px;">
+          選べる3つのご相談方法
+        </h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 28px;">
+          <div style="background: #ffffff; border: 1.5px solid #2d6a4f; border-radius: 12px; padding: 20px;">
+            <div style="font-size: 12px; color: #166534; font-weight: 700; margin-bottom: 6px;">方法 01【おすすめ】</div>
+            <h3 style="font-size: 17px; font-weight: 700; color: #0f172a; margin: 0 0 10px;">公式Webチャット相談</h3>
+            <p style="font-size: 13.5px; color: #475569; line-height: 1.7; margin: 0 0 14px;">トップページ右下のチャットボタンより、ログイン不要ですぐにご相談いただけます。敷地図面や現場写真の添付、代理作図依頼もチャット内で完結します。</p>
+            <a href="/" style="display: inline-block; background: #2d6a4f; color: #fff; font-size: 13px; font-weight: 700; padding: 8px 16px; border-radius: 6px; text-decoration: none;">チャットを開く</a>
+          </div>
+
+          <div style="background: #ffffff; border: 1.5px solid #06c755; border-radius: 12px; padding: 20px;">
+            <div style="font-size: 12px; color: #15803d; font-weight: 700; margin-bottom: 6px;">方法 02</div>
+            <h3 style="font-size: 17px; font-weight: 700; color: #0f172a; margin: 0 0 10px;">公式LINEで相談</h3>
+            <p style="font-size: 13.5px; color: #475569; line-height: 1.7; margin: 0 0 14px;">スマイチ公式LINEをお友だち追加いただき、トーク画面から写真やご要望をお送りください。返信通知をLINEでスムーズに受け取れます。</p>
+            <a href="https://line.me/R/ti/p/@smile049" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #06c755; color: #fff; font-size: 13px; font-weight: 700; padding: 8px 16px; border-radius: 6px; text-decoration: none;">LINE友だち追加</a>
+          </div>
+
+          <div style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 20px;">
+            <div style="font-size: 12px; color: #64748b; font-weight: 700; margin-bottom: 6px;">方法 03</div>
+            <h3 style="font-size: 17px; font-weight: 700; color: #0f172a; margin: 0 0 10px;">お電話でのお問い合わせ</h3>
+            <p style="font-size: 13.5px; color: #475569; line-height: 1.7; margin: 0 0 14px;">お急ぎのご相談や現地調査のご依頼は、お電話にて専任スタッフが承ります。<br>受付時間: 9:00〜18:00 (水・日・祝定休)</p>
+            <a href="tel:049-271-2350" style="display: inline-block; background: #0f172a; color: #fff; font-size: 13px; font-weight: 700; padding: 8px 16px; border-radius: 6px; text-decoration: none;">📞 049-271-2350</a>
+          </div>
+        </div>
+
+        <h2 style="font-size: 20px; font-weight: 700; color: #1e293b; border-left: 4px solid #2d6a4f; padding-left: 12px; margin-bottom: 16px;">
+          建築士による「無料代理作図サービス」の流れ
+        </h2>
+        <ol style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px 24px 18px 40px; font-size: 14px; color: #334155; line-height: 1.9; margin: 0;">
+          <li><strong>図面・写真の送信:</strong> 敷地の測量図、配置図、または手描きの寸法メモや現地の写真をチャットまたはLINEでお送りください。</li>
+          <li><strong>専任建築士による3D作図:</strong> 敷地境界、斜線制限、建ぺい率を考慮し、プロの建築士が3Dモデルと7項目積算見積もりを作成します。</li>
+          <li><strong>完成データの送付・ブラウザ閲覧:</strong> 完成した3Dプロジェクトデータをチャットでお送りします。ワンクリックでご自身のスマホ・PCで立体モデルを自由に動かして確認できます。</li>
+        </ol>
+      </section>
+    `
+  },
+  {
+    path: 'plan-hobby',
+    title: 'Plan 01 愛車・ホビーガレージ｜木造自由設計ガレージ スマイチ',
+    description: '車＋大型バイク＋工具棚＋ロフトをミリ単位で自由設計。冬場の結露を防ぎ愛車を守る木造ホビーガレージの仕様・価格・施工例。3Dシミュレーターで即時自動見積もり対応。',
+    keywords: 'ホビーガレージ,バイクガレージ,木造ガレージ 愛車,ガレージ ロフト,大人の秘密基地 ガレージ',
+    canonical: 'https://smile049.jp/plan-hobby/',
+    h1: 'Plan 01 大人の秘密基地【愛車・ホビーガレージ】',
+    bodyContent: `
+      <section style="margin-bottom: 32px;">
+        <h2 style="font-size: 22px; font-weight: 700; color: #1e293b; border-left: 4px solid #2d6a4f; padding-left: 12px; margin-bottom: 16px;">
+          愛車と工具、ロフト空間をひとつの木造ガレージに凝縮
+        </h2>
+        <p style="font-size: 15px; line-height: 1.85; color: #334155; margin-bottom: 20px;">
+          規格品の鉄骨ガレージでは味わえない、木造軸組構法ならではの温もりと調湿性。冬場の冷え込みによる愛車の結露やサビを防ぎ、大切な車やバイク、アウトドアギアを最高の環境で保管できます。
+        </p>
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; line-height: 1.8; font-size: 14px; color: #334155;">
+          <strong>主な特徴:</strong><br>
+          ・車1台＋大型バイク＋整備スペース＋壁面工具収納<br>
+          ・中二階ロフトによる大容量タイヤ・パーツ保管<br>
+          ・高耐力木造金物工法による耐震等級3相当設計<br>
+          ・外壁ガルバリウム鋼板×内装OSB合板または現し梁仕上げ
+        </div>
+      </section>
+    `
+  },
+  {
+    path: 'plan-storage',
+    title: 'Plan 02 隙間・変形地特注ストッカー倉庫｜木造自由設計 スマイチ',
+    description: '敷地境界15cm、台形地・三角地にジャストフィット。既製品物置では収まらない敷地を100%有効活用する特注木造倉庫。軒ゼロ設計と確認申請対応。',
+    keywords: '変形地 倉庫,狭小地 ガレージ,軒ゼロ ガレージ,境界15cm 物置,台形地 倉庫',
+    canonical: 'https://smile049.jp/plan-storage/',
+    h1: 'Plan 02 隙間・変形地活用【特注ストッカー倉庫】',
+    bodyContent: `
+      <section style="margin-bottom: 32px;">
+        <h2 style="font-size: 22px; font-weight: 700; color: #1e293b; border-left: 4px solid #2d6a4f; padding-left: 12px; margin-bottom: 16px;">
+          敷地境界15cm・斜め境界線にミリ単位でジャストフィット
+        </h2>
+        <p style="font-size: 15px; line-height: 1.85; color: #334155; margin-bottom: 20px;">
+          大手物置メーカーのカタログを見て「あと30cm広げたい」「境界が斜めで三角形のデッドスペースができる」とお困りの方に最適。ミリ単位の自由設計と特注軒ゼロディテールにより、敷地を無駄なく100%使い切るストッカー倉庫を実現します。
+        </p>
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; line-height: 1.8; font-size: 14px; color: #334155;">
+          <strong>主な特徴:</strong><br>
+          ・敷地境界15cmまで攻める「軒ゼロ・雨樋内蔵」設計<br>
+          ・台形敷地や斜め道路に沿った偏芯・変形外壁施工<br>
+          ・防火地域・準防火地域に準拠した耐火・延焼遮断仕様<br>
+          ・10㎡超の確認申請および完了検査の自社一貫代行
+        </div>
+      </section>
+    `
+  },
+  {
+    path: 'plan-agri',
+    title: 'Plan 03 農機具大型格納庫・アグリシェッド｜木造倉庫 スマイチ',
+    description: 'トラクター・コンバインの動線から設計する大型農機具格納庫。市街化調整区域での建築許可・農地転用（農地法4条5条）も自社一括代行。',
+    keywords: '農機具倉庫,トラクター 格納庫,市街化調整区域 倉庫,農地転用 ガレージ,アグリシェッド',
+    canonical: 'https://smile049.jp/plan-agri/',
+    h1: 'Plan 03 農機具・大型格納庫【アグリシェッド】',
+    bodyContent: `
+      <section style="margin-bottom: 32px;">
+        <h2 style="font-size: 22px; font-weight: 700; color: #1e293b; border-left: 4px solid #2d6a4f; padding-left: 12px; margin-bottom: 16px;">
+          大型トラクターの旋回動線と農地法・調整区域申請を完全攻略
+        </h2>
+        <p style="font-size: 15px; line-height: 1.85; color: #334155; margin-bottom: 20px;">
+          大型トラクターやコンバイン、乾燥機、肥料・収穫資材を雨風や湿気から守る専用木造シェッド。他社では断られがちな青地・白地の農地転用手続きや、市街化調整区域での農業用施設建築許可を専任建築士がワンストップで代行します。
+        </p>
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; line-height: 1.8; font-size: 14px; color: #334155;">
+          <strong>主な特徴:</strong><br>
+          ・大型農機具のスムーズな出入りを実現するW5.0m特注ワイドシャッター<br>
+          ・重量車両の乗り入れに耐える補強ベタ基礎工法<br>
+          ・農地法第4条・第5条転用申請、都市計画法第34条・43条許可代行<br>
+          ・農業近代化資金等の公的融資・補助金申請サポート対応
+        </div>
+      </section>
+    `
+  },
+  {
+    path: 'plan-workshop',
+    title: 'Plan 04 BtoB無柱大空間 15mトラスワークショップ｜木造倉庫 スマイチ',
+    description: '木造トラス構法による最大15m無柱空間。配送デポ・加工場・スタジオ・事業用大型倉庫を鉄骨比低コスト・短工期で実現。事業用ローン対応。',
+    keywords: '木造トラス 倉庫,無柱大空間 木造,事業用 木造倉庫,加工場 建築,木造デポ 埼玉',
+    canonical: 'https://smile049.jp/plan-workshop/',
+    h1: 'Plan 04 BtoB無柱大空間【スマイチワークショップ】',
+    bodyContent: `
+      <section style="margin-bottom: 32px;">
+        <h2 style="font-size: 22px; font-weight: 700; color: #1e293b; border-left: 4px solid #2d6a4f; padding-left: 12px; margin-bottom: 16px;">
+          15m無柱スパンの木造トラス。鉄骨造比で建設費・固定資産税を大幅削減
+        </h2>
+        <p style="font-size: 15px; line-height: 1.85; color: #334155; margin-bottom: 20px;">
+          木造トラス構法（大スパン架構）を採用することで、室内に柱を一切立てずに最大15mの無柱大空間を実現。物流配送デポ、自動車整備ピット、木工・金属加工場、撮影スタジオなど、事業用大型スペースを鉄骨造よりも基礎工事費と工期を大幅に抑えて建設可能です。
+        </p>
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; line-height: 1.8; font-size: 14px; color: #334155;">
+          <strong>主な特徴:</strong><br>
+          ・最大15mの無柱大空間（フォークリフトや大型車の自由な旋回動線）<br>
+          ・鉄骨造に比べて建物の自重が軽く、地盤改良・基礎工事費用を削減<br>
+          ・法定耐用年数22年による早期減価償却（法人節税効果）<br>
+          ・日本政策金融公庫や民間銀行の事業計画書・融資支援サポート
+        </div>
+      </section>
+    `
+  }
+];
+
+fixedPages.forEach((page) => {
+  const pageDir = path.join(distDir, page.path);
+  if (!fs.existsSync(pageDir)) {
+    fs.mkdirSync(pageDir, { recursive: true });
+  }
+
+  const pageHtml = `<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-EV2QGP2C62"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-EV2QGP2C62', { send_page_view: false });
+    </script>
+
+    <!-- SEO基本メタタグ（ページ固有完全定義） -->
+    <title>${page.title}</title>
+    <meta name="description" content="${page.description}" />
+    <meta name="keywords" content="${page.keywords}" />
+    <link rel="canonical" href="${page.canonical}" />
+
+    <!-- OGP (Open Graph Protocol) -->
+    <meta property="og:title" content="${page.title}" />
+    <meta property="og:description" content="${page.description}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="${page.canonical}" />
+    <meta property="og:image" content="https://smile049.jp/assets/ogp.webp" />
+    <meta property="og:site_name" content="木造ガレージ・倉庫 スマイチ" />
+    <meta property="og:locale" content="ja_JP" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="${page.title}" />
+    <meta name="twitter:description" content="${page.description}" />
+    <meta property="twitter:image" content="https://smile049.jp/assets/ogp.webp" />
+
+    <!-- ファビコン・アイコン -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+    <!-- 構造化データ (JSON-LD: パンくずリスト & 企業情報) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "ホーム",
+              "item": "https://smile049.jp/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "${page.title.split('｜')[0]}",
+              "item": "${page.canonical}"
+            }
+          ]
+        },
+        {
+          "@type": "GeneralContractor",
+          "@id": "https://smile049.jp/#contractor",
+          "name": "株式会社 住ま居る / スマイチ",
+          "url": "https://smile049.jp/",
+          "telephone": "+81-49-271-2350",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "町屋176番地5",
+            "addressLocality": "鶴ヶ島市",
+            "addressRegion": "埼玉県",
+            "postalCode": "350-2224",
+            "addressCountry": "JP"
+          }
+        }
+      ]
+    }
+    </script>
+
+    <!-- アセット読み込み（React SPA hydrate） -->
+${assetIncludes}
+  </head>
+  <body style="background: #f8fafc; color: #1e293b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0;">
+    <div id="root">
+      <noscript>
+        <div style="padding: 16px; text-align: center; background: #fff3cd; color: #856404; font-size: 14px;">
+          ※シミュレーターや対話機能をご利用の場合は、JavaScriptを有効にしてください。
+        </div>
+      </noscript>
+
+      <!-- 静的ページコンテンツ (検索エンジン & AIクローラー向け即時レンダリング) -->
+      <article style="max-width: 920px; margin: 0 auto; padding: 36px 20px; background: #ffffff; min-height: 100vh; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+        <!-- パンくずリスト -->
+        <nav aria-label="Breadcrumb" style="font-size: 13px; color: #64748b; margin-bottom: 20px;">
+          <a href="/" style="color: #64748b; text-decoration: none;">ホーム</a>
+          <span style="margin: 0 8px;">&gt;</span>
+          <span style="color: #0f172a; font-weight: 600;">${page.title.split('｜')[0]}</span>
+        </nav>
+
+        <!-- H1タイトル -->
+        <h1 style="font-size: 26px; line-height: 1.45; font-weight: 800; color: #0f172a; margin: 0 0 16px;">
+          ${page.h1}
+        </h1>
+
+        <!-- 導入リード文 -->
+        <div style="font-size: 15px; line-height: 1.85; color: #475569; background: #f8fafc; border-left: 4px solid #2d6a4f; padding: 16px 20px; border-radius: 0 8px 8px 0; margin-bottom: 32px;">
+          ${page.description}
+        </div>
+
+        <!-- 本文 -->
+        ${page.bodyContent}
+
+        <!-- 会社情報＆フッター -->
+        <footer style="margin-top: 48px; padding-top: 24px; border-top: 1px solid #e2e8f0; font-size: 12.5px; color: #64748b; text-align: center; line-height: 1.8;">
+          <div style="font-weight: 700; color: #1e293b; margin-bottom: 4px;">
+            株式会社 住ま居る ｜ 木造自由設計ガレージ・倉庫 スマイチ
+          </div>
+          <div>〒350-2224 埼玉県鶴ヶ島市町屋176番地5 ｜ TEL: 049-271-2350 ｜ 営業時間: 9:00〜18:00 (水・日・祝定休)</div>
+          <div>建築士事務所登録：埼玉県知事 第(5)10278号 ／ 建設業許可：埼玉県知事 許可（般-8）第60650号</div>
+          <div style="margin-top: 8px;">© 2026 SMILE Co., Ltd. All Rights Reserved.</div>
+        </footer>
+      </article>
+    </div>
+  </body>
+</html>`;
+
+  fs.writeFileSync(path.join(pageDir, 'index.html'), pageHtml, 'utf8');
+  console.log(`[Success] Generated static HTML for https://smile049.jp/${page.path}/ in dist/${page.path}/index.html`);
+});
+
+console.log(`[Success] Successfully pre-rendered all ${fixedPages.length} primary fixed pages to static HTML.`);
 console.log('[Complete] All static generation completed successfully.');

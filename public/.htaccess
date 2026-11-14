@@ -1,19 +1,42 @@
+# =========================================================================
+# エックスサーバー 高速化・キャッシュ制御
+# =========================================================================
 SetEnvIf Request_URI ".*" Ngx_Cache_NoCacheMode=off
 SetEnvIf Request_URI ".*" Ngx_Cache_AllCacheMode
-RewriteEngine on
-RewriteCond %{HTTP_HOST} ^www\.smile049\.jp$ [NC]
-RewriteRule ^(.*)$ https://smile049.jp/$1 [R=301,L]
 
-RewriteCond %{HTTPS} !on
-RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+# =========================================================================
+# カスタムエラーページ（ソフト404の根絶：存在しないURLに真のHTTP 404を返す）
+# =========================================================================
+ErrorDocument 404 /404.html
 
-
-# SPA Fallback Routing
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
+
+  # 1. www ➔ non-www への 301 恒久転送（ホスト正規化）
+  RewriteCond %{HTTP_HOST} ^www\.smile049\.jp$ [NC]
+  RewriteRule ^(.*)$ https://smile049.jp/$1 [R=301,L]
+
+  # 2. HTTP ➔ HTTPS への 301 恒久転送（常時SSL化）
+  RewriteCond %{HTTPS} !on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^(.*)$ https://smile049.jp/$1 [R=301,L]
+
+  # 3. 特殊静的ファイル・APIの保護
   RewriteRule ^index\.html$ - [L]
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule . /index.html [L]
+  RewriteRule ^404\.html$ - [L]
+  RewriteRule ^llms\.txt$ - [L]
+  RewriteRule ^llms-full\.txt$ - [L]
+  RewriteRule ^robots\.txt$ - [L]
+  RewriteRule ^sitemap.*\.xml$ - [L]
+
+  # 4. 実在するファイルやディレクトリはそのまま返却
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # 5. SPAが管理する正規ルート（末尾スラッシュ有無両対応）のみ index.html へフォールバック
+  # （これ以外のランダムな未実在URLは 404.html へ落として真のHTTP 404を返却！）
+  RewriteRule ^(simulator|cases|stories|plans|company|contact|admin|staff-portal|plan-hobby|plan-storage|plan-agri|plan-workshop)/?$ /index.html [L]
+
 </IfModule>
